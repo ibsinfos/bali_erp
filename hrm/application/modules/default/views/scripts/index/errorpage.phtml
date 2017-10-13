@@ -1,0 +1,10 @@
+<h2><?php //echo '<pre>'; print_r($this->messages); ?></h2>
+<?php
+if(count($this->messages) > 0){
+    foreach($this->messages as $key=>$msg){
+        echo $msg.'<br/>';
+    }
+}
+
+        
+?>

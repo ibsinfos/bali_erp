@@ -1,0 +1,13 @@
+.btn-flat {
+    box-shadow: none;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+}
+.dis-none{
+    display: none;
+}
+
+div.dt-buttons {
+    margin-bottom: 10px;
+}

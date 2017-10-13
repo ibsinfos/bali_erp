@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>%%INVOICE_TITLE%%</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style type="text/css">
+        body {
+            height: 842px;
+            width: 595px;
+            /* to centre page on screen*/
+            margin-left: auto;
+            margin-right: auto;
+        }
+        </style>
+    </head>
+    <body>
+        <div>
+            <table id="invoice_template" class="invoice-temp" width="100%;" style="height: 842px; border: 2px solid #0070ff;" >
+                <tr>
+                    <td colspan="4" style="background: #0070ff; height: 30px;"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" >
+                        <h4>%%SCHOOL_NAME%%</h4>
+                        <p>%%SCHOOL_ADDRESS%%</p>
+                    </td>
+                    <td colspan="2">
+                        <img src="%%COMPANY_LOGO%%"  style="width: auto; height: auto;" >
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="height: 2px; background: #0070ff;"></td>
+                </tr>
+                <tr>
+                    <td style="height: 250px;">
+                        <H2>Bill To</H2>
+                        <p>
+                            %%BILLTO_ADDRESS%%
+                        </p>
+                    </td>
+                    <td style="height: 250px;">
+                        <H2>Ship To</H2>
+                        <p>
+                            %%BILLTO_ADDRESS%%
+                        </p>
+                    </td>
+                    <td colspan="2" style="height: 250px;">
+                        INVOICE #    : %%INVOICE_NUMBER%%
+                        INVOICE DATE : %%INVOICE_DATE%%
+                        DUE DATE     : %%INVOICE_DUE_DATE%%
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="height: 2px; background: #0070ff;"></td>
+                </tr>
+                <tr style="border-top: 2px solid #0070ff;">
+                    <td colspan="2" style="height: 50px;">TOTAL INVOICE :</td>
+                    <td colspan="2" style="height: 50px;">%%TOTAL_AMOUNT%%</td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="height: 2px; background: #0070ff;"></td>
+                </tr>
+                <tr >
+                    <td colspan="4" style="min-height: 300px; background: #0070ff;">
+                        <table style="width: 100%; height: 100%; background: #FFF;" >
+                            <thead style="background: #0070ff; color: #FFF; text-align: left; ">
+                                <th style="width: 5%; height: 30px;">#</th>
+                                <th style="width: 45%;">Particulars</th>
+                                <th style="width: 20%;">Tax (12%)</th>
+                                <th style="width: 15%;">Amount</th>
+                                <th style="width: 15%;">Total</th>
+                            </thead>
+                            <tr style="text-align: left;">
+                                <td style="width: 10%;">1</td>
+                                <td style="width: 40%;">Tution Fee</td>
+                                <td style="width: 20%;">1,200</td>
+                                <td style="width: 15%;">10,000</td>
+                                <td style="width: 15%;">12,000</td>
+                            </tr>
+                            <tr style="text-align: left;">
+                                <td style="width: 10%;">2</td>
+                                <td style="width: 40%;">Bus Fee</td>
+                                <td style="width: 20%;">1,20</td>
+                                <td style="width: 15%;">1,000</td>
+                                <td style="width: 15%;">1,200</td>
+                            </tr>
+                            <tr style="text-align: left;">
+                                <td colspan="5" style="height: 1px; background: #0070ff;"></td>
+                            </tr>
+                            <tr style="text-align: left;">
+                                <td colspan="2" >Total :</td>
+                                <td style="width: 15%;">1,320</td>
+                                <td style="width: 15%;">11,000</td>
+                                <td style="width: 15%;">12,320</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr> 
+                <tr>
+                    <td colspan="4" style="min-height: 40px; background: #0070ff; color: #FFF">
+                        Amount in words : %%AMOUNT_IN_WORDS%%
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="height: 2px; background: #0070ff;"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="height: 200px;">
+                        TERMS AND CONDITIONS<br>
+                        <p>
+                            %%TERMS_AND_CONDITIONS%%
+                        </p>
+                    </td>
+                    <td colspan="2">
+                        %%COMPANY-SIGN%%
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="background: #0070ff; height: 30px;"></td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
+

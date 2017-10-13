@@ -1,0 +1,187 @@
+<form name="payrollcategory" id="payrollcategory" action="<?php echo BASE_URL; ?>payrollcategory/edit/id/<?php echo $this->id;?>/empcategory/<?php echo $this->empcategory; ?>/userid/<?php echo $this->userid; ?>/payslipid/<?php echo $this->payslipid; ?>" method="post" onsubmit="return confirmSubmit(this);">
+    <div class="total-form-controller">
+        <div class="new-form-ui">
+            <label class="required">Payroll Category Name</label>
+            <div class="division">
+                <input type="text" name="category_name" id="category_name" value="<?php echo $this->categoryFullDetails[0]['name'];?>" class="formDataElement">
+                <span id="errors-category_name" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('category_name', $this->err_msg_arr)){ echo $this->err_msg_arr['category_name'];}?></span>
+            </div> 
+        </div>
+
+        <?php /*<div class="new-form-ui">
+            <label class="required">Category Code</label>
+            <div class="division">
+                <input type="text" name="category_code" id="category_code" value="<?php echo $this->categoryFullDetails[0]['code'];?>" class="">
+                <span id="errors-category_code" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('category_code', $this->err_msg_arr)){ echo $this->err_msg_arr['category_code'];}?></span>
+            </div> 
+        </div>
+
+        <div class="new-form-ui">
+            <label class="required">Category Value</label>
+            <div class="division">
+                <select name="category_value" id="category_value">
+                    <option></option>
+                    <option value="numeric" <?php if($this->categoryFullDetails[0]['value_type_id']==0){?>selected<?php }?>>Numeric</option>
+                    <option value="formula" <?php if($this->categoryFullDetails[0]['value_type_id']==1){?>selected<?php }?>>Formula</option>
+                    <option value="conditionwithformula" <?php if($this->categoryFullDetails[0]['value_type_id']==2){?>selected<?php }?>>Conditions with Formula</option>
+                </select>
+            </div> 
+            <span id="errors-category_value" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('category_value', $this->err_msg_arr)){ echo $this->err_msg_arr['category_value'];}?></span>
+        </div>*/?>
+        <div class="new-form-ui">
+            <label class="required">Category Type</label>
+            <div class="division">
+                <input type="radio" name="category_type" id="category_type" value="0" class="formDataElement" required="required" <?php if($this->categoryFullDetails[0]['type']==0){?>checked<?php }?>>Earnings	    
+                <input type="radio" name="category_type" id="category_type" value="1" class="formDataElement" required="required" <?php if($this->categoryFullDetails[0]['type']==1){?>checked<?php }?>>Deductions	    
+            </div> 
+            <span id="errors-category_type" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('category_type', $this->err_msg_arr)){ echo $this->err_msg_arr['category_type'];}?></span>
+        </div>
+
+        <div class="new-form-ui" id="numeric">
+            <label class="required">Amount</label>
+            <div class="division">
+                <input type="text" name="numeric" value="<?php echo $this->categoryFullDetails[0]['value_formula'];?>" class="">	    
+            </div> 
+        </div>
+        <div style="clear:both"></div>
+
+        <div class="new-form-ui"  id="formula">
+            <label class="required">Formula</label>
+            <div class="division">
+                <textarea  name="formula" value="" class=""><?php echo $this->categoryFullDetails[0]['value_formula'];?></textarea>  <a href="<?php echo BASE_URL; ?>/payrollcategory/validate">Validate</a>  
+            </div> 
+        </div>
+        <div style="clear:both"></div>
+        <center>
+            <div class="new-form-ui" id="conditionwithformula">
+                <label class="required">If</label>
+                <div class="division">
+                    <textarea  name="if" class=""><?php if(!empty($this->payrollConditionDetails)){ echo $this->payrollConditionDetails['if'];} ?></textarea>  <!--<a href="">Validate</a>-->   
+                </div>
+                <?php $operatorValArr=array('gt'=>'Greater Then','lt'=>'Less Then','ge'=>'Greater then equal to','le'=>'Less then equal to','et'=>'equal to');?>
+                <div class="division">
+                    <select name="operator" id="operator">
+                        <option>Select Operator</option>
+                        <?php foreach($operatorValArr AS $k => $v):?>
+                        <option value="<?php echo $k;?>" <?php if(!empty($this->payrollConditionDetails)){ if($this->payrollConditionDetails['operator']==$k){ echo 'selected';} }?>><?php echo $v;?></option>
+                        <?php endforeach;?>
+                    </select>
+                </div> 
+
+                <div class="division">
+                    <textarea  name="condition" class=""><?php if(!empty($this->payrollConditionDetails)){ echo $this->payrollConditionDetails['condition'];}?></textarea>  <!--<a href="">Validate</a>-->   
+                </div>
+
+                <label class="required">Then</label>
+                <div class="division">
+                    <textarea  name="then" value="" class=""><?php if(!empty($this->payrollConditionDetails)){ echo $this->payrollConditionDetails['then'];} ?></textarea>  <!--<a href="">Validate</a>-->   
+                </div>
+
+            </div>
+        </center>
+        <div style="clear:both"></div>
+        <div class="new-form-ui-submit" style="margin-left: 200px;">
+
+            <input type="submit" name="submit" value="Save">
+            <button onclick="window.location.href = '<?php echo BASE_URL; ?>payrollcategory';" type="button" id="Cancel" name="Cancel">Cancel</button>
+        </div>
+    </div>
+</form>	
+
+<?php //echo '$this->categoryFullDetails[0]["value_type_id"] : '.$this->categoryFullDetails[0]['value_type_id'];?>
+<style>
+    <?php if($this->categoryFullDetails[0]['value_type_id']==0){?>
+    #formula, #conditionwithformula {
+        display:none;
+    }
+    <?php }else if($this->categoryFullDetails[0]['value_type_id']==1){?>
+    #numeric, #conditionwithformula {
+        display:none;
+    }
+    <?php }else if($this->categoryFullDetails[0]['value_type_id']==2){?>
+    #numeric, #formula{
+        display:none;
+    }
+    <?php }?>
+    .error{color: red !important;font-weight: bold !important;}
+</style>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script>
+    function confirmSubmit(frm){
+        if(confirm('Are sure to submit the data ? Yes/No')){
+            frm.submit();
+        }else{
+            return false;
+        }
+    }
+                           // When the browser is ready...
+                           function validate_formula(string)
+                           {
+                               var saveData = $.ajax({
+                                   type: 'POST',
+                                   url: "<?php echo BASE_URL; ?>payrollcategory/validate",
+                                   data: string,
+                                   dataType: "text",
+                                   success: function (resultData) {
+                                       alert(resultData)
+                                   }
+                               });
+                               saveData.error(function () {
+                                   alert("Something went wrong");
+                               });
+                           }
+                           $(function () {
+
+                               // Setup form validation on the #payrollcategory form element
+                               $("#payrollcategory").validate({
+                                   // Specify the validation rules
+                                   rules: {
+                                       category_name: "required",
+                                       category_code: "required",
+                                       category_type: "required",
+                                       category_value: "required"
+                                   },
+                                   // Specify the validation error messages
+                                   messages: {
+                                       category_name: "Please enter category name",
+                                       category_code: "Please enter category code",
+                                       category_type: "Please choose category type",
+                                       category_value: "Please select category value"
+                                   },
+                                   submitHandler: function (form) {
+                                       form.submit();
+                                   }
+                               });
+
+                               $('#category_value').on('change', function () {
+                                   // if (this.value == '1'); { No semicolon and I used === instead of ==
+                                   if (this.value === 'numeric') {
+                                       $("#numeric").show();
+                                       $( "input[name*='numeric']" ).attr("required","required");
+                                   } else {
+                                       $("#numeric").hide();
+                                       $( "input[name*='numeric']" ).removeAttr("required");
+                                   }
+
+                                   if (this.value === 'formula') {
+                                       $("#formula").show();
+                                       //$( "input[name*='formula']" ).attr("required","required");
+                                   } else {
+                                       $("#formula").hide();
+                                       //$( "input[name*='formula']" )..removeAttr("required");
+                                   }
+
+                                   if (this.value === 'conditionwithformula'){
+                                    $("#conditionwithformula").show();
+                                    } else {
+                                    $("#conditionwithformula").hide();
+                                    }
+                               })
+
+                           });
+
+</script>

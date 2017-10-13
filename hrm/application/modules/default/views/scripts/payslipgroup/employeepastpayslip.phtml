@@ -1,0 +1,89 @@
+<div class="">
+    <div id="breadcrumdiv"> 
+        <div class="breadcrumbs"><span class="firstbreadcrumb" onclick="window.location = 'http://localhost/beta/hrm/index.php'">Home</span> <span class="arrows">&rsaquo;</span> <span>HR</span> <span class="arrows">&rsaquo;</span> <a href="http://localhost/beta_merge/hrm/index.php/payslipgroup" >Payroll and Payslip Management </a><span class="arrows">&rsaquo;</span> <span>Payslips for Employees </span><span class="arrows">&rsaquo;</span> <span>Generated Payslips - Nirmal</span><span class="arrows">&rsaquo;</span> <span>View Payroll</span></div>    </div>
+
+
+    <div id="pageshortcutdiv" class="shortcut_div help_appri_list">
+
+        <div id="pageshortcut" class ="sprite shortcut-icon " onclick="createorremoveshortcut(14, 1)">Pin to shortcuts</div>    </div>
+
+</div><div id="maincontentdiv">	
+    <div id="dialog-confirm" style="display:none;">
+        <div class="newframe-div">
+            <div class="new-form-ui height32">
+                <div class="division">
+                    <input maxlength="12" id="number_value" name="number_value" type="text">
+                </div>
+                <span class="errors" id="errors-contactnumber"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="empstatus-alert" style="display:none;">
+        <div class="newframe-div"><div id="empstatusmessage"></div></div>
+    </div>
+
+    <div id="empleaves-alert" style="display:none;">
+        <div class="newframe-div"><div id="empleavesmessage"></div></div>
+    </div>									
+    <div>
+
+        <!-- For excel Upload -->
+        <div class="profile-tabs-right-2">
+            <div class="flt_right">
+
+                <div class="actions_div">
+
+                    <span class="uploadbut_exel uploadbutsel flt_left marginfiv   " id="upload_custom_div">Import Employees</span>
+                    <a target="_blank" href="http://localhost/beta_merge/hrm/public/downloads/import_employees.xlsx" class="importformatlink flt_left">Import format</a>
+                    <a target="_blank" href="http://localhost/beta_merge/hrm/public/downloads/importguide.pdf" class="importformatlink flt_left">Help</a>
+                    <div id="loaderimgprofile" style="display:none;"><img src="http://localhost/beta_merge/hrm/public/media/images/loaderwhite_21X21.gif" style="width:21px; height: 21px; float: none; "></div>								
+                </div>                 					
+            </div>
+            <input id="uploadimagepath" name="uploadimagepath" value="" type="hidden">
+            <input name="emp_excel" value="" type="hidden">							    	
+
+        </div>
+    </div>
+    <br>
+    <h2>Employee payroll - Nirmal T</h2>
+    <br>
+     <br>
+    <table>
+        <tr><th>Name:</th><td>Harsha k ‎(E9)</td></tr>
+        <tr><th>Department:</th><td>English</td></tr>
+        <tr><th>Position:</th><td>Junior Tutor</td></tr>
+        <tr><th>Grade:</th><td>Harsha k ‎(E9)</td></tr>
+        
+    </table>
+     <hr>
+         <br>
+         <h2><b>Payroll Details</b></h2><br>
+    <table>
+        <tr><th>Gross pay:</th><td> $ 150000.00</td><td><a href="http://localhost/beta_merge/hrm/index.php/payslipgroup/employeeeditpastpayslip"><input type="submit" name="submit" id="submitbutton" value="Edit Payroll"></a></td></tr>
+                   
+    </table>
+         <br>
+         <hr>
+         <h2> <b>   Payroll categories of this payroll group</b></h2><br>
+         <p>The payroll amounts are calculated based on how each payroll category is set up. You can edit the amounts if needed.</p><br>
+         <br>
+         <h4>Earnings</h4><br>
+         <table>
+        <tr><th>Basic Pay:</th><td>$ 0.00</td></tr>
+        <tr><th>Dearness Allowance:</th><td>$ 22500.00</td></tr>
+        <tr><th>House Rent Allowance:</th><td>$ 0.00</td></tr>
+        <tr><th>Travelling Allowance:</th><td>$ 0.00</td></tr>
+        <tr><th>Total earnings:</th><td>$ 22500.00</td></tr>         
+         </table>
+         <br>
+         <h4>Deductions</h4><br>
+         <table>
+             <tbody>
+        <tr><th>Provident Fund:</th><td>$ 0.00</td></tr>
+        <tr><th>Tax :</th><td>$ 0.00</td></tr>
+        <tr><th>Total deductions:</th><td>$ 0.00</td></tr>
+        <tr style="background-color: silver;"><th>Net Pay:</th><td>$ 22500.00</td></tr>        
+    </table>
+
+    </div>

@@ -1,0 +1,90 @@
+/*  in introjs.css  */
+.introjs-helperNumberLayer {
+  top: 6px !important;
+}
+/*  in custom-style.css */
+.btn-circle.btn-lg {
+    width: 40px;
+    height: 38px;
+    padding: 8px 10px;
+}
+
+.GpaPref{margin-top: 30px;}
+
+.ShowTab{display: block;}
+
+.par-add-btn {margin-bottom: 33px;}
+.dis-none{display: none;}
+.success{color: green !important;}
+
+.breadcrumb li ul{display: none; position: absolute; z-index: 50; padding-left: 22px;}
+.breadcrumb li:hover ul{display: block;}
+.breadcrumb li ul li{margin:0; list-style-type: none; display: list-item; font-weight: 400;}
+.breadcrumb li ul li:hover a{color: #2cabe3 !important; font-weight: 500;}
+.bg-title .breadcrumb{margin-right: 68px !important;}
+
+.bg-title .breadcrumb li ul {border: 1px solid rgba(120,130,140,.13); background-color: #FFFFFF; padding: 3px 5px; margin-left: 16px; border-radius: 8px; box-shadow: 7px 7px 5px grey;}
+
+#att thead, .AttView > thead{background-color: #ececec !important;}
+#att tr{border:1px solid #707cd2;}
+#att td, th{border-left: none; border-right: none;}
+
+.attached_document{max-width: 181px; max-height: 200px; margin-top: 24px;}
+
+.AttView > thead > tr > th {text-align: center;}
+
+.breadcrumb > li:nth-child(2){
+        cursor: pointer;
+    }
+
+.form-control{
+    z-index: 0 !important;
+}
+
+.tabs-style-flip{
+    z-index: 0;
+}
+
+.input-group > .bootstrap-select.btn-group{
+    width:99%;
+}
+
+.modal-body .form-material .form-group, .modal-body .form-group{
+    overflow: visible;
+}
+
+.ChatDel{top: 0px !important; left: 2px !important;}
+.SelectedUser{background-color: #fff;}
+
+/*.bootstrap-select .dropdown-menu{
+    position: absolute !important;
+}
+
+.bootstrap-select.btn-group:not(.input-group-btn), .bootstrap-select.btn-group[class*=col-]{
+z-index:1;
+}
+
+.bootstrap-select.btn-group .dropdown-menu.inner{
+    position: static !important;
+    min-height: 100px !important;
+    height: auto !important;
+    max-height: 150px !important;
+    z-index: 99999 !important;
+}
+
+.input-group > .bootstrap-select.btn-group{
+    width:99%
+}
+
+.form-control{
+    z-index: 0 !important;
+}
+
+
+.bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn){
+    position: static;
+}
+
+#admin_custom .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn){
+    margin-top:-90px;
+}*/

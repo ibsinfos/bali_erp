@@ -1,0 +1,1 @@
+{"is_active":"9b4a22273a5aa6289686890efec40c31","purchase_code":"1858f7b4-a62b-4a06-8153-e75397b1451e","item_name":"Library Management System (LMS)","buy_at":"2017-01-06T15:48:51+11:00","licence_type":"Regular License","domain":"localhost","checking_date":"2017-01-28"}

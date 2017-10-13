@@ -1,0 +1,36 @@
+<?php //sapp_Payrollcal::pre($this->filterData);?>
+<table class="grid" width="100%" cellspacing="0" cellpadding="4" border="0" align="center">
+    <?php if(!empty($this->filterData)):?>
+    <thead>
+        <th>&nbsp;</th>
+        <th width=120><span class='action-text'>First Name</span></th>
+        <th width=120><span class='action-text'>Last Name</span></th>
+        <th width=120><span class='action-text'>Employee ID</span></th>
+        <th width=120><span class='action-text'>Net Salary</span></th>
+        <th width=120><span class='action-text'>Job Title</span></th>
+    </thead>
+     
+    <tbody>
+     <?php 
+    //echo '<pre>';print_r($this->dataArray);die;
+    foreach($this->filterData As $k => $v): //print_r($v);die;?>
+        <tr class="row1">
+            <td>
+                <div class="grid-action-align">
+                    <a href="<?php echo BASE_URL;?>emppayslips/view/userid/<?php echo $v['user_id'];?>/payslipid/<?php echo $v['id'];?>" name="95"  title="Add Category">View Payslip</a>
+                </div>
+            </td>
+            <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['firstname'];?></span></td>
+            <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['lastname'];?></span></td>
+            <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['employeeId'];?></span></td>
+            <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['net_pay'];?></span></td>
+            <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['emprole_name'];?></span></td>
+        </tr>
+    <?php endforeach;?>
+    <?php else:?>
+        <tr>
+            <td colspan="5" style=" text-align: center;"> No record found </td>
+        </tr>
+    <?php endif;?>
+    </tbody>
+    

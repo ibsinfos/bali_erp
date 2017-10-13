@@ -1,0 +1,137 @@
+<?php //echo '<pre>';print_r($this->groupcode);die;?>
+<h4>Create payroll Category roll for "<?php echo $this->rs_main_roll_details[0]['rolename'];?>"</h4><br><hr>
+<form name="payroll_group" id="payroll_group" method="POST" action="<?php echo BASE_URL;?>payrollgroup/add/id/<?php echo $this->main_roll_id;?>" onsubmit="return confirmSubmit(this);">
+<?php /*<div class="new-form-ui">
+    <label class="required">Payroll group name</label>
+    <div class="division">
+        <input name="name" id="name" value="" class="formDataElement"  type="text" required="required">  
+        <span id="errors-group_name" class="errors"><?php if(array_key_exists('name', $this->err_msg_arr)){ echo $this->err_msg_arr['name'];}?></span>
+    </div> 
+</div>
+<div class="new-form-ui">
+    <label class="required">
+        Payroll Group code</label>
+    <div class="division">
+        <input name="group_code" id="group_code" value="" class="formDataElement"  type="text" required="required">  
+        <span id="errors-group_group_code" class="errors"><?php if(array_key_exists('group_code', $this->err_msg_arr)){ echo $this->err_msg_arr['group_code'];}?></span>
+    </div> 
+</div>
+<div class="new-form-ui">
+    <label class="required">
+        Payroll Generation day</label>
+    <div class="division">
+        <select name="frequency" id="frequency" class="select2-offscreen" tabindex="-1">
+            <option value="48">Weekly</option>
+            <option value="24">Semi monthly - Once in 15 day</option>
+            <option value="12">Monthly</option>
+        </select>  
+    </div> 
+</div>
+<div class="new-form-ui">
+    <label class="required">
+        Payroll Generation day</label>
+    <div class="division">
+        <select name="generation_date" id="generation_date" class="select2-offscreen" tabindex="-1">
+            <?php for($i=1;$i<32;$i++):?>
+            <option value="<?php echo $i;?>"><?php echo $i;?></option>
+            <?php endfor;?>
+        </select> 
+    </div> 
+</div>*/?>
+    <div style="clear: both;"></div>    
+<div class="new-form-ui" id="PayrollGroupMinWidth">
+    <label class="required">
+        Payroll Category Group Code</label>
+    <div class="division">
+        <div>
+        <?php /* <select name="payroll_group_code" id="payroll_group_code" class="select2-offscreen" tabindex="-1">
+            <option value="">Select</option>
+            <?php foreach ($this->groupcode AS $k => $v):?>
+            <option value="<?php echo $v['payroll_category_id'];?>">
+                <?php echo $v['name'].' - ';if($v['type']==0){ echo 'Earning';}else{ echo 'Deduction';}?>
+            </option>
+            <?php endforeach;?>
+        </select> 
+        <input type="button" name="add_payroll_group_code" id="add_payroll_group_code" value="add">
+        <div style="clear: both;"></div>
+        <span id="all_payroll_category"></span>
+        <input type="hidden" value="" name="add_payroll_group_code_hidden" id="add_payroll_group_code_hidden">*/?>
+        <?php foreach ($this->groupcode AS $k => $v):?>
+            <label>
+                <input type="checkbox" name="add_payroll_group_code_hidden[]" value="<?php echo $v['payroll_category_id'];?>">
+                <?php echo $v['name'].' - ';if($v['type']==0){ echo 'Earning';}else{ echo 'Deduction';}?>
+            </label><br>
+        <?php endforeach;?>    
+        </div>
+        <span id="errors-group_payroll_group_code" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('payroll_group_codes', $this->err_msg_arr)){ echo $this->err_msg_arr['payroll_group_codes'];}?></span>
+    </div>
+    
+        
+</div>
+    <div style="clear: both !important;"></div>    
+    <div class="new-form-ui-submit" style="margin-left: 280px;margin-top: 200px;">
+    <input name="submit"  value="Connect Role with payroll category" type="submit">
+    <button onclick="window.location.href = '<?php echo BASE_URL;?>payrollgroup';" type="button" id="Cancel" name="Cancel">Cancel</button>
+</div>
+    </form>
+<script type="text/javascript">
+    function confirmSubmit(frm){
+        if(confirm('Are sure to submit the data ? Yes/No')){
+            frm.submit();
+        }else{
+            return false;
+        }
+    }
+$(document).ready(function(){
+    /*$("#add_payroll_group_code").on('click',function(){
+        var payroll_group_code=$('#payroll_group_code').val();
+        if(payroll_group_code==""){
+            return false;
+        }
+         var selectedText=$('#payroll_group_code').find(":selected").text();
+         if($('#all_payroll_category').text()==""){
+             $('#all_payroll_category').text(selectedText);
+         }
+        
+        var add_payroll_group_code_hidden_val=$("#add_payroll_group_code_hidden").val();
+        //alert("cVal + "+add_payroll_group_code_hidden_val);
+        if(add_payroll_group_code_hidden_val==""){
+            $("#add_payroll_group_code_hidden").val(payroll_group_code);
+        }else{
+            var hiddenValSelected=$("#add_payroll_group_code_hidden").val().split(",");
+            //alert(hiddenValSelected.length);
+            if(hiddenValSelected.length==1){
+                if($('#add_payroll_group_code_hidden').val()==payroll_group_code){
+                    $('#errors-group_payroll_group_code').text('"'+$.trim(selectedText)+'" is already selected before.');
+                }else{
+                    $("#add_payroll_group_code_hidden").val($('#add_payroll_group_code_hidden').val()+","+payroll_group_code);
+                    $('#all_payroll_category').text($('#all_payroll_category').text()+','+selectedText);
+                }
+            }else if(hiddenValSelected.length>1){
+                if($.inArray(payroll_group_code,hiddenValSelected)!=-1){
+                    $('#errors-group_payroll_group_code').text('"'+$.trim(selectedText)+'" is already selected before.');
+                }else{
+                    $("#add_payroll_group_code_hidden").val($('#add_payroll_group_code_hidden').val()+","+payroll_group_code);
+                    $('#all_payroll_category').text($('#all_payroll_category').text()+','+selectedText);
+                }
+            }
+        }
+    });*/
+    $("#name").on("change",function(){
+        if($.trim($(this).val())==""){
+            $("#errors-group_name").text("Please enter value for Payrool group.");
+        }else{
+            $("#errors-group_name").text("");
+        }
+    });
+    $("#group_code").on("change",function(){
+        if($.trim($(this).val())==""){
+            $("#errors-group_group_code").text("Please enter value for Payrool group code.");
+        }else{
+            $("#errors-group_group_code").text("");
+        }
+    });
+    
+});
+</script>    

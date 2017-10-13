@@ -1,0 +1,68 @@
+<table>
+    <tr>
+        <td>subject</td>
+        <td colspan="5">term1</td>
+        <td colspan="5">term2</td>
+        <td colspan="2">term1+term2</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>fa1</td>
+        <td>fa2</td>
+        <td>total<br>(fa)</td>
+        <td>sa1</td>
+        <td>total<div>(fa+sa1)</td>
+        <td>fa3</td>
+        <td>fa4</td>
+        <td>total<br>(fa) </td>
+        <td>sa2</td>
+        <td>total<br>(fa+sa2)</td>
+        <td>total</td>
+        <td>grade point</td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>

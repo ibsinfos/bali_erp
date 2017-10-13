@@ -1,0 +1,277 @@
+<form name="payrollcategory" id="payrollcategory" action="<?php echo BASE_URL; ?>payrollcategory/addpopup/userid/<?php echo $this->userid; ?>" method="post" onsubmit="return confirmSubmit();">
+    <div class="total-form-controller">
+        <div class="new-form-ui">
+            <label class="required">Payroll Category Name</label>
+            <div class="division">
+                <input type="text" name="category_name" id="category_name" value="" class="formDataElement">
+                <span id="errors-category_name" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('category_name', $this->err_msg_arr)){ echo $this->err_msg_arr['category_name'];}?></span>
+            </div> 
+
+        </div>
+
+        <div class="new-form-ui">
+            <label class="required">Category Code</label>
+            <div class="division">
+                <input type="text" name="category_code" id="category_code" value="" class="">
+                <span id="errors-category_code" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('category_code', $this->err_msg_arr)){ echo $this->err_msg_arr['category_code'];}?></span>
+            </div> 
+        </div>
+
+        <div class="new-form-ui">
+            <label class="required">Category Value</label>
+            <div class="division">
+                <select name="category_value" id="category_value">
+                    <option></option>
+                    <option value="numeric">Numeric</option>
+                    <option value="formula">Formula</option>
+                    <option value="conditionwithformula">Conditions with Formula</option>
+                </select>
+            </div> 
+            <span id="errors-category_value" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('category_value', $this->err_msg_arr)){ echo $this->err_msg_arr['category_value'];}?></span>
+        </div>
+        
+
+        <div class="new-form-ui" id="numeric">
+            <label class="required">Amount</label>
+            <div class="division">
+                <input type="text" name="numeric" value="" class="">	    
+            </div> 
+        </div>
+        <div style="clear:both"></div>
+
+        <div class="new-form-ui"  id="formula">
+            <label class="required">Formula</label>
+            <div class="division">
+                <textarea  name="formula" value="" class=""></textarea>  <a href="<?php echo BASE_URL; ?>/payrollcategory/validate">Validate</a>  
+            </div> 
+        </div>
+        <div style="clear:both"></div>
+        <center>
+            <div class="new-form-ui" id="conditionwithformula">
+
+                <label class="required">If</label>
+                <div class="division">
+                    <textarea  name="if" value="" class=""></textarea>  <!--<a href="">Validate</a>-->   
+                </div>
+                <?php $operatorValArr=array('gt'=>'Greater Then','lt'=>'Less Then','ge'=>'Greater then equal to','le'=>'Less then equal to','et'=>'equal to');?>
+                <div class="division">
+                    <select name="operator" id="operator">
+                        <option>Select Operator</option>
+                        <?php foreach($operatorValArr AS $k => $v):?>
+                        <option value="<?php echo $k;?>"><?php echo $v;?></option>
+                        <?php endforeach;?>
+                    </select>
+                </div> 
+
+                <div class="division">
+                    <textarea  name="condition" value="" class=""></textarea>  <!--<a href="">Validate</a>-->   
+                </div>
+
+                <label class="required">Then</label>
+                <div class="division">
+                    <textarea  name="then" value="" class=""></textarea>  <!--<a href="">Validate</a>-->   
+                </div>
+            </div>
+        </center>
+        <div style="clear:both"></div>
+        <div class="new-form-ui-submit" style="margin-left: 200px;">
+            <input type="hidden" name="category_type" value="<?php echo $this->type; ?>" />
+            <input type="submit" name="submit" id="submitbutton" value="Save">
+            <button onclick="parent.top.location=parent.top.location;" type="button" >Cancel</button>
+<!--            <button onclick="closeiframepopup('<?php echo $this->controllername;?>','cancel');" type="button" >Cancel</button>-->
+        </div>
+    </div>
+</form>	
+
+
+<style>
+    #numeric, #formula, #conditionwithformula {
+        display:none;
+    }
+    .error{color: red !important;font-weight: bold !important;}
+</style>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script src="http://t4t5.github.io/sweetalert/dist/sweetalert-dev.js"></script>
+<link rel="stylesheet" href="http://t4t5.github.io/sweetalert/dist/sweetalert.css">
+<script>
+    $(document).ready(function(){
+       
+        /*$('#btn-submit').on('click',function(e){
+            //e.preventDefault();
+            var form = $(this).parents('form');
+            swal({
+                title: "Are you sure?",
+                text: "You will not be able to recover this imaginary file!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, delete it!",
+                closeOnConfirm: false
+            }, function(isConfirm){
+                if (isConfirm){
+                    alert('ll');
+                    //form.submit();
+                   //$(this).closest('form').submit();
+                    //eturn true;
+                    //alert('kk');
+                    //$('#payrollcategory').submit();
+                    $('body').find("#payrollcategory").submit();
+                    //alert('KKKKK');
+                }
+            });
+        });*/
+
+        /*$('#payrollcategory').submit(function (e, params) {
+                var localParams = params || {};
+
+                if (!localParams.send) {
+                    e.preventDefault();
+                }
+
+                   //additional input validations can be done hear
+
+            swal({
+                        title: "Confirm Entry",
+                        text: "Are you sure all entries are correct",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#6A9944",
+                        confirmButtonText: "Confirm",
+                        cancelButtonText: "Cancel",
+                        closeOnConfirm: true
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            $(e.currentTarget).trigger(e.type, { 'send': true });
+                            $('#payrollcategory').submit();
+                        } else {
+
+                      //additional run on cancel  functions can be done hear
+
+                    }
+                });
+        });*/
+       /* var confirmed = false;
+        $("#payrollcategory").on("submit", function(e) {
+            var $this = $(this);
+            if (!confirmed) {
+                e.preventDefault();
+                swal({
+                    title: $(this).data("swa-title"),
+                    text: $(this).data("swa-text"),
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#cc3f44",
+                    confirmButtonText: $(this).data("swa-btn-txt"),
+                    closeOnConfirm: true,
+                    html: false
+                }, function() {
+                    confirmed = true;
+                    $this.submit();
+                });
+            }
+        });*/
+    });
+    function confirmSubmit(){
+        if(confirm('Are sure to submit the data ? Yes/No')){
+            $('#payrollcategory').submit();
+        }else{
+            return false;
+        }
+        //alert("kk");
+        //swal("Deleted!", "Your imaginary file has been deleted!", "success");
+        
+        /*swal({
+		title: "Are you sure?",
+		text: "You will not be able to recover this imaginary file!",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: '#DD6B55',
+		confirmButtonText: 'Yes, delete it!',
+		cancelButtonText: "No, cancel plx!",
+		closeOnConfirm: false,
+		closeOnCancel: false
+	},
+         function(isConfirm){
+             //alert(isConfirm);
+            if (isConfirm){
+              //swal("Deleted!", "Your imaginary file has been deleted!", "success");
+              return true;
+            } else {
+              //swal("Cancelled", "Your imaginary file is safe :)", "error");
+              return false;
+            }
+	});*/
+         //return false;
+    }
+                           // When the browser is ready...
+                           function validate_formula(string)
+                           {
+                               var saveData = $.ajax({
+                                   type: 'POST',
+                                   url: "<?php echo BASE_URL; ?>payrollcategory/validate",
+                                   data: string,
+                                   dataType: "text",
+                                   success: function (resultData) {
+                                       alert(resultData)
+                                   }
+                               });
+                               saveData.error(function () {
+                                   alert("Something went wrong");
+                               });
+                           }
+                           $(function () {
+
+                               // Setup form validation on the #payrollcategory form element
+                               $("#payrollcategory").validate({
+                                   // Specify the validation rules
+                                   rules: {
+                                       category_name: "required",
+                                       category_code: "required",
+                                       category_value: "required"
+                                   },
+                                   // Specify the validation error messages
+                                   messages: {
+                                       category_name: "Please enter category name",
+                                       category_code: "Please enter category code",
+                                       category_value: "Please select category value"
+                                   },
+                                   submitHandler: function () {
+                                       $('#payrollcategory').submit();
+                                   }
+                               });
+
+                               $('#category_value').on('change', function () {
+                                   // if (this.value == '1'); { No semicolon and I used === instead of ==
+                                   if (this.value === 'numeric') {
+                                       $("#numeric").show();
+                                       $( "input[name*='numeric']" ).attr("required","required");
+                                   } else {
+                                       $("#numeric").hide();
+                                       $( "input[name*='numeric']" ).removeAttr("required");
+                                   }
+
+                                   if (this.value === 'formula') {
+                                       $("#formula").show();
+                                       //$( "input[name*='formula']" ).attr("required","required");
+                                   } else {
+                                       $("#formula").hide();
+                                       //$( "input[name*='formula']" )..removeAttr("required");
+                                   }
+
+                                   if (this.value === 'conditionwithformula'){
+                                    $("#conditionwithformula").show();
+                                    } else {
+                                    $("#conditionwithformula").hide();
+                                    }
+                               })
+
+                           });
+                           
+                           <?php if($this->popup != '') { ?>
+					parent.top.location.href = parent.top.location.href;
+	<?php } ?>
+
+</script>

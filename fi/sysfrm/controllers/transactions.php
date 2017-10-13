@@ -1,0 +1,1051 @@
+<?php
+// *************************************************************************
+// *                                                                       *
+// * iBilling -  Accounting, Billing Software                              *
+// * Copyright (c) Sadia Sharmin. All Rights Reserved                      *
+// *                                                                       *
+// *************************************************************************
+// *                                                                       *
+// * Email: sadiasharmin3139@gmail.com                                                *
+// * Website: http://www.sadiasharmin.com                                  *
+// *                                                                       *
+// *************************************************************************
+// *                                                                       *
+// * This software is furnished under a license and may be used and copied *
+// * only  in  accordance  with  the  terms  of such  license and with the *
+// * inclusion of the above copyright notice.                              *
+// * If you Purchased from Codecanyon, Please read the full License from   *
+// * here- http://codecanyon.net/licenses/standard                         *
+// *                                                                       *
+// *************************************************************************
+_auth();
+$ui->assign('_title', $_L['Transactions'].'- '. $config['CompanyName']);
+$ui->assign('_st', $_L['Transactions']);
+$ui->assign('_sysfrm_menu', 'transactions');
+$ui->assign('content_inner',inner_contents($config['c_cache']));
+$action = $routes['1'];
+$user = User::_info();
+$ui->assign('user', $user);
+$mdate = date('Y-m-d');
+
+//js var
+
+$ui->assign('jsvar', '
+_L[\'Working\'] = \''.$_L['Working'].'\';
+_L[\'Submit\'] = \''.$_L['Submit'].'\';
+ ');
+
+Event::trigger('transactions');
+//
+switch ($action) {
+    case 'deposit':
+
+        Event::trigger('transactions/deposit/');
+
+
+        $d = ORM::for_table('sys_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+       // $p = ORM::for_table('sys_payers')->find_many();
+        $p = ORM::for_table('crm_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('p', $p);
+        $ui->assign('d', $d);
+        $cats = ORM::for_table('sys_cats')->where('type','Income')->where('school_id',$_SESSION['school_id'])->order_by_asc('sorder')->find_many();
+        $ui->assign('cats', $cats);
+        $pms = ORM::for_table('sys_pmethods')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('pms', $pms);
+        $ui->assign('mdate', $mdate);
+
+        $tags = Tags::get_all('Income');
+        $ui->assign('tags',$tags);
+//        $ui->assign('xheader', '
+//<link rel="stylesheet" type="text/css" href="' . $_theme . '/lib/select2/select2.css"/>
+//<link rel="stylesheet" type="text/css" href="' . $_theme . '/lib/dp/dist/datepicker.min.css"/>
+//');
+
+        $ui->assign('xheader', Asset::css(array('s2/css/select2.min','dp/dist/datepicker.min','datatable/css/jquery.dataTables.min')));
+
+
+//        $ui->assign('xfooter', '
+//<script type="text/javascript" src="' . $_theme . '/lib/select2/select2.min.js"></script>
+//<script type="text/javascript" src="' . $_theme . '/lib/dp/dist/datepicker.min.js"></script>
+//<script type="text/javascript" src="' . $_theme . '/lib/numeric.js"></script>
+//<script type="text/javascript" src="' . $_theme . '/lib/deposit.js"></script>
+//');
+
+        $ui->assign('xfooter', Asset::js(array('s2/js/select2.min','s2/js/i18n/'.lan(),'dp/dist/datepicker.min','dp/i18n/'.$config['language'],'numeric','deposit','datatable/js/jquery.dataTables.min')));
+
+        $ui->assign('xjq', '
+ $(\'.amount\').autoNumeric(\'init\', {
+
+    aSign: \''.$config['currency_code'].' \',
+    dGroup: '.$config['thousand_separator_placement'].',
+    aPad: '.$config['currency_decimal_digits'].',
+    pSign: \''.$config['currency_symbol_position'].'\',
+    aDec: \''.$config['dec_point'].'\',
+    aSep: \''.$config['thousands_sep'].'\'
+
+    });
+
+ ');
+        $groups = ORM::for_table('crm_groups')->select('id')->select('gname')->where('school_id',$_SESSION['school_id'])->order_by_desc('id')->find_many();
+        $ui->assign('groups', $groups);
+       //find latest income
+       $tr = ORM::for_table('sys_transactions')->where('type','Deposit')->where('school_id',$_SESSION['school_id'])->order_by_desc('id')->limit('20')->find_many();
+        $ui->assign('tr', $tr);
+        $ui->display('deposit.tpl');
+
+        break;
+
+
+
+    case 'deposit-post':
+
+        Event::trigger('transactions/deposit-post/');
+
+        $account = _post('account');
+        $date = _post('date');
+        $amount = _post('amount'); //fdf
+        /* @since v2. added support for ',' as decimal separator */
+        $amount = Finance::amount_fix($amount);
+        $payerid = '';//_post('payer');
+        $ref = _post('ref');
+        $pmethod = _post('pmethod');
+        $cat = _post('cats');
+        $tags = $_POST['tags'];
+
+
+        
+        if($payerid == ''){
+            $payerid = '0';
+        }
+        $description = _post('description');
+        $msg = '';
+        if ($description == '') {
+            $msg .= $_L['description_error'] . '<br>';
+        }
+
+        
+        /* if (Validator::Length($account, 100, 1) == false) {
+            $msg .= $_L['Choose an Account'].' ' . '<br>';
+        } */
+        if ($account=='') {
+            $msg .= $_L['Choose an Account'].' ' . '<br>';
+        }
+
+        if ($amount == '') { 
+            $msg .= 'Amount Is Required'. '<br>';
+        }
+        
+        if (is_numeric($amount) == false) {
+            $msg .= $_L['amount_error'] . '<br>';
+        }
+
+        if ($msg == '') {
+
+            Tags::save($tags,'Income');
+
+            //find the current balance for this account
+            //$a = ORM::for_table('sys_accounts')->where('account',$account)->where('school_id',$_SESSION['school_id'])->find_one();
+            $a = ORM::for_table('sys_accounts')->where('id',$account)->where('school_id',$_SESSION['school_id'])->find_one();
+            //echo '<pre>';print_r($a);exit;
+            $cbal = $a['balance'];
+            $nbal = $cbal+$amount;
+            $a->balance=$nbal;
+            $a->save();
+            
+            /* payee balance calculate start */
+            $b1 = ORM::for_table('sys_transactions')->where('payeeid',$payerid)->where('school_id',$_SESSION['school_id'])->find_many();
+            $b2 = ORM::for_table('sys_transactions')->where('payerid',$payerid)->where('school_id',$_SESSION['school_id'])->find_many();
+            
+            if(count($b1) > 0) {
+                foreach($b1 as $trans) {
+                    $payee_bal1      =   $trans['payee_balance'] + $amount;
+                    $payee_trans1    =   $trans['id'];
+                }
+            } else {
+                $payee_bal1      =   0+$amount;
+//                $payee_trans1    =   $trans['id'];
+            }
+
+            if(!empty($b1[0])) {
+                foreach($b1 as $trans) {
+                    $payee_bal1      =   $trans['payee_balance'] + $amount;
+                    $payee_trans1    =   $trans['id'];
+                }
+            } else {
+                $payee_bal1      =   0+$amount;
+//                $payee_trans1    =   $trans['id'];
+            }
+
+            if(!empty($b2[0])) {
+                foreach($b2 as $trans) {
+                    $payee_bal2      =   $trans['payee_balance'] + $amount;
+                    $payee_trans2    =   $trans['id'];
+                }
+            } else {
+                $payee_bal2      =   0+$amount;
+//                $payee_trans2    =   $trans['id'];
+            }
+
+            if(!empty($b2[0]) && !empty($b1[0])) {
+                $payee_bal      =   ($payee_trans1 > $payee_trans2?$payee_bal1:$payee_bal2);
+            } else if(!empty($b2[0])) {
+                $payee_bal      =   $payee_bal2;
+            } else if(!empty($b1[0])) {
+                $payee_bal      =   $payee_bal1;
+            } else {
+                $payee_bal      =   0+$amount;
+            }
+                    
+            /* payee balance calculate end*/
+            
+            $d = ORM::for_table('sys_transactions')->create();
+            $d->account = $account;
+            $d->type = 'Deposit';
+            $d->payerid =  $payerid;
+            $d->payee_balance = $payee_bal;
+            $d->tags =  Arr::arr_to_str($tags);
+            $d->amount = $amount;
+            $d->category = $cat;
+            $d->method = $pmethod;
+            $d->ref = $ref;
+
+            $d->description = $description;
+            $d->date = $date;
+            $d->dr = '0.00';
+            $d->cr = $amount;
+            $d->bal = $nbal;
+
+            //others
+            $d->payer = '';
+            $d->payee = '';
+            $d->payeeid = '0';
+            $d->status = 'Cleared';
+            $d->tax = '0.00';
+            $d->iid = 0;
+			$d->school_id = $_SESSION['school_id'];									   
+            //
+
+            $d->save();
+            $tid = $d->id();
+            _log('New Deposit: '.$description.' [TrID: '.$tid.' | Amount: '.$amount.']','Admin',$user['id']);
+            _msglog('s',$_L['Transaction Added Successfully']);
+           echo $tid;
+        } else {
+           echo $msg;
+        }
+        break;
+
+    case 'expense':
+
+        Event::trigger('transactions/expense/');
+
+        $d = ORM::for_table('sys_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        $p = ORM::for_table('crm_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        $vendors = ORM::for_table('sys_vendors')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('p', $p);
+        $ui->assign('d', $d);
+        $ui->assign('vendors', $vendors);
+        $tags = Tags::get_all('Expense');
+        $ui->assign('tags',$tags);
+        $cats = ORM::for_table('sys_cats')->where('type','Expense')->where('school_id',$_SESSION['school_id'])->order_by_asc('sorder')->find_many();
+        $ui->assign('cats', $cats);
+        $pms = ORM::for_table('sys_pmethods')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('pms', $pms);
+        $ui->assign('mdate', $mdate);
+//        $ui->assign('xheader', '
+//<link rel="stylesheet" type="text/css" href="' . $_theme . '/lib/select2/select2.css"/>
+//<link rel="stylesheet" type="text/css" href="' . $_theme . '/lib/dp/dist/datepicker.min.css"/>
+//');
+
+        $ui->assign('xheader', Asset::css(array('s2/css/select2.min','dp/dist/datepicker.min','datatable/css/jquery.dataTables.min')));
+//        $ui->assign('xfooter', '
+//<script type="text/javascript" src="' . $_theme . '/lib/select2/select2.min.js"></script>
+//<script type="text/javascript" src="' . $_theme . '/lib/dp/dist/datepicker.min.js"></script>
+//<script type="text/javascript" src="' . $_theme . '/lib/numeric.js"></script>
+//<script type="text/javascript" src="' . $_theme . '/lib/expense.js"></script>
+//');
+
+        $ui->assign('xfooter', Asset::js(array('s2/js/select2.min','s2/js/i18n/'.lan(),'dp/dist/datepicker.min','dp/i18n/'.$config['language'],'numeric','expense','datatable/js/jquery.dataTables.min',)));
+
+        $ui->assign('xjq', '
+
+ $(\'.amount\').autoNumeric(\'init\', {
+
+    aSign: \''.$config['currency_code'].' \',
+    dGroup: '.$config['thousand_separator_placement'].',
+    aPad: '.$config['currency_decimal_digits'].',
+    pSign: \''.$config['currency_symbol_position'].'\',
+    aDec: \''.$config['dec_point'].'\',
+    aSep: \''.$config['thousands_sep'].'\'
+
+    });
+
+ ');
+        //find latest income
+        $tr = ORM::for_table('sys_transactions')->where('type','School_Expense')->where('school_id',$_SESSION['school_id'])->order_by_desc('id')->limit('20')->find_many();
+        $ui->assign('tr', $tr);
+
+        $ui->display('expense.tpl');
+
+        break;
+
+
+
+    case 'expense-post':
+
+        Event::trigger('transactions/expense-post/');
+
+        $account = _post('account');
+        $date = _post('date');
+        $amount = _post('amount');
+        $amount = Finance::amount_fix($amount);
+        $payee = 0;//_post('payee');
+        $ref = _post('ref');
+        $pmethod = _post('pmethod');
+        $vendor_id = _post('vendor_id');
+        $cat = _post('cats');
+        $tags = $_POST['tags'];
+
+        if(!is_numeric($payee)){
+            $payee = '0';
+        }
+
+        $description = _post('description');
+        $msg = '';
+        if ($description == '') {
+            $msg .= $_L['description_error'] . '<br>';
+        }
+        
+        
+        if ($amount == '') {
+            $msg .= 'Amount Is Required' . '<br>';
+        }
+
+        /* if (Validator::Length($account, 100, 1) == false) {
+            $msg .= $_L['Choose an Account'].' ' . '<br>';
+        } */
+
+        if ($account=='') {
+            $msg .= $_L['Choose an Account'].' ' . '<br>';
+        }
+
+        if (is_numeric($amount) == false) {
+            $msg .= $_L['amount_error'] . '<br>';
+        }
+
+        if ($msg == '') {
+
+            Tags::save($tags,'Expense');
+
+            //find the current balance for this account
+            //$a = ORM::for_table('sys_accounts')->where('account',$account)->where('school_id',$_SESSION['school_id'])->find_one();
+            $a = ORM::for_table('sys_accounts')->where('id',$account)->where('school_id',$_SESSION['school_id'])->find_one();
+            $cbal = $a['balance'];
+            $nbal = $cbal-$amount;
+            $a->balance=$nbal;
+            $a->school_id = $_SESSION['school_id'];
+            $a->save();
+            
+            /* payee balance calculate start */
+            if($payee != 0) {
+                $b1 = ORM::for_table('sys_transactions')->where('payeeid',$payee)->where('school_id',$_SESSION['school_id'])->find_many();
+                $b2 = ORM::for_table('sys_transactions')->where('payerid',$payee)->where('school_id',$_SESSION['school_id'])->find_many();
+
+                if(count($b1) > 0) {
+                    foreach($b1 as $trans) {
+                        $payee_bal1      =   $trans['payee_balance'] + $amount;
+                        $payee_trans1    =   $trans['id'];
+                    }
+                } else {
+                    $payee_bal1      =   0+$amount;
+//                    $payee_trans1    =   $trans['id'];
+                }
+
+                if(!empty($b1[0])) {
+                    foreach($b1 as $trans) {
+                        $payee_bal1      =   $trans['payee_balance'] + $amount;
+                        $payee_trans1    =   $trans['id'];
+                    }
+                } else {
+                    $payee_bal1      =   0+$amount;
+//                    $payee_trans1    =   $trans['id'];
+                }
+
+                if(!empty($b2[0])) {
+                    foreach($b2 as $trans) {
+                        $payee_bal2      =   $trans['payee_balance'] + $amount;
+                        $payee_trans2    =   $trans['id'];
+                    }
+                } else {
+                    $payee_bal2      =   0+$amount;
+//                    $payee_trans2    =   $trans['id'];
+                }
+
+                if(!empty($b2[0]) && !empty($b1[0])) {
+                    $payee_bal      =   ($payee_trans1 > $payee_trans2?$payee_bal1:$payee_bal2);
+                } else if(!empty($b2[0])) {
+                    $payee_bal      =   $payee_bal2;
+                } else if(!empty($b1[0])) {
+                    $payee_bal      =   $payee_bal1;
+                } else {
+                    $payee_bal      =   0+$amount;
+                }
+            } else {
+                $payee              =   0;
+                $payee_bal          =   0;
+            }
+            /* payee balance calculate end*/
+            
+            
+            $d = ORM::for_table('sys_transactions')->create();
+            $d->account = $account;
+            $d->type = 'School_Expense';//'Expense';
+            $d->payeeid =  $payee;
+            if(isset($payee_bal)) {
+                $d->payee_balance   =   $payee_bal;
+            }
+            $d->tags =  Arr::arr_to_str($tags);
+            $d->amount = $amount;
+            $d->vendor_id = $vendor_id;
+            $d->category = $cat;
+            $d->method = $pmethod;
+            $d->ref = $ref;
+
+            $d->description = $description;
+            $d->date = $date;
+            $d->dr = $amount;
+            $d->cr = '0.00';
+            $d->bal = $nbal;
+            //others
+            $d->payer = '';
+            $d->payee = '';
+            $d->payerid = '0';
+            $d->status = 'Cleared';
+            $d->tax = '0.00';
+            $d->iid = 0;
+            $d->school_id = $_SESSION['school_id'];
+
+            $d->save();
+            $tid = $d->id();
+            _log('New Expense: '.$description.' [TrID: '.$tid.' | Amount: '.$amount.']','Admin',$user['id']);
+            _msglog('s',$_L['Transaction Added Successfully']);
+            echo $tid;
+        } else {
+            echo $msg;
+        }
+        break;
+
+    case 'transfer':
+
+        Event::trigger('transactions/transfer/');
+
+
+        $d = ORM::for_table('sys_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('p', $d);
+        $ui->assign('d', $d);
+
+        $pms = ORM::for_table('sys_pmethods')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('pms', $pms);
+        $ui->assign('mdate', $mdate);
+        $tags = Tags::get_all('Transfer');
+        $ui->assign('tags',$tags);
+        $ui->assign('xheader', Asset::css(array('s2/css/select2.min','dp/dist/datepicker.min')));
+
+        $ui->assign('xfooter', Asset::js(array('s2/js/select2.min','s2/js/i18n/'.lan(),'dp/dist/datepicker.min','dp/i18n/'.$config['language'],'numeric','transfer')));
+
+        $ui->assign('xjq', '
+
+ $(\'.amount\').autoNumeric(\'init\', {
+
+    aSign: \''.$config['currency_code'].' \',
+    dGroup: '.$config['thousand_separator_placement'].',
+    aPad: '.$config['currency_decimal_digits'].',
+    pSign: \''.$config['currency_symbol_position'].'\',
+    aDec: \''.$config['dec_point'].'\',
+    aSep: \''.$config['thousands_sep'].'\'
+
+    });
+
+ ');
+        //find latest income
+        $tr = ORM::for_table('sys_transactions')->where('type','Transfer')->where('school_id',$_SESSION['school_id'])->order_by_desc('id')->limit('20')->find_many();
+        
+        $ui->assign('tr', $tr);
+        $ui->display('transfer.tpl');
+
+        break;
+
+
+
+    case 'transfer-post':
+
+        Event::trigger('transactions/transfer-post/');
+
+
+        $faccount = _post('faccount');
+        $taccount = _post('taccount');
+        $date = _post('date');
+        $amount = _post('amount');
+        $amount = Finance::amount_fix($amount);
+        $pmethod = _post('pmethod');
+        $ref = _post('ref');
+
+        $description = _post('description');
+        $msg = '';
+        if (Validator::Length($faccount, 100, 2) == false) {
+            $msg .= $_L['Choose an Account'].' ' . '<br>';
+        }
+
+        if (Validator::Length($taccount, 100, 2) == false) {
+            $msg .= $_L['Choose the Traget Account'].' ' . '<br>';
+        }
+
+        if ($description == '') {
+            $msg .= $_L['description_error'] . '<br>';
+        }
+
+        if (is_numeric($amount) == false) {
+            $msg .= $_L['amount_error'] . '<br>';
+        }
+
+        //check if from account & target account is same
+
+        if($faccount == $taccount){
+            $msg .= $_L['same_account_error'] . '<br>';
+        }
+
+        $tags = $_POST['tags'];
+
+        Tags::save($tags,'Transfer');
+
+
+        if ($msg == '') {
+            $a = ORM::for_table('sys_accounts')->where('account',$faccount)->where('school_id',$_SESSION['school_id'])->find_one();
+            $cbal = $a['balance'];
+            $nbal = $cbal-$amount;
+            $a->balance=$nbal;
+            $d->school_id = $_SESSION['school_id'];
+            $a->save();
+            $a = ORM::for_table('sys_accounts')->where('account',$taccount)->where('school_id',$_SESSION['school_id'])->find_one();
+            $cbal = $a['balance'];
+            $tnbal = $cbal+$amount;
+            $a->balance=$tnbal;
+            $d->school_id = $_SESSION['school_id'];
+            $a->save();
+            $d = ORM::for_table('sys_transactions')->create();
+            $d->account = $faccount;
+            $d->type = 'Transfer';
+
+            $d->amount = $amount;
+
+            $d->method = $pmethod;
+            $d->ref = $ref;
+            $d->tags = Arr::arr_to_str($tags);
+
+            $d->description = $description;
+            $d->date = $date;
+            $d->dr = $amount;
+            $d->cr = '0.00';
+            $d->bal = $nbal;
+
+            //others
+            $d->payer = '';
+            $d->payee = '';
+            $d->payerid = '0';
+            $d->payeeid = '0';
+            $d->category = '';
+            $d->status = 'Cleared';
+            $d->tax = '0.00';
+            $d->iid = 0;
+            $d->school_id = $_SESSION['school_id'];
+
+            $d->save();
+            //transaction for target account
+            $d = ORM::for_table('sys_transactions')->create();
+            $d->account = $taccount;
+            $d->type = 'Transfer';
+
+            $d->amount = $amount;
+
+            $d->method = $pmethod;
+            $d->ref = $ref;
+            $d->tags = Arr::arr_to_str($tags);
+            $d->description = $description;
+            $d->date = $date;
+            $d->dr = '0.00';
+            $d->cr = $amount;
+            $d->bal = $tnbal;
+
+            //others
+            $d->payer = '';
+            $d->payee = '';
+            $d->payerid = '0';
+            $d->payeeid = '0';
+            $d->category = '';
+            $d->status = 'Cleared';
+            $d->tax = '0.00';
+            $d->iid = 0;
+            $d->school_id = $_SESSION['school_id'];
+
+            $d->save();
+            _msglog('s',$_L['Transaction Added Successfully']);
+           echo '1';
+        } else {
+            echo $msg;
+        }
+        break;
+
+
+    case 'list':
+
+        Event::trigger('transactions/list/');
+
+            
+        $d = ORM::for_table('sys_transactions')
+        ->select_many(array("accounts"=>"sys_accounts.account"),'sys_transactions.*')
+        ->_add_join_source('left', 'sys_accounts',array('sys_transactions.account','=','sys_accounts.id'))
+        ->where_not_equal('sys_transactions.category','invoice')
+        ->where_in('sys_transactions.type',array('Expense','School_Expense'))
+        ->where('school_id', $_SESSION['school_id'])->order_by_desc('sys_transactions.id')->find_many();
+
+        /* $d = ORM::for_table('sys_transactions')->where('school_id',$_SESSION['school_id'])->where_not_equal( 'type' , 'Deposit' )
+        ->where_not_equal( 'category' , 'Invoice' )
+        ->where_in('sys_transactions.type',array('Expense','School_Expense'))
+        ->order_by_desc('id')->find_many(); */
+        $ui->assign('d',$d);
+        
+        $ui->assign('_st', $_L['Transactions']);
+        $mode_css = Asset::css('datatable/css/jquery.dataTables.min');
+        $ui->assign('xheader', $mode_css);
+        $ui->assign('xfooter',Asset::js(array('numeric','datatable/js/jquery.dataTables.min')));
+//echo ORM::get_last_query();exit();
+        $ui->assign('xjq', '
+
+ $(\'.amount\').autoNumeric(\'init\', {
+
+    aSign: \''.$config['currency_code'].' \',
+    dGroup: '.$config['thousand_separator_placement'].',
+    aPad: '.$config['currency_decimal_digits'].',
+    pSign: \''.$config['currency_symbol_position'].'\',
+    aDec: \''.$config['dec_point'].'\',
+    aSep: \''.$config['thousands_sep'].'\'
+
+    });
+
+ ');
+
+        $ui->display('transactions.tpl');
+        break;
+
+    case 'a':
+
+        Event::trigger('transactions/a/');
+
+        $d = ORM::for_table('sys_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        // $p = ORM::for_table('sys_payers')->find_many();
+        $p = ORM::for_table('crm_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('p', $p);
+        $ui->assign('d', $d);
+        $cats = ORM::for_table('sys_cats')->where('type','Income')->where('school_id',$_SESSION['school_id'])->order_by_asc('sorder')->find_many();
+        $ui->assign('cats', $cats);
+        $pms = ORM::for_table('sys_pmethods')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('pms', $pms);
+        $ui->assign('xheader', Asset::css(array('s2/css/select2.min','dp/dist/datepicker.min','dt/media/css/jquery.dataTables.min','modal','css/dta')));
+
+        $ui->assign('xfooter', Asset::js(array('s2/js/select2.min','s2/js/i18n/'.lan(),'dp/dist/datepicker.min','dp/i18n/'.$config['language'],'numeric','modal','dt/media/js/jquery.dataTables.min','js/dta','js/tra')));
+
+        $ui->assign('xjq', '
+
+
+ ');
+
+        $ui->display('tra.tpl');
+
+        break;
+
+    case 'tr_ajax':
+
+//        $filter = '';
+//
+//        $d = ORM::for_table('sys_transactions');
+//
+//
+//        if(isset($_POST['order_id']) AND ($_POST['order_id'] != '')){
+//            // $iTotalRecords = ORM::for_table('flexi_req')->where('id',$_POST['order_id'])->count('id');
+//            $oid = _post('order_id');
+//            //  $filter .= "AND id='$oid' ";
+//            $d->where('id',$oid);
+//        }
+//
+//        if(isset($_POST['sender']) AND ($_POST['sender'] != '')){
+//            $sender = _post('sender');
+//            // $filter .= "AND sender='$sender'";
+//            $d->where_like('sender', "%$sender%");
+//        }
+//
+//        if(isset($_POST['receiver']) AND ($_POST['receiver'] != '')){
+//            $receiver = _post('receiver');
+//            // $filter .= "AND receiver='$receiver' ";
+//            $d->where_like('receiver', "%$receiver%");
+//        }
+//
+//        if(isset($_POST['sdate']) AND ($_POST['sdate'] != '') AND isset($_POST['tdate']) AND ($_POST['tdate'] != '')){
+//            $sdate = _post('sdate');
+//            $tdate = _post('tdate');
+//            // $filter .= "AND reqlogtime >= '$sdate 00:00:00' AND reqlogtime <= '$tdate 23:59:59'";
+//            $d->where_gte('reqlogtime', "$sdate 00:00:00");
+//            $d->where_lte('reqlogtime', "$tdate 23:59:59");
+//        }
+//
+//        if(isset($_POST['type']) AND ($_POST['type'] != '')){
+//            $type = _post('type');
+//            // $filter .= "AND type='$type' ";
+//            $d->where('type',$type);
+//
+//
+//        }
+//
+//
+//
+//        if(isset($_POST['trid']) AND ($_POST['trid'] != '')){
+//            $trid = _post('trid');
+//            //  $filter .= "AND transactionid='$trid' ";
+//            $d->where('transactionid',$trid);
+//
+//        }
+//
+//        if(isset($_POST['op']) AND ($_POST['op'] != '')){
+//            $op = _post('op');
+//            //  $filter .= "AND op='$op' ";
+//            $d->where('op',$op);
+//
+//        }
+//
+//        $iTotalRecords =  $d->count();
+//
+//
+//        $iDisplayLength = intval($_REQUEST['length']);
+//        $iDisplayLength = $iDisplayLength < 0 ? $iTotalRecords : $iDisplayLength;
+//        $iDisplayStart = intval($_REQUEST['start']);
+//        $sEcho = intval($_REQUEST['draw']);
+//
+//        $records = array();
+//        $records["data"] = array();
+//
+//        $end = $iDisplayStart + $iDisplayLength;
+//        $end = $end > $iTotalRecords ? $iTotalRecords : $end;
+//
+//
+//        if($end > 1000){
+//            exit;
+//        }
+//        $d->order_by_desc('id');
+//        $d->limit($end);
+//        $d->offset($iDisplayStart);
+//        $x = $d->find_many();
+//
+//        $i = $iDisplayStart;
+//        foreach ($x as $xs){
+//
+//
+//
+//
+//            $id = ($i + 1);
+//            $records["data"][] = array(
+//                '<input type="checkbox" name="id[]" value="'.$xs['id'].'">',
+//                $xs['id'],
+//                $xs['date'],
+//                $xs['account'],
+//                $xs['type'],
+//
+//                $xs['amount'],
+//                $xs['description'],
+//
+//                $xs['dr'],
+//                $xs['cr'],
+//                $xs['bal'],
+//
+//
+//
+//                '<a href="#" class="fview btn btn-xs blue btn-editable" id="i'.$xs['id'].'"><i class="icon-list"></i> View</a>',
+//            );
+//        }
+//
+//
+//        $records["draw"] = $sEcho;
+//        $records["recordsTotal"] = $iTotalRecords;
+//        $records["recordsFiltered"] = $iTotalRecords;
+//        $resp =  json_encode($records);
+//        $handler = PhpConsole\Handler::getInstance();
+//        $handler->start();
+//        $handler->debug($_REQUEST, 'request');
+//        echo $resp;
+
+
+        break;
+
+    case 'list-income':
+
+        Event::trigger('transactions/list-income/');
+        $ui->assign('_st', 'Income');
+        $ui->assign('_sysfrm_menu', 'reports');
+        $paginator = Paginator::bootstrap('sys_transactions','type','Income');
+        $d = ORM::for_table('sys_transactions')->select_many(array("accounts"=>"sys_accounts.account"),'sys_transactions.*')
+                ->_add_join_source('left', 'sys_accounts',array('sys_transactions.account','=','sys_accounts.id'))
+                ->where('school_id', $_SESSION['school_id'])->where('sys_transactions.type','Income')
+                ->offset($paginator['startpoint'])->limit($paginator['limit'])->order_by_desc('sys_transactions.id')->find_many();
+        $mode_css = Asset::css('datatable/css/jquery.dataTables.min');
+        $ui->assign('d',$d);
+        $ui->assign('xfooter',Asset::js(array('numeric','datatable/js/jquery.dataTables.min')));
+        $ui->assign('xheader',$mode_css);
+        $ui->assign('xjq','
+
+         $(\'.amount\').autoNumeric(\'init\', {
+
+    aSign: \''.$config['currency_code'].' \',
+    dGroup: '.$config['thousand_separator_placement'].',
+    aPad: '.$config['currency_decimal_digits'].',
+    pSign: \''.$config['currency_symbol_position'].'\',
+    aDec: \''.$config['dec_point'].'\',
+    aSep: \''.$config['thousands_sep'].'\'
+
+    });
+
+        ');
+        $ui->assign('paginator',$paginator);
+        $ui->display('transactions.tpl');
+        break;
+
+    case 'list-expense':
+
+        Event::trigger('transactions/list-expense/');
+        $mode_css = '';
+        $mode_js = '';
+        $ui->assign('_sysfrm_menu', 'reports');
+        
+        $d = ORM::for_table('sys_transactions')
+                ->select_many(array("accounts"=>"sys_accounts.account"),'sys_transactions.*')
+                ->_add_join_source('left', 'sys_accounts',array('sys_transactions.account','=','sys_accounts.id'))
+                ->where_not_equal('sys_transactions.category','invoice')
+                ->where_in('sys_transactions.type',array('Expense','School_Expense'))
+                ->where('school_id', $_SESSION['school_id'])->order_by_desc('sys_transactions.id')->find_many();
+        //echo ORM::get_last_query();exit;
+        $ui->assign('d',$d);
+        $mode_css = Asset::css('datatable/css/jquery.dataTables.min');
+
+        $mode_js = Asset::js(array('datatable/js/jquery.dataTables.min'));
+        $ui->assign('xheader', $mode_css);
+        $ui->assign('xfooter', $mode_js);
+    
+        $ui->assign('xjq','
+        
+            $(\'.amount\').autoNumeric(\'init\', {
+
+            aSign: \''.$config['currency_code'].' \',
+            dGroup: '.$config['thousand_separator_placement'].',
+            aPad: '.$config['currency_decimal_digits'].',
+            pSign: \''.$config['currency_symbol_position'].'\',
+            aDec: \''.$config['dec_point'].'\',
+            aSep: \''.$config['thousands_sep'].'\'
+
+            });
+        ');
+
+        $ui->display('transactions.tpl');
+        break;
+
+    case 'manage':
+
+        Event::trigger('transactions/manage/');
+
+
+        $id = $routes['2'];
+        $t = ORM::for_table('sys_transactions')->where('school_id',$_SESSION['school_id'])->find_one($id);
+        if ($t) {
+            $p = ORM::for_table('crm_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+            $ui->assign('p', $p);
+            $ui->assign('t', $t);
+            $d = ORM::for_table('sys_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+            $ui->assign('d', $d);
+            $icat = '1';
+            if(($t['type']) == 'Income'){
+                $cats = ORM::for_table('sys_cats')->where('type','Income')->where('school_id',$_SESSION['school_id'])->find_many();
+                $tags = Tags::get_all('Income');
+            }
+            elseif(($t['type']) == 'Expense'){
+                $cats = ORM::for_table('sys_cats')->where('type','Expense')->where('school_id',$_SESSION['school_id'])->find_many();
+                $tags = Tags::get_all('Expense');
+            }
+            else{
+                $cats = '0';
+                $icat = '0';
+                $tags = Tags::get_all('Transfer');
+            }
+
+            $ui->assign('tags',$tags);
+            $dtags = explode(',',$t['tags']);
+            $ui->assign('dtags',$dtags);
+            $ui->assign('icat', $icat);
+            $ui->assign('cats', $cats);
+            $pms = ORM::for_table('sys_pmethods')->where('school_id',$_SESSION['school_id'])->find_many();
+            $ui->assign('pms', $pms);
+
+            $ui->assign('mdate', $mdate);
+            $ui->assign('xheader', Asset::css(array('s2/css/select2.min','dp/dist/datepicker.min')));
+            $ui->assign('xfooter', Asset::js(array('s2/js/select2.min','s2/js/i18n/'.lan(),'dp/dist/datepicker.min','dp/i18n/'.$config['language'],'numeric','tr-manage')));
+            $ui->display('manage-transaction.tpl');
+        } else {
+            r2(U . 'transactions/list', 'e', $_L['Transaction_Not_Found']);
+        }
+
+        break;
+    case 'edit-post':
+
+        Event::trigger('transactions/edit-post/');
+
+
+        $id = _post('id');
+        $d = ORM::for_table('sys_transactions')->where('school_id',$_SESSION['school_id'])->find_one($id);
+        if($d){
+            $cat = _post('cats');
+            $pmethod = _post('pmethod');
+            $ref = _post('ref');
+            $date = _post('date');
+            $payer = _post('payer');
+            $payee = _post('payee');
+            $description = _post('description');
+            $msg = '';
+            if ($description == '') {
+                $msg .= $_L['description_error'] . '<br>';
+            }
+
+
+
+            if(!is_numeric($payer)){
+                $payer = '0';
+            }
+
+            if(!is_numeric($payee)){
+                $payee = '0';
+            }
+
+            $tags = $_POST['tags'];
+
+
+            if ($msg == '') {
+                //find the current balance for this account
+
+                Tags::save($tags,$d['type']);
+
+                $d->category = $cat;
+                $d->payerid = $payer;
+                $d->payeeid = $payee;
+                $d->method = $pmethod;
+                $d->ref = $ref;
+                $d->tags = Arr::arr_to_str($tags);
+                $d->description = $description;
+                $d->date = $date;
+                $d->school_id = $_SESSION['school_id'];
+                $d->save();
+                _msglog('s',$_L['edit_successful']);
+                echo $d->id();
+            } else {
+                echo $msg;
+            }
+        }
+        else{
+            echo 'Transaction Not Found';
+        }
+
+
+
+
+        break;
+    case 'delete-post':
+        Event::trigger('transactions/delete-post/');
+        $id = _post('id');
+        if(Transaction::delete($id)){
+            r2(U . 'transactions/list', 's', $_L['transaction_delete_successful']);
+        }
+        else{
+            r2(U . 'transactions/list', 'e', $_L['an_error_occured']);
+        }
+        break;
+
+
+    case 'post':
+
+        break;
+
+    case 's':
+        Event::trigger('transactions/s/');
+        $d = ORM::for_table('sys_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        // $p = ORM::for_table('sys_payers')->find_many();
+        $c = ORM::for_table('crm_accounts')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('c', $c);
+        $ui->assign('d', $d);
+        $cats = ORM::for_table('sys_cats')->where('type','Income')->where('school_id',$_SESSION['school_id'])->order_by_asc('sorder')->find_many();
+        $ui->assign('cats', $cats);
+        $pms = ORM::for_table('sys_pmethods')->where('school_id',$_SESSION['school_id'])->find_many();
+        $ui->assign('pms', $pms);
+        $mdate = date('Y-m-d');
+        $fdate = date('Y-m-d', strtotime('today - 30 days'));
+        $ui->assign('fdate', $fdate);
+        $ui->assign('tdate', $mdate);
+        $ui->assign('xheader', Asset::css(array('s2/css/select2.min','dp/dist/datepicker.min','modal')));
+        $ui->assign('xfooter', Asset::js(array('s2/js/select2.min','s2/js/i18n/'.lan(),'dp/dist/datepicker.min','dp/i18n/'.$config['language'],'numeric','modal','js/tra')));
+
+        $ui->display('trs.tpl');
+
+
+        break;
+
+    case 'export_csv':
+
+        Event::trigger('transactions/export_csv/');
+
+        $fileName = 'transactions_'.time().'.csv';
+
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header('Content-Description: File Transfer');
+        header("Content-type: text/csv");
+        header("Content-Disposition: attachment; filename={$fileName}");
+        header("Expires: 0");
+        header("Pragma: public");
+
+        $fh = @fopen( 'php://output', 'w' );
+
+        $headerDisplayed = false;
+
+        // $results = ORM::for_table('crm_Accounts')->find_array();
+        $results = db_find_array('sys_transactions');
+
+        foreach ( $results as $data ) {
+            // Add a header row if it hasn't been added yet
+            if ( !$headerDisplayed ) {
+                // Use the keys from $data as the titles
+                fputcsv($fh, array_keys($data));
+                $headerDisplayed = true;
+            }
+
+            // Put the data into the stream
+            fputcsv($fh, $data);
+        }
+// Close the file
+        fclose($fh);
+
+
+        break;
+case 'accounts-by-class':
+    $group_id       =   _post('group_id');
+    $c = ORM::for_table('crm_accounts')->select('id')->select('account')->select('company')->select('email')->where('school_id',$_SESSION['school_id'])->where( 'gid' , $group_id )->order_by_desc('id')->find_many();
+        $ui->assign('c', $c);
+        $option_value       =   '<option value="">Choose Student...</option>';
+        foreach( $c as $key => $val ) {
+            $option_value       .=  '<option value="'.$val['id'].'">'.$val['account'].'</option>';
+        }
+        echo $option_value;exit;
+    break;
+    default:
+        echo 'action not defined';
+}

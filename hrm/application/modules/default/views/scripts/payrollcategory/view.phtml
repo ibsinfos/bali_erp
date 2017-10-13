@@ -1,0 +1,110 @@
+<div class="">
+    <div id="breadcrumdiv"> 
+        <div class="breadcrumbs">
+            <span class="firstbreadcrumb" onclick="window.location = '<?php echo BASE_URL;?>/hrm/index.php'">Home</span>
+            <span class="arrows">&rsaquo;</span> <span>HR</span> 
+            <span class="arrows">&rsaquo;</span> 
+            <a href="<?php echo BASE_URL;?>/hrm/index.php/payslipgroup" >Payroll and Payslip Management </a>
+            <span class="arrows">&rsaquo;</span> 
+            <span>Payroll Categories </span>
+            <span class="arrows">&rsaquo;</span> 
+            <span>Basic Pay</span>
+        </div>    
+    </div>
+
+
+    <div class="new_actions">
+
+            <a class="edit_action_new" href="<?php echo BASE_URL;?>/hrm/index.php/sitepreference/edit/id/1"><i class="fa fa-pencil"></i>Edit</a>
+          
+    </div>
+
+</div>
+<div id="maincontentdiv">	
+    <div id="dialog-confirm" style="display:none;">
+        <div class="newframe-div">
+            <div class="new-form-ui height32">
+                <div class="division">
+                    <input maxlength="12" id="number_value" name="number_value" type="text">
+                </div>
+                <span class="errors" id="errors-contactnumber"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="empstatus-alert" style="display:none;">
+        <div class="newframe-div"><div id="empstatusmessage"></div></div>
+    </div>
+
+    <div id="empleaves-alert" style="display:none;">
+        <div class="newframe-div"><div id="empleavesmessage"></div></div>
+    </div>									
+    <div>
+
+        <!-- For excel Upload -->
+        
+    </div>
+    <br>
+    <h2>Payroll Category Details</h2>
+    <br>
+     <br>
+    <table>
+        <tr><th>Payroll Category Name:</th><td>Basic Pay</td></tr>
+        <tr><th>Category Code:</th><td>CAT1</td></tr>
+        <tr><th>Category Type:</th><td>Earnings</td></tr>
+    </table>
+     <hr>
+         <table>
+        <tr>
+            <tr><th>Value Type:</th><td>Basic Pay</td></tr>
+            <tr><th>Default Value:</th><td>0.00</td></tr>
+        </tr>
+                   
+    </table>
+         <br>
+         <hr>
+         <h2> <b> Dependent Payroll Group</b></h2><br>
+         <p>List Of Payroll Categories whose value is calculated using this category code.</p><br>
+         <br>
+         
+          <div id="grid_employee" class="all-grid-control">
+        <div id="msg" style="display:none;font-style: oblique; font-weight: bold; color: green;"></div>
+        <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: 250px; height: auto;">
+                <div id="employee" class="details_data_display_block newtablegrid" style="overflow: hidden; width: 250px; height: auto; background: rgb(204, 204, 204) none repeat scroll 0% 0%; padding-bottom: 10px;">
+                <table class="grid" width="100%" cellspacing="0" cellpadding="4" border="0" align="center">
+                   <tbody>
+                        <tr onclick="selectrow(employee, this);" class="row1">
+                            
+                            <td><span title="doonn">Travelling Allowance</span></td>
+                            <td><span title="adam">CAT2</span></td>
+                            
+                        </tr>
+
+                        <tr onclick="selectrow(employee, this);" class="row1">
+                            
+                            <td><span title="doonn">House rent Allowance</span></td>
+                            <td><span title="adam">CAT3</span></td>
+                            
+                        </tr>
+                        
+                        <tr onclick="selectrow(employee, this);" class="row1">
+                            
+                            <td><span title="doonn">Tax</span></td>
+                            <td><span title="adam">CAT4</span></td>
+                            
+                        </tr>
+                        
+                        <tr onclick="selectrow(employee, this);" class="row1">
+                            
+                            <td><span title="doonn">Providend Fund</span></td>
+                            <td><span title="adam">CAT5</span></td>
+                            
+                        </tr>
+                    </tbody>
+                </table>            
+               
+            </div>
+               
+    </div>
+</div>
+</div>

@@ -1,0 +1,1 @@
+{include file="../../../sysfrm/plugins/$_include.tpl"}

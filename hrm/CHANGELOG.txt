@@ -1,0 +1,65 @@
+CHANGELOG Sentrifugo
+====================
+RELEASE 3.1 
+-----------
+
+Changes in Controllers
+------------------------
+./application/modules/default/controllers/RequisitionController.php 
+./application/modules/default/controllers/ApprovedrequisitionsController.php 
+./application/modules/default/controllers/CandidatedetailsController.php 
+./application/modules/default/controllers/ScheduleinterviewsController.php 
+./application/modules/default/controllers/shortlistedcandidatesController.php 
+./application/modules/default/controllers/VendorsController.php 
+./application/modules/default/controllers/ClientsController.php 
+./application/modules/default/controllers/ProjectsController.php 
+./application/modules/default/controllers/LeaverequestController.php 
+./application/modules/default/controllers/manageremployeevacationsController.php 
+./application/modules/default/controllers/appraisalinitController.php 
+./application/modules/default/controllers/appraisalstatusController.php 
+./application/modules/default/controllers/appraisalratingsController.php 
+./application/modules/default/controllers/manageremployeevacationsController.php 
+./application/modules/default/controllers/announcementsController.php 
+./application/modules/default/controllers/EmployeeController.php 
+
+
+- RequisitionController.php
+  Filters are added  for Approved and Rejected Requisition.
+  
+- CandidatedetailsController.php
+  Management and Hr  can add candidate for particular client and an icon is addeded in the grid to schedule an interview. 
+  
+- shortlistedcandidatesController.php
+  An icon is added in the grid to add selected candidates.
+
+- VendorsController.php 
+  Management and Hr can add,edit,view and delete vendors
+
+- LeaverequestController.php
+  An activity log is added performed by the users.
+
+- AppraisalinitController.php
+  Hr can add appraisals for any business unit and departments.
+
+- EmployeeController.php 
+  HR can upload profile picture of an employee.
+
+- ClientsController.php
+  Manager can add,edit,view,delete projects. 
+  
+- ProjectsController.php
+  Manager can add,edit,view,delete projects. 
+  
+- AnnouncementsController.php
+  Hr can add announcements for any business unit and departments.
+
+ 
+  
+Note: You can find the respective view files in below scripts: 
+./application/modules/default/views/scripts
+
+Changes in scripts
+------------------------
+./public/media/js/hrms.js
+./public/media/css/style.css
+./public/media/css/successstyle.css

@@ -1,0 +1,117 @@
+<?php $group_details=$this->group_details;
+$group_category_details_arr=array();
+foreach($this->group_category_details AS $k => $v){
+    $group_category_details_arr[]=$v['payroll_category_id'];
+}
+?>
+<form name="payroll_group" id="payroll_group" method="POST" action="<?php echo BASE_URL;?>payrollgroup/edit/id/<?php echo $this->main_roll_id;?>" onsubmit="return confirmSubmit(this);">
+
+    <div style="position: relative">
+    <div style="clear: both;"></div>    
+<div class="new-form-ui" id="PayrollGroupMinWidth">
+    <div class="division">
+        <div>
+        <?php foreach ($this->groupcode AS $k => $v):?>
+            <label id="cate_<?php echo $v['payroll_category_id'];?>">
+                <a class="sprite delete" href="javascript:void(0);" onclick="deleteEmpCategory('<?php echo $v['payroll_category_id'];?>');"></a>
+                <a class="sprite edit" href="javascript:void(0);" onclick="showEditPopup('<?php echo $v['payroll_category_id']; ?>');"></a>
+                <?php echo $v['name'].' - ';if($v['type']==0){ echo 'Earning';}else{ echo 'Deduction';}?>
+            </label><br>
+        <?php endforeach;?>    
+        </div>
+        <span id="errors-group_payroll_group_code" class="errors" style="width: 600px !important;">
+            <?php if(array_key_exists('payroll_group_codes', $this->err_msg_arr)){ echo $this->err_msg_arr['payroll_group_codes'];}?></span>
+    </div>
+    <div style="clear:both;">&nbsp;</div>
+    <div class="division" style="width:100%;">
+        <iframe width="800" height="400" src="" style="overflow:visible; display: none;" id="edit_frame"></iframe>
+    </div>
+</div>
+    <div style="clear: both !important;"></div>    
+    
+    </div>
+    </form>
+<script type="text/javascript">
+function showEditPopup(cateId){
+    $('#edit_frame').css('display','block');
+    $('#edit_frame').attr('src',"<?php echo BASE_URL.'payrollcategory/edit/empcategory/1/id/';?>"+cateId+"/userid/<?php echo $this->userid; ?>/payslipid/<?php echo $this->payslipid; ?>");
+    //parent.top.location="<?php echo BASE_URL.'payrollcategory/edit/empcategory/1/id/'; ?>"+cateId+"/userid/<?php echo $this->userid; ?>/payslipid/<?php echo $this->payslipid; ?>";
+    //displaydeptform('<?php //echo BASE_URL.'payrollcategory/editpopup/categoryid/'.$v['payroll_category_id']; ?>','Update Category');
+}
+function deleteEmpCategory(category_id){
+    if(confirm("Are you sure you want to delete this category?")) {
+        var ajaxURL='<?php echo BASE_URL;?>payrollcategory/deleteempcategory/cateId/'+category_id;
+        $.ajax({
+            url:ajaxURL,
+            success:function(msg){
+                $('#cate_'+category_id).remove();
+                parent.top.location.reload();
+            }
+        });
+    }
+}
+function confirmSubmit(frm){
+    if(confirm('Are sure to submit the data ? Yes/No')){
+        frm.submit();
+    }else{
+        return false;
+    }
+}
+$(document).ready(function(){
+    var isButttonClickFistTime=0;
+    $("#add_payroll_group_code").on('click',function(){
+        if(isButttonClickFistTime==0){
+            $('#all_payroll_category').text("");
+            $("#add_payroll_group_code_hidden").val("");
+            isButttonClickFistTime=1;
+        }
+        var payroll_group_code=$('#payroll_group_code').val();
+        if(payroll_group_code==""){
+            return false;
+        }
+         var selectedText=$('#payroll_group_code').find(":selected").text();
+         if($('#all_payroll_category').text()==""){
+             $('#all_payroll_category').text(selectedText);
+         }
+        
+        var add_payroll_group_code_hidden_val=$("#add_payroll_group_code_hidden").val();
+        if(add_payroll_group_code_hidden_val==""){
+            $("#add_payroll_group_code_hidden").val(payroll_group_code);
+        }else{
+            var hiddenValSelected=$("#add_payroll_group_code_hidden").val().split(",");
+            //alert(hiddenValSelected.length);
+            if(hiddenValSelected.length==1){
+                if($('#add_payroll_group_code_hidden').val()==payroll_group_code){
+                    $('#errors-group_payroll_group_code').text('"'+$.trim(selectedText)+'" is already selected before.');
+                }else{
+                    $("#add_payroll_group_code_hidden").val($('#add_payroll_group_code_hidden').val()+","+payroll_group_code);
+                    $('#all_payroll_category').text($('#all_payroll_category').text()+','+selectedText);
+                }
+            }else if(hiddenValSelected.length>1){
+                if($.inArray(payroll_group_code,hiddenValSelected)!=-1){
+                    $('#errors-group_payroll_group_code').text('"'+$.trim(selectedText)+'" is already selected before.');
+                }else{
+                    $("#add_payroll_group_code_hidden").val($('#add_payroll_group_code_hidden').val()+","+payroll_group_code);
+                    $('#all_payroll_category').text($('#all_payroll_category').text()+','+selectedText);
+                }
+            }
+        }
+    });
+    $("#name").on("change",function(){
+        if($.trim($(this).val())==""){
+            $("#errors-group_name").text("Please enter value for Payrool group.");
+        }else{
+            $("#errors-group_name").text("");
+        }
+    });
+    $("#group_code").on("change",function(){
+        if($.trim($(this).val())==""){
+            $("#errors-group_group_code").text("Please enter value for Payrool group code.");
+        }else{
+            $("#errors-group_group_code").text("");
+        }
+    });
+});
+
+
+</script>    
