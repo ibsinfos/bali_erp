@@ -1,0 +1,13 @@
+bus number( control with the number tan route) ***
+
+enable multiple trips.
+
+upload of photos after trip completion.
+
+disable log out.
+
+
+bus admin
+---------------
+-assign route nd bus num
+-see the attendence for the day for student

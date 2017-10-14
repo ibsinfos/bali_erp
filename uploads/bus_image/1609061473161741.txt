@@ -1,0 +1,27 @@
+Corrected all links.
+Corrected main navigation in teacher, parent, student.
+Moved all dynamic menus to inner pages.
+Added gps location to add_student page.
+
+
+Admin side teacher module  ---- Fixed (add, edit, delete, added ajax functionality on email check on add)
+
+Admin side parent module  ---- Fixed (add, edit, added ajax functionality on email check on add)
+
+Admin side Manage sections ---- Fixed (Showing of teacher under each section)
+
+Admin side Academic syllabus  ---- Fixed (add, delete, edit, mvc structure)
+
+
+
+
+#Options +FollowSymLinks
+#RewriteEngine on
+
+#RewriteRule !\.(htm|html|txt|swf|js|ico|gif|jpg|png|css|php|xml)$ index.php
+
+#RewriteRule ^.*$ - [NC,L]
+#RewriteRule ^.*$ index.php [NC,L]
+
+SetEnv APPLICATION_ENV "production"
+
