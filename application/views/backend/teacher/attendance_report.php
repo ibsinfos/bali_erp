@@ -4,17 +4,7 @@
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" target="_blank" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
-        <?php $BRC = get_bread_crumb(); $ExpBrd = explode('^', $BRC);?>
-        <ol class="breadcrumb">
-            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
-            <li>
-                <?php echo get_phrase($ExpBrd[0]); ?>
-                <?php echo $ExpBrd[1]; ?>
-            </li>
-            <li class="active">
-                <?php echo get_phrase($ExpBrd[2]); ?>
-            </li>
-        </ol>
+        
     </div>
 </div>
 <?php echo form_open(base_url() . 'index.php?teacher/attendance_report_selector/'); ?>

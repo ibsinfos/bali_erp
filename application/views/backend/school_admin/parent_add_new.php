@@ -28,9 +28,9 @@
 <div class="row white-box">
  <?php
     create_dynamic_form($arrDynamic,$arrGroups, $arrLabel, $arrAjaxEvent, $arrValidation, $arrFieldValue, $arrFieldQuery,
-            $arrDbField, $arrClass, $arrPlaceHolder, $arrMin, $arrMax);
+            $arrDbField, $arrClass, $arrPlaceHolder, $arrMin, $arrMax, $arrPost);
  
-    echo "<div class='text-right'>
+    echo "<div class='col-md-12 text-center'>
             <button type='submit' class='fcbtn btn btn-danger btn-outline btn-1d'>Add Parent</button>
           </div>";
 
@@ -50,8 +50,7 @@
     }
 
 
-
-    function validate_email(email) {
+    /*function validate_email(email) {
         $('#parent_email_error').hide();
         email = encodeURIComponent(email);
         mycontent = $.ajax({
@@ -76,13 +75,20 @@
         });
 
 
-    }
+    }*/
 
     $(document).ready(function () {
-        $('#email').change(function () {
+        $(".datepicker").datepicker({
+            dateFormat: "dd/mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            autoclose: true
+        });
+
+       /* $('#email').change(function () {
             email = $(this).val();
             validate_email(email);
-        });
+        });*/
 
     });
 

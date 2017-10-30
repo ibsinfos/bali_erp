@@ -1,7 +1,7 @@
 <div class="row bg-title">
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-        <h4 class="page-title"><?php echo get_phrase('fee_particulars');?></h4>
+        <h4 class="page-title"><?php echo get_phrase('fee_fines');?></h4>
     </div>
     <!-- /.page title -->
     <!-- .breadcrumb -->
@@ -12,7 +12,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?<?php echo $this->session->userdata('login_type');?>/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -61,8 +61,9 @@
                                     <td><?php echo $rec->grace_period.' days';?></td>
                                     <td><?php echo $rec->value.($rec->value_type==2?'%':''); ?></td>
                                     <td>
-                                        <a class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" 
-                                            data-original-title="Edit" href="<?php echo base_url('index.php?fees/main/fine_edit/'.$rec->id);?>">
+                                        <a href="javascript: void(0);" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" 
+                                            onclick="showAjaxModal('<?php echo base_url('index.php?fees/main/fine_edit/'.$rec->id)?>')"
+                                            data-placement="top" data-original-title="Edit">
                                             <i class="fa fa-pencil-square-o"></i>
                                          </a>
                                          <a href="javascript:void(0)" onclick="confirm_act('<?php echo base_url('index.php?fees/main/fine_delete/'.$rec->id);?>')">
@@ -81,7 +82,7 @@
                     <?php echo form_open(base_url('index.php?fees/main/fines'), array('class' => 'form-horizontal form-groups-bordered validate', 'target' => '_top')); ?>
                     <div class="row">
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="running_session"><?php echo get_phrase('running_session'); ?></label>
+                            <label for="running_session"><strong><?php echo get_phrase('current_session');?></strong></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                                 <input type="text" class="form-control" name="name" value="<?php echo $running_year?>" readonly/> 
@@ -92,7 +93,7 @@
 
                     <div class="row">          
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="field-1"><?php echo get_phrase('fine_name'); ?><span class="error mandatory">*</span></label>
+                            <label for="field-1"><strong><?php echo get_phrase('fine_name');?></strong><span class="error mandatory">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-road"></i></div>
                                 <input type="text" class="form-control" name="name" required="required" data-validate="required" 
@@ -104,7 +105,7 @@
                     
                     <div class="row">          
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="field-1"><?php echo get_phrase('grace_period'); ?><span class="error mandatory">*</span></label>
+                            <label for="field-1"><strong><?php echo get_phrase('grace_period');?></strong><span class="error mandatory">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-road"></i></div>
                                 <input type="text" class="form-control" name="grace_period" required="required" data-validate="required" 
@@ -116,7 +117,7 @@
 
                     <div class="row">          
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="field-1"><?php echo get_phrase('value_type'); ?><span class="error mandatory">*</span></label>
+                            <label for="field-1"><strong><?php echo get_phrase('value_type'); ?></strong><span class="error mandatory">*</span></label>
                             <div>
                                 <label class="radio-inline">
                                     <input type="radio" name="value_type" value="1" 
@@ -132,7 +133,7 @@
 
                     <div class="row">          
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="field-1"><?php echo get_phrase('fine_value'); ?></label>
+                            <label for="field-1"><strong><?php echo get_phrase('fine_value'); ?></strong></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-book"></i></div>
                                 <input type="number" class="form-control" name="value" value="<?php echo set_value('value')?>"/>
@@ -143,7 +144,7 @@
 
                     <div class="row">          
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="field-1"><?php echo get_phrase('fine_description'); ?></label>
+                            <label for="field-1"><strong><?php echo get_phrase('fine_description'); ?></strong></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-book"></i></div>
                                 <input type="text" class="form-control" name="description" value="<?php echo set_value('description')?>"/>

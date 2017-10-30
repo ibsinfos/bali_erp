@@ -203,8 +203,8 @@
                             <label class="mandatory"> <?php echo form_error('achivement_award'); ?></label>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit'); ?></button>
+                    <div class="text-center">
+                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('add_doctor'); ?></button>
                     </div>
 <?php echo form_close(); ?> 
                 </section>             

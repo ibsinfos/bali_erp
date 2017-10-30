@@ -30,7 +30,6 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="ibox float-e-margins">
-                    <div class="ibox-title"><h5>Term Setting</h5></div>
                     <div class="ibox-content">
                         <?php if (!count($terms)){?>}
                             <div class="form-group  col-lg-12">
@@ -40,7 +39,7 @@
                             </div>
                         <?php }?>
                         <div class="form-group col-lg-12">
-                            <label class="col-lg-4" for="header_scripts"><?php echo get_phrase('school_fee_terms')?></label>
+                            <label class="col-lg-4" for="header_scripts"><strong><?php echo get_phrase('school_fee_terms')?></strong></label>
                             <span class="col-md-8">
                                 <select multiple="true" id="tutionfee_installments" name="school_fee_terms[]" class="selectpicker" data-style="form-control" data-live-search="true">
                                     <?php foreach($terms as $ti=>$term){?>
@@ -53,7 +52,7 @@
                         </div>
                         
                         <div class="form-group col-lg-12">
-                            <label class="col-lg-4" for="header_scripts"><?php echo get_phrase('hostel_fee_terms')?></label>
+                            <label class="col-lg-4" for="header_scripts"><strong><?php echo get_phrase('hostel_fee_terms')?></strong></label>
                             <span class="col-md-8">
                                 <select multiple="true" id="hostelfee_installments" name="hostel_fee_terms[]" class="selectpicker" data-style="form-control" data-live-search="true">
                                     <?php foreach($terms as $ti=>$term){?>
@@ -66,7 +65,7 @@
                         </div>
                         
                         <div class="form-group col-lg-12">
-                            <label class="col-lg-4" for="header_scripts"><?php echo get_phrase('transport_fee_terms')?></label>
+                            <label class="col-lg-4" for="header_scripts"><strong><?php echo get_phrase('transport_fee_terms')?></strong></label>
                             <span class="col-md-8">
                                 <select multiple="true" id="transpfee_installments" name="transport_fee_terms[]" class="selectpicker" data-style="form-control" data-live-search="true">
                                     <?php foreach($terms as $ti=>$term){?>
@@ -83,17 +82,17 @@
             </div>
             <div class="col-md-6">
                 <div class="ibox-title">
-                    <h5><?php echo get_phrase('terms_available')?></h5>
+                    <h5><strong><?php echo get_phrase('terms_available')?></strong></h5>
                 </div>
                 <div class="ibox-content">
                     <table class="table table-bordered table-hover sys_table footable" data-page-size="50">
                         <tr>
-                            <th>#</th>
-                            <th>Term Name</th>
-                            <th>No</th>
-                            <th>School Fee</th>
-                            <th>Hostel Fee</th>
-                            <th>Transport Fee</th>
+                            <th><strong>S.N.</strong></th>
+                            <th><strong>Term Name</strong></th>
+                            <th><strong>No</strong></th>
+                            <th><strong>School Fee</strong></th>
+                            <th><strong>Hostel Fee</strong></th>
+                            <th><strong>Transport Fee</strong></th>
                         </tr>
                         <!-- {if $school_settings['academic_year']==''}
                             <tr>

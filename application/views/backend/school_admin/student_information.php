@@ -1,3 +1,9 @@
+<style  type="text/css">
+/*.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+    padding: 8px 0px;
+}*/
+</style>
+
 <div class="row bg-title"> 
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
         <h4 class="page-title"><?php echo get_phrase($page_title); ?> </h4></div>
@@ -20,8 +26,8 @@
 </div>
 <div class="row">
     <div class="col-md-10 form-group">
-        <div class="form-group col-sm-6 p-0" data-step="5" data-intro="<?php echo get_phrase('Select a class, then you will get a list of all students with their all information.');?>" data-position='right'>
-            <label class="control-label">Select Class</label>
+        <div class="form-group col-sm-3 p-0" data-step="5" data-intro="<?php echo get_phrase('Select_a_class,_then_you_will_get_a_list_of_all_students_with_their_all_information.');?>" data-position='right'>
+            <label class="control-label"><?php echo get_phrase('Select_Class'); ?></label>
             <select class="selectpicker" data-style="form-control" name="class_id" id="class_id" data-live-search="true" onchange="window.location = this.options[this.selectedIndex].value">
                 <option value="">Select Class</option>
                 <?php
@@ -40,7 +46,7 @@
     </div>
 
     <div class="col-md-2 hidden-xs">
-        <a href="<?php echo base_url(); ?>index.php?school_admin/student_add" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Student" data-step="6" data-intro="From here you can add a new student" data-position='left'>
+        <a href="<?php echo base_url(); ?>index.php?school_admin/student_add" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Student" data-step="6" data-intro="<?php echo get_phrase('From_here_you_can_add_a_new_student.');?>" data-position='left'>
             <i class="fa fa-plus"></i>
         </a> 
     </div>
@@ -50,7 +56,7 @@
 <div class="col-md-12 white-box">
     <div class="sttabs tabs-style-flip">
         <?php if ($class_id != '') { ?>
-            <nav data-step="7" data-intro="<?php echo get_phrase('Here, students of all sections of selected class will be displayed.');?>" data-position='top'>
+            <nav data-step="7" data-intro="<?php echo get_phrase('Here,_students_of_all_sections_of_selected_class_will_be_displayed.');?>" data-position='top'>
                 <ul>
                     <li>
                         <a href="#section-flip-1" class="sticon fa fa-users">
@@ -78,19 +84,19 @@
                     <table id="table" class="table display" cellspacing="0" width="100%">
                         <thead>
                             <tr>   
-                                <th width="3%"><div><?php echo get_phrase('no'); ?></div></th>
+                                <th width="5%"><div><?php echo get_phrase('no'); ?></div></th>
                                 <!--<th><div><?php // echo get_phrase('roll_no'); ?></div></th>-->
                                 <th width="10%"><div><?php echo get_phrase('name'); ?></div></th>
                                 <th width="15%"><div><?php echo get_phrase("father's_Name"); ?></div></th>
                                 <th width="15%"><div><?php echo get_phrase("mother's_Name"); ?></div></th>
-                                <th width="5%"><div><?php echo get_phrase('gender'); ?></div></th>
+                                <th width="8%"><div><?php echo get_phrase('gender'); ?></div></th>
                                 <th width="10%"><div><?php echo get_phrase('emergency_contact'); ?></div></th>
                                 <th width="10%"><div><?php echo get_phrase('medical_condition'); ?></div></th>
-                                <th width="5%"><div><?php echo get_phrase('media_consent'); ?></div></th>
+                                <!-- <th width="5%"><div><?php echo get_phrase('media_consent'); ?></div></th> -->
                                 <th width="5%"><div><?php echo get_phrase('status'); ?></div></th>
-            <th data-step="8" data-intro="<?php echo get_phrase('Here, You can view student \'s Academic performance,Marksheet,Documents and Enable or Disable the student.');?>" data-position='top' width="5%"><div><?php echo get_phrase('options'); ?></div>
+            <th data-step="8" data-intro="<?php echo get_phrase('Here,_You_can_view_student_\'s_Academic_performance,Marksheet,Documents_and_Enable_or_Disable_the_student.');?>" data-position='top' width="5%"><div><?php echo get_phrase('options'); ?></div>
                                 </th>
-<th data-step="9" data-intro="<?php echo get_phrase('Here, You can view student profile, edit and delete options also available.');?>" data-position='top' width="17%"><div><?php echo get_phrase('actions'); ?></div>
+<th data-step="9" data-intro="<?php echo get_phrase('Here,_You_can_view_student_profile,_edit_and_delete_options_also_available.');?>" data-position='top' width="17%"><div><?php echo get_phrase('actions'); ?></div>
                                 </th>
                             </tr>
                         </thead>
@@ -111,18 +117,18 @@
                             <table id="table_section_<?php echo $section['section_id']; ?>" class="table display" cellspacing="0" width="100%">
                                 <thead>
                                     <tr>  
-                                        <th><div><?php echo get_phrase('no'); ?></div></th>
-                                        <th><div><?php echo get_phrase('roll_no'); ?></div></th>
-                                        <th><div><?php echo get_phrase('name'); ?></div></th>
-                                        <th><div><?php echo get_phrase("father's_Name"); ?></div></th>
-                                        <th><div><?php echo get_phrase("mother's_Name"); ?></div></th>
-                                        <th><div><?php echo get_phrase('gender'); ?></div></th>
-                                        <th><div><?php echo get_phrase('emergency_contact'); ?></div></th>
-                                        <th><div><?php echo get_phrase('medical_condition'); ?></div></th>
-                                        <th><div><?php echo get_phrase('media_consent'); ?></div></th>
-                                        <th><div><?php echo get_phrase('status'); ?></div></th>
-                                        <th><div><?php echo get_phrase('options'); ?></div></th>
-                                        <th width="15%"><div><?php echo get_phrase('actions'); ?></div></th>
+                                        <th style="width: 5% !important;"><div><?php echo get_phrase('no'); ?></div></th>
+                                        <th style="width: 5% !important;"><div><?php echo get_phrase('roll_no'); ?></div></th>
+                                        <th style="width: 5% !important;"><div><?php echo get_phrase('name'); ?></div></th>
+                                        <th style="width: 10% !important;"><div><?php echo get_phrase("father's_Name"); ?></div></th>
+                                        <th style="width: 12% !important;"><div><?php echo get_phrase("mother's_Name"); ?></div></th>
+                                        <th style="width: 8% !important;"><div><?php echo get_phrase('gender'); ?></div></th>
+                                        <th style="width: 8% !important;"><div><?php echo get_phrase('emergency_contact'); ?></div></th>
+<!--                                        <th width="10%" class="hide"><div><?php //echo get_phrase('medical_condition'); ?></div></th>-->
+                                        <th style="width: 10% !important;"><div><?php echo get_phrase('media_consent'); ?></div></th>
+                                        <th style="width: 10% !important;"><div><?php echo get_phrase('status'); ?></div></th>
+                                        <th style="width: 10% !important;"><div><?php echo get_phrase('options'); ?></div></th>
+                                        <th style="width: 15% !important;"><div><?php echo get_phrase('actions'); ?></div></th>
                                     </tr>
                                 </thead>
 
@@ -181,7 +187,7 @@
 
             //Set column definition initialisation properties.
             "columnDefs": [
-                {"targets": [0, 9, 10], "orderable": false},
+                {"targets": [0, 8, 9], "orderable": false},
             ],
 
         });
@@ -221,13 +227,19 @@
 
                 //Set column definition initialisation properties.
                 "columnDefs": [
-                    {"targets": [0, 9, 10, 11], "orderable": false},
+                    {"targets": [0, 9, 10, 10], "orderable": false},
                 ],
 
             });
 
         });
 
+
+       
+        /*table.columns().iterator( 'column', function (ctx, idx) {
+            $( table.column(idx).header() ).append('<span class="sorting"/>');
+            
+          } );*/
         //datatables for sections ends here
 
         table.$('tr').tooltip({selector: '[data-toggle="tooltip"]'});

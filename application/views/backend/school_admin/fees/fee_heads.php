@@ -30,11 +30,11 @@
             <nav>
                 <ul>
                     <li class="active" data-step="5" data-intro="<?php echo get_phrase('From here you can view the list of fee head');?>" data-position='right'>
-                        <a href="#list" class="sticon fa fa-list"><span class="hidden-xs"><?php echo get_phrase('heads_list'); ?></span></a>
+                        <a href="#list" class="sticon fa fa-list"><span class="hidden-xs"><?php echo get_phrase('fee_heads'); ?></span></a>
                     </li>
                     <li data-step="6" data-intro="<?php echo get_phrase('From here you can add new fee head');?>" data-position='left'>
                         <a href="#add" class="sticon fa fa-plus-circle">
-                            <span class="hidden-xs"><?php echo get_phrase('add_head'); ?></span>
+                            <span class="hidden-xs"><?php echo get_phrase('create_fee_head'); ?></span>
                         </a>
                     </li>
                 </ul>
@@ -47,7 +47,7 @@
                             <tr>
                                 <th><div><?php echo get_phrase('no'); ?></div></th>
                                 <th><div><?php echo get_phrase('head_name'); ?></div></th>
-                                <th><div><?php echo get_phrase('for'); ?></div></th>
+                                <th><div><?php echo get_phrase('fee_head_type'); ?></div></th>
                                 <th><div><?php echo get_phrase('action'); ?></div></th>
                             </tr>
                         </thead>
@@ -93,12 +93,12 @@
                     'target' => '_top')); ?>
                     <div class="row">
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="running_session"><?php echo get_phrase('running_session'); ?></label>
+                            <label for="running_session"><?php echo get_phrase('current_session'); ?></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                                 <input type="text" class="form-control" name="name" value="<?php echo $running_year?>" readonly/> 
                                 <!-- <select name="running_year" class="form-control" readonly>
-                                      <option value=""><?php //echo get_phrase('select_running_session');?></option>
+                                      <option value=""><?php //echo get_phrase('select_current_session');?></option>
                                       <?php /*$last_year = date('Y',strtotime('-1 year'));
                                             for($i = 0; $i < 10; $i++){
                                                 $grp_year = ($last_year+$i).'-'.($last_year+($i+1));?>
@@ -157,7 +157,7 @@
 
                     <div class="form-group">
                         <div class="text-right">
-                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit');?></button>
+                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('create_fee_head');?></button>
                         </div>
                     </div>
                    <?php echo form_close()?>   

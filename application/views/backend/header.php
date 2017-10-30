@@ -1,3 +1,25 @@
+<style>
+  a .default_theme{
+    display: inline;
+    width: 4px;
+    height: 1px;
+    padding: 0 6px;
+    cursor: pointer;
+    border: solid 1px;
+    background: #707cd2;
+}
+a .diffrent_theme{
+    display: inline;
+    width: 4px;
+    height: 1px;
+    padding: 0 6px;
+    cursor: pointer;
+    border: solid 1px;
+    background: #a28cc1
+}
+
+.heartbit{font-size: 30px;}
+</style>
 <?php
 //$filename = $this->crud_model->get_image_url('admin', $this->session->userdata('admin_id'));
 // $date_last_modif = date('Y-m-d', @filemtime($filename));
@@ -8,7 +30,7 @@ if ($this->session->userdata('student_login') == 1) {
     $student_id = $this->session->userdata('student_id');
     $filename = $this->crud_model->get_records('student', array('student_id' => $student_id), 'stud_image');
     $filename = $filename[0]['stud_image'];
-    $file_name = 'uploads/student_image/' . $filename;
+    $file_name = base_url().'uploads/student_image/' . $filename;
 } else if ($this->session->userdata('admin_login') == 1) {
     $admin_id = $this->session->userdata('admin_id');
 
@@ -23,7 +45,7 @@ if ($this->session->userdata('student_login') == 1) {
     $filename = $this->crud_model->get_records('teacher', array('teacher_id' => $teacher_id), 'teacher_image');
     $filename = $filename[0]['teacher_image'];
     $file_name = 'uploads/teacher_image/' . $filename;
-} else if ($this->session->userdata('parent_login') == 1) {
+} else if ($this->session->userdata('parent_login') == 1) { 
     $parent_id = $this->session->userdata('parent_id');
     $filename = $this->crud_model->get_records('parent', array('parent_id' => $parent_id), 'parent_image');
     $filename = $filename[0]['parent_image'];
@@ -111,19 +133,16 @@ if($this->session->userdata('login_user_id') == ''){
             <!-- /.Task dropdown -->
             <!-- /.dropdown -->
             <li data-step="3" data-intro="<?php echo get_phrase('What you want you just search from here!');?>" data-position='left'>
-                <form role="search" class="form-group bs-example m-b-0 m-r-10 hidden-xs">
+<form role="search" class="form-group bs-example hidden-xs"> <!--  m-b-20 m-t-20 -->
 <!--                <input type="text" placeholder="Search..." class="form-control typeahead tt-query" data-provide="typeahead" autocomplete="off" spellcheck="false" id="PublicSearch" value="<?php //echo @$search_text; ?>">-->
-                    <input class="form-control typeahead tt-query button-on" placeholder="search.." value="<?php echo @$search_text; ?>" id="PublicSearch"/>
+                    <input class="form-control typeahead tt-query button-on" placeholder="Search.." value="<?php echo @$search_text; ?>" id="PublicSearch"/>
                     <a href=""><i class=""></i></a>
                 </form>
                 <div class="serch-click-overlay">
-
                     <span class="serach-cross"><i class="fa fa-times"></i></span>
-
                     <input type="text" placeholder="Search..." id="searchString" value="<?php echo @$search_text; ?>"/>
                     <input id="submitSearch" type="hidden" value="" />
                     <span class="serach-fa-text"><i class="fa fa-search"></i></span>
-
                     <div class="col-xs-12 col-xs-offset-1 col-xs-10 no-padding top-tiles">
                         <div class="col-xs-12 col-sm-4"><h1 class="text-white">Student</h1>
 <?php if ($this->session->userdata('school_admin_login') == 1) { ?>
@@ -201,7 +220,7 @@ if($this->session->userdata('login_user_id') == ''){
                         </div>
                         <div class="col-xs-12 col-sm-4"><h1 class="text-white">Teacher</h1>
 <?php if ($this->session->userdata('school_admin_login') == 1) { ?>
-                            <div class="m-b-20 dummy-media-object" search-location="admin/teacher"><a class="text-white" href="#">
+                            <div class="m-b-20 dummy-media-object" search-location="school_admin/teacher"><a class="text-white" href="#">
                                     <span class="text-font-tile"><i class="fa fa-user m-r-20"></i></span>
                                     <span class="text-font">Teacher List</span>
                                 </a>
@@ -258,7 +277,7 @@ if($this->session->userdata('login_user_id') == ''){
 
                     <?php
                     $filename = $this->crud_model->get_image_url('admin', $this->session->userdata('admin_id'));
-
+                    $file_name = '';
                     $lastModified = @filemtime($filename);
 //if($lastModified == NULL)
                     $lastModified = @filemtime(utf8_decode($filename));
@@ -266,16 +285,25 @@ if($this->session->userdata('login_user_id') == ''){
                         $student_id = $this->session->userdata('student_id');
                         $filename = $this->crud_model->get_records('student', array('student_id' => $student_id), 'stud_image');
                         $filename = $filename[0]['stud_image'];
+                        if(!empty($filename) && file_exists(FCPATH.'uploads/student_image/'.$filename)){
                         $file_name = 'uploads/student_image/' . $filename;
+                        }                         
                     } else if ($this->session->userdata('admin_login') == 1) {
                         $admin_id = $this->session->userdata('admin_id');
 
                         $filename = $this->crud_model->getSpecificRecord($this->session->userdata('table'), $admin_id);
 
-                        if (isset($filename['type']) && $filename['type'] == "A")
-                            $file_name = 'uploads/admin_image/' . $filename['image'];
-                        if (isset($filename['type']) && $filename['type'] == "T")
-                            $file_name = 'uploads/teacher_image/' . $filename['image'];
+                        if (isset($filename['type']) && $filename['type'] == "A"){
+                            if($filename['image']!=''){
+                                $file_name = 'uploads/admin_image/' . $filename['image'];
+                            }
+                        }                                    
+                        if (isset($filename['type']) && $filename['type'] == "T"){
+                             if($filename['image']!=''){
+                                $file_name = 'uploads/teacher_image/' . $filename['image'];
+                            }      
+                        }
+                            
                     } else if ($this->session->userdata('teacher_login') == 1) {
                         $teacher_id = $this->session->userdata('teacher_id');
                         $filename = $this->crud_model->get_records('teacher', array('teacher_id' => $teacher_id), 'teacher_image');
@@ -285,8 +313,9 @@ if($this->session->userdata('login_user_id') == ''){
                         $parent_id = $this->session->userdata('parent_id');
                         $filename = $this->crud_model->get_records('parent', array('parent_id' => $parent_id), 'parent_image');
                         $filename = $filename[0]['parent_image'];
-                        $file_name = "";
-                        $file_name = 'uploads/parent_image/' . $filename;
+                        if(!empty($filename) && file_exists(FCPATH.'uploads/parent_image/'.$filename)){
+                         $file_name = 'uploads/parent_image/' . $filename;   
+                        }                        
                     } else if ($this->session->userdata('hostel_login') == 1) {
                         $hostel_admin_id = $this->session->userdata('hostel_admin_id');
                         $filename = $this->crud_model->get_records('hostel_admin', array('hostel_admin_id' => $hostel_admin_id), 'image');
@@ -303,31 +332,54 @@ if($this->session->userdata('login_user_id') == ''){
                             $filename = $filename['profile_pic'];
                             $file_name = 'uploads/sc_admin_images/' . $filename;
                         }    
-                    }else {
-                        $file_name = 'uploads/user.jpg';
+                    }else if($this->session->userdata('doctor_login') == 1){
+                        $doctor_id = '';
+                        $doctor_id = $this->session->userdata('doctor_id');
+                        if(isset($_SESSION['doctor_id']))
+                            $doctor_id = $_SESSION['doctor_id'];
+                        $filename = $this->Doctor_model->get_data_by_id($doctor_id);
+                        $file_name = $filename->profile_pic;
+                        if(!empty($file_name) && file_exists(FCPATH.'uploads/doctor_image/'.$file_name))
+                        {  
+                         $file_name = 'uploads/doctor_image/' . $file_name; 
+                        }
+                    }else if($this->session->userdata('bus_driver_login') == 1){
+                        $bus_driver_id = $this->session->userdata('bus_driver_id');
+                        $bus_driver_id = '';
+                        if(isset($_SESSION['bus_driver_id']))
+                            $bus_driver_id = $_SESSION['bus_driver_id'];
+                        $filename = $this->Bus_driver_modal->get_bus_driver($bus_driver_id);
+                        $file_name = $filename->driver_image;
+                        if(!empty($file_name) && file_exists(FCPATH.'uploads/bus_driver_image/'.$file_name))
+                        {  
+                         $file_name = 'uploads/bus_driver_image/' . $file_name; 
+                        }
                     }
+                    ?><?php  
+                    if($file_name == ''){
+//                        echo "sucess";
+                        $file_name = base_url().'uploads/user.png';
+                    }
+//                    echo $file_name;
                     ?>
-                    <img src="<?php echo (file_exists($file_name) ? $file_name : 'uploads/user.png'); ?>" alt="user-img" width="36" height="36" class="img-circle">
-
+                    <img src="<?php echo $file_name; ?>" alt="user-img" width="36" height="36" class="img-circle">
                     <b class="hidden-xs"><?php echo $this->session->userdata('name'); ?></b><span class="caret"></span> </a>
-
-
                 <ul class="dropdown-menu dropdown-user animated flipInY">
                     <li>
                         <div class="dw-user-box">
                             <div class="u-img">
-
                                 <?php
                                 $filename = $this->crud_model->get_image_url('admin', $this->session->userdata('admin_id'));
-
                                 $lastModified = @filemtime($filename);
-//if($lastModified == NULL)
+                                //if($lastModified == NULL)
                                 $lastModified = @filemtime(utf8_decode($filename));
                                 if ($this->session->userdata('student_login') == 1) {
                                     $student_id = $this->session->userdata('student_id');
                                     $filename = $this->crud_model->get_records('student', array('student_id' => $student_id), 'stud_image');
                                     $filename = $filename[0]['stud_image'];
+                                    if($filename!=''){
                                     $file_name = 'uploads/student_image/' . $filename;
+                                    }
                                 } else if ($this->session->userdata('admin_login') == 1) {
                                     $admin_id = $this->session->userdata('admin_id');
 
@@ -346,18 +398,22 @@ if($this->session->userdata('login_user_id') == ''){
                                     $parent_id = $this->session->userdata('parent_id');
                                     $filename = $this->crud_model->get_records('parent', array('parent_id' => $parent_id), 'parent_image');
                                     $filename = $filename[0]['parent_image'];
-                                    $file_name = "";
-                                    $file_name = 'uploads/parent_image/' . $filename;
+                                    if(!empty($filename) && file_exists(FCPATH.'uploads/parent_image/'.$filename)){
+                                    $file_name = 'uploads/parent_image/' . $filename;   
+                                    }    
                                 } else if ($this->session->userdata('hostel_login') == 1) {
                                     $hostel_admin_id = $this->session->userdata('hostel_admin_id');
                                     $filename = $this->crud_model->get_records('hostel_admin', array('hostel_admin_id' => $hostel_admin_id), 'image');
                                     $filename = $filename[0]['image'];
                                     $file_name = 'uploads/hostel_admin_image/' . $filename;
-                                } else {
-                                    $file_name = 'uploads/user.jpg';
-                                }
+                                } else if ($this->session->userdata('school_admin_login') == 1) {
+                                    $school_admin_id = $this->session->userdata('school_admin_id');
+                                    $filename = $this->crud_model->get_records('school_admin', array('school_admin_id' => $school_admin_id), 'profile_pic');
+                                    $filename = $filename[0]['profile_pic'];
+                                    $file_name = 'uploads/sc_admin_images/' . $filename;
+                                } 
                                 ?>
-                                <img src="<?php echo (file_exists($file_name) ? $file_name : 'uploads/user.jpg'); ?>" alt="user-img" width="80" height="80" class="img-circle">
+                                <img src="<?php echo (file_exists(FCPATH.$file_name) ? $file_name : 'uploads/user.png'); ?>" alt="user-img" width="80" height="80" class="img-circle">
 
                             </div>
 
@@ -385,11 +441,11 @@ if($this->session->userdata('login_user_id') == ''){
                     <!--start-->
                    
                     <div id="demo-wrapper">
-                        <li data-path="<?php echo base_url();?>assets/css/custom-style.css"><a href="#"><i class="fa fa-picture-o"></i> Default Theme</a></li>
+                        <li data-path="<?php echo base_url();?>assets/css/custom-style.css"><a href="#"><span class="default_theme">&nbsp;</span> Default Theme</a></li>
                      </div>   
                     <li role="separator" class="divider"></li>
                      <div id="demo-wrapper">
-                        <li data-path="<?php echo base_url();?>assets/css/second-theme.css"><a href="#"><i class="fa fa-picture-o"></i> Dimmer Theme</a></li>
+                         <li data-path="<?php echo base_url();?>assets/css/second-theme.css"><a href="#"><span class="diffrent_theme">&nbsp;</span> Dimmer Theme</a></li>
                      </div>
                     <!--end-->
                 
@@ -420,7 +476,7 @@ function getPushNotification() {
     mycontent = $.ajax({
         async: false,
         dataType: 'json',
-        url: base_url + 'index.php?Ajax_controller/getNotifications',
+        url: base_url + 'index.php?Ajax_controller/getNotifications_new',
         success: function (response) {
         },
         error: function (error_param, error_status) {
@@ -428,8 +484,8 @@ function getPushNotification() {
         }
     });
     notific = $.parseJSON(mycontent.responseText);
+    $('.push_notification_content').empty();
     $('.push_notification_content').html(notific.notifications);
-
 }
 </script>
 

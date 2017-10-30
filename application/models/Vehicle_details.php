@@ -27,14 +27,43 @@ class Vehicle_details extends CI_Model {
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
             if($school_id > 0){
-                 $sql="SELECT vd.*,t.route_name,bd.name as driver_name,b.name as bus_name FROM vehicle_details vd JOIN bus b on(vd.bus_id=b.bus_id) JOIN transport t on(vd.route_id=t.transport_id) JOIN bus_driver bd on(vd.driver_id=bd.bus_driver_id) WHERE vd.school_id = '".$school_id."'";
+                 $sql="SELECT vd.*,t.route_name,bd.name as driver_name,b.name as bus_name FROM vehicle_details vd JOIN bus b on(vd.bus_id=b.bus_id) JOIN transport t on(vd.route_id=t.transport_id) JOIN bus_driver bd on(vd.driver_id=bd.bus_driver_id) WHERE vd.school_id = '".$school_id."' ORDER BY vd.vehicle_details_id DESC";
             } 
         } else {
-            $sql="SELECT vd.*,t.route_name,bd.name as driver_name,b.name as bus_name FROM vehicle_details vd JOIN bus b on(vd.bus_id=b.bus_id) JOIN transport t on(vd.route_id=t.transport_id) JOIN bus_driver bd on(vd.driver_id=bd.bus_driver_id)";
+            $sql="SELECT vd.*,t.route_name,bd.name as driver_name,b.name as bus_name FROM vehicle_details vd JOIN bus b on(vd.bus_id=b.bus_id) JOIN transport t on(vd.route_id=t.transport_id) JOIN bus_driver bd on(vd.driver_id=bd.bus_driver_id)  ORDER BY vd.vehicle_details_id DESC";
         }
         $rs = $this->db->query($sql)->result_array();
         return $rs;
     }
+    
+    public function get_all_details_by_busDriver($bus_driver_id = '', $bus_id = ''){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                  $sql="SELECT vd.*,t.route_name,bd.name as driver_name,b.name as bus_name FROM vehicle_details vd join bus_driver bd JOIN bus b on(vd.bus_id=b.bus_id) LEFT JOIN transport t on(vd.route_id=t.transport_id) WHERE bd.bus_driver_id = '".$bus_driver_id."' and b.bus_id = '".$bus_id."' and vd.school_id = '".$school_id."' ORDER BY vd.vehicle_details_id DESC limit 1";
+            } 
+        } else {
+            $sql="SELECT vd.*,t.route_name,bd.name as driver_name,b.name as bus_name FROM vehicle_details vd LEFT JOIN bus b on(vd.bus_id=b.bus_id) LEFT JOIN transport t on(vd.route_id=t.transport_id) LEFT JOIN bus_driver bd on(vd.driver_id=bd.bus_driver_id) WHERE bd.bus_driver_id = '".$bus_driver_id."' and b.bus_id = '".$bus_id."' ORDER BY vd.vehicle_details_id DESC limit 1";
+        }
+        $rs = $this->db->query($sql)->result_array();
+//        echo $this->db->last_query(); die;
+        return $rs;
+    }
+    public function get_all_vehicle_details(){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                 $sql="SELECT vd.*,t.route_name,bd.name as driver_name,b.name as bus_name,b.bus_unique_key,a.name,a.email as admin_email FROM vehicle_details vd JOIN bus b on(vd.bus_id=b.bus_id) JOIN transport t on(vd.route_id=t.transport_id) JOIN bus_driver bd on(vd.driver_id = bd.bus_driver_id) JOIN admin as a WHERE vd.school_id = '".$school_id."' and a.school_id = '".$school_id."' ORDER BY vd.vehicle_details_id DESC";
+                 
+            } 
+        }        
+        $rs = $this->db->query($sql)->result_array();
+//        echo $this->db->last_query(); die;
+        return $rs;
+    }
+    
     public function updatebyId($vehicle_details_id,$dataArray){
         $this->db->where('vehicle_details_id',$vehicle_details_id);
         $this->db->update($this->_table, $dataArray);

@@ -25,7 +25,8 @@
                         <th width="5%"><div>No</div></th>
                         <th width="25%"><div><?php echo get_phrase('title');?></div></th>
                         <th width="45%"><div><?php echo get_phrase('notice');?></div></th>
-                        <th width="15%"><div><?php echo get_phrase('class');?></div></th>
+                        <th width="10%"><div><?php echo get_phrase('send_by');?></div></th>
+                        <!-- <th width="15%"><div><?php echo get_phrase('class');?></div></th> -->
                         <th width="10%"><div><?php echo get_phrase('date');?></div></th>
                     </tr>
                 </thead>
@@ -34,13 +35,14 @@
                     <tr>
                         <td><?php echo $count++;?></td>
                         <td><?php echo ucfirst(wordwrap($row['notice_title'], 60, "\n", true));?></td>
-                        <td class="span5"><?php echo ucfirst(wordwrap($row['notice'], 60, "\n", true));?></td>
-                        <?php if($row['class_id'] == ''){ ?>
+                        <td class="span5"><?php echo ucfirst(wordwrap($row['message'], 60, "\n", true));?></td>
+                        <td><?php echo ($row['sender_type']=='SA') ? 'School Admin':(($row['sender_type']=='T')?'Teacher':'');?></td>
+                        <!-- <?php if($row['class_id'] == ''){ ?>
                         <td><?php echo get_phrase('common_notice');?></td>
                         <?php } else{ ?>
                         <td><?php echo $row['name'];?></td>
-                        <?php } ?>
-                        <td><?php echo date('d M, Y', $row['create_timestamp']);?></td>							
+                        <?php } ?> -->
+                        <td><?php echo date('d M, Y', strtotime($row['message_created_at']));?></td>							
                     </tr>
                     <?php endforeach;?>
                     </tbody>

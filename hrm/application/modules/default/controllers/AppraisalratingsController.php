@@ -166,6 +166,11 @@ class Default_AppraisalratingsController extends Zend_Controller_Action
         $appraisal_rating = '';
         $appraisalratingsform = new Default_Form_Appraisalratings();
         $appInitModel = new Default_Model_Appraisalinit();
+        
+        $departmentsmodel = new Default_Model_Departments();
+        $departmentlistArr = $departmentsmodel->getDepartmentList();
+        $this->view->deptArr = $departmentlistArr;
+        
 		if($loginuserRole != SUPERADMINROLE && $loginuserGroup != MANAGEMENT_GROUP && $loginuserGroup != HR_GROUP)
         {
 			$checkActiveApp = $appInitModel->checkAppraisalExists($businessUnit,$department);
@@ -393,7 +398,7 @@ class Default_AppraisalratingsController extends Zend_Controller_Action
 							$deptOptions = isset($optionsArray['deptoptions'])?$optionsArray['deptoptions']:'';
 							/* End */
 							$this->view->performanceappflag = $performanceappflag;	
-							$this->view->buOptions = $buOptions;
+							//$this->view->buOptions = $buOptions;
 							$this->view->deptOptions = $deptOptions;	
 							$this->view->data = $data;
 							$this->view->checkActiveApp = $appInitdata[0];
@@ -451,7 +456,7 @@ class Default_AppraisalratingsController extends Zend_Controller_Action
 			}        	
         	$this->view->appraislaid = $id;
         	$this->view->performanceappflag = $performanceappflag;
-        	$this->view->businessUnitId = $businessUnitId;
+        	//$this->view->businessUnitId = $businessUnitId;
         	$this->view->departmentId = $departmentId;
         	$this->view->buOptions = $buOptions;
         	$this->view->deptOptions = $deptOptions;
@@ -464,11 +469,11 @@ class Default_AppraisalratingsController extends Zend_Controller_Action
 		$businessunitmodel = new Default_Model_Businessunits();
 		$deptmodel = new Default_Model_Departments();
 		$deptOptions = '';
-		$buDataArr = $businessunitmodel->getSingleUnitData($businessUnitId);
-		if(!empty($buDataArr))
-		{
-			$buOptions = "<option value=".$buDataArr['id'].">".utf8_encode($buDataArr['unitname'])."</option>";
-		}
+//		$buDataArr = $businessunitmodel->getSingleUnitData($businessUnitId);
+//		if(!empty($buDataArr))
+//		{
+//			$buOptions = "<option value=".$buDataArr['id'].">".utf8_encode($buDataArr['unitname'])."</option>";
+//		}
 		//if($performanceappflag == 0)
 		//{
 			if($departmentId!='')

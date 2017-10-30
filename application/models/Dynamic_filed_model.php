@@ -33,6 +33,7 @@ class Dynamic_filed_model extends CI_Model {
         $this->db->select("dynamic_fields.*,dynamic_group.name");
         $this->db->from($this->_table);
         $this->db->join($this->_table_dynamic_group,'dynamic_fields.group_id = dynamic_group.id','left');
+        $this->db->order_by("group_id","order_id");
         return $this->db->get()->result_array();
     }    
      function delete_field($where){

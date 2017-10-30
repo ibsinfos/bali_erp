@@ -52,7 +52,7 @@
             <div class="row">
                 <div class="col-md-12" id="add-type">
                     <div class="form-group">
-                        <form>
+                        <form class="form-material">
                             <label class="control-label">Event Category</label>
                             <input class="form-control form-white" placeholder="Category Name" type="text" name="category-name" id="category-name"  />
                         </form>

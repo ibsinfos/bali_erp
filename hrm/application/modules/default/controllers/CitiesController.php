@@ -678,7 +678,7 @@ class Default_CitiesController extends Zend_Controller_Action
 				$result = sapp_Global::logManager($menuID,$actionflag,$loginUserId,$tableid);
 				if(isset($selectedstateid) && isset($selectedcountryid))
 				{
-					$cityData = $citiesmodel->fetchAll("isactive = '1' and state = '".$selectedstateid."' and countryid = '".$selectedcountryid."' AND school_id ='".$school_id."'",'city')->toArray();
+					$cityData = $citiesmodel->fetchAll("isactive = '1' and state = '".$selectedstateid."' and countryid = '".$selectedcountryid."'",'city')->toArray();
 				}
 				else $cityData = array();				
 				

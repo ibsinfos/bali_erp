@@ -15,12 +15,19 @@
              <div class="p-30">
                 <div class="row">
                     <div class="col-xs-4">
-                        <?php if($doctor_list->profile_pic!= ''){
-                            $img = base_url()."uploads/doctor_image/".$doctor_list->profile_pic;
-                        }else{
-                            $img = base_url()."uploads/doctor_image/doctor.png";
-                        } ?>
-                        <img src="<?php echo $img; ?>" width="200px" height="200px">
+                        <?php if ($doctor_list->profile_pic != "" && file_exists('uploads/doctor_image/' . $doctor_list->profile_pic)) {
+                                $doctor_image = $doctor_list->profile_pic;
+                                } else {
+                                    $doctor_image = '';
+                                } ?>
+                                <img src="<?php echo ($doctor_image!=""?"uploads/doctor_image/".$doctor_image:"uploads/user.png");?>" width="200px" height="200px"/>
+                        
+                        <?php // if($doctor_list->profile_pic!= ''){
+//                            $img = base_url()."uploads/doctor_image/".$doctor_list->profile_pic;
+//                        }else{
+//                            $img = base_url()."uploads/doctor_image/doctor.png";
+//                        } ?>
+                        <!--<img src="<?php // echo $img; ?>" width="200px" height="200px">-->
                     </div>
                 <div class="col-xs-8">
                     <h2 class="m-b-0"><?php echo $doctor_list->name; ?></h2>

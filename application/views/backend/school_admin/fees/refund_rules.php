@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?<?php echo $this->session->userdata('login_type');?>/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -44,17 +44,25 @@
                     <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
                         <thead>
                             <tr>
-                                <th><div><?php echo get_phrase('no'); ?></div></th>
-                                <th><div><?php echo get_phrase('rule_name'); ?></div></th>
-                                <th><div><?php echo get_phrase('action'); ?></div></th>
+                                <th><div><?php echo get_phrase('no');?></div></th>
+                                <th><div><?php echo get_phrase('rule_name');?></div></th>
+                                <th><div><?php echo get_phrase('group_name');?></div></th>
+                                <th><div><?php echo get_phrase('term_type');?></div></th>
+                                <th><div><?php echo get_phrase('term_name');?></div></th>
+                                <th><div><?php echo get_phrase('amount');?></div></th>
+                                <th><div><?php echo get_phrase('action');?></div></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $count = 1;
                             foreach ($refund_rules as $row): ?>
                                 <tr>
-                                    <td><?php echo $count++; ?></td>
-                                    <td><?php echo $row['name']; ?></td>
+                                    <td><?php echo $count++;?></td>
+                                    <td><?php echo $row['name'];?></td>
+                                    <td><?php echo $row['fee_group_name'];?></td>
+                                    <td><?php echo $row['term_name'];?></td>
+                                    <td><?php echo $row['setup_term_name'];?></td>
+                                    <td><?php echo $row['amount_type']==1?$row['amount'].'%':$row['amount']?></td>
                                     <td>
                                         <a href="<?php echo base_url('index.php?fees/refund/refund_rule_edit/'.$row['id']);?>">
                                             <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil-square-o"></i></button>
@@ -76,7 +84,7 @@
                     <?php echo form_open(base_url('index.php?fees/refund/refund_rule_create'), array('class' => 'form-horizontal form-groups-bordered validate', 'target' => '_top')); ?>
                     <div class="row">
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                            <label for="running_session"><?php echo get_phrase("current_session"); ?></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                                 <input name="running_year" class="form-control" value="<?php echo sett('running_year')?>" readonly>

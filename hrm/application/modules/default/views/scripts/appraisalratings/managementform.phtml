@@ -43,7 +43,7 @@ else
 <input type="hidden" id="appraisalid" name="appraisalid" value="<?php echo $appraisalid;?>" >
 <input type="hidden" id="perf_app_flag" name = "perf_app_flag" value="<?php echo $performance_app_flag;?>">
 <?php if($this->flag == 1) {?>
-	<div class="new-form-ui">
+	<?php /*<div class="new-form-ui">
 		<label >Business Unit</label>
 		<div class="division">
 			<select id="bunit_id" name="bunit_id" onchange="checkappratings('1',this.value)">
@@ -56,18 +56,21 @@ else
 			</select>
 			<span class="errors" id="errors-bunit_id"></span>
 		</div>	
-	</div>
+	</div> */ ?>
 	<div class="new-form-ui" id="deptdiv">
 		<label >Department <img class="tooltip" title="Select business unit to populate departments" src="<?php echo $this->baseUrl().'/public/media/';?>images/help.png"></label>
 		<div class="division">
 				<select id="dept_id" name="dept_id" onchange="checkappratings('2',this.value)">
 				<option  value="">Select Department</option>
+                                <?php foreach($this->deptArr as $key=>$dept) { ?>
+                                <option  value="<?php echo $dept['id']; ?>"><?php echo $dept['deptname']; ?></option>
+                                <?php } ?>
 				</select>
 				<span class="errors" id="errors-dept_id"></span>
 		</div>
 	</div>
 <?php } else {?>
-	<div class="new-form-ui">
+	<?php /*<div class="new-form-ui">
 		<label >Business Unit</label>
 		<div class="division">
 			<select id="bunit_id" name="bunit_id" >
@@ -80,7 +83,7 @@ else
 			</select>
 			<span class="errors" id="errors-bunit_id"></span>
 		</div>	
-	</div>
+	</div> */ ?>
 	<?php if($this->performanceappflag == 0) { ?>
 		<div class="new-form-ui" id="deptdiv">
 			<label >Department </label>
@@ -104,13 +107,13 @@ else
 function displayappraisalratings(flag)
 {
 	var appraisalid = $("#appraisalid").val();
-	var bunitid = $("#bunit_id").val();
+	//var bunitid = $("#bunit_id").val();
 	var deptid = $("#dept_id").val();
 	var perf_app_flag = $("#perf_app_flag").val();
 	if(flag == 1)
 		DATA = 'appraisalid='+appraisalid+'&flag='+flag;
 	else
-		DATA = 'bunitid='+bunitid+'&deptid='+deptid+'&flag='+flag+'&perf_app_flag='+perf_app_flag;
+		DATA = 'deptid='+deptid+'&flag='+flag+'&perf_app_flag='+perf_app_flag;
 	$.ajax({
 		url: base_url+"/appraisalratings/addratings/format/html",
 		type : 'POST',	

@@ -347,3 +347,63 @@ function fi_collection_closed(){
     $close_rec = $ci->db->get_where('fi_day_end_process',array('DATE(date)'=>date('Y-m-d')))->row();
     return $close_rec?true:false;
 }
+
+function get_timing_st_color($st=false,$at_st=false,$closed=false,$custom=false,$is_admin=false){
+    $return = array('style'=> '','info'=>false);
+    if($st==1){
+        //1.Entry-Exit Right
+        $return['info'] = 'Entry-Exit Right';
+        $return['style'] = 'color: #0EB736;font-weight: bold;';    
+    } else if($st==2){
+        //2.Entry Right-Exit Early
+        $return['info'] = 'Entry Right-Exit Early';
+        $return['style'] = 'color: #0EB736;'; 
+    }else if($st==3){
+        //3.Entry Right-Exit Late
+        $return['info'] = 'Entry Right-Exit Late';
+        $return['style'] = 'color: #7bb70b;font-weight: bold;';
+    }else if($st==4){
+        //4.Entry Late-Exit Right
+        $return['info'] = 'Entry Late-Exit Right';
+        $return['style'] = 'color: #7bb70b;';
+    }else if($st==5){
+        //5.Entry Late-Exit Early
+        $return['info'] = 'Entry Late-Exit Early';
+        $return['style'] = 'color: #7bb70b;';
+    }else if($st==6){
+        //6.Entry Late-Exit Late
+        $return['info'] = 'Entry Late-Exit Late';
+        $return['style'] = 'color: #7bb70b;font-weight: bold;';
+    }else if($st==7){
+        //7.No Entry-But Exit
+        $return['info'] = 'No Entry-But Exit';
+        $return['style'] = 'color: #7bb70b;';
+    }else if($st==8){
+        //8.Entry-No Exit - Att Open
+        $return['info'] = 'Present';
+        $return['style'] = 'color: #0EB736;';
+        if($st==8 && $closed){
+            //8.Entry-No Exit - Att Closed
+            $return['info'] = 'Entry- But No Exit';
+            $return['style'] = 'color: #ef970f;font-weight: bold;';
+        }
+    }
+    
+    //9.No Record / But Present
+    if((!$st || $st==9) && $at_st==1){
+        $return['info'] = 'Present';
+        if($custom){
+            $return['info'] = 'Present, Marked by '.($is_admin?'admin':'teacher');
+        }
+        $return['style'] = 'color: #0EB736;';
+    }else if($at_st==2){
+        //Absent
+        $return['info'] = 'Absent';
+        if($custom){
+            $return['info'] = 'Absent, Marked by '.($is_admin?'admin':'teacher');
+        }
+        $return['style'] = 'color: #f50404;';
+    }
+    return $return;
+}
+

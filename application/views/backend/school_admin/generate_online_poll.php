@@ -55,14 +55,14 @@
                     <?php echo get_phrase('poll_date'); ?><span class="error mandatory"> *:</span></label>
                     <input type='text' class="form-control" name="poll_date" id="poll_date" required value="<?php echo date('d/m/Y');?>" placeholder="<?php echo date('d/m/Y');?>" />
             </div>
-            <div id="answer_content" class="col-md-12">
-                <div class="col-md-8">
+        <div id="answer_content">
+                <div class="col-md-8 m-b-10">
                     <label for="poll_content">
                         <?php echo get_phrase('poll_answer_1'); ?>:<span class="error mandatory"> *</span>
                     </label>
                     <input type="text" class="form-control poll_count" id="poll_answer1" name="poll_answer[]" placeholder="Poll Answer" required>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-8 m-b-10">
                     <label for="poll_content">
                         <?php echo get_phrase('poll_answer_2'); ?>:<span class="error mandatory"> *</span>
                     </label>
@@ -70,14 +70,14 @@
                 </div>
             </div>
             <br>
-            <div class="col-md-12"><br>
-                <div class="col-md-4"  data-position="top" data-step="7" data-intro="<?php echo get_phrase('Click on this button to add a new poll answer.');?>"><button id="add_answer" title="Add Answer" class="fcbtn btn btn-danger btn-outline btn-1d">+</button></div>
+            <div class="col-md-12 text-left">
+                <div class="col-md-4 text-left addAnswerJS no-padding"  data-position="top" data-step="7" data-intro="<?php echo get_phrase('Click on this button to add a new poll answer.');?>"><button id="add_answer" title="Add Answer" class="fcbtn btn btn-danger btn-outline btn-1d">+</button></div>
             </div>
             <br>
             <div class="col-xs-12 text-right btn-center-in-sm">
                 <input type="hidden" id="answer_count" value="0">
                 <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"  name="submit_poll" value="save_poll" data-step="8" data-position="left" data-intro="<?php echo get_phrase('Click on the submit button to create an online poll.');?>">
-                    <?php echo get_phrase('submit'); ?>
+                    <?php echo get_phrase('add_poll'); ?>
                 </button>
             </div>
         </div>
@@ -94,6 +94,7 @@
         }).on('change', function () {
             $('.datepicker').hide();
         });
+        $('.addAnswerJS').removeClass('text-center');
     });
     $("#add_answer").click(function() {
         var answer_count        =   parseInt($("#answer_count").val());
@@ -104,14 +105,16 @@
     });
     
     $('body').on('click', '.remove_answer', function(){
-        var remove_elem     =   $(this).attr('id');
-        remove_answer(remove_elem);
+        /*var remove_elem     =   $(this).attr('id');
+        remove_answer(remove_elem);*/
+        $(this).parent().remove();
     });
     
     function add_new_answer(count,next) {
-        var add_answer_html     =   '<div class="col-md-12" id="answer_content'+count+'"><div><label for="poll_content"><span class="error">Poll Answer '+next+' </span></label>'+
+        /*var add_answer_html     =   '<div class="col-md-12" id="answer_content'+count+'"><div><label for="poll_content"><span class="error">Poll Answer '+next+' </span></label>'+
                 '</div><div class="col-md-8"><input type="text" class="form-control poll_count" id="poll_answer'+next+'" name="poll_answer[]" placeholder="Poll Answer" required>'+
-                '<div class="col-md-2"><button type="button" id="'+count+'" class="remove_answer btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Remove"><i class="fa fa-trash-o"></i></button></div></div></div>';
+                '<div class="col-md-2"><button type="button" id="'+count+'" class="remove_answer btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Remove"><i class="fa fa-trash-o"></i></button></div></div></div>';*/
+    var add_answer_html     =   '<div class="col-md-8 m-b-10"><label for="poll_content">Poll Answer '+next+':</label><input type="text" class="form-control poll_count m-b-10" id="poll_answer'+next+'" name="poll_answer[]" placeholder="Poll Answer" required><button type="button" id="'+count+'" class="remove_answer btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Remove"><i class="fa fa-trash-o"></i></button></div>';
         $('#answer_content').append(add_answer_html);
     }
     

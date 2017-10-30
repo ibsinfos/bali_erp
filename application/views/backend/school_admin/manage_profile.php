@@ -41,8 +41,8 @@
                             <div class="col-md-12 no-padding m-b-20">
                                     <div class="col-xs-2 col-md-1 no-padding text-left table-stu-info">                                         
                                         <div class="profile-picture">
-                                            <?php if(isset($row['image']) && $row['image']!='') { ?>
-                                            <img src="<?php echo ($row['image']!=" "?"uploads/admin_image/".$row['image']:"uploads/user.jpg");?>" width="80px" height="80px"/>
+                                            <?php if(isset($row['profile_pic']) && $row['profile_pic']!='') { ?>
+                                            <img src="<?php echo ($row['profile_pic']!=" "?"uploads/sc_admin_images/".$row['profile_pic']:"uploads/user.png");?>" width="80px" height="80px"/>
                                             <?php } ?>
                                         </div>
                                    </div>
@@ -83,7 +83,7 @@
                             <label for="field-1"><?php echo get_phrase('email');?></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-envelope"></i></div>
-                                <input type="email" class="form-control" name="email"  value="<?php echo $row['email'];?>">                                                             <input type="hidden" class="form-control" name="email_old"  value="<?php echo $row['email'];?>"> 
+                                <input type="email" class="form-control" name="email"  value="<?php echo $row['email'];?>" required>                                                             <input type="hidden" class="form-control" name="email_old"  value="<?php echo $row['email'];?>"> 
                             </div>
                         </div>
              
@@ -95,8 +95,8 @@
 <!--
                             <div class="fileinput fileinput-new" data-provides="fileinput">
                                 <div class="fileinput-new thumbnail" style="width: 110px; height: 110px;" data-trigger="fileinput">
-                                    <input type="hidden" value="<?php echo $row['image']; ?>" name="image">
-                                <img src="<?php echo ($row['image']!=" "?"uploads/admin_image/".$row['image']:"uploads/user.jpg");?>" alt="...">
+                                    <input type="hidden" value="<?php echo $row['profile_pic']; ?>" name="image">
+                                <img src="<?php echo ($row['profile_pic']!=" "?"uploads/sc_admin_images/".$row['profile_pic']:"uploads/user.png");?>" alt="...">
                                 </div>
                                 <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 60px; max-height: 60px"></div>
                                 <div>

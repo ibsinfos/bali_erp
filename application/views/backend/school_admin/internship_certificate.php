@@ -37,13 +37,13 @@ if (!empty($certificate_detail)) {
      }
 ?>
  <?php if ($is_approve == '1') { ?>
-    <div class="col-md-12 m-b-20 text-right no-padding">
+    <div class="col-md-12 m-b-20 text-center no-padding">
         <input type="button" value="Approved" id="tc_confm" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="5" data-intro="Click on confirm button , then you will get a print button for print certificate." data-position='right' disabled="">
         <button value="Print"  onclick="PrintElem('#print_div');" class="fcbtn btn btn-danger btn-outline btn-1d"> Print </button>
     </div>
 <?php } else { ?>
 <form method="post" action="<?php echo base_url(); ?>index.php?school_admin/internship_certificate/<?php echo $teacher_id; ?>/create">
-<div class="col-md-12 m-b-20 text-right no-padding">
+<div class="col-md-12 m-b-20 text-center no-padding">
        <button value="submit" class="fcbtn btn btn-danger btn-outline btn-1d"> Approve </button>
     <?php } ?>
 </div>

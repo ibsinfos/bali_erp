@@ -22,14 +22,21 @@ class Teacher_model extends CI_Model {
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
-            if($school_id > 0){
-                $this->db->where('school_id',$school_id);
-            } 
         }
-        $this->db->where(array('isActive' => '1'));
+        /*$this->db->where(array('isActive' => '1', 'teacher_status' => '1'));
         $this->db->order_by("name", "asc");
         $teachers_array = $this->db->get('teacher')->result_array();
-        return $teachers_array;
+        return $teachers_array;*/
+
+        $this->db->select('t.teacher_id, t.name, t.middle_name, t.last_name, t.cell_phone, t.home_phone, t.work_phone, t.email, t.device_token, s.class_id');
+        $this->db->from('teacher t');
+        $this->db->join( 'subject as s', 's.teacher_id = t.teacher_id' );
+        $this->db->where('t.isActive','1');
+        $this->db->group_by('t.teacher_id');
+        $this->db->where('t.teacher_status','1');
+        $this->db->where('t.school_id', $school_id);
+
+        return $this->db->get()->result_array();
     }
 
     public function get_teacher_list($school_id) {
@@ -92,6 +99,15 @@ class Teacher_model extends CI_Model {
     public function update_teacher($dataArray, $id) {
         $this->db->where('teacher_id', $id);
         $this->db->update('teacher', $dataArray);
+
+        return true;
+    }
+    
+    public function update_hrm_password($data,$id) {
+        $emailData = $this->db->where("teacher_id='".$id."'")->get('teacher')->result_array(); 
+        
+        $this->db->where('emailaddress', $emailData[0]['email']);
+        $this->db->update('main_users',$data);
         return true;
     }
 
@@ -101,13 +117,13 @@ class Teacher_model extends CI_Model {
     }
 
     public function add_from_hrm($dataArray) {
-        //$school_id = '';
-        /*if(($this->session->userdata('school_id'))) {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
             if($school_id > 0){
                 $dataArray['school_id'] = $school_id;
             } 
-        }*/
+        }
         $this->db->insert('teacher', $dataArray);
         generate_log($this->db->last_query());
         $teacher_id = $this->db->insert_id();
@@ -116,7 +132,7 @@ class Teacher_model extends CI_Model {
         $arrLink['role_id'] = 2;
         $arrLink['user_type'] = "T";
         $arrLink['original_user_type'] = "T";
-        $arrLink['school_id'] = 1;
+        $arrLink['school_id'] = $school_id;
         
         $this->db->insert('user_role_transaction', $arrLink);
         return $teacher_id;
@@ -730,21 +746,20 @@ class Teacher_model extends CI_Model {
         return  $this->db->get()->result_array();
     }
 
-    function get_teacher_details_by_id($teacher_id=array()){ 
+    function get_teacher_details_by_id($teacher_id=''){ 
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
         }
 
-        $this->db->select('t.teacher_id, t.name, t.middle_name, t.last_name, t.cell_phone, t.home_phone, t.work_phone, t.email, t.device_token, s.class_id');
+        $this->db->select('t.teacher_id, t.name, t.middle_name, t.last_name, t.cell_phone, t.home_phone, t.work_phone, t.email, t.device_token');
         $this->db->from('teacher t');
-        $this->db->join( 'subject as s', 's.teacher_id = t.teacher_id' );
-        $this->db->where_in('t.teacher_id',$teacher_id);
+        $this->db->where('t.teacher_id',$teacher_id);
         $this->db->where('t.isActive','1');
         $this->db->where('t.teacher_status','1');
         $this->db->where('t.school_id', $school_id);
 
-        return $this->db->get()->result_array();
+        return $this->db->get()->row();
     }
     
     function get_class_id_by_teacher($teacher_id){
@@ -765,4 +780,15 @@ class Teacher_model extends CI_Model {
         return $this->db->count_all_results();
     }
     
+    public function get_teacher_passcode($teacher_id){
+        $result = $this->db->select('email,passcode')->from('teacher')->where('teacher_id',$teacher_id)->get()->row();
+        return $result;
+    }
+    
+    public function update_from_hrm($dataArray,$teacher_id) {
+        $this->db->where('emp_id',$teacher_id);
+        $this->db->update('teacher', $dataArray);
+        
+        return 1;
+    }
 }

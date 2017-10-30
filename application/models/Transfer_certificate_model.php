@@ -12,7 +12,7 @@ class Transfer_certificate_model extends CI_Model {
         parent::__construct();
     }
 
-    public function get_tc_no($student_id) {
+    public function get_tc_no($student_id = '') {
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');

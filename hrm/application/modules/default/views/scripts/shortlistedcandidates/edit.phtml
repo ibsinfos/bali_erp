@@ -52,9 +52,9 @@
 					<div class="new-form-ui-submit empedit-submit-setup" style="top: 23px;">
 					<?php echo $this->form->submit; ?>
 					<?php if($this->cancel_name == 'Back') {?>
-					<input onclick="window.location.href='<?php echo BASE_URL; ?>shortlistedcandidates<?php echo $back_str;?>';" type="button" value="Back" />
+					<input onclick="window.location.href='<?php echo BASE_URL; ?>shortlistedcandidates<?php echo $back_str;?>';" type="button" value="Back" style="float:left;" />
 					<?php } else { ?>
-					<button onclick="window.location.href='<?php echo BASE_URL; ?>shortlistedcandidates<?php echo $back_str;?>';" type="button" id="Cancel" name="Cancel"><?php echo $this->cancel_name;?></button>
+					<button onclick="window.location.href='<?php echo BASE_URL; ?>shortlistedcandidates<?php echo $back_str;?>';" type="button" id="Cancel" name="Cancel" style="float:left;"><?php echo $this->cancel_name;?></button>
 					<?php } ?>
 					</div>
                     </div>

@@ -49,11 +49,11 @@ else
 		<input type="hidden" id="employee_rep_mang_id" name="employee_rep_mang_id" value=""/>
 		<input type="hidden" id="employee_id" name="employee_id" value=""/>
 
-		<div class="new-form-ui">
+		<?php /*<div class="new-form-ui">
 			<label class="required"><?php echo $this->form->employee_bu_id->getLabel(); ?></label>
 			<div class="division loca_state_div"><?php echo $this->form->employee_bu_id; ?></div>
 			<span class="errors" id="errors-<?php echo $this->form->employee_bu_id->getId(); ?>"><?php echo isset($this->msgarray['employee_bu_id'])?$this->msgarray['employee_bu_id']:'' ;?></span>
-		</div>	
+		</div>	*/ ?>
 
 		<div class="new-form-ui">
 			<label><?php echo $this->form->employee_dept_id->getLabel(); ?></label>
@@ -200,21 +200,21 @@ $("#corrective_action").change(function(){
 	}
 });
 
-$("#employee_bu_id").change(function(){
-	var businessunit_id = $("#employee_bu_id").val();
-	var department_id = $("#employee_dept_id").val();
-	if($("#employee_bu_id").val() == '')
-	{
-		$("#employee_dept_id").html('');
-		$("#employee_name").html('');
-	}
-	getdetails(businessunit_id,department_id,'from_form');
-});
+//$("#employee_bu_id").change(function(){
+//	var businessunit_id = $("#employee_bu_id").val();
+//	var department_id = $("#employee_dept_id").val();
+//	if($("#employee_bu_id").val() == '')
+//	{
+//		$("#employee_dept_id").html('');
+//		$("#employee_name").html('');
+//	}
+//	getdetails(businessunit_id,department_id,'from_form');
+//});
 
 $("#employee_dept_id").change(function(){
-	var businessunit_id = $("#employee_bu_id").val();
+	//var businessunit_id = $("#employee_bu_id").val();
 	var department_id = $("#employee_dept_id").val();
-	getdetails(businessunit_id,department_id,'from_form');
+	getdetails('',department_id,'from_form');
 });
 
 $("#employee_name").change(function(){
@@ -243,15 +243,15 @@ $("#employee_name").change(function(){
 	$("#employee_rep_mang_id").val(reporting_manager_id);
 });
 
-function getdetails(businessunit_id,department_id,flag)
+function getdetails(buid,department_id,flag)
 {
     var eleId = "employee_name";
 	Url= base_url+"/disciplinaryincident/getemployees/format/html";
-	params="businessunit_id="+businessunit_id+"&department_id="+department_id;
+	params="department_id="+department_id;
 	$.ajax({
 		url:Url,   				
 		type : 'POST',	
-		data : params,
+		data : params, 
 		dataType: 'html',
 		beforeSend: function () {
 		$("#"+eleId).before("<div id='loader'></div>");
@@ -334,9 +334,9 @@ $(document).ready(function(){
 	});
 
 	<?php if($_POST || !empty($this->data)){ ?>
-		var bu_id = '<?php echo !empty($_POST['employee_bu_id'])?$_POST['employee_bu_id']:$this->data['employee_bu_id'];?>';
+		//var bu_id = '<?php echo !empty($_POST['employee_bu_id'])?$_POST['employee_bu_id']:$this->data['employee_bu_id'];?>';
 		var dept_id = '<?php echo !empty($_POST['employee_dept_id'])?$_POST['employee_dept_id']:$this->data['employee_dept_id'];?>';
-			getdetails(bu_id,dept_id,'from_post');
+			getdetails(dept_id,'from_post');
 	<?php } ?>
 
 });

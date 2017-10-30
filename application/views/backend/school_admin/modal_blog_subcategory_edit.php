@@ -1,16 +1,16 @@
 
 <div class="panel panel-primary" data-collapsed="0">
-    <div class="panel-heading">
-        <div class="panel-title">
+<!--    <div class="panel-heading">
+        <div class="">
             <i class="entypo-plus-circled"></i>
-            <?php echo get_phrase('edit_subcategory'); ?>
+            <?php //echo get_phrase('edit_subcategory'); ?>
         </div>
-    </div>    
+    </div>    -->
     <div class="panel-body">  
         <?php 
         $row        =       array_shift($catname); //echo $row['blog_category_parent_id'];
         ?>
-        <?php echo form_open(base_url().'index.php?blogs/view_category_subcategory/subedit/'.$row['blog_category_id'], array('class' =>'form-horizontal validate','id'=>'addCategorySubcategoryId', 'method' => 'POST'));?>
+        <?php echo form_open(base_url().'index.php?blogs/view_category_subcategory/subedit/'.$row['blog_category_id'], array('class' =>'form-horizontal form-material validate','id'=>'addCategorySubcategoryId', 'method' => 'POST'));?>
         <div class="form-group">
             <label class="control-label col-sm-5" for="create_update"><?php echo get_phrase('sub_category');?>:<span class="error" style="color: red;"> *</span></label>
             <div class="col-sm-5">
@@ -31,7 +31,7 @@
             </div>
         </div>
         <div class="col-md-12 text-center"> 
-            <button type="submit" class="btn btn-success" id="insert" name="add_new" value="add_new"><?php echo get_phrase('submit'); ?></button>
+            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" id="insert" name="add_new" value="add_new"><?php echo get_phrase('update'); ?></button>
         </div>      
         <?php echo form_close();?>
     </div>

@@ -1,8 +1,15 @@
 <div class="profile-env">
-    <?php if(!isset($data_not_found)) { ?>
+    <?php if(!isset($data_not_found)) { 
+        if($student_details->stud_image !='' and file_exists('uploads/student_image/'.$student_details->stud_image)){
+            $image_url = base_url().'uploads/student_image/'.$student_details->stud_image;
+        }else{
+            $image_url = base_url().'uploads/user.png'; 
+        }
+        ?>
+    
         <header class="row">
             <div class="col-xs-3 p-l-20">           
-                <img src="<?php echo $photo_url;?>" 
+                <img src="<?php echo $image_url;?>" 
                     height="100px" /> 
             </div>
             <div class="col-sm-9 m-t-20">
@@ -76,7 +83,9 @@
                                     </tr>
                 </table>
                 <span>
-                    <input type="button" value="<?php echo ($card_number !="")?"Update":"Add"; ?>" name="update_rfid" id="update_rfid" class="pull-right fcbtn btn btn-danger btn-outline btn-1d">
+                    <center>
+                    <input type="button" value="<?php echo ($card_number !="")?"Update":"Add"; ?>" name="update_rfid" id="update_rfid" class="fcbtn btn btn-danger btn-outline btn-1d">
+                    </center>
                 </span>
             </div>
         </section>

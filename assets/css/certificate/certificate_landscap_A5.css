@@ -1,0 +1,259 @@
+ body {
+	margin: 0;
+	padding: 0;
+ }
+ 
+ #background 
+{ 
+	 left: 0px; 
+	 top: 0px; 
+	 position: relative; 
+	 margin-left: auto; 
+	 margin-right: auto; 
+	 width: 2480px;
+	 height: 1749px; 
+	 overflow: hidden;
+	 z-index:0;
+	} 
+
+ #BG 
+{ 
+	 left: -6px; 
+	 top: 0px; 
+	 position: absolute; 
+	 width: 2492px;
+	 height: 1749px;
+	 z-index:1;
+} 
+
+ #Shape6 
+{ 
+	 left: 39px; 
+	 top: 26px; 
+	 position: absolute; 
+	 width: 2402px;
+	 height: 1697px;
+	 z-index:2;
+} 
+
+ #Shape7 
+{ 
+	 left: 62px; 
+	 top: 50px; 
+	 position: absolute; 
+	 width: 2356px;
+	 height: 1649px;
+	 z-index:3;
+} 
+
+ #Ribbon 
+{ 
+	 left: 485px; 
+	 top: 180px; 
+	 position: absolute; 
+	 width: 1510px;
+	 height: 297px;
+	 z-index:4;
+} 
+
+ #Shape13 
+{ 
+	 left: 1710px; 
+	 top: 257px; 
+	 position: absolute; 
+	 width: 77px;
+	 height: 74px;
+	 z-index:5;
+} 
+
+ #Shape14 
+{ 
+	 left: 695px; 
+	 top: 257px; 
+	 position: absolute; 
+	 width: 76px;
+	 height: 73px;
+	 z-index:6;
+} 
+
+ #Shape15 
+{ 
+	 left: 919px; 
+	 top: 487px; 
+	 position: absolute; 
+	 width: 639px;
+	 height: 4px;
+	 z-index:7;
+} 
+
+ #THISCERTIFICATEISPRE 
+{ 
+         color: #58595B;
+         font-size: 30px;
+         text-align: center;
+         font-family: Bodoni MT;
+	 left: 887px; 
+	 top: 434px; 
+	 position: absolute; 
+	 width: 703px;
+	 height: 28px;
+	 z-index:8;
+} 
+
+ #CERTIFICATE 
+{ 
+         color:white;
+         font-size: 70px;
+         font-family: Trajan Pro;
+         text-align: center;
+	 left: 817px; 
+	 top: 253px; 
+	 position: absolute; 
+	 width: 844px;
+	 height: 85px;
+	 z-index:9;
+} 
+
+ #Shape18 
+{ 
+	 left: 1086px; 
+	 top: 1342px; 
+	 position: absolute; 
+	 width: 308px;
+	 height: 280px;
+	 z-index:10;
+} 
+
+ #Shape19 
+{ 
+	 left: 1125px; 
+	 top: 1376px; 
+	 position: absolute; 
+	 width: 230px;
+	 height: 212px;
+	 z-index:11;
+} 
+
+ #CERTIFIED 
+{ 
+	 left: 1147px; 
+	 top: 1468px; 
+	 position: absolute; 
+	 width: 185px;
+	 height: 27px;
+	 z-index:12;
+} 
+
+ #Starsbottom 
+{ 
+	 left: 1184px; 
+	 top: 1524px; 
+	 position: absolute; 
+	 width: 112px;
+	 height: 44px;
+	 z-index:13;
+} 
+
+ #Starstop 
+{ 
+	 left: 1184px; 
+	 top: 1394px; 
+	 position: absolute; 
+	 width: 112px;
+	 height: 44px;
+	 z-index:14;
+} 
+
+ #DATE 
+{        
+         left: 518px; 
+	 top: 1561px; 
+	 position: absolute; 
+	 width: 129px;
+	 height: 37px;
+	 z-index:15;
+} 
+#date_format
+{
+     /*font-family: Bookman Old Style;*/
+         /*font-family: Castellar;*/
+         /*font-family: Century;*/
+         font-family: Century Schoolbook;
+         /*font-family: Charlemagne Std;*/
+         /*font-family: Colonna MT;*/
+         /*font-family: Consolas;*/
+    font-size: 30px;
+    left: 470px; 
+    align: center;
+	 top: 1500px; 
+	 position: absolute; 
+	 z-index:15;
+}
+
+ #Shape16copy 
+{ 
+	 left: 399px; 
+	 top: 1541px; 
+	 position: absolute; 
+	 width: 367px;
+	 height: 5px;
+	 z-index:16;
+} 
+
+ #SIGNATURE 
+{ 
+	 left: 1749px; 
+	 top: 1562px; 
+	 position: absolute; 
+	 width: 298px;
+	 height: 36px;
+	 z-index:17;
+} 
+
+ #Shape16 
+{ 
+	 left: 1715px; 
+	 top: 1541px; 
+	 position: absolute; 
+	 width: 366px;
+	 height: 5px;
+	 z-index:18;
+} 
+
+ #Loremipsumdolorsitam 
+{       
+         /*font-family: Bookman Old Style;*/
+         /*font-family: Castellar;*/
+         /*font-family: Century;*/
+         font-family: Century Schoolbook;
+         /*font-family: Charlemagne Std;*/
+         /*font-family: Colonna MT;*/
+         /*font-family: Consolas;*/
+         font-size: 30px;
+         text-align:center;
+	 left: 396px; 
+	 top: 1005px; 
+	 position: absolute; 
+	 width: 1688px;
+	 height: 139px;
+	 z-index:19;
+} 
+
+ #JOHNSMITH 
+{       
+         /*font-family: Bookman Old Style;*/
+         /*font-family: Castellar;*/
+         font-family: Century;
+         /*font-family: Century Schoolbook;*/
+         /*font-family: Charlemagne Std;*/
+         /*font-family: Colonna MT;*/
+         /*font-family: Consolas;*/
+         font-size: 150px;
+         text-align:center;
+	 left: 540px; 
+	 top: 622px; 
+	 position: absolute; 
+	 width: 1346px;
+	 height: 175px;
+	 z-index:20;
+}

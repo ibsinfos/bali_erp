@@ -124,28 +124,28 @@ class Default_JobtitlesController extends Zend_Controller_Action
 			if(is_numeric($id) && $id>0)
 			{
 				$data = $jobtitlesmodel->getsingleJobTitleData($id);
-				$payfreqData = $payfrequencyModal->getActivePayFreqData($data[0]['jobpayfrequency']);
-				if(sizeof($payfreqData) > 0)
-				{
-					foreach ($payfreqData as $payfreqres){
-						$jobtitlesform->jobpayfrequency->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
-					}
-				}
-				
+//				$payfreqData = $payfrequencyModal->getActivePayFreqData($data[0]['jobpayfrequency']);
+//				if(sizeof($payfreqData) > 0)
+//				{
+//					foreach ($payfreqData as $payfreqres){
+//						$jobtitlesform->jobpayfrequency->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
+//					}
+//				}
+//				
 					
 				
 				if(!empty($data) && $data != "norows")
 				{
 					
-				if(!empty($data[0]['jobpayfrequency']))
-				{ 
-		          $jobPayFreq = $payfrequencyModal->getsinglePayfrequencyData($data[0]['jobpayfrequency']);
-					
-					if(!empty($jobPayFreq))
-					{
-						$data[0]['jobpayfrequency'] = $jobPayFreq[0]['freqtype'];
-				     }
-				 }
+//				if(!empty($data[0]['jobpayfrequency']))
+//				{ 
+//		          $jobPayFreq = $payfrequencyModal->getsinglePayfrequencyData($data[0]['jobpayfrequency']);
+//					
+//					if(!empty($jobPayFreq))
+//					{
+//						$data[0]['jobpayfrequency'] = $jobPayFreq[0]['freqtype'];
+//				     }
+//				 }
 					$jobtitlesform->populate($data[0]);
 					$this->view->controllername = $objName;
 					$this->view->id = $id;
@@ -194,21 +194,21 @@ class Default_JobtitlesController extends Zend_Controller_Action
 
             $jobtitlesform = new Default_Form_jobtitles();
             $jobtitlesmodel = new Default_Model_Jobtitles();
-            $payfrequencyModal = new Default_Model_Payfrequency();
-            $payfreqData = $payfrequencyModal->getActivePayFreqData();
+            //$payfrequencyModal = new Default_Model_Payfrequency();
+            //$payfreqData = $payfrequencyModal->getActivePayFreqData();
             $msgarray = array();
-            if(sizeof($payfreqData) > 0)
-            {
-                    foreach ($payfreqData as $payfreqres){
-                            $jobtitlesform->jobpayfrequency->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
-                    }
-
-            }else
-            {
-                    $msgarray['jobpayfrequency'] = 'Pay frequency is not configured yet.';
-                    $emptyFlag++;
-
-            }
+//            if(sizeof($payfreqData) > 0)
+//            {
+//                    foreach ($payfreqData as $payfreqres){
+//                            $jobtitlesform->jobpayfrequency->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
+//                    }
+//
+//            }else
+//            {
+//                    $msgarray['jobpayfrequency'] = 'Pay frequency is not configured yet.';
+//                    $emptyFlag++;
+//
+//            }
 		$this->view->msgarray = $msgarray;
 		$this->view->emptyFlag = $emptyFlag;
 		try
@@ -255,7 +255,7 @@ class Default_JobtitlesController extends Zend_Controller_Action
 				$jobdescription = $this->_request->getParam('jobdescription');
 				$minexperiencerequired = $this->_request->getParam('minexperiencerequired');
 				$jobpaygradecode = $this->_request->getParam('jobpaygradecode');
-				$jobpayfrequency = $this->_request->getParam('jobpayfrequency');
+				//$jobpayfrequency = $this->_request->getParam('jobpayfrequency');
 				$comments = $this->_request->getParam('comments');
 				$date = new Zend_Date();
 				$actionflag = '';
@@ -324,6 +324,7 @@ class Default_JobtitlesController extends Zend_Controller_Action
 		$auth = Zend_Auth::getInstance();
 		if($auth->hasIdentity()){
 			$loginUserId = $auth->getStorage()->read()->id;
+                        $school_id = $auth->getStorage()->read()->school_id;
 		}
 		$id = $this->getRequest()->getParam('id');
 
@@ -396,7 +397,8 @@ class Default_JobtitlesController extends Zend_Controller_Action
 				foreach($jobtitlesData as $record){
 					$opt .= sapp_Global::selectOptionBuilder($record['id'], $record['jobtitlename']);
 				}
-				$this->view->jobtitlesData = $opt;
+
+                                $this->view->jobtitlesData = $opt;
 					
 				$this->view->eventact = 'added';
 				$close = 'close';

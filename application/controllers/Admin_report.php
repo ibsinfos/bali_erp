@@ -37,6 +37,7 @@ class Admin_report extends CI_Controller{
         $this->globalSettingsTextAlign = $this->globalSettingsSMSDataArr[4]->description;
         $this->globalSettingsActiveSmsService = $this->globalSettingsSMSDataArr[3]->description;
         $this->load->helper("graphical_report");
+		
     }
     
     function index(){
@@ -71,7 +72,8 @@ class Admin_report extends CI_Controller{
 //        echo $overview_barchart;die;
         $page_data['overview_barchart']=$overview_barchart;
 //        pre($page_data['overview_barchart']);die;
-        /// student by class
+
+//*************************************Student By Class*************************************/
         $this->load->model("Enroll_model");
         $rs= $this->Enroll_model->get_all_enroll_student_report();
         if(!empty($rs)){
@@ -87,11 +89,12 @@ class Admin_report extends CI_Controller{
             $page_data['overview_paichart']="";
         }
         
-        ///present and absent data.
+//*************************************Present Absent Data*************************************/
         $this->load->model("Attendance_model");
-        $attendanceReport= $this->Attendance_model->get_present_absent_report($timeStamp);
+        $attendanceReport= $this->Attendance_model->get_present_absent_report(date("Y-m-d"));
+		
         if(!empty($attendanceReport)){
-            //pre($attendanceReport);die;
+            
             $attendanceReport1=array();
             foreach($rs as $key=>$val){
                 if($val['name']==""){
@@ -123,11 +126,15 @@ class Admin_report extends CI_Controller{
         }else{
             $page_data['overview_column_line_mix_linner_chart']="";
         }
-        
+//***************************DEPARTMENT WISE REFLECTION*************************************/		
+		
+
         
         $this->load->view('backend/index', $page_data);
     }
     
+	
+	
     function student_information_misc_report($class_id=0,$student_running_year=""){
         $page_data= $this->get_page_data_var();
         $page_data['search_text'] = '';
@@ -240,7 +247,17 @@ class Admin_report extends CI_Controller{
         }
         
         $page_data['all_students'] = $data;
-        //pre($page_data['all_students']);die;        
+		//$temp=arr();
+		foreach($data as $key=>$value)
+		{
+			$temp[$key]['baseDataValue']=$value['class_name']."-".$value['section_name'];
+			$temp[$key]['baseRelatedData1Value']=$value['male_count']+$value['female_count'];
+			$temp[$key]['baseRelatedData2Value']=$value['female_count'];
+		}
+		$dataProviderColumnLiner= get_data_provider_for_column_line_mix_linner_chart($temp, "class", "total_student", "girls");
+            $finaleReportColumnLineMixDataArr=array("dataProvider"=>$dataProviderColumnLiner,"baseData"=>"Class","baseRelatedData1"=>"Total_student","baseRelatedData2"=>"Girls","chartTitle"=>'Girls vs total students');
+            $page_data['overview_column_line_mix_linner_chart']=get_column_line_mix_linner_chart_report($finaleReportColumnLineMixDataArr);
+      //  pre($page_data);       
         $this->load->view('backend/index', $page_data);
     }
     

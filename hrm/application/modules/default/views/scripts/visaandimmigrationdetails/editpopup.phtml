@@ -93,42 +93,36 @@ sapp_Global::generateClientValidations($this->form);
 			<?php }?>
 			</div>
 			
+			
 			<div class="new-form-ui ">
-			  <label>I-9 Status </label>
-			<div class="division"><?php echo $this->form->inine_status; ?></div>
-			  <?php if(isset($this->msgarray['inine_status'])){?>
-			   <span class="errors" id="errors-<?php echo $this->form->inine_status->getId(); ?>"><?php echo $this->msgarray['inine_status'];?></span>
+			  <label>Emirates ID </label>
+			<div class="division"><?php echo $this->form->emirates_id; ?></div>
+			  <?php if(isset($this->msgarray['emirates_id'])){?>
+			   <span class="errors" id="errors-<?php echo $this->form->emirates_id->getId(); ?>"><?php echo $this->msgarray['emirates_id'];?></span>
 			<?php }?>
 			</div>
 			
 			<div class="new-form-ui ">
-			  <label>I-9 Review Date <img class="tooltip" title="<?php echo DATE_DESCRIPTION;?>" src="<?php echo $this->baseUrl().'/public/media/';?>images/help.png"> </label>
-			<div class="division"><?php echo $this->form->inine_review_date; ?></div>
-			  <?php if(isset($this->msgarray['inine_review_date'])){?>
-			   <span class="errors" id="errors-<?php echo $this->form->inine_review_date->getId(); ?>"><?php echo $this->msgarray['inine_review_date'];?></span>
+			  <label>Emirates Renewal Date <img class="tooltip" title="<?php echo DATE_DESCRIPTION;?>" src="<?php echo $this->baseUrl().'/public/media/';?>images/help.png"> </label>
+			<div class="division"><?php echo $this->form->emirates_renewal_date; ?></div>
+			  <?php if(isset($this->msgarray['emirates_renewal_date'])){?>
+			   <span class="errors" id="errors-<?php echo $this->form->emirates_renewal_date->getId(); ?>"><?php echo $this->msgarray['emirates_renewal_date'];?></span>
 			<?php }?>
 			</div>
-			<div class="new-form-ui ">
+            
+            <div class="new-form-ui ">
 			  <label>Issuing Authority</label>
 			<div class="division"><?php echo $this->form->issuing_authority; ?></div>
 			  <?php if(isset($this->msgarray['issuing_authority'])){?>
 			   <span class="errors" id="errors-<?php echo $this->form->issuing_authority->getId(); ?>"><?php echo $this->msgarray['issuing_authority'];?></span>
 			<?php }?>
 			</div>
-			
-			<div class="new-form-ui ">
-			  <label>I-94 Status </label>
-			<div class="division"><?php echo $this->form->ininetyfour_status; ?></div>
-			   <?php if(isset($this->msgarray['ininetyfour_status'])){?>
-			   <span class="errors" id="errors-<?php echo $this->form->ininetyfour_status->getId(); ?>"><?php echo $this->msgarray['ininetyfour_status'];?></span>
-			<?php }?>
-			</div>
-			
-			<div class="new-form-ui ">
-			  <label>I-94 Expiry Date <img class="tooltip" title="<?php echo DATE_DESCRIPTION;?>" src="<?php echo $this->baseUrl().'/public/media/';?>images/help.png"> </label>
-			<div class="division"><?php echo $this->form->ininetyfour_expiry_date; ?></div>
-			   <?php if(isset($this->msgarray['ininetyfour_expiry_date'])){?>
-			   <span class="errors" id="errors-<?php echo $this->form->ininetyfour_expiry_date->getId(); ?>"><?php echo $this->msgarray['ininetyfour_expiry_date'];?></span>
+            
+                        <div class="new-form-ui ">
+			  <label>Work Permit Expiry Date <img class="tooltip" title="<?php echo DATE_DESCRIPTION;?>" src="<?php echo $this->baseUrl().'/public/media/';?>images/help.png"> </label>
+			<div class="division"><?php echo $this->form->work_permit_expiry_date; ?></div>
+			   <?php if(isset($this->msgarray['work_permit_expiry_date'])){?>
+			   <span class="errors" id="errors-<?php echo $this->form->work_permit_expiry_date->getId(); ?>"><?php echo $this->msgarray['work_permit_expiry_date'];?></span>
 			<?php }?>
 			</div>	
        
@@ -150,7 +144,7 @@ $(document).ready(function(){
 	//To get the Calender image...
 	//var yearrange = <?php echo "'".date("Y", strtotime("-30 years")).':'.date('Y')."'"; ?>;
 	     var yearrange = <?php echo "'".YEAR.':'.date('Y')."'"; ?>;
-	$('#inine_review_date,#passport_issue_date,#visa_issue_date').datepicker({
+	$('#passport_issue_date,#visa_issue_date').datepicker({
 					showOn:'both',
 					maxDate: new Date, 
 					yearRange: yearrange,
@@ -166,7 +160,7 @@ $(document).ready(function(){
 						$(this).trigger('blur');
 					}  
 	});
-	$('#ininetyfour_expiry_date,#passport_expiry_date,#visa_expiry_date').datepicker({
+	$('#passport_expiry_date,#visa_expiry_date,#work_permit_expiry_date,#emirates_renewal_date').datepicker({
 					showOn:'both',
 			
 					dateFormat:"<?php echo DATEFORMAT_JS;?>",
@@ -179,7 +173,7 @@ $(document).ready(function(){
 					onClose:function()
 					{
 						$(this).trigger('blur');
-						chk_future_date(this,'Expiry date should be greater than current date.');	//to check future date....
+						chk_future_date(this,'date should be greater than current date.');	//to check future date....
 					}  
 	});	
 	});

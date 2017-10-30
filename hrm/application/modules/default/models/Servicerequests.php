@@ -254,9 +254,10 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
             $loginuserGroup = $auth->getStorage()->read()->group_id;            
             $login_bu = $auth->getStorage()->read()->businessunit_id;
             $login_dept = $auth->getStorage()->read()->department_id;
+            $school_id = $auth->getStorage()->read()->school_id;
         }        
         
-        $where = " r.isactive = 1 ";
+        $where = " r.isactive = 1 and r.school_id = '".$school_id."'";
      //   echo $grid_type_arr[$grid_type];
         if(array_key_exists($grid_type, $grid_type_arr))
         {
@@ -309,10 +310,10 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 ->setIntegrityCheck(false)
                 ->from(array('r'=>'main_sd_requests_summary'),array('r.service_desk_name','r.request_for'=>'request_for','r.service_request_name','r.raised_by_name','id' => 'r.sd_requests_id','priority' =>new Zend_Db_Expr("case  when r.priority = 1 then 'Low' when r.priority = 2 then 'Medium' when r.priority = 3 then 'High' end "),
                     'description'=>"CONCAT(UCASE(LEFT(r.description, 1)), SUBSTRING(r.description, 2))",'status' => 'r.status','ticket_number'=>'r.ticket_number',
-                    'executor_comments'=>"r.executor_comments",'createddate' => 'DATE_FORMAT(r.createddate,"'.DATEFORMAT_MYSQL.'")','r.modifieddate','request_for'=>'if(r.request_for=1,"Service","Asset")','category_name'=>'if(r.request_for=1,r.service_desk_name,a.name)','request_name'=>'if(r.request_for=1,r.service_request_name,ac.name)'))                                
+                    'executor_comments'=>"r.executor_comments",'createddate' => 'DATE_FORMAT(r.createddate,"'.DATEFORMAT_MYSQL.'")','r.modifieddate','request_for'=>'if(r.request_for=1,"Service","Asset")','category_name'=>'if(r.request_for=1,r.service_desk_name,"")','request_name'=>'if(r.request_for=1,r.service_request_name,"")'))                                
                 ->joinInner(array('sdc' => 'main_sd_configurations'), "sdc.id = r.service_desk_conf_id and sdc.isactive = 1 and find_in_set(".$loginUserId.",sdc.request_recievers)",array())
-                 ->joinLeft(array('ac'=>'assets'), 'r.service_desk_id = ac.id and ac.isactive=1 ', array('ac.name'))
-               ->joinLeft(array('a'=>'assets_categories'), 'r.service_request_id = a.id AND a.is_active=1 and a.parent=0 ', array('a.name'))
+                 //->joinLeft(array('ac'=>'assets'), 'r.service_desk_id = ac.id and ac.isactive=1 ', array('ac.name'))
+               //->joinLeft(array('a'=>'assets_categories'), 'r.service_request_id = a.id AND a.is_active=1 and a.parent=0 ', array('a.name'))
                 ->where($where." and r.createdby != ".$loginUserId);
             
             if($grid_type_arr[$grid_type] == 'rec_rept')
@@ -324,9 +325,9 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                         ->setIntegrityCheck(false)
                         ->from(array('r'=>'main_sd_requests_summary'),array('r.service_desk_name','r.request_for'=>'request_for','r.service_request_name','r.raised_by_name','id' => 'r.sd_requests_id','priority' =>new Zend_Db_Expr("case  when r.priority = 1 then 'Low' when r.priority = 2 then 'Medium' when r.priority = 3 then 'High' end "),
                     'description'=>"CONCAT(UCASE(LEFT(r.description, 1)), SUBSTRING(r.description, 2))",'status' => 'r.status','ticket_number'=>'r.ticket_number',
-                    'executor_comments'=>"r.executor_comments",'createddate' => 'DATE_FORMAT(r.createddate,"'.DATEFORMAT_MYSQL.'")','r.modifieddate','request_for'=>'if(r.request_for=1,"Service","Asset")','category_name'=>'if(r.request_for=1,r.service_desk_name,a.name)','request_name'=>'if(r.request_for=1,r.service_request_name,ac.name)'))
-                     ->joinLeft(array('ac'=>'assets'), 'r.service_desk_id = ac.id and ac.isactive=1 ', array('ac.name'))
-               		->joinLeft(array('a'=>'assets_categories'), 'r.service_request_id = a.id AND a.is_active=1 and a.parent=0 ', array('a.name'))
+                    'executor_comments'=>"r.executor_comments",'createddate' => 'DATE_FORMAT(r.createddate,"'.DATEFORMAT_MYSQL.'")','r.modifieddate','request_for'=>'if(r.request_for=1,"Service","Asset")','category_name'=>'if(r.request_for=1,r.service_desk_name,"")','request_name'=>'if(r.request_for=1,r.service_request_name,"")'))
+                     //->joinLeft(array('ac'=>'assets'), 'r.service_desk_id = ac.id and ac.isactive=1 ', array('ac.name'))
+               		//->joinLeft(array('a'=>'assets_categories'), 'r.service_request_id = a.id AND a.is_active=1 and a.parent=0 ', array('a.name'))
                         ->where($where." and r.reporting_manager_id = ".$loginUserId." and r.status in ('To manager approve','Manager approved','Manager rejected','Rejected','Closed')");
                 if($status_value == '')
                 {     
@@ -370,9 +371,9 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 ->setIntegrityCheck(false)                   
                 ->from(array('r'=>'main_sd_requests_summary'),array('r.service_desk_name','r.request_for'=>'request_for','r.service_request_name','r.raised_by_name','id' => 'r.sd_requests_id','priority' =>new Zend_Db_Expr("case  when r.priority = 1 then 'Low' when r.priority = 2 then 'Medium' when r.priority = 3 then 'High' end "),
                     'description'=>"CONCAT(UCASE(LEFT(r.description, 1)), SUBSTRING(r.description, 2))",'r.ticket_number','status' => 'r.status','ticket_number'=>'r.ticket_number',
-                    'executor_comments'=>"r.executor_comments",'createddate' => 'DATE_FORMAT(r.createddate,"'.DATEFORMAT_MYSQL.'")','r.modifieddate','request_for'=>'if(r.request_for=1,"Service","Asset")','category_name'=>'if(r.request_for=1,r.service_desk_name,a.name)','request_name'=>'if(r.request_for=1,r.service_request_name,ac.name)'))
-                ->joinLeft(array('ac'=>'assets'), 'r.service_desk_id = ac.id and ac.isactive=1 ', array('ac.name'))
-               ->joinLeft(array('a'=>'assets_categories'), 'r.service_request_id = a.id AND a.is_active=1 and a.parent=0 ', array('a.name'))
+                    'executor_comments'=>"r.executor_comments",'createddate' => 'DATE_FORMAT(r.createddate,"'.DATEFORMAT_MYSQL.'")','r.modifieddate','request_for'=>'if(r.request_for=1,"Service","Asset")','category_name'=>'if(r.request_for=1,r.service_desk_name,"")','request_name'=>'if(r.request_for=1,r.service_request_name,"")'))
+                //->joinLeft(array('ac'=>'assets'), 'r.service_desk_id = ac.id and ac.isactive=1 ', array('ac.name'))
+               //->joinLeft(array('a'=>'assets_categories'), 'r.service_request_id = a.id AND a.is_active=1 and a.parent=0 ', array('a.name'))
                 ->where($where);
             $count_query = $requestData;
             $result = $db->query($count_query);
@@ -395,6 +396,18 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getRequestsCnt($emp_id,$grid_type)
     {
+        $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
         $counts = array();
         if($emp_id != '')
         {
@@ -402,7 +415,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
             if($grid_type == 'request')
             {
                 $query = "select status,count(id) cnt from main_sd_requests "
-                        . "where isactive = 1 and raised_by = ".$emp_id." group by status";
+                        . "where isactive = 1 and raised_by = ".$emp_id." and school_id ='".$school_id."' group by status";
                 $result = $db->query($query);
                 $rows = $result->fetchAll();
                 $counts = $rows;
@@ -419,7 +432,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 $query = "SELECT count(r.id) cnt,r.status FROM `main_sd_requests_summary` AS `r` "
                         . "INNER JOIN `main_sd_configurations` AS `sdc` ON sdc.id = r.service_desk_conf_id "
                         . "and find_in_set(".$emp_id.",sdc.request_recievers) "
-                        . "WHERE ( r.isactive = 1 and r.createdby != ".$emp_id.") group by r.status";
+                        . "WHERE ( r.isactive = 1 and r.createdby != ".$emp_id." and r.school_id = '".$school_id    ."') group by r.status";
                 $result = $db->query($query);
                 $rows = $result->fetchAll();
                 
@@ -435,7 +448,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 if($grid_type == 'rec_rept')
                 {
                     $toapprove_query = "select count(id) cnt,status from main_sd_requests "
-                            . "where isactive = 1 and reporting_manager_id = ".$emp_id." and status in "
+                            . "where isactive = 1 and reporting_manager_id = ".$emp_id." and school_id='".$school_id."' and status in "
                             . "('To manager approve','Manager approved','Manager rejected','Rejected','Closed') group by status";
                     $toapprove_result = $db->query($toapprove_query);
                     $toapprove_row = $toapprove_result->fetchAll();
@@ -456,7 +469,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                                    from main_sd_requests sdr inner join main_sd_configurations sdc 
                                    on sdc.id = sdr.service_desk_conf_id and sdc.isactive = 1 
                                    and find_in_set(".$emp_id.",sdc.request_recievers)"
-                                   . "where sdr.isactive = 1 and sdr.status='Open' "
+                                   . "where sdr.isactive = 1 and sdr.school_id='".$school_id."' and sdr.status='Open' "
                         . "and sdr.createdby != ".$emp_id." and date_add(date(sdr.createddate),interval 10 day) < date(now())";
                 $over_due_result = $db->query($over_due_query);
                 $over_due_row = $over_due_result->fetch();
@@ -466,7 +479,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                                     from main_sd_requests sdr inner join main_sd_configurations sdc 
                                     on sdc.id = sdr.service_desk_conf_id and sdc.isactive = 1 
                                     and find_in_set(".$emp_id.",sdc.request_recievers)"
-                                    . "where sdr.isactive = 1 and sdr.status='Open' "
+                                    . "where sdr.isactive = 1 and sdr.school_id = '".$school_id."' and sdr.status='Open' "
                         . "and sdr.createdby != ".$emp_id." and date_add(date(sdr.createddate),interval 10 day) = date(now())";
                 $today_due_result = $db->query($today_due_query);
                 $today_due_row = $today_due_result->fetch();
@@ -479,7 +492,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 $tot_act_cnt = 0;
                 $query = "select sdr.status,count(sdr.id) cnt 
                           from main_sd_requests sdr  
-                          where sdr.isactive = 1 group by sdr.status";
+                          where sdr.isactive = 1 and sdr.school_id = '".$school_id."' group by sdr.status";
                 $result = $db->query($query);
                 $rows = $result->fetchAll();
                 
@@ -493,14 +506,14 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 }
                 $over_due_query = "select count(sdr.id) cnt 
                                    from main_sd_requests sdr "
-                                   . " where sdr.isactive = 1 and sdr.status='Open' and date_add(date(sdr.createddate),interval 10 day) < date(now())";
+                                   . " where sdr.isactive = 1 and sdr.status='Open' and sdr.school_id = '".$school_id."' and date_add(date(sdr.createddate),interval 10 day) < date(now())";
                 $over_due_result = $db->query($over_due_query);
                 $over_due_row = $over_due_result->fetch();
                 $counts['overdue'] = $over_due_row['cnt'];                
                 
                 $today_due_query = "select count(sdr.id) cnt 
                                     from main_sd_requests sdr "
-                                    . "where sdr.isactive = 1 and sdr.status='Open' and date_add(date(sdr.createddate),interval 10 day) = date(now())";
+                                    . "where sdr.isactive = 1 and sdr.status='Open' and sdr.school_id = '".$school_id."' and date_add(date(sdr.createddate),interval 10 day) = date(now())";
                 $today_due_result = $db->query($today_due_query);
                 $today_due_row = $today_due_result->fetch();
                 $counts['duetoday'] = $today_due_row['cnt'];                                
@@ -514,7 +527,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                           from main_sd_requests sdr inner join main_sd_configurations sdc 
                           on sdc.id = sdr.service_desk_conf_id and sdc.isactive = 1 
                           and find_in_set(".$emp_id.",sdc.request_recievers) 
-                          where sdr.isactive = 1 and sdr.createdby != ".$emp_id." group by sdr.status";
+                          where sdr.isactive = 1 and sdr.createdby != ".$emp_id." and sdr.school_id = '".$school_id."' group by sdr.status";
                 $result = $db->query($query);
                 $rows = $result->fetchAll();
                 
@@ -530,7 +543,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                                    from main_sd_requests sdr inner join main_sd_configurations sdc 
                                    on sdc.id = sdr.service_desk_conf_id and sdc.isactive = 1 
                                    and find_in_set(".$emp_id.",sdc.request_recievers)"
-                                   . "where sdr.isactive = 1 and sdr.status='Open' and sdr.createdby != ".$emp_id." and date_add(date(sdr.createddate),interval 10 day) < date(now())";
+                                   . "where sdr.isactive = 1 and sdr.status='Open' and sdr.createdby != ".$emp_id." and sdr.school_id='".$school_id."' and date_add(date(sdr.createddate),interval 10 day) < date(now())";
                 $over_due_result = $db->query($over_due_query);
                 $over_due_row = $over_due_result->fetch();
                 $counts['overdue'] = $over_due_row['cnt'];                
@@ -539,7 +552,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                                     from main_sd_requests sdr inner join main_sd_configurations sdc 
                                     on sdc.id = sdr.service_desk_conf_id and sdc.isactive = 1 
                                     and find_in_set(".$emp_id.",sdc.request_recievers)"
-                                    . "where sdr.isactive = 1 and sdr.status='Open' and sdr.createdby != ".$emp_id." and date_add(date(sdr.createddate),interval 10 day) = date(now())";
+                                    . "where sdr.isactive = 1 and sdr.status='Open' and sdr.createdby != ".$emp_id." and sdr.school_id='".$school_id."' and date_add(date(sdr.createddate),interval 10 day) = date(now())";
                 $today_due_result = $db->query($today_due_query);
                 $today_due_row = $today_due_result->fetch();
                 $counts['duetoday'] = $today_due_row['cnt'];                                
@@ -551,7 +564,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 $executor_id = " and reporting_manager_id = ".$emp_id;
                 $tot_act_cnt = 0;
                 $query = "select status,count(id) cnt from main_sd_requests "
-                        . "where isactive = 1 ".$executor_id." and status in ('To manager approve','Closed','Manager approved','Manager rejected','Rejected') group by status";
+                        . "where isactive = 1 ".$executor_id." and school_id='".$school_id."' and status in ('To manager approve','Closed','Manager approved','Manager rejected','Rejected') group by status";
                 $result = $db->query($query);
                 $rows = $result->fetchAll();
                 
@@ -579,7 +592,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 }
                 
                 $query = "select count(id) cnt,status from main_sd_requests "
-                        . "where isactive = 1 and (".$emp_id." in (approver_1,approver_2,approver_3) ".$rept_app_str." ) and status in (".$status_str.") "
+                        . "where isactive = 1 and (".$emp_id." in (approver_1,approver_2,approver_3) ".$rept_app_str." ) and school_id='".$school_id."' and status in (".$status_str.") "
                         . "group by status";
                 $result = $db->query($query);
                 $rows = $result->fetchAll();
@@ -608,10 +621,22 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getServiceTypes($login_bu,$login_dept,$service_desk_flag)
     {
+        $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select sc.id,sd.service_desk_name,sd.id service_desk_id "
                 . "from main_sd_configurations sc inner join main_sd_depts sd on sd.id = sc.service_desk_id and sd.isactive = 1 "
-                . "where sc.isactive = 1 and sc.businessunit_id = ".$login_bu." and sc.service_desk_flag = ".$service_desk_flag." ";
+                . "where sc.isactive = 1 and sc.school_id='".$school_id."' ";
         if($service_desk_flag == 0 && $login_dept!='')
             $query .= " and sc.department_id = ".$login_dept;
         $query .= " group by sd.id order by sd.service_desk_name asc";
@@ -630,7 +655,18 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
     */
     public function SaveorUpdateRequestData($data, $where)
     {
-    	
+    	$auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
         if($where != '')
         {
             $this->update($data, $where);
@@ -638,7 +674,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
         }
         else
         {
-        	
+            $data['school_id'] = $school_id;
             $this->insert($data);
             $id=$this->getAdapter()->lastInsertId($this->_name);
             return $id;
@@ -654,10 +690,22 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function check_receiver($emp_id,$businessunit_id)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $status = "no";
         if($emp_id != '')
         {
-            if($businessunit_id == 0)
+            if($businessunit_id == 0 || $businessunit_id == '')
                 $service_desk_flag = '0';
             else 
             {
@@ -665,11 +713,11 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                 $bu_data = $bu_model->getSingleUnitData($businessunit_id);
                 $service_desk_flag = $bu_data['service_desk_flag'];            
             }
-            if($service_desk_flag != '' && $businessunit_id != '')
+            if($service_desk_flag != '')
             {
                 $db = Zend_Db_Table::getDefaultAdapter();
                 $query = "select count(*) cnt from main_sd_configurations "
-                        . "where isactive = 1 and businessunit_id = ".$businessunit_id." and service_desk_flag = ".$service_desk_flag." "
+                        . "where isactive = 1 and service_desk_flag = ".$service_desk_flag." "
                         . "and find_in_set(".$emp_id.",request_recievers) ";
                 
                 $result = $db->query($query);
@@ -688,12 +736,24 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getRequestById($id)
     {
+        $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
         $data = array();
         if($id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             
-            $query = "select * from main_sd_requests_summary where sd_requests_id = ".$id;
+            $query = "select * from main_sd_requests_summary where school_id = '".$school_id."' and sd_requests_id = ".$id;
             $result = $db->query($query);
             $data = $result->fetch();
         }
@@ -707,12 +767,24 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function check_reporting($emp_id)
     {
+        $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
         $status = "no";
         if($emp_id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select count(id) cnt from main_employees_summary "
-                    . "where isactive = 1 and reporting_manager = ".$emp_id;
+                    . "where isactive = 1 and school_id = '".$school_id."' and reporting_manager = ".$emp_id;
             $result = $db->query($query);
             $row = $result->fetch();
             if($row['cnt'] > 0)
@@ -728,11 +800,23 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function check_approver($emp_id)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $status = "no";
         if($emp_id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
-            $query = "select count(id) cnt from main_sd_requests where ".$emp_id." in (approver_1,approver_2,approver_3) and isactive = 1  ";
+            $query = "select count(id) cnt from main_sd_requests where ".$emp_id." in (approver_1,approver_2,approver_3) and school_id = '".$school_id."' and isactive = 1  ";
             $result = $db->query($query);
             $row = $result->fetch();
             if($row['cnt'] > 0)
@@ -747,13 +831,25 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getReptId($request_id)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $return = '';
         if($request_id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select es.reporting_manager from main_sd_requests sdr "
                     . "inner join main_employees_summary es on es.user_id = sdr.raised_by and es.isactive =1 "
-                    . "where sdr.id = ".$request_id." and sdr.isactive = 1 and sdr.status = 'Open'";
+                    . "where sdr.id = ".$request_id." and sdr.isactive = 1 and sdr.status = 'Open' and sdr.school_id='".$school_id."'";
             $result = $db->query($query);
             $row = $result->fetch();
             $return = $row['reporting_manager'];
@@ -769,6 +865,18 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getApprovers($request_id,$flag)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $appr_arr = array();
         if($request_id != '')
         {
@@ -779,14 +887,14 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
                         . "from main_sd_requests sdr "
                         . "inner join main_sd_configurations sdc on sdc.isactive = 1 "
                         . "and sdc.id = sdr.service_desk_conf_id "
-                        . "where sdr.isactive = 1 and sdr.id = ".$request_id." and sdr.status = 'Open'";
+                        . "where sdr.isactive = 1 and sdr.id = ".$request_id." and sdr.status = 'Open' and sdr.school_id = '".$school_id."'";
             
             }
             else 
             {
                 $query = "select sdc.approver_1,sdc.approver_2,sdc.approver_3 "
                         . "from main_sd_configurations sdc "                                                
-                        . "where sdc.isactive = 1 and sdc.id = ".$request_id." ";
+                        . "where sdc.isactive = 1 and sdc.id = ".$request_id." and sdc.school_id = '".$school_id."' ";
             }
             $result = $db->query($query);
             $row = $result->fetch();
@@ -811,12 +919,24 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getApproverLevel($emp_id,$request_id)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $approver_level = "view";
         if($emp_id != '' && $request_id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             $app_query = "select approver_1,approver_2,approver_3,approver_status_1,approver_status_2,approver_status_3 "
-                    . "from main_sd_requests where id = ".$request_id." and isactive = 1 and status = 'To management approve'";
+                    . "from main_sd_requests where id = ".$request_id." and isactive = 1 and status = 'To management approve' and school_id = '".$school_id."'";
             $app_result = $db->query($app_query);
             $app_row = $app_result->fetch();
             
@@ -862,12 +982,24 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getCC_mails($config_id)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $mails_arr = array();
         if($config_id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select request_recievers,cc_mail_recievers "
-                    . "from main_sd_configurations where id = ".$config_id." and isactive = 1";
+                    . "from main_sd_configurations where id = ".$config_id." and isactive = 1 and school_id = '".$school_id."'";
             $result = $db->query($query);
             $mails_arr = $result->fetch();
         }
@@ -881,12 +1013,24 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getEmailIds($total_ids)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $mails_arr = array();
         if($total_ids != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select user_id,emailaddress from main_employees_summary "
-                    . "where user_id in (".$total_ids.")";
+                    . "where user_id in (".$total_ids.") and school_id = '".$school_id."'";
             $result = $db->query($query);
             $row = $result->fetchAll();
             if(count($row) > 0)
@@ -927,12 +1071,24 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function check_raiser($service_desk_conf_id,$loginUserId)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $proceed = 'yes';
         if($service_desk_conf_id != '' && $loginUserId != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select request_recievers from main_sd_configurations "
-                    . "where id = ".$service_desk_conf_id." and isactive = 1";
+                    . "where id = ".$service_desk_conf_id." and isactive = 1 and school_id='".$school_id."'";
             $result = $db->query($query);
             $row = $result->fetch();
             $ids = explode(',', $row['request_recievers']);
@@ -957,12 +1113,24 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
      */
     public function getRequestHistory($request_id)
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
         $history = array();
         if($request_id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select concat(description,emp_name) history,emp_profileimg,date(createddate) hdate,time(createddate) htime,comments "
-                    . "from main_request_history where request_id = ".$request_id." order by createddate desc";
+                    . "from main_request_history where request_id = ".$request_id." and school_id='".$school_id."' order by createddate desc";
             $result = $db->query($query);
             $history = $result->fetchAll();
         }
@@ -971,16 +1139,40 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
     
     public function getActiveCategoriesData()
     {
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
     	 $userdata=	$this->select()
     	->setIntegrityCheck(false)
     	->from(array('c'=>'assets_categories'),array('c.*'))
     	->order('c.id')
-    	->where('c.is_active =1 and c.parent=0 ');
+    	->where('c.is_active =1 and c.parent=0 and c.school_id='.$school_id);
     	return $this->fetchAll($userdata)->toArray();
     
     } 
   public function getuserallocatedAssetData($userid){
   	
+        $auth = Zend_Auth::getInstance();
+        $request = Zend_Controller_Front::getInstance();
+        if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+        }
   	$db = Zend_Db_Table::getDefaultAdapter();
  	/*$query = "SELECT s.id AS service_conf_id, a.*  FROM assets a 
 			INNER JOIN main_sd_configurations s ON s.service_desk_id = a.category AND s.request_for = 2 
@@ -991,7 +1183,7 @@ class Default_Model_Servicerequests extends Zend_Db_Table_Abstract
   	if($userid!='') {
  	$query = "SELECT name,id,category FROM assets WHERE category 
 			  IN(SELECT service_desk_id  FROM main_sd_configurations WHERE request_for=2 AND isactive=1 AND 
-			  service_desk_id IN(SELECT DISTINCT category FROM assets WHERE allocated_to=$userid)) AND isactive=1 AND allocated_to=$userid";
+			  service_desk_id IN(SELECT DISTINCT category FROM assets WHERE allocated_to=$userid)) AND isactive=1 AND school_id='".$school_id."' AND allocated_to=$userid";
   	}
   	$result = $db->query($query);
   	$userassets = $result->fetchAll();

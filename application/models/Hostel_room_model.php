@@ -89,7 +89,7 @@ class Hostel_room_model extends CI_Model {
         $this->db->delete($this->_table);
         return true;
     }
-
+	
     public function get_count_of_students($dormitory_id = '') {
         $school_id = ''; $where = '';
         if(($this->session->userdata('school_id'))) {
@@ -100,6 +100,7 @@ class Hostel_room_model extends CI_Model {
         }
         $sql = "select SUM(occupied_beds)as occupied from hostel_room where hostel_id='".$dormitory_id."'".$where;
         $rs = $this->db->query($sql)->result_array();
+       // echo $this->db->last_query();
         return $rs;
     }
     

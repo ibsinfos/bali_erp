@@ -253,6 +253,19 @@ public function editAction()
             $msgarray['violation_id'] = 'Violation Types are not configured yet.';
             // $emptyFlag++;
         }
+        
+        $departmentsmodel = new Default_Model_Departments();
+        $departmentlistArr = $departmentsmodel->getDepartmentList();
+        $totalDeptList = $departmentsmodel->getTotalDepartmentList();
+        $form->employee_dept_id->clearMultiOptions();
+        $form->employee_dept_id->addMultiOption('','Select Department');
+        if(count($departmentlistArr) > 0)
+        {
+                foreach($departmentlistArr as $departmentlistresult)
+                {
+                        $form->employee_dept_id->addMultiOption($departmentlistresult['id'],utf8_encode($departmentlistresult['deptname']));
+                }
+        }
 
         $this->view->form = $form;
         $this->view->logged_in_user_id = $logged_in_user_id;
@@ -280,7 +293,7 @@ public function editAction()
         {
             $corrective_action = $this->_request->getParam('corrective_action');
             $corrective_action_text = $this->_request->getParam('corrective_action_text');
-            $employee_bu_id = $this->_request->getParam('employee_bu_id');
+            //$employee_bu_id = $this->_request->getParam('employee_bu_id');
             $employee_dept_id = $this->_request->getParam('employee_dept_id');
             $error_flag = 0;
             if(!empty($corrective_action) && $corrective_action == 'Other' )
@@ -322,7 +335,7 @@ public function editAction()
 
                 $data = array(
                     'incident_raised_by' => $incident_raised_by,
-                    'employee_bu_id' => $employee_bu_id,
+                    //'employee_bu_id' => $employee_bu_id,
                     'employee_dept_id' => $employee_dept_id,
                     'employee_id' => $employee_id,
                     'employee_rep_mang_id' => $employee_rep_mang_id,
@@ -434,10 +447,10 @@ public function editAction()
     public function getemployeesAction()
     {
         $this->_helper->layout->disableLayout();
-        $businessunit_id = $this->_getParam('businessunit_id');
-        $department_id = $this->_getParam('department_id');
+        //$businessunit_id = $this->_getParam('businessunit_id');
+        $department_id = $this->_getParam('department_id'); 
         $disciplinary_object = new Default_Model_Disciplinaryincident();
-        $employee_data = $disciplinary_object->getemployees($businessunit_id,$department_id);
+        $employee_data = $disciplinary_object->getemployees('',$department_id);
         if(empty($employee_data))
         {
             $flag = 'false';
@@ -560,5 +573,3 @@ public function editAction()
 				}
 	}
 }
-
-

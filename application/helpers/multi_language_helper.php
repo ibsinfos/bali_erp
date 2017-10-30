@@ -17,27 +17,29 @@
 if ( ! function_exists('get_phrase'))
 {
 	function get_phrase($phrase = '') {
-		$CI	=&	get_instance();
+        $CI	=&	get_instance();
+        $CI->load->database();
+        
+		/* $CI	=&	get_instance();
 		$CI->load->database();
-        $current_language	=	$CI->db->get_where('settings' , array('type' => 'language'))->row();
+        $current_language = $CI->db->get_where('settings' , array('type' => 'language'))->row();
         $current_language = ($current_language)?$current_language->description:'';
 		
-		if ( $current_language	==	'') {
-			$current_language	=	'english';
+		if ($current_language == '') {
+			$current_language = 'english';
 			$CI->session->set_userdata('current_language' , $current_language);
 		}
 
-		/** insert blank phrases initially and populating the language db ***/
+		//insert blank phrases initially and populating the language db 
 		$check_phrase_arr	=	$CI->db->get_where('language' , array('UPPER (phrase)=' => strtoupper($phrase)))->row();
-                
-                if(count($check_phrase_arr)>0)
-                {
-                    $check_phrase=  strtoupper($check_phrase_arr->phrase);
-                }
-                else
-                {
-                    $check_phrase="";
-                }
+        if(count($check_phrase_arr)>0)
+        {
+            $check_phrase=  strtoupper($check_phrase_arr->phrase);
+        }
+        else
+        {
+            $check_phrase="";
+        }
 		if ( $check_phrase	!= strtoupper($phrase))
 			$CI->db->insert('language' , array('phrase' => $phrase));
 			
@@ -50,7 +52,13 @@ if ( ! function_exists('get_phrase'))
 		if (isset($row->$current_language) && $row->$current_language !="")
 			return $row->$current_language;
 		else 
-			return ucwords(str_replace('_',' ',$phrase));
+            return ucwords(str_replace('_',' ',$phrase)); */
+
+        if($CI->config->item('lang_'.strtoupper($phrase))){
+            return ucwords(str_replace('_',' ',$CI->config->item('lang_'.strtoupper($phrase))));
+        }else{
+            return ucwords(str_replace('_',' ',$phrase));
+        }
 	}
 }
 
@@ -496,8 +504,8 @@ if(!function_exists('read_mark_data_from_excel_file')){
 
 if ( ! function_exists('set_machin_active_log')){
     function set_machin_active_log($msg,$heading=""){
-        $dir='/var/www/html/School/'; 
-        $log_file_path=$dir.'machichine_activity_'.date('Y-m-d').'_log.log';
+        $dir = BASEPATH.'../';//'/var/www/html/beta_ag/'; 
+        $log_file_path = $dir.'machichine_activity_'.date('Y-m-d').'_log.log';
         if (!$handle = fopen($log_file_path, 'a+')) {
             return false;
         }else{

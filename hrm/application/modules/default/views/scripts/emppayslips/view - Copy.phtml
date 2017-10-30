@@ -1,0 +1,363 @@
+<link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/payslip_style.css" />
+
+<?php
+/* * ******************************************************************************* 
+ *  This file is part of Sentrifugo.
+ *  Copyright (C) 2014 Sapplica
+ *   
+ *  Sentrifugo is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Sentrifugo is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Sentrifugo.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Sentrifugo Support <support@sentrifugo.com>
+ * ****************************************************************************** */
+?>
+ <?php echo $this->headScript()->prependFile(
+        $this->baseUrl('\public\scripts\jquery.fileDownload-master\src\Scripts\jquery.fileDownload.js')); ?>
+
+<?php if (empty($this->empdata)) { ?>
+    <div class="ml-alert-1-info">
+        <div class="style-1-icon info"></div>
+        <?php if ($this->rowexist == 'norows') { ?>
+            No data found.
+        <?php } else { ?>
+            Employee inactivated.
+        <?php } ?>
+    </div>
+    <?php
+} else {
+    ?>
+    <?php
+    $baseUrl = $this->serverUrl() . $this->baseUrl();
+
+    if (!empty($this->employeedata)) {
+        echo $this->employeedetails($this->employeedata, 'view', $this->id);
+      //echo "<pre>"; print_r($this->employeedata); 
+      //print_r($this->salarydetails);
+      
+    }
+    ?>
+
+<!-- Code by Shuchita -->
+<?php
+    $salaryPerDay=$this->salarydetails['salary']/30;
+    $empLeaveData=$this->empLeaveData;
+
+    if($empLeaveData['emp_leave_limit']>=$empLeaveData['used_leaves']) { 
+            $lop=0;
+        }else{
+            $lop=$empLeaveData['used_leaves']-$empLeaveData['emp_leave_limit'];
+        }
+
+        $presentDays=30-$lop;
+        $salaryForPresentDays=$presentDays*$salaryPerDay;
+        $deductedSalary=$salaryPerDay*$lop;
+        $netPay=$this->netPayDetails[0]['net_pay']-$deductedSalary;
+?>    
+
+<!-- Code by Shuchita -->
+ 
+<div class="right-block-data right-over-border"> 
+        <div id="error_message" style="display:none;"></div>
+        <!--<div class="ml-alert-1-info m1-info-set">
+                <div class="style-1-icon info"></div>Feature will be available soon.
+        </div>-->
+        <div id="winPrint">
+            <div class="slimScrollDiv">
+                <div id="empleavesummary" class="details_data_display_block newtablegrid" style="width:100% !important;">
+                    <div class="row">
+                        <div class="row">
+            <div class="col-md-12 text-center">
+                <span>
+                    <?php 
+                    $organizationImg = new Zend_Session_Namespace('organizationinfo');
+                    $hideshowmainmenu = $organizationImg->hideshowmainmenu;
+                    $orgLogoImg = MEDIA_PATH.'images/hrms-logo-new.PNG';
+                    //echo '$orgLogoImg : '.$orgLogoImg;
+                    if(isset($organizationImg->orgimg) && !empty($organizationImg->orgimg)){
+                        $orgLogoImg = DOMAIN.'public/uploads/organisation/'.$organizationImg->orgimg ; 
+                    }?>
+                                     <img src="<?php echo $orgLogoImg;?>" alt="logo image here"/>
+                </span>
+            </div>
+        </div>
+                        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-info">
+                    <div class="text-center year_info">
+                            <b>Payslip For <?php echo date('F Y',strtotime($this->empPayslipData[0]['generate_date'])); ?> <br/>
+                            </b>
+                        </div>
+                    <div class="panel-body">
+                        <table class="table table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th class="info" colspan="1">Name</th>
+                                    <td colspan="2"><?php echo $this->employeedata['userfullname']; ?></td>
+                                    <th class="info" colspan="1" id="p">Personal No.</th>
+                                    <td colspan="2"><?php echo $this->employeedata['contactnumber'];?></td>
+                                </tr>
+                                <tr>
+                                    <th class="info" colspan="1">Bank</th>
+                                    <td colspan="2"><?php echo $this->salarydetails['bankname']; ?></td>
+                                    <th class="info" colspan="1">Bank A/C No.</th>
+                                    <td colspan="2"><?php echo $this->salarydetails['accountnumber']; ?></td>
+                                </tr>
+                                <tr>
+                                    <th class="info" colspan="1">DOJ</th>
+                                    <td colspan="2"><?php echo $this->employeedata['selecteddate'];?></td>
+                                    <th class="info" colspan="1">LOP Days</th>
+                                    <td colspan="2"><?=$lop?></td>
+                                </tr>
+                                <tr>
+                                    <th class="info" colspan="1">Employee Id</th>
+                                    <td colspan="2"><?php echo $this->employeedata['employeeId'];?></td>
+                                    <th class="info" colspan="1">STD Days</th>
+                                    <td colspan="2">30</td>
+                                </tr>
+                                <?php /*<tr>
+                                    <th class="info" colspan="1">Location</th>
+                                    <td colspan="2">1234567890</td>
+                                    <th class="info" colspan="1">Worked Days</th>
+                                    <td colspan="2">Deepak Gupta</td>
+                                </tr>
+                                <tr>
+                                    <th class="info" colspan="1">Department</th>
+                                    <td colspan="2">1234567890</td>
+                                    <th class="info" colspan="1">Designation</th>
+                                    <td colspan="2">Deepak Gupta</td>
+                                </tr>*/?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+                        <div class="row">
+            <div class="col-md-12 table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="info">
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        Earnings
+                                    </div>
+                                    <div class="col-md-2">
+                                        Amount
+                                    </div>
+                                    <div class="col-md-4">
+                                        Deduction
+                                    </div>
+                                    <div class="col-md-2">
+                                        Amount
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="earning_deduct">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <?php foreach($this->earningColArr as $k => $v):?>
+                                            <div class="col-md-8"><?php echo $v['name'];?></div>
+                                            <div class="col-md-4 text-left"><?php echo number_format($v['value'],2);?></div>
+                                            <?php endforeach;?>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="row">
+                                            <?php foreach($this->deductColArr as $k => $v):?>
+                                            <div class="col-md-8"><?php echo $v['name'];?></div>
+                                            <div class="col-md-4 text-left"><?php echo number_format($v['value'],2);?></div>
+                                            <?php endforeach;?>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-8">LOP Amount</div>
+                                            <div class="col-md-4 text-left"><?=number_format($deductedSalary,2)?></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="earning_deduct">
+                                <div class="row">
+                                    <div class="col-md-6"><a onclick="displaydeptform('<?php echo BASE_URL.'payrollcategory/addpopup/type/0/userid/'.$this->id; ?>','Add Earning');">+ Earning</a></div>
+                                    <div class="col-md-6"><a onclick="displaydeptform('<?php echo BASE_URL.'payrollcategory/addpopup/type/1/userid/'.$this->id; ?>','Add Deduction');">+ Deduction</a></div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-6"><b>Net Earning</b></div>
+                                    <div class="col-md-5 text-right" style="margin-left: -20px;"><b>Rs. <?php echo number_format($netPay,2);?></b></div>
+                                </div>
+                            </td>
+                            
+                        </tr>
+
+                    </tbody>
+                </table>
+                <span>&nbsp;&nbsp;**This is computer generated payslip and require signature and stamp of Bank.</span>
+            </div>
+        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clear"></div>
+            <div style="height:50px !important; width:100% !important;"></div>
+            
+
+            <div class="clear"></div>
+            <div style="height:50px !important; width:100% !important;"></div>
+            
+        </div>
+        
+       
+        
+        
+
+    </div>	
+    </div>
+    <div align="center" style="width: 100%; float: left;">
+            <input type="button" value="Update" class="print" onclick="displaydeptform('<?php echo BASE_URL.'payrollcategory/editcategoryforemppopup/userid/'.$this->id.'/payslipid/'.$this->payslip_id; ?>','Update Payroll Category');">
+            <input type="button" value="Print" class="print" onclick="printSalarySlip();">
+            <input type="button" value="PDF" class="print" onclick="salarySlipPDF();">
+        </div>
+        <div style="clear:both">&nbsp;</div>
+    <?php
+}
+?>
+    
+<div id="payrollcategoryContainer"  style="display: none; overflow: auto;">
+	<div class="heading">
+		<a href="javascript:void(0)">
+	    <img src="<?php echo $this->baseUrl().'/public/media/';?>images/close.png" name="" align="right" border="0" hspace="3" vspace="5" class="closeAttachPopup" style="margin: -24px 8px 0 0;"> </a>
+	</div>
+
+	<iframe id="payrollcategoryCont" class="business_units_iframe" frameborder="0"></iframe>
+</div>
+    
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $('#value_type').on('change', function () {
+            alert(this.value);
+            // if (this.value == '1'); { No semicolon and I used === instead of ==
+            if (this.value === 'numeric') {
+                $("#numeric").show();
+                $( "input[name*='numeric']" ).attr("required","required");
+            } else {
+                $("#numeric").hide();
+                $( "input[name*='numeric']" ).removeAttr("required");
+            }
+
+            if (this.value === 'formula') {
+                $("#formula").show();
+                //$( "input[name*='formula']" ).attr("required","required");
+            } else {
+                $("#formula").hide();
+                //$( "input[name*='formula']" )..removeAttr("required");
+            }
+
+            if (this.value === 'conditionwithformula'){
+             $("#conditionwithformula").show();
+             } else {
+             $("#conditionwithformula").hide();
+             }
+        })
+    });
+    function openForm(type){
+       $('#payslip_form').slideToggle('slow');
+       $('#payroll_category_type').val(type);
+    }
+    
+    $(document).ready(function () {
+        $("#emp_payslips").addClass('active');
+        $("#emp_payslips").removeAttr("onclick");
+    });
+    
+    function printSalarySlip(){
+        //alert($("#winPrint").html());
+        PrintElem($("#winPrint").html());
+    }
+     function salarySlipPDF(){
+        //alert($("#winPrint").html());
+      var param_str = $('#filters_div').find('select, textarea, input').serialize();
+        var url= base_url+"/default/reports/rolesgrouprptpdf?"+param_str; 	
+	$.ajax({
+                type: "POST",
+                url: base_url +'/emppayslips/printslip/userid/<?php echo $this->id; ?>',
+                data: param_str,
+                success: function(response) 
+                { 
+                    alert(response);
+                    response = JSON.parse(response);
+                    url = base_url +'/reports/downloadreport/file_name/' + response.file_name;
+                    var $preparingFileModal = $("#preparing-file-modal");
+                    $preparingFileModal.dialog({ modal: true });
+
+                    $.fileDownload(url, {
+                            successCallback: function(url) 
+                            {
+                                $preparingFileModal.dialog('close');
+                            },
+                            failCallback: function(responseHtml, url) 
+                            {
+                                $preparingFileModal.dialog('close');
+                                $("#error-modal").dialog({ modal: true });
+                            }
+                        });			        
+                    return false; //this is critical to stop the click event which will trigger a normal file download!
+                },
+        });
+    
+    }
+    function PrintElem(elem)
+{
+    var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+
+    mywindow.document.write('<html><head><title>Sharad Technologies LLC - School ERP</title><style type="text/css">*{-webkit-print-color-adjust: exact !important; }.col-md-6{width:49% !important; float:left !important;}.text-right{text-align:right !important;}.info,.panel-info>.panel-heading{background-color:#d9edf7 !important;-webkit-print-color-adjust: exact !important; border-bottom: 1px solid transparent; border-top-left-radius: 3px; border-top-right-radius: 3px;}.newtablegrid table {color: #3B3B3B;font-family: "Roboto Regular";font-size: 13px;line-height: 25px; position: relative;width: 100%;border-collapse: collapse;}.table-bordered {border: 1px solid #ddd; }th,td{border: 1px solid #ddd !important; text-align:left !important;}.text-center{text-align:center;}.year_info{}</style>');
+    mywindow.document.write('<link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/bootstrap.min.css" /><link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/payslip_style.css" />');
+    mywindow.document.write('</head><body >');
+    
+    mywindow.document.write('<h1>Rarome LLC</h1>');
+    
+    mywindow.document.write(elem);
+
+    mywindow.document.write('</body></html>');
+    
+    var tables=mywindow.document.getElementsByTagName('table');
+    
+    for(var i=0;i<tables.length;i++) {
+        tables[i].setAttribute('cellpadding','5');
+        tables[i].setAttribute('cellspacing','0');
+        tables[i].setAttribute('border','1');
+        tables[i].setAttribute('width','100%');
+        tables[i].setAttribute('style','margin-top:20px; border-top:0;');
+    }
+
+    mywindow.document.close(); // necessary for IE >= 10
+    mywindow.focus(); // necessary for IE >= 10*/
+
+    mywindow.print();
+    mywindow.close();
+
+    return true;
+}
+</script>

@@ -31,7 +31,7 @@
         <label class="control-label">Select Role</label>
         <select  data-style="form-control" data-live-search="true" class="selectpicker" id="role_id" name="role_id" onchange="GetRolePermission()">
             <option value="">Select</option><?php if(count($roles)){ foreach($roles as $role){ ?>
-            <option value="<?php echo $role['id'];?>" <?php if($this->uri->segment(3)==$role['id']){ echo 'selected';}?>><?php echo ucwords($role['name']);?></option><?php  } } ?>
+            <option value="<?php echo $role['id'];?>" <?php if($this->uri->segment(3)==$role['id']){ echo 'selected';}?>><?php echo ucwords($role['role_name']);?></option><?php  } } ?>
         </select>
     </div>
 
@@ -46,31 +46,45 @@
             <option value="SA" <?php if($this->uri->segment(4)=='SA'){echo 'selected';}?>>School Admin</option>
             <option value="ACCT" <?php if($this->uri->segment(4)=='ACCT'){echo 'selected';}?>>Accountant</option>
             <option value="CASH" <?php if($this->uri->segment(4)=='CASH'){echo 'selected';}?>>Cashier</option>
+            <option value="BD" <?php if($this->uri->segment(4)=='BD'){echo 'selected';}?>>Bus Driver</option>
+            <option value="BA" <?php if($this->uri->segment(4)=='BA'){echo 'selected';}?>>Bus Admin</option>
         </select>
     </div>
 </div>
     </div>
 
 <?php if(isset($data) && count($data)){?>
-
-<div class="col-md-12 white-box"><?php $i =1; foreach($data as $datum){ ?>
-    <div class="checkbox checkbox-danger col-md-offset-1">
-        <input type="checkbox" name="link_id[]" value="<?php echo $datum['id'];?>" <?php if(isset($exist_role_link_data)){ if(in_array($datum['id'], $exist_role_link_data)){ echo 'checked';}}?> class="par_<?php echo $i;?>">
-        <label><b><?php echo ucfirst($datum['name']); ?></b></label>
-       <?php if(count($datum['link_data'])){ foreach($datum['link_data'] as $link_datum){?>
-            <div class="checkbox checkbox-danger col-md-offset-1">
-                <input type="checkbox" name="link_id[]" value="<?php echo $link_datum['id']; ?>" <?php if(isset($exist_role_link_data)){ if(in_array($link_datum['id'], $exist_role_link_data)){ echo 'checked';}}?> class="par_<?php echo $i.'child';?>">
-                <label><?php echo ucfirst($link_datum['name']); ?></label>
-            </div>
-            <br/><?php }}?>
-    </div><hr/><?php $i++;}?>
+<div class="col-md-12 white-box">
+    <?php $i =1; 
+    foreach($data as $datum){ ?>
+        <div class="checkbox checkbox-danger col-md-offset-1">
+            <input type="checkbox" name="link_id[]" value="<?php echo $datum['id'];?>" 
+                <?php echo isset($exist_role_link_data) && in_array($datum['id'], $exist_role_link_data)?'checked':'';?> class="par_<?php echo $i;?>">
+            <label><b><?php echo ucfirst($datum['name']); ?></b></label>
+            <?php if(count($datum['link_data'])){ 
+                foreach($datum['link_data'] as $link_datum){?>
+                <div class="checkbox checkbox-danger col-md-offset-1">
+                    <input type="checkbox" name="link_id[]" value="<?php echo $link_datum['id']; ?>" <?php if(isset($exist_role_link_data)){ if(in_array($link_datum['id'], $exist_role_link_data)){ echo 'checked';}}?> class="par_<?php echo $i.'child';?>">
+                    <label><?php echo ucfirst($link_datum['name']); ?></label>
+                    <?php if(count($link_datum['link_data'])){ 
+                        foreach($link_datum['link_data'] as $link_datum){?>
+                        <div class="checkbox checkbox-danger col-md-offset-1">
+                            <input type="checkbox" name="link_id[]" value="<?php echo $link_datum['id']; ?>" <?php if(isset($exist_role_link_data)){ if(in_array($link_datum['id'], $exist_role_link_data)){ echo 'checked';}}?> class="par_<?php echo $i.'child';?>">
+                            <label><?php echo ucfirst($link_datum['name']); ?></label>
+                        </div>
+                        <br/>
+                    <?php }}?>
+                </div>
+                <br/>
+            <?php }}?>
+        </div><hr/>
+    <?php $i++;}?>
 
     <div class="text-right col-xs-12 p-t-20">
         <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" id="assign_role"><?php echo get_phrase('Save'); ?></button>
     </div>
-
-</div><?php }?>
-
+</div>
+<?php }?>
 <?php echo form_close(); ?>
 
 <script type="text/javascript">
@@ -109,12 +123,12 @@
                 type: 'POST',
                 data :{school_id: school_id},
                 success: function(response){
-                    debugger;
+                    
                     if(response){
                         data = JSON.parse(response);
                         if(data.length){
                             for(k in data){
-                                school+='<option value="'+data[k]['id']+'">'+data[k]['name']+'</option>';
+                                school+='<option value="'+data[k]['id']+'">'+data[k]['role_name']+'</option>';
                             }
                         }else{
                             alert('No any user role is created for this school.');

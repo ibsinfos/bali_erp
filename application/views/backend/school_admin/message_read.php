@@ -17,7 +17,11 @@ $user = $user_type . "-" . $user_id;
     <?php if ($row['sender'] == $user) { ?>
                         <li class="odd">
                             <div class="chat-image">
-                                 <img src="<?php echo base_url()."uploads/".$row['image'];?>" class="img-circle" width="50px" height="50px"> 
+                                <?php if($row['image']!='' && file_exists("uploads/".$row['image'])) { ?>
+                                 <img src="<?php echo base_url()."uploads/".$row['image'];?>" class="img-circle" width="50px" height="50px" />
+                                <?php } else { ?>
+                                 <img src="<?php echo base_url()."uploads/user.png"; ?>" class="img-circle" width="50px" height="50px" />
+                                <?php } ?>
                             </div>
                             <div class="chat-body">
                                 <div class="chat-text">
@@ -33,7 +37,11 @@ $user = $user_type . "-" . $user_id;
     <?php } else { ?>
                         <li>
                             <div class="chat-image"> 
+                                <?php if($row['image']!='' && file_exists("uploads/".$row['image'])) { ?>
                                 <img src="<?php echo base_url()."uploads/".$row['image'];?>" class="img-circle" width="50px" height="50px">
+                                <?php } else { ?>
+                                <img src="<?php echo base_url()."uploads/user.png"; ?>" class="img-circle" width="50px" height="50px" />
+                                <?php } ?>
                             </div>
                             <div class="chat-body">
                                 <div class="chat-text">
@@ -52,7 +60,7 @@ $user = $user_type . "-" . $user_id;
                     <div class="col-sm-12">
                         <textarea class="form-control" placeholder="Type your message" name="message" id="sample_wysiwyg"></textarea>
                         <div class="custom-send">
-                            <button class="btn btn-danger btn-rounded" type="submit">Send</button>
+                            <button class="fcbtn btn btn-danger btn-outline btn-1d" type="submit">Send</button>
                         </div>
                     </div>
 <?php echo form_close(); ?>

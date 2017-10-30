@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="text-right">
-            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit_changes'); ?></button>   
+            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('update'); ?></button>   
         </div>
                 
     </from>     

@@ -30,12 +30,22 @@
 
 <!--row-->
     <?php foreach($details as $value){?>
-<div class="row">
+<?php
+if ($value['stud_image'] != "" && file_exists('uploads/student_image/' . $value['stud_image'])) {
+    $student_image = $value['stud_image'];
+} else {
+    $student_image = '';
+}
+?>
+<div class="row"><?php // pre($value); ?>
     <div class="col-md-4 col-sm-12 col-lg-4">
         <div class="panel p-b-30">
             <div class="p-30">
                 <div class="row">
-                    <div class="col-xs-4"><img src="<?php echo base_url();?>uploads/user.jpg" alt="varun" class="img-circle img-responsive"></div>
+                    <div class="col-xs-4">
+                        <!--<img src="<?php // echo base_url();?>uploads/user.png" alt="varun" class="img-circle img-responsive">-->
+                    <img src="<?php echo ($student_image != "" ? 'uploads/student_image/' . $student_image : 'uploads/user.png') ?>"  class="img-circle img-responsive"/>
+                    </div>
                     <div class="col-xs-8">
                         <h2 class="m-b-0"><?php echo $value['name'];?></h2>
                         <h4><?php echo $value['phone'];?></h4>

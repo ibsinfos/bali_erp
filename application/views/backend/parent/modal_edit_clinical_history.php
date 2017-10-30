@@ -32,7 +32,7 @@ if (!empty($clinical_record)) {
 
                     <div class="col-xs-12">
                         <div class="text-right">
-                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('update'); ?></button>
+                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('update_record'); ?></button>
                         </div>
                     </div>
 

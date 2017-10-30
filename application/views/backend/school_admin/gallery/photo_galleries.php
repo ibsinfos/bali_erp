@@ -34,7 +34,7 @@
                     </li>
                     <li data-step="6" data-intro="<?php echo get_phrase('From here you can add new fee head');?>" data-position='left'>
                         <a href="#add" class="sticon fa fa-plus-circle">
-                            <span class="hidden-xs"><?php echo get_phrase('add_gallery'); ?></span>
+                            <span class="hidden-xs"><?php echo get_phrase('create_gallery'); ?></span>
                         </a>
                     </li>
                 </ul>
@@ -62,21 +62,22 @@
                                     <td><?php echo $rec->image_count; ?></td>
                                     <td>
                                         <a href="javascript: void(0);"
-                                        onclick="showAjaxModal('<?php echo base_url('index.php?school_admin/photo_gallery_edit/'.$rec->id);?>')">
+                                        onclick="showAjaxModal('<?php echo base_url('index.php?'.$this->session->userdata('login_type').'/photo_gallery_edit/'.$rec->id);?>')">
                                             <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" 
                                                 data-toggle="tooltip" data-placement="top" data-original-title="Edit">
                                                 <i class="fa fa-pencil-square-o"></i>
                                             </button>
                                         </a>
                                         
-                                        <a href="<?php echo base_url('index.php?school_admin/photo_gallery_images/'.$rec->id)?>">
+                                        <a href="<?php echo base_url('index.php?'.$this->session->userdata('login_type').'/photo_gallery_images/'.$rec->id)?>">
                                             <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" 
                                                 data-toggle="tooltip" data-placement="top" data-original-title="Gallery Images">
                                                 <i class="fa fa-picture-o"></i>
                                             </button>
                                         </a>
                                          
-                                        <a href="javascript:void(0)" onclick="confirm_act('<?php echo base_url('index.php?school_admin/photo_gallery_delete/'.$rec->id);?>')">
+                                        <a href="javascript:void(0)" 
+                                            onclick="confirm_act('<?php echo base_url('index.php?'.$this->session->userdata('login_type').'/photo_gallery_delete/'.$rec->id);?>')">
                                             <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger"
                                             data-toggle="tooltip" data-placement="top" data-original-title="Delete"><i class="fa fa-trash-o"></i></button>
                                         </a>
@@ -99,7 +100,8 @@
 
                 <!--CREATION FORM STARTS-->
                 <section id="add">  
-                    <?php echo form_open(base_url('index.php?school_admin/photo_galleries#add'), array('class' => 'form-horizontal form-groups-bordered validate', 
+                    <?php echo form_open(base_url('index.php?'.$this->session->userdata('login_type').'/photo_galleries#add'), 
+                        array('class' => 'form-horizontal form-groups-bordered validate', 
                     'target' => '_top')); ?>
                     <div class="row">
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
@@ -118,7 +120,7 @@
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-road"></i></div>
                                 <select name="class_id" class="selectpicker" data-style="form-control" data-live-search="true">
-                                    <option value="0"><?php echo get_phrase('for_all')?></option>
+                                    <option value="0"><?php echo get_phrase('common')?></option>
                                     <?php foreach($classes as $cls){?>
                                         <option value="<?php echo $cls->class_id?>"><?php echo $cls->name?></option>
                                     <?php }?>

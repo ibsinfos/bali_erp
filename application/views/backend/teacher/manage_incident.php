@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?teacher/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+<?php $BRC = get_bread_crumb_old(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -34,16 +34,13 @@ if($this->session->flashdata('flash_message_error')) {?>
 <?php echo $this->session->flashdata('flash_message_error'); ?>
 </div>
 <?php } ?>
-   <div class="col-md-12 white-box" > 
-        <div class="text-center m-b-20" data-step="8" data-intro="<?php echo get_phrase('Here you can see the list of incident.');?>" data-position='top'>
-             <h3><?php echo get_phrase('incident');?></h3>
-        </div>
+   <div class="col-md-12 white-box" >
 <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
     <thead>
         <tr>
-            <th><div><?php echo get_phrase('No'); ?></div></th>                               
+            <th><div><?php echo get_phrase('S._no.'); ?></div></th>                               
             <th><div><?php echo get_phrase('violation_type'); ?></div></th>
-            <th><div><?php echo get_phrase('section_teacher'); ?></div></th>
+            <th><div><?php echo get_phrase('raised_by'); ?></div></th>
             <th><div><?php echo get_phrase('violation_description'); ?></div></th>
             <th><div><?php echo get_phrase('class'); ?></div></th>
             <th><div><?php echo get_phrase('section'); ?></div></th>
@@ -59,11 +56,11 @@ if($this->session->flashdata('flash_message_error')) {?>
         </tr>
     </thead>
     <tbody>
-    <?php $count = 1; foreach ($details as $row):  ?>
+    <?php $count = 1; $i=0; foreach ($details as $row):  ?>
         <tr>
             <td><?php echo $count++; ?></td>
             <td><?php echo $row['type']; ?></td>
-            <td><?php echo $row['raised_by']; ?></td>
+            <td><?php echo $raised_by[$i]; ?></td>
             <td><?php echo $row['description']; ?></td>
             <td><?php echo $row['class_name']; ?></td>
             <td><?php echo $row['section_name']; ?></td>
@@ -73,8 +70,8 @@ if($this->session->flashdata('flash_message_error')) {?>
             <td><?php echo $row['verdict']; ?></td>
             <td><?php echo $row['reporting_teacher']; ?></td>
             <td><?php echo $row['corrective_action']; ?></td>
-            <td><?php echo $row['date_of_occurrence']; ?></td>
-            <td><?php echo $row['expiry_date']; ?></td>
+            <td><?php echo date('d/m/Y',strtotime($row['date_of_occurrence'])); ?></td>
+            <td><?php echo date('d/m/Y',strtotime($row['expiry_date'])); ?></td>
             <td>
                 <div class="btn-group">
                 <a href="<?php echo base_url(); ?>index.php?disciplinary/edit_incident/<?php echo $row['incident_id']; ?>">
@@ -92,7 +89,7 @@ if($this->session->flashdata('flash_message_error')) {?>
                 </div>
             </td>
         </tr>
-    <?php endforeach; ?>
+    <?php $i++;  endforeach; ?>
     </tbody>
 </table>
 </div>

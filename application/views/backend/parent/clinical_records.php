@@ -31,9 +31,8 @@ if ($student_details->stud_image != "" && file_exists('uploads/student_image/' .
 <div class="row m-0" data-step="5" data-intro="<?php echo get_phrase('Student Information');?>" data-position='top'>
     <div class="col-xs-12 white-box">
         <div class="col-xs-12 col-sm-2">
-            <a href="#"><img src="<?php echo ($student_image != "" ? 'uploads/student_image/' . $student_image : 'uploads/user.jpg') ?>" width="100px" height="100px"/></a>
+            <a href="#"><img src="<?php echo ($student_image != "" ? 'uploads/student_image/' . $student_image : 'uploads/user.png') ?>" width="100px" height="100px"/></a>
         </div>
-
         <div class="col-xs-12 col-sm-10">
             <div>
                 <h3><?php if(isset($student_details->name) && isset($student_details->lname)) { echo $student_details->name . " " . $student_details->lname; } ?></h3>
@@ -46,14 +45,14 @@ if ($student_details->stud_image != "" && file_exists('uploads/student_image/' .
 <div class="row m-0" data-step="6" data-intro="<?php echo get_phrase('Desease Details');?>" data-position='top'>
     <span class="pull-right"></span>
     <div class="col-sm-12 white-box">
-
-        <table id="example23" class="display nowrap new_tabulation" cellspacing="0" width="100%">
+<!--<table class = "custom_table table display" cellspacing="0" width="100%" id="example23">-->
+        <table id="ex" class="display nowrap new_tabulation" cellspacing="0" width="100%">
             <thead>
-            <th>No.</th>
-            <th>Desease</th>
-            <th>Date</th>
-            <th>Discription</th>
-            <th data-step="7" data-intro="<?php echo get_phrase('More Desease Details');?>" data-position='top'> Options</th>
+            <th><div>No.</div></th>
+            <th><div>Desease</div></th>
+            <th><div>Date</div></th>
+            <th><div>Discription</div></th>
+            <th data-step="7" data-intro="<?php echo get_phrase('More Desease Details');?>" data-position='left'><div> Options </div></th>
             </thead><?php $c = 1;
 foreach ($medical_records as $med_rec): ?>
 

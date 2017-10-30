@@ -17,14 +17,14 @@ class Admin_config extends Home
     {
         parent::__construct();
 
-        if ($this->session->userdata('logged_in')!= 1) {
+        /*if ($this->session->userdata('logged_in')!= 1) {
             redirect('home/login', 'location');
         }
 
         if ($this->session->userdata('user_type')!= 'Admin') {
             redirect('home/login', 'location');
         }
-
+*/
         //$this->important_feature();
     }
 

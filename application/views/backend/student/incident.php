@@ -22,7 +22,7 @@
 <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
     <thead>
         <tr>
-            <th><div><?php echo get_phrase('No'); ?></div></th>                               
+            <th><div class="m-r-15"><?php echo get_phrase('No'); ?></div></th>                               
             <th><div><?php echo get_phrase('violation_type'); ?></div></th>
             <th><div><?php echo get_phrase('section_teacher'); ?></div></th>
             <th><div><?php echo get_phrase('violation_description'); ?></div></th>
@@ -31,9 +31,9 @@
             <th><div><?php echo get_phrase('parent_appeal'); ?></div></th>
             <th><div><?php echo get_phrase('student_name'); ?></div></th>
             <th><div><?php echo get_phrase('parent_statement'); ?></div></th>
-            <th><div><?php echo get_phrase('verdict'); ?></div></th>
+            <th><div class="m-r-15"><?php echo get_phrase('verdict'); ?></div></th>
             <th><div><?php echo get_phrase('reporting_teacher'); ?></div></th>
-            <th><div><?php echo get_phrase('corrective_action'); ?></div></th>
+            <th><div class="m-r-15"><?php echo get_phrase('corrective_action'); ?></div></th>
             <th><div><?php echo get_phrase('date_of_occurrence'); ?></div></th>
             <th><div><?php echo get_phrase('expiry_date'); ?></div></th>
         </tr>

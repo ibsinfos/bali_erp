@@ -26,7 +26,7 @@
 <!-- /.row -->
 <div class="col-md-12 white-box">
 <?php echo form_open(base_url().'index.php?fees/transaction/revert/search'); if($this->session->flashdata('flash_message_error')) {?><div class="alert alert-danger"><?php echo $this->session->flashdata('flash_message_error'); ?></div><?php }?>                       
-    <div class="col-md-3">
+    <div class="col-md-4">
         <label for="revert_type"><?php echo get_phrase("revert_type"); ?><span class="error" style="color: red;">*</span></label>
         <select class="form-control" name="revert_type" required="required">
             <option value=""><?php echo get_phrase("select"); ?></option>
@@ -35,7 +35,7 @@
         </select>
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-4">
         <label for="start_date"><?php echo get_phrase("start_date"); ?><span class="mandatory">*</span></label>
         <div class="input-group">
             <div class="input-group-addon"><i class="fa fa-calendar"></i></div>                  
@@ -43,7 +43,7 @@
         </div> 
     </div>
 
-    <div class="col-md-3">
+    <div class="col-md-4">
         <label for="end_date"><?php echo get_phrase("end_date"); ?><span class="mandatory">*</span></label>
         <div class="input-group">
             <div class="input-group-addon"><i class="fa fa-calendar"></i></div>                  
@@ -51,7 +51,7 @@
         </div> 
     </div>
 
-    <div class="col-md-3"><br>
+    <div class="col-md-12 text-center"><br>
         <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("search");?></button>
     </div>
     <?php echo form_close();?>

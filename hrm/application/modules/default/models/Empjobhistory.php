@@ -104,7 +104,7 @@ class Default_Model_Empjobhistory extends Zend_Db_Table_Abstract
 		}
 		$objName = 'empjobhistory';
 		
-		$tableFields = array('action'=>'Action','department'=>'Department','client_id'=>'Client','start_date'=>'From','end_date'=>'To');
+		$tableFields = array('action'=>'Action','department'=>'Department','start_date'=>'From','end_date'=>'To');
 		
 		$tablecontent = $this->getEmpJobHistoryData($sort, $by, $pageNo, $perPage,$searchQuery,$exParam1);     
 		

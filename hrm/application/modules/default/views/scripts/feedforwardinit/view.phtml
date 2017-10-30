@@ -40,7 +40,7 @@ $empCount=$this->empsCount['total'].' Employees';
 $empCountCompleted=$this->empsCount['completed'].' Employees';
 $duedate=sapp_Global::change_date($this->data['ff_due_date'],'view');
 sapp_Helper::viewHeader();
-sapp_Helper::viewBody('alt','Business Unit ',(!empty($this->data['unitname']))?$this->data['unitname']:"...",'Department',(!empty($this->data['deptname']))?$this->data['deptname']:"...");
+sapp_Helper::viewBody('alt','Department',(!empty($this->data['deptname']))?$this->data['deptname']:"...");
 sapp_Helper::viewBody('nor','Mode',(!empty($this->data['ff_mode']))?$this->data['ff_mode']:"...",'From Year',(!empty($this->data['ff_from_year']))?$this->data['ff_from_year']:"...");
 sapp_Helper::viewBody('alt','To Year ',(!empty($this->data['ff_to_year']))?$this->data['ff_to_year']:"...",'Period ',(!empty($this->data['ff_period']))?$this->data['ff_period']:"...");
 sapp_Helper::viewBody('nor','Enabled To',(isset($this->data['enable_to']))?$this->data['enable_to']:"...",'Due Date',(!empty($duedate))?$duedate:"..."); 

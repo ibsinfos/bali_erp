@@ -13,13 +13,12 @@
         </ol>
     </div>
 </div>
-<?php if (!empty($study_material_info)){ ?>
 <div class="col-md-12 white-box preview_outer">
     
     <table  id="data_table" class="display nowrap" data-step="5" data-intro="<?php echo get_phrase('View the study materials available.');?>" data-position='top'>
     <thead>
         <tr>        
-            <th><div>No</div></th>           
+            <th><div><?php echo get_phrase('s._no.');?></div></th>           
             <th><div><?php echo get_phrase('title');?></div></th>
             <th><div><?php echo get_phrase('class');?></div></th>
             <th><div><?php echo get_phrase('uploaded_by');?></div></th>
@@ -32,8 +31,8 @@
     </thead>
 
     <tbody>
-        <?php    
-        $count = 1;
+        <?php if (!empty($study_material_info)){ 
+            $count = 1;
         foreach ($study_material_info as $row) { ?>   
             <tr>               
                 <td><?php echo $count++; ?></td>               
@@ -58,10 +57,8 @@
                 </td>
                 
             </tr>
-        <?php } ?>
+        <?php } 
+        }?>
     </tbody>
 </table>
 </div>
-<?php } else { 
-echo "No Data Available";
- } ?>

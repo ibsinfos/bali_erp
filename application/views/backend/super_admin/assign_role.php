@@ -29,14 +29,17 @@
         <select class="selectpicker" data-style="form-control" data-live-search="true" onchange="window.location = this.options[this.selectedIndex].value" name="original_user_type" id="original_user_type">
             <option value="">Select</option>
 <?php if(count($roles)){ foreach($roles as $role){ ?>
-                <option value="<?php echo base_url().'index.php?super_admin/assign_role/'.$role['id'].'/'.$this->uri->segment(4);?>" <?php if($this->uri->segment(3)==$role['id']){ echo 'selected';}?> ><?php echo ucwords($role['name']);?></option>
+                <option value="<?php echo base_url().'index.php?super_admin/assign_role/'.$role['id'].'/'.$this->uri->segment(4);?>" <?php if($this->uri->segment(3)==$role['id']){ echo 'selected';}?> ><?php echo ucwords($role['role_name']);?></option>
 <?php }}?>            
         </select>
     </div>
 </div>
 
 
-<?php if(isset($data)){?>
+<?php if(isset($data)){
+    
+    
+    ?>
 
 <?php if ($this->session->flashdata('flash_message_error')) { ?>        
 <div class="alert alert-danger">
@@ -70,9 +73,9 @@
                     <td>
                         <select class="col-md-12 selectpicker" data-style="form-control" data-live-search="true" name="assign_role[<?php echo $datum['id'];?>]">
 <?php if(count($roles)){ if($datum['role_id']!=''){ foreach($roles as $role){ ?>
-                            <option value="<?php echo $role['id'];?>" <?php if($datum['role_id']==$role['id']){ echo 'selected';}?> ><?php echo ucwords($role['name']);?></option>
+                            <option value="<?php echo $role['id'];?>" <?php if($datum['role_id']==$role['id']){ echo 'selected';}?> ><?php echo ucwords($role['role_name']);?></option>
 <?php }}else{ foreach($roles as $role){ ?>
-                            <option value="<?php echo $role['id'];?>" <?php if($this->uri->segment(3)==$role['id']){ echo 'selected';} ?> ><?php echo ucwords($role['name']); ?></option><?php }}} ?>
+                            <option value="<?php echo $role['id'];?>" <?php if($this->uri->segment(3)==$role['id']){ echo 'selected';} ?> ><?php echo ucwords($role['role_name']); ?></option><?php }}} ?>
                         </select>
                     </td>
                 </tr><?php }} ?>
@@ -117,12 +120,12 @@
                 type: 'POST',
                 data :{school_id: school_id},
                 success: function(response){
-                    debugger;
+                   
                     if(response){
                         data = JSON.parse(response);
                         if(data.length){
                             for(k in data){
-                                school+='<option value="<?php echo base_url();?>index.php?super_admin/assign_role/'+data[k]['id']+'/'+data[k]['school_id']+'">'+data[k]['name']+'</option>';
+                                school+='<option value="<?php echo base_url();?>index.php?super_admin/assign_role/'+data[k]['id']+'/'+data[k]['school_id']+'">'+data[k]['role_name']+'</option>';
                             }
                         }else{
                             alert('No any user role is created for this school.');

@@ -25,8 +25,13 @@
     <!-- /.breadcrumb -->
 </div>
 
-
-
+<div class="text-right m-b-20" >    
+    <a  href="<?php echo base_url(); ?>index.php?blogs/view_all_blogs " 
+       class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger par-add-btn" data-toggle="tooltip" 
+       data-placement="left" title="" data-original-title="Go Back">
+       <i class="fa fa-reply"></i>
+    </a>
+</div>
 
 <div class="row">
     <div class="col-md-12">

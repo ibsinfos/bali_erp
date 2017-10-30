@@ -1,13 +1,13 @@
 <div class="row bg-title">
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-        <h4 class="page-title"><?php echo get_phrase('manage_transport'); ?> </h4></div>
+        <h4 class="page-title"><?php echo get_phrase($page_title); ?></h4></div>
     <!-- /.page title -->
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
-         <ol class="breadcrumb">
+        <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
 <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
@@ -27,13 +27,13 @@
         <div class="sttabs tabs-style-flip">
             <nav>
                 <ul>
-                    <li class="active" data-step="5" data-intro="<?php echo get_phrase('It Shows Transport List');?>" data-position='bottom'>
-                        <a href="#list" class="sticon fa fa-list"><span class="hidden-xs"><?php echo get_phrase('transport_list'); ?></span>
+                    <li class="active" data-step="5" data-intro="<?php echo get_phrase('It_Shows_Transport_List');?>" data-position='bottom'>
+                        <a href="#list" class="sticon fa fa-list"><span class="hidden-xs"><?php echo get_phrase('route_list'); ?></span>
                         </a>
                     </li>
-                    <li data-step="6" data-intro="<?php echo get_phrase('you can Add New Transport from here');?>" data-position='bottom'>
+                    <li data-step="6" data-intro="<?php echo get_phrase('you_can_Add_New_Transport_from_here');?>" data-position='bottom'>
                         <a href="#add" class="sticon fa fa-plus-circle">
-                            <span class="hidden-xs"><?php echo get_phrase('add_transport'); ?></span>
+                            <span class="hidden-xs"><?php echo get_phrase('add_route'); ?></span>
                         </a>
                     </li>
                 </ul>
@@ -49,8 +49,8 @@
                                 <th><div><?php echo get_phrase('no_of_buses'); ?></div></th>
                                 <th><div><?php echo get_phrase('description'); ?></div></th>
 <!--                    		<th><div><?php // echo get_phrase('route_fare'); ?></div></th>   -->
-                                <th><div data-step="7" data-intro="<?php echo get_phrase('You can view bus stops of route from here');?>" data-position='left'><?php echo get_phrase('options'); ?></div></th>
-                                <th><div data-step="8" data-intro="<?php echo get_phrase('You can do edit ,Delete and see students in this route from here by clicking on specific iconava');?>" data-position='left'><?php echo get_phrase('action'); ?></div></th>
+                                <th><div data-step="7" data-intro="<?php echo get_phrase('You_can_view_bus_stops_of_route_from_here');?>" data-position='left'><?php echo get_phrase('options'); ?></div></th>
+                                <th><div data-step="8" data-intro="<?php echo get_phrase('You_can_do_edit,_Delete_and_see_students_in_this_route_from_here_by_clicking_on_specific_icon');?>" data-position='left'><?php echo get_phrase('action'); ?></div></th>
                             </tr>
                         </thead>
                         <tbody>

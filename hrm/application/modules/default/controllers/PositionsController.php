@@ -255,6 +255,7 @@ class Default_PositionsController extends Zend_Controller_Action
 		$auth = Zend_Auth::getInstance();
 		if($auth->hasIdentity()){
 			$loginUserId = $auth->getStorage()->read()->id;
+                        $school_id = $auth->getStorage()->read()->school_id;
 		}
 		$jobtitleid = $this->_request->getParam('jobtitleid');
 
@@ -330,15 +331,18 @@ class Default_PositionsController extends Zend_Controller_Action
 
 				$opt ='';
 				if($displayposition == '0'){
-					$this->view->positionlistArr = $opt;
-				}else{
+                                    $positionlistArr = $positionsmodel->getPositionList($displayposition);
+                                    foreach($positionlistArr as $record){
+                                            $opt .= sapp_Global::selectOptionBuilder($record['id'], $record['positionname']);
+                                    }					 
+                                    $this->view->positionlistArr = $opt;
+				}else{ 
 					$positionlistArr = $positionsmodel->getPositionList($displayposition);
 					foreach($positionlistArr as $record){
 						$opt .= sapp_Global::selectOptionBuilder($record['id'], $record['positionname']);
 					}					 
 					$this->view->positionlistArr = $opt;
 				}
-
 
 				$this->view->eventact = 'added';
 				$close = 'close';

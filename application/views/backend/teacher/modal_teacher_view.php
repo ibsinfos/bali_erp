@@ -4,7 +4,7 @@ if (!empty($teacher_info)){ ?>
     <div class="profile-env">
         <header class="row">   
             <div class="col-xs-3">           
-                <img src="<?php echo base_url();?>uploads/user.jpg" alt="profile image"  width="100" height="100"> 
+                <img src="<?php echo base_url();?>uploads/user.png" alt="profile image"  width="100" height="100"> 
             </div>
             <div class="col-sm-9">
                 <div class="profile-name m-t-20">

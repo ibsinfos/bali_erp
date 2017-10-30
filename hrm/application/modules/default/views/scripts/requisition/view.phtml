@@ -98,7 +98,7 @@ if($this->ermsg == '')  { ?>
 <?php 
 sapp_Helper::viewHeader();
 sapp_Helper::viewBody('alt','Requisition Code ',(!empty($this->data['requisition_code']))?$this->data['requisition_code']:"...",'Job Title',(!empty($this->data['titlename']))?$this->data['titlename']:"...");
-sapp_Helper::viewBody('nor','Due Date',(!empty($this->data['onboard_date']))?$this->data['onboard_date']:"...",'Business Unit',(!empty($this->data['businessunit_name']))?$this->data['businessunit_name']:"...");
+sapp_Helper::viewBody('nor','Due Date',(!empty($this->data['onboard_date']))?$this->data['onboard_date']:"...");
 sapp_Helper::viewBody('alt','Department',(!empty($this->data['dept_name']))?$this->data['dept_name']:"...",'Position',(!empty($this->data['posname']))?$this->data['posname']:"...");
 sapp_Helper::viewBody('nor','Reporting Manager',(!empty($this->data['mngrname']))?$this->data['mngrname']:"...",'Priority',(!empty($this->data['req_priority']))?$this->data['req_priority']:"..."); 
 sapp_Helper::viewBody('alt','Employment Status',(!empty($this->data['empttype']))?$this->data['empttype']:"...",'Req. Qualification ',(!empty($this->data['req_qualification']))?$this->data['req_qualification']:"...");

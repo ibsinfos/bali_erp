@@ -21,19 +21,21 @@
 <div class="row">
        <div class="col-md-12" data-step="5" data-intro="<?php echo get_phrase('Here you can see the list of previous exams.');?>" data-position='top'>
         <div class="panel panel-primary panel-shadow" data-collapsed="0">
-            <div class="panel-heading">
-                <div class="panel-title">Previous Exam</div>
+          <div class="panel-danger">
+            <div class="panel-heading"> Previous Exam
+                <div class="pull-right"></div>
             </div>
+          </div>
             <div class="panel-body">
                <div class="col-md-12">
                    <table class="table table-bordered">
                        <thead>
                         <tr>
-                            <td style="text-align: center;"><?php echo get_phrase('exam_name');?></td>
-                            <td style="text-align: center;"><?php echo get_phrase('class_name');?></td>
+                            <td><?php echo get_phrase('exam_name');?></td>
+                            <td><?php echo get_phrase('class_name');?></td>
 <!--                            <td style="text-align: center;"><?php echo get_phrase('subject_name');?></td>-->
-                            <td style="text-align: center;"><?php echo get_phrase('passing_percentage');?></td>
-                            <td style="text-align: center;" colspan="2"><?php echo get_phrase('action');?></td>
+                            <td><?php echo get_phrase('passing_percentage');?></td>
+                            <td colspan="2"><?php echo get_phrase('action');?></td>
                             
                         </tr>
                     </thead>
@@ -50,17 +52,17 @@
                                 if($row3['start_date'])
                         ?>
                             <tr>
-                                <td style="text-align: center;"><?php echo $row3['exam_name'];?></td>
-                                <td style="text-align: center;">
+                                <td><?php echo $row3['exam_name'];?></td>
+                                <td>
                                     <?php
                                        echo "Class ".$row3['class_name'];
                                        ?></td>
 <!--                                <td style="text-align: center;">
                                      <?php  echo $row3['subject_name']; ?>                           
                                 </td>-->
-                                <td style="text-align: center;"><?php echo $row3['passing_percent']?></td>
+                                <td><?php echo $row3['passing_percent']?></td>
                                     
-                                <td style="text-align: center;">
+                                <td>
                                 <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_view_online_exam_details/<?php echo $row3['id']; ?>');">
                                     <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view_details');?>">
                                     <i class="fa fa-eye"></i></button></a>
@@ -82,19 +84,21 @@
     </div>
     <div class="col-md-12" data-step="6" data-intro="<?php echo get_phrase('Here you can see exams list of today.');?>" data-position='top'>
         <div class="panel panel-primary panel-shadow" data-collapsed="0">
-            <div class="panel-heading">
-                <div class="panel-title">Today Exam</div>
+          <div class="panel-danger">
+            <div class="panel-heading"> Today Exam
+                <div class="pull-right"></div>
             </div>
+          </div>
             <div class="panel-body">
                <div class="col-md-12">
                    <table class="table table-bordered">
                        <thead>
                         <tr>
-                            <td style="text-align: center;"><?php echo get_phrase('exam_name');?></td>
-                            <td style="text-align: center;"><?php echo get_phrase('class_name');?></td>
+                            <td><?php echo get_phrase('exam_name');?></td>
+                            <td><?php echo get_phrase('class_name');?></td>
 <!--                            <td style="text-align: center;"><?php echo get_phrase('subject_name');?></td>-->
-                            <td style="text-align: center;"><?php echo get_phrase('passing_percentage');?></td>
-                            <td style="text-align: center;" colspan="2"><?php echo get_phrase('action');?></td>
+                            <td><?php echo get_phrase('passing_percentage');?></td>
+                            <td colspan="2"><?php echo get_phrase('action');?></td>
                             
                         </tr>
                     </thead>
@@ -112,29 +116,29 @@
                                 if($row3['start_date'])
                         ?>
                             <tr>
-                                <td style="text-align: center;"><?php echo $row3['exam_name'];?></td>
-                                <td style="text-align: center;">
+                                <td><?php echo $row3['exam_name'];?></td>
+                                <td>
                                     <?php
                                        echo "Class ".$row3['class_name'];
                                        ?></td>
 <!--                                <td style="text-align: center;">
                                      <?php  echo $row3['subject_name']; ?>                           
                                 </td>-->
-                                <td style="text-align: center;"><?php echo $row3['passing_percent']?></td>
+                                <td><?php echo $row3['passing_percent']?></td>
                                     
-                                <td style="text-align: center;">
+                                <td>
                                 <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_view_online_exam_details/<?php echo $row3['id']; ?>');">
                                     <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view_details');?>">
                                     <i class="fa fa-eye"></i></button></a>
                                 </td>
                                 <?php if($row3['attempt']    ==  "can attempt"){?>
-                                <td style="text-align: center;">
+                                <td>
                                     <a href="<?php echo base_url(); ?>index.php?student/attempt_exam/<?php echo $row3['id']; ?>">
                                     <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('attempt_now'); ?>">
                                     <i class="fa fa-sign-in"></i></button></a>
                                 </td>
                                 <?php } else{ ?>
-                                <td style="text-align: center;">
+                                <td>
                                     <?php echo get_phrase("already_attempted"); ?>
                                 </td>
                                 <?php } ?>
@@ -150,20 +154,23 @@
     </div>
     <div class="col-md-12" data-step="7" data-intro="<?php echo get_phrase('Here you can see the list of upcoming exams.');?>" data-position='top'>
         <div class="panel panel-primary panel-shadow" data-collapsed="0">
-            <div class="panel-heading">
-                <div class="panel-title">Upcoming Exam</div>
+          <div class="panel-danger">
+            <div class="panel-heading"> Upcoming Exam
+                <div class="pull-right"></div>
             </div>
+          </div>
+            
             <div class="panel-body">        
                 
                <div class="col-md-12">
                    <table class="table table-bordered">
                        <thead>
                         <tr>
-                            <td style="text-align: center;"><?php echo get_phrase('exam_name');?></td>
-                            <td style="text-align: center;"><?php echo get_phrase('class_name');?></td>
+                            <td><?php echo get_phrase('exam_name');?></td>
+                            <td><?php echo get_phrase('class_name');?></td>
                             <!-- <!-- <td style="text-align: center;"><?php echo get_phrase('subject_name');?></td> --> 
-                            <td style="text-align: center;"><?php echo get_phrase('passing_percentage');?></td>
-                            <td style="text-align: center;" colspan="2"><?php echo get_phrase('action');?></td>
+                            <td><?php echo get_phrase('passing_percentage');?></td>
+                            <td colspan="2"><?php echo get_phrase('action');?></td>
                             
                         </tr>
                     </thead>
@@ -180,8 +187,8 @@
                                 if($row3['start_date'] > date('m/d/Y')){
                         ?>
                             <tr>
-                                <td style="text-align: center;"><?php echo $row3['exam_name'];?></td>
-                                <td style="text-align: center;">
+                                <td><?php echo $row3['exam_name'];?></td>
+                                <td>
                                     <?php
                                        echo "Class ".$row3['class_name'];
                                        ?>
@@ -191,11 +198,11 @@
                                      <?php  echo $row3['subject_name']; ?>                           
                                 </td> -->
 
-                                <td style="text-align: center;">
+                                <td>
                                 <?php echo $row3['passing_percent']?>
                                 </td>
                                     
-                                <td style="text-align: center;">
+                                <td>
                                 <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_view_online_exam_details/<?php echo $row3['id']; ?>');">
                                     <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view_details');?>">
                                     <i class="fa fa-eye"></i></button></a>

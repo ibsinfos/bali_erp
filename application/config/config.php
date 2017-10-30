@@ -101,7 +101,7 @@ $config['charset'] = 'UTF-8';
 | setting this variable to TRUE (boolean).  See the user guide for details.
 |
 */
-$config['enable_hooks'] = FALSE;
+$config['enable_hooks'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -159,7 +159,7 @@ $config['composer_autoload'] = FALSE;
 | DO NOT CHANGE THIS UNLESS YOU FULLY UNDERSTAND THE REPERCUSSIONS!!
 |
 */
-$config['permitted_uri_chars'] = 'a-z 0-9~%.:_\-';
+$config['permitted_uri_chars'] = '+=\a-z 0-9~%.:_\-';
 
 
 /*
@@ -364,7 +364,7 @@ $config['encryption_key'] = 'Creativeitem';
 $config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ci_session';
 
-$config['sess_expiration'] = 400000;
+$config['sess_expiration'] = 1800;
 
 $config['sess_save_path'] = 'ci_sessions';
 $config['sess_match_ip'] = FALSE;

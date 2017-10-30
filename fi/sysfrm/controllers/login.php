@@ -84,6 +84,10 @@ switch($do){
                         $d->save();
                         //login log
 
+                        @session_start();
+                        $_SESSION['start'] = time();
+                        $_SESSION['expire'] = $_SESSION['start'] + (30 * 60) ;
+
                         _log($_L['Login Successful'].' '.$username,'Admin',$d['id']);
 
                         setcookie("tplsub", 'default', time()+15552000);

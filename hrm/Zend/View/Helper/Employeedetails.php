@@ -232,22 +232,22 @@ class Zend_View_Helper_Employeedetails extends Zend_View_Helper_Abstract {
 		{
 			$empdata .=	'<p><b>Contact Number <i>:</i></b>';
 			$empdata .= '<span id="contactnospan" >'.$emparr['contactnumber'].'</span>';
-			if($group_id == HR_GROUP || $loggedinuser == SUPERADMIN || $loggedinuser == $userId || $group_id == MANAGER_GROUP)
-			{
+//			if($group_id == HR_GROUP || $loggedinuser == SUPERADMIN || $loggedinuser == $userId || $group_id == MANAGER_GROUP)
+//			{
 				$empdata .= '<span class="number-edit"><input type="button" value="Update" id="editcontactnumber" name="Edit Number" onclick="opencontactnumberpopup(\''.$emparr['id'].'\',\'edit\',\''.$emparr['contactnumber'].'\');">';
 				$empdata .= '</span>';
-			}
+			//}
 			$empdata .= '</p>';
 		}
 		else
 		{
 			$empdata .=	'<p><b>Contact Number <i>:</i></b>';
 			$empdata .= '<span id="contactnospan" ></span>';
-			if($group_id == HR_GROUP || $loggedinuser == SUPERADMIN || $loggedinuser == $userId || $group_id == MANAGER_GROUP)
-			{
+//			if($group_id == HR_GROUP || $loggedinuser == SUPERADMIN || $loggedinuser == $userId || $group_id == MANAGER_GROUP)
+//			{
 				$empdata .= '<span class="number-add"><input type="button" value="Add" id="addcontactnumber" name="Add Number" onclick="opencontactnumberpopup(\''.$emparr['id'].'\',\'add\',\'\');">';
 				$empdata .= '</span>';
-			}
+			//}
 
 			$empdata .= '</p>';
 		}
@@ -363,7 +363,7 @@ class Zend_View_Helper_Employeedetails extends Zend_View_Helper_Abstract {
 			$tabsHtml .= '<li id = "emp_additional" onclick="changeempeditscreen(\'empadditionaldetails\','.$userId .');">'.TAB_EMP_ADDITIONAL.'</li>';
                         
                         if(!empty($empOrganizationTabs) && in_array("emp_payslips", $empOrganizationTabs))
-			$tabsHtml .= '<li id = "emp_payslips" onclick="changeempviewscreen(\'emppayslips\','.$userId .');">'.TAB_EMP_PAY_SLIPS.'</li>';
+			$tabsHtml .= '<li id = "emp_payslips" onclick="changemyempviewscreen(\'emppayslips\',\'view\','.$userId .');">'.TAB_EMP_PAY_SLIPS.'</li>';
 			
 			//if(!empty($empOrganizationTabs) && in_array("emp_performanceappraisal", $empOrganizationTabs))
 			//$tabsHtml .= '<li id = "emp_performanceappraisal" onclick="changeempeditscreen(\'empperformanceappraisal\','.$userId .');">'.TAB_EMP_PERFORMANCE_APPRAISAL.'</li>';
@@ -451,7 +451,7 @@ class Zend_View_Helper_Employeedetails extends Zend_View_Helper_Abstract {
 				//$tabsHtml .= '<li id = "emp_performanceappraisal" onclick="changeempviewscreen(\'empperformanceappraisal\','.$userId .');">'.TAB_EMP_PERFORMANCE_APPRAISAL.'</li>';
 
 				if(!empty($empOrganizationTabs) && in_array("emp_payslips", $empOrganizationTabs))
-				$tabsHtml .= '<li id = "emp_payslips" onclick="changeempviewscreen(\'emppayslips\','.$userId .');">'.TAB_EMP_PAY_SLIPS.'</li>';
+				$tabsHtml .= '<li id = "emp_payslips" onclick="changeempviewscreen(\'payslipemployee\','.$userId .');">'.TAB_EMP_PAY_SLIPS.'</li>';
 				
 				/*if(!empty($empOrganizationTabs) && in_array("emp_benifits", $empOrganizationTabs))
 				$tabsHtml .= '<li id = "emp_benifits" onclick="changeempviewscreen(\'empbenefits\','.$userId .');">'.TAB_EMP_BENEFITS.'</li>';

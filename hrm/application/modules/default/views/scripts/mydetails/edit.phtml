@@ -318,7 +318,7 @@ var yearrange = <?php echo "'".date("Y", strtotime("-30 years")).':'.date('Y')."
 <?php if (count($this->messages)) {?>
       setTimeout(function(){
 			$('#dispmsgemp').fadeOut('slow');
-		},3000);
+		},10000);
 
 <?php } ?>    
     $("#empdetails").addClass('active');

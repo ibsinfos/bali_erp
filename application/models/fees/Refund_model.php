@@ -65,11 +65,15 @@ class Refund_model extends CI_Model {
         return $this->db->get_where($this->_table_refund_rules,array('id' => $rule_id))->result_array(); 
     }
     
-    public function get_refund_rules($running_year=false) {
-        $running_year = $running_year?$running_year:$this->session->userdata('running_year');
-        _school_cond();
-        _year_cond('running_year',$running_year);
-        return $this->db->get($this->_table_refund_rules)->result_array(); 
+    public function get_refund_rules() {
+        _school_cond('RR.school_id');
+        _year_cond('RR.running_year');
+        $this->db->select('RR.*,FG.name fee_group_name,FT.name term_name,FST.name setup_term_name');
+        $this->db->from($this->_table_refund_rules.' RR');
+        $this->db->join('fee_groups FG','FG.id=RR.fee_group_id','LEFT');
+        $this->db->join('fee_terms FT','FT.id=RR.term_type_id','LEFT');
+        $this->db->join('fee_setup_terms FST','FST.id=RR.setup_term_id','LEFT');
+        return $this->db->get()->result_array(); 
     }
 
 

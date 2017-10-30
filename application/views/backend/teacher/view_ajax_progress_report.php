@@ -90,7 +90,7 @@ if($selected_section!=''){?>
               <div class="form-group">
                     <div class="text-right">
         <button id="submit_button" class="fcbtn btn btn-danger btn-outline btn-1d" type="submit">
-              Submit
+              Add Progress Report
         </button>
             </div>
               </div>

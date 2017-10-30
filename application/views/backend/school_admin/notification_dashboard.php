@@ -240,8 +240,8 @@
                     <!-- /content -->
 
                     <div class="row">
-                        <div class="col-md-12 form-group text-right m-t-20">
-                            <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" id="submit_notification" name="submit" value="submit">
+                        <div class="col-md-12 form-group text-center m-t-20">
+                            <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" id="submit_notification" name="submit" value="Submit">
                         </div>
                     </div>
                 </div>

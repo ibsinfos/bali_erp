@@ -12,13 +12,41 @@ class sapp_Schoolteacher{
     }
     
     public static function _add_school_employee($postData){
-        error_reporting(E_ALL);
-        ini_set('display_errors',1);
+//        error_reporting(E_ALL);
+//        ini_set('display_errors',1);
         sapp_Schoolteacher::_generate_log("inside cURL function");
         if($_SERVER['HTTP_HOST']=='52.29.203.220' || $_SERVER['HTTP_HOST']=='localhost' || $_SERVER['HTTP_HOST']=='localhost:8080'){
             $url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST'].'/'.SH_CURRENT_INSTANCE."/index.php?ajax_controller/add_employee_from_hrm";
         } else {
             $url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST']."/index.php?ajax_controller/add_employee_from_hrm";
+        }
+//        $url_arr=explode('/', $_SERVER['PHP_SELF']);
+//        $url="http://".$_SERVER['HTTP_HOST']."/".$url_arr[1].'/index.php/?ajax_controller/add_employee_from_hrm';
+        sapp_Schoolteacher::_generate_log(" init URL = ".$url);
+        $ch = curl_init($url);
+        sapp_Schoolteacher::_generate_log("init curl");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
+        sapp_Schoolteacher::_generate_log('starting curl execute '.PHP_EOL);
+        // execute!
+        $response = curl_exec($ch);
+        sapp_Schoolteacher::_generate_log("get curl response from remote shcool == ".  json_decode($response));
+        sapp_Schoolteacher::_generate_log('getting cURL '.$url.' response '.$response.PHP_EOL);
+       // print_r($response); die;
+        curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+    }
+    
+    public static function _update_school_employee($postData,$id){
+//        error_reporting(E_ALL);
+//        ini_set('display_errors',1);
+        sapp_Schoolteacher::_generate_log("inside cURL function");
+        if($_SERVER['HTTP_HOST']=='52.29.203.220' || $_SERVER['HTTP_HOST']=='localhost' || $_SERVER['HTTP_HOST']=='localhost:8080'){
+            $url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST'].'/'.SH_CURRENT_INSTANCE."/index.php?ajax_controller/update_employee_from_hrm/".$id;
+        } else {
+            $url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST']."/index.php?ajax_controller/update_employee_from_hrm/".$id;
         }
 //        $url_arr=explode('/', $_SERVER['PHP_SELF']);
 //        $url="http://".$_SERVER['HTTP_HOST']."/".$url_arr[1].'/index.php/?ajax_controller/add_employee_from_hrm';

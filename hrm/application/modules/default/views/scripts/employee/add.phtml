@@ -133,7 +133,7 @@ if(!empty($this->msgarray) && isset($this->msgarray))
 </div>
 <div class="right-block-data right-over-border"> 
 	<div id="error_message" style="display:none;"></div>
-	<form name="<?php echo $this->form->getName(); ?>" id="<?php echo $this->form->getId(); ?>" action="<?php echo $this->form->getAction();?>" method="<?php echo $this->form->getMethod(); ?>">
+	<form name="<?php echo $this->form->getName(); ?>" id="<?php echo $this->form->getId(); ?>" action="<?php echo $this->form->getAction();?>" method="<?php echo $this->form->getMethod(); ?>" enctype="multipart/form-data">
 		<?php echo $this->form->id; ?>
             <?php echo $this->form->final_emp_id; ?>
             <input type="hidden" name="tmp_emp_name" id="tmp_emp_name"/>
@@ -325,19 +325,30 @@ if(!empty($this->msgarray) && isset($this->msgarray))
 				</div>
 				
 				<div class="new-form-ui">
-				  <label class="required">Employment Status</label>
+				  <label class="required">Employment Type (WPS)</label>
                                   
-				<div class="division"><?php echo $this->form->emp_status_id; ?>
-					<?php if(isset($this->msgarray['emp_status_id'])){?>
-					   <span class="errors" id="errors-<?php echo $this->form->emp_status_id->getId(); ?>"><?php echo $this->msgarray['emp_status_id'];?></span>
-					<?php }?>
-					<input type="hidden" name="screenflag" id = "screenflag" value="add"/>
-					
-				  <?php if(in_array('empstatus',$this->popConfigPermission)) { ?>	
-					<span class="add-coloum" onclick="displaydeptform('<?php echo BASE_URL.'employmentstatus/addpopup' ?>','Employment Status');"> Add Employment Status</span>			
-				<?php } ?>
-                </div>
-				
+                                    <div class="division"><?php echo $this->form->emp_status_id; ?>
+                                        <?php if(isset($this->msgarray['emp_status_id'])){?>
+                                           <span class="errors" id="errors-<?php echo $this->form->emp_status_id->getId(); ?>"><?php echo $this->msgarray['emp_status_id'];?></span>
+                                        <?php }?>
+                                        <input type="hidden" name="screenflag" id = "screenflag" value="add"/>
+
+                                        <?php if(in_array('empstatus',$this->popConfigPermission)) { ?>	
+                                            <span class="add-coloum" onclick="displaydeptform('<?php echo BASE_URL.'employmentstatus/addpopup' ?>','Employment Status');"> Add Employment Status</span>			
+                                    <?php } ?>
+                                    </div>
+				</div>
+                            
+                            <div class="new-form-ui" id="vendor_list" style="display:none;">
+				  <label class="required">Vendors</label>
+                                    <div class="division">
+                                        <?php echo $this->form->vendor_id; ?>
+                                        <?php if(isset($this->msgarray['vendor_id'])){?>
+                                           <span class="errors" id="errors-<?php echo $this->form->vendor_id->getId(); ?>">
+                                               <?php echo $this->msgarray['vendor_id'];?>
+                                           </span>
+                                        <?php }?>
+                                    </div>
 				</div>
 				
 				<div class="new-form-ui">
@@ -395,6 +406,16 @@ if(!empty($this->msgarray) && isset($this->msgarray))
                                      <label>No <input type="radio" name="isTeacher" value="0"> </label>
                                  </div>
                              </div>
+                            
+                            <div class="new-form-ui">
+				  <label >Profile Photo</label>
+                                    <div class="division">
+                                        <input type="file" name="profile_photo" id="profile_photo" />
+                                    </div>
+                                    <?php if(isset($this->msgarray['profile_photo'])){?>
+                                       <span class="errors" id="errors-<?php echo $this->form->profile_photo->getId(); ?>"><?php echo $this->msgarray['profile_photo'];?></span>
+                                    <?php }?>
+				</div>
 			
 			<div class="new-form-ui-submit">
 					<?php echo $this->form->submit; ?>
@@ -842,6 +863,21 @@ $("#employeeId,#employeeNumId").blur(function(){
     var empId = $("#employeeNumId").val();
     $("#final_emp_id").val(empCode+empId);
 });
+
+$(document).ready(function(){
+    var empStatusId = "<?php echo $_POST['emp_status_id']; ?>";
+    if(empStatusId == 6){ 
+        $('#vendor_list').show();
+    }
+});
+
+
+$('#vendor_id').on('blur',vendor_id_empty);
+
+function vendor_id_empty(){
+    $('#vendor_id').parent().append("<span class='errors' id='errors-vendor_id'>Please select vendor name.</span>");
+}
+
 function saveEmployee()
 {
     var emp_name = $('#rccandidatename option:selected').text();

@@ -217,80 +217,80 @@ class Default_LeavemanagementController extends Zend_Controller_Action
 		$this->view->editpermission = $permission;
 			try
 			{
-				if($id)
-				{
-				    if(is_numeric($id) && $id>0)
-				    {
-						$leavemanagementmodel = new Default_Model_Leavemanagement();
-						$data = $leavemanagementmodel->getActiveleavemanagementId($id);
-						if(!empty($data))
-							{
-								$data = $data[0]; 
-								$monthslistmodel = new Default_Model_Monthslist();
-								$weekdaysmodel = new Default_Model_Weekdays();
-								$departmentsmodel = new Default_Model_Departments();
-								$busineesUnitModel = new Default_Model_Businessunits();
-								$businessunitData = $busineesUnitModel->getParicularBusinessUnit($data['businessunit_id']);
-								$particulardeptidArr = $departmentsmodel->getParicularDepartmentId($data['department_id']);	
-								$monthslistdata = $monthslistmodel->getMonthlistData();
-								$weekdaysdata = $weekdaysmodel->getWeeklistData();
-								if(!empty($businessunitData) && !empty($particulardeptidArr) && !empty($monthslistdata) && !empty($weekdaysdata))
-								{	
-									if(!empty($businessunitData)){
-									  $leavemanagementform->businessunit->addMultiOption($businessunitData[0]['id'],utf8_encode($businessunitData[0]['unitname']));
-									 $data['businessunit_id']= $businessunitData[0]['unitname'];
-									} 
-									
-									
-									if(!empty($particulardeptidArr))
-									{
-										$leavemanagementform->department_id->addMultiOption($particulardeptidArr[0]['id'],utf8_encode($particulardeptidArr[0]['deptname']));		   
-									    $data['department_id']=$particulardeptidArr[0]['deptname'];
-									} 
-								   
-									
-									if(sizeof($monthslistdata) > 0)
-									{
-										foreach ($monthslistdata as $monthslistres){
-											$leavemanagementform->cal_startmonth->addMultiOption($monthslistres['month_id'],utf8_encode($monthslistres['month_name']));
-											
-										}
-									}
-									
-									
-									if(sizeof($weekdaysdata) > 0)
-									{
-										foreach ($weekdaysdata as $weekdaysres){
-											$leavemanagementform->weekend_startday->addMultiOption($weekdaysres['day_id'],utf8_encode($weekdaysres['day_name']));
-										     $leavemanagementform->weekend_endday->addMultiOption($weekdaysres['day_id'],utf8_encode($weekdaysres['day_name']));
-										}
-									}	
-								
-									$leavemanagementform->populate($data);
-									$leavemanagementform->setDefault('cal_startmonth',$data['cal_startmonth']);
-									$leavemanagementform->setDefault('weekend_startday',$data['weekend_startday']);
-									$leavemanagementform->setDefault('weekend_endday',$data['weekend_endday']);
-									$leavemanagementform->setDefault('businessunit',$data['businessunit_id']);
-									$leavemanagementform->setDefault('department_id',$data['department_id']);								
-									$this->view->rowexist = "";
-								}
-								else
-								{
-								   $this->view->rowexist = "rows";
-								}
-							
-							}	
-							else
-							{
-							   $this->view->rowexist = "norows";
-							}
-					}else
-					{
-					   $this->view->rowexist = "norows";
-					}		
-				}else{
-				    $this->view->rowexist = "norows";
-				}
+                            if($id)
+                            {
+                                if(is_numeric($id) && $id>0)
+                                {
+                                    $leavemanagementmodel = new Default_Model_Leavemanagement();
+                                    $data = $leavemanagementmodel->getActiveleavemanagementId($id);
+                                    
+                                    if(!empty($data))
+                                    {
+                                        $data = $data[0]; 
+                                        $monthslistmodel = new Default_Model_Monthslist();
+                                        $weekdaysmodel = new Default_Model_Weekdays();
+                                        $departmentsmodel = new Default_Model_Departments();
+//                                        $busineesUnitModel = new Default_Model_Businessunits();
+//                                        $businessunitData = $busineesUnitModel->getParicularBusinessUnit($data['businessunit_id']);
+                                        $particulardeptidArr = $departmentsmodel->getParicularDepartmentId($data['department_id']);	
+                                        $monthslistdata = $monthslistmodel->getMonthlistData();
+                                        $weekdaysdata = $weekdaysmodel->getWeeklistData();
+                                        if(!empty($particulardeptidArr) && !empty($monthslistdata) && !empty($weekdaysdata))
+                                        {	
+//									if(!empty($businessunitData)){
+//									  $leavemanagementform->businessunit->addMultiOption($businessunitData[0]['id'],utf8_encode($businessunitData[0]['unitname']));
+//									 $data['businessunit_id']= $businessunitData[0]['unitname'];
+//									} 
+
+
+                                            if(!empty($particulardeptidArr))
+                                            {
+                                                $leavemanagementform->department_id->addMultiOption($particulardeptidArr[0]['id'],utf8_encode($particulardeptidArr[0]['deptname']));		   
+                                                $data['department_id']=$particulardeptidArr[0]['deptname'];
+                                            } 
+
+
+                                            if(sizeof($monthslistdata) > 0)
+                                            {
+                                                foreach ($monthslistdata as $monthslistres){
+                                                        $leavemanagementform->cal_startmonth->addMultiOption($monthslistres['month_id'],utf8_encode($monthslistres['month_name']));
+
+                                                }
+                                            }
+
+
+                                            if(sizeof($weekdaysdata) > 0)
+                                            {
+                                                foreach ($weekdaysdata as $weekdaysres){
+                                                        $leavemanagementform->weekend_startday->addMultiOption($weekdaysres['day_id'],utf8_encode($weekdaysres['day_name']));
+                                                     $leavemanagementform->weekend_endday->addMultiOption($weekdaysres['day_id'],utf8_encode($weekdaysres['day_name']));
+                                                }
+                                            }	
+
+                                            $leavemanagementform->populate($data);
+                                            $leavemanagementform->setDefault('cal_startmonth',$data['cal_startmonth']);
+                                            $leavemanagementform->setDefault('weekend_startday',$data['weekend_startday']);
+                                            $leavemanagementform->setDefault('weekend_endday',$data['weekend_endday']);
+                                            //$leavemanagementform->setDefault('businessunit',$data['businessunit_id']);
+                                            $leavemanagementform->setDefault('department_id',$data['department_id']);								
+                                            $this->view->rowexist = "";
+                                    }
+                                        else
+                                        {
+                                           $this->view->rowexist = "rows";
+                                        }
+                                    }	
+                                    else
+                                    {
+                                       $this->view->rowexist = "norows";
+                                    }
+                            }else
+                            {
+                               $this->view->rowexist = "norows";
+                            }		
+                            }else{
+                                $this->view->rowexist = "norows";
+                            }
 			}
 			catch(Exception $e)
 			{

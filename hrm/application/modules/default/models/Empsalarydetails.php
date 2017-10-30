@@ -27,9 +27,9 @@ class Default_Model_Empsalarydetails extends Zend_Db_Table_Abstract
 	public function getsingleEmpSalaryDetailsData($id)
 	{
 		$select = $this->select()
-						->setIntegrityCheck(false)
-						->from(array('s'=>'main_empsalarydetails'),array('s.*'))
-						->where('s.user_id='.$id.' AND s.isactive = 1');
+                    ->setIntegrityCheck(false)
+                    ->from(array('s'=>'main_empsalarydetails'),array('s.*'))
+                    ->where('s.user_id='.$id.' AND s.isactive = 1');
 					
 		return $this->fetchAll($select)->toArray();
 	}

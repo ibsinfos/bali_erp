@@ -458,8 +458,7 @@ select max(id) FROM `main_pa_initialization` GROUP BY `pa_configured_id`
     	$str_dept = " department_id = $department_id and ";
     	$qry = "select es.id,es.user_id,es.userfullname,es.emailaddress from main_employees_summary es where es.user_id in (
 				select s.user_id from main_employees_summary s 
-				inner join main_roles r on s.emprole = r.id where (s.businessunit_id=$unit_id 
-				and $str_dept r.group_id = ".HR_GROUP.") or r.group_id = ".MANAGEMENT_GROUP."  and r.isactive=1 ) and es.isactive =1 ;"; 
+				inner join main_roles r on s.emprole = r.id where ($str_dept r.group_id = ".HR_GROUP.") or r.group_id = ".MANAGEMENT_GROUP."  and r.isactive=1 ) and es.isactive =1 ;"; 
     	$result = $this->_db->query($qry)->fetchAll();
     	 return $result;
     }

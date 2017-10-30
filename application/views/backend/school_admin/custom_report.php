@@ -22,6 +22,11 @@
     if(!empty($arrDbField)){
         if(count($arrDbField))
             $view_flag = 1;
+        if(count($arrDbField) >2){
+            $md_class = 'col-sm-4 ';
+        } else {
+            $md_class = 'col-sm-6 ';
+        }
         foreach($arrDbField as $db_key => $db_field)
         {    
             $ajax_event = '' ;     
@@ -40,7 +45,7 @@
             switch($field_type)
               {
                 case 'text' :
-                  echo "<div class='col-sm-4 form-group text-left'>
+                  echo "<div class='".$md_class."' form-group text-left'>
                             <label for='field-1' class='control-label'>".get_phrase($label);
 
                      echo   "<div class='input-group'>
@@ -58,7 +63,7 @@
                         else
                             $val = '';
                         echo "
-                                           <div class='col-sm-4 form-group text-left'>
+                                           <div class='".$md_class."' form-group text-left'>
                                                <label for='field-1'>".
                                                    get_phrase($label);
                                             
@@ -94,7 +99,7 @@
                             }   
                           }    
 
-                        echo "<div class='col-sm-4 form-group text-left'>
+                        echo "<div class='".$md_class."' form-group text-left'>
                         <label for='control-label'>".
                             get_phrase($label);
 
@@ -129,7 +134,7 @@
 if($view_flag == 1)
 {?>
 
-<div class="text-right col-xs-12" >
+<div class="text-right col-xs-12 m-t-15" >
     <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="8" data-intro="Click to view report" data-position='left'><?php echo get_phrase('VIEW REPORT');?></button>
 </div>
 <?php
@@ -151,7 +156,7 @@ if($view_flag == 1)
                 {
                     foreach($arrCaption as $caption)
                     {
-                        echo "<th><div>".get_phrase($caption)."</div></th>";
+                        echo "<th style='text-align:center'>".get_phrase($caption)."</th>";
                     }    
                 }
             ?>
@@ -166,7 +171,7 @@ if($view_flag == 1)
                 <?php
                     foreach($arrCaption as $caption)
                     {
-                        echo "<td>".$row[$caption]."</td>";
+                        echo "<td style='text-align:center'>".$row[$caption]."</td>";
                     }
                 ?>    
             </tr>

@@ -10,7 +10,7 @@
          <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -34,42 +34,37 @@
 <div class="row m-0">
 <div class="col-sm-12 white-box" data-step="7" data-intro="<?php echo get_phrase('This is the list of hostel allocation.');?>" data-position='top'>     
 <table id="table" class="table display">
-            <thead>
-                <tr>
+    <thead>
+        <tr>
+            <th><div><?php echo get_phrase('No.'); ?></div></th>
+            <th><div><?php echo get_phrase('hostel_name'); ?></div></th>
+            <th><div><?php echo get_phrase('student_name'); ?></div></th>
+            <th><div><?php echo get_phrase('class_name'); ?></div></th>
+            <th><div><?php echo get_phrase('section_name'); ?></div></th>
+            <th><div><?php echo get_phrase('hostel_type'); ?></div></th>
+            <th><div><?php echo get_phrase('floor'); ?></div></th>
+            <th><div><?php echo get_phrase('room_no.'); ?></div></th>
+            <th><div><?php echo get_phrase('food'); ?></div></th>
+            <th><div><?php echo get_phrase('registered_date'); ?></div></th>
+            <th><div><?php echo get_phrase('vacate_date'); ?></div></th>
+            <th><div><?php echo get_phrase('transfer_date'); ?></div></th>
+            <th><div><?php echo get_phrase('status'); ?></div></th>
+            <th data-step="6" data-intro="<?php echo get_phrase('From here you can get actions like edit, vacant and transfer.');?>" data-position='left'><div><?php echo get_phrase('options'); ?></div></th>
+        </tr>
+    </thead>
+    <tbody>
 
-                    <th><div><?php echo get_phrase('No.'); ?></div></th>
-                    <th><div><?php echo get_phrase('hostel_name'); ?></div></th>
-                    <th><div><?php echo get_phrase('student_name'); ?></div></th>
-                    <th><div><?php echo get_phrase('class_name'); ?></div></th>
-                    <th><div><?php echo get_phrase('section_name'); ?></div></th>
-                    <th><div><?php echo get_phrase('hostel_type'); ?></div></th>
-                    <th><div><?php echo get_phrase('floor'); ?></div></th>
-                    <th><div><?php echo get_phrase('room_no.'); ?></div></th>
-                    <th><div><?php echo get_phrase('food'); ?></div></th>
-                    <th><div><?php echo get_phrase('registered_date'); ?></div></th>
-                    <th><div><?php echo get_phrase('vacate_date'); ?></div></th>
-                    <th><div><?php echo get_phrase('transfer_date'); ?></div></th>
-                    <th><div><?php echo get_phrase('status'); ?></div></th>
-                    <th data-step="6" data-intro="<?php echo get_phrase('From here you can get actions like edit, vacant and transfer.');?>" data-position='left'><div><?php echo get_phrase('options'); ?></div></th>
-                </tr>
-            </thead>
-            <tbody>
-     
-            </tbody>
-        </table>
+    </tbody>
+</table>
 </div>
 </div>
 
 <script>
     var table;
-
     $(document).ready(function() {
-
         var SearchName = $('#PublicSearch').val();
-
         //datatables
         table = $('#table').DataTable({ 
-
             "dom": 'Bfrtip',
             "responsive": true,
             "buttons": [
@@ -82,9 +77,8 @@
             "order": [], //Initial no order.
 
             // Load data for the table's content from an Ajax source
-           
             "ajax": {
-                "url": "<?php echo base_url().'index.php?ajax_controller/all_dormitory_manage_allocation_list/';?>",
+                "url": "<?php echo base_url('index.php?ajax_controller/all_dormitory_manage_allocation_list/');?>",
                 "type": "POST"
             },
 

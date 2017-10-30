@@ -96,7 +96,7 @@
                         <div class="col-xs-12 col-md-offset-1 col-md-5">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                                    <label for="running_session"><?php echo get_phrase("current_session"); ?></label>
                                     <div class="input-group">
                                         <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                                         <input type="text" class="form-control" name="running_year" value="<?php echo $running_year?>" readonly/>

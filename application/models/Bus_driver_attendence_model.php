@@ -179,6 +179,47 @@ class Bus_driver_attendence_model extends CI_Model {
         $rs     =       $this->db->where("attn.timestamp",$timestamp)->get()->result_array();
         return $rs;        
     }
+
+    function get_student_bus_attendance($whr=array(),$date=false,$order_by='S.name ASC'){
+        _school_cond('S.school_id');
+        _year_cond('E.year');
+        _school_cond('SBA.school_id');
+        $this->db->select('S.*,E.roll,E.class_id,E.section_id,C.name class_name,SC.name section_name,E.enroll_code,E.date_added,P.father_name,P.father_lname,
+                          P.mother_name,P.mother_lname,P.email parent_email,P.cell_phone parent_phone,P.device_token,SBA.bus_id,SBA.route_id,BD.bus_driver_id,
+                          B.name bus_name,
+                          (SELECT bus_attendence_id FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) bus_attendence_id,
+                          (SELECT status FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) att_st,
+                          (SELECT pick_up_in FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) pick_up_in,
+                          (SELECT pick_up_out FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) pick_up_out,
+                          (SELECT drop_in FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) drop_in,
+                          (SELECT drop_out FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) drop_out,
+                          (SELECT pick_up_in_time FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) pick_up_in_time,
+                          (SELECT pick_up_out_time FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) pick_up_out_time,
+                          (SELECT drop_in_time FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) drop_in_time,
+                          (SELECT drop_out_time FROM bus_attendence AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.student_id=E.student_id 
+                          AND AT.bus_id=SBA.bus_id AND AT.route_id=SBA.route_id AND AT.school_id=S.school_id AND AT.date="'.$date.'" LIMIT 1) drop_out_time',FALSE);  
+        $this->db->from('student S');
+        $this->db->join('enroll E','E.student_id=S.student_id','LEFT'); 
+        $this->db->join('class C','C.class_id=E.class_id','LEFT');  
+        $this->db->join('section SC','SC.section_id=E.section_id','LEFT');  
+        $this->db->join('parent P','P.parent_id=S.parent_id','LEFT');
+        $this->db->join('student_bus_allocation SBA','SBA.student_id=S.student_id','LEFT');
+        $this->db->join('bus B','B.bus_id=SBA.bus_id','LEFT');
+        $this->db->join('bus_driver BD','BD.bus_id=SBA.bus_id','LEFT'); 
+        $this->db->where($whr);
+        $this->db->order_by($order_by);
+//        echo $this->db->last_query(); die;
+        return $this->db->get()->result(); 
+    }
     
     function attendence_update($id, $dataArr){
         $this->db->where('bus_attendence_id', $id);

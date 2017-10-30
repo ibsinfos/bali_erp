@@ -24,7 +24,7 @@
 </div>
 
 <div class="row m-0">
-    <div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('From here select class and subject.');?>" data-position="top">
+    <div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('From_here_select_class_and_subject.');?>" data-position="top">
         <div class="col-sm-6 form-group">                
             <label class="control-label" style="margin-bottom: 5px;"><?php echo get_phrase('class'); ?></label>
             <span class="error" style="color: red;"> </span>
@@ -54,7 +54,7 @@
 
 
 <div class="row m-0">
-    <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('From here you can see the list of teachers.');?>" data-position="top">    
+    <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('From_here_you_can_see_the_list_of_teachers.');?>" data-position="top">    
         <table id="example23" class="display nowrap" cellspacing="0" width="100%">
             <thead>
                 <tr>

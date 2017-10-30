@@ -97,3 +97,130 @@
 
 <!--Own New Custom style css -->
 <link href="<?php echo base_url();?>assets/css/new-custom-style.css" rel="stylesheet">
+
+<script src="<?php echo base_url('assets/bower_components/jquery/dist/jquery.min.js');?>"></script>
+
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		$('.notify').hide();
+        setInterval(ajaxCallUnreadMessage,5000);  
+	});
+
+	function ajaxCallUnreadMessage(){
+        var mycontent = "";
+	    base_url = $('#base_url').val();
+	    mycontent = $.ajax({
+	        async: false,
+	        dataType: 'json',
+	        url: base_url + 'index.php?Ajax_controller/getNotifications_new',
+	        success: function (response) {
+	        },
+	        error: function (error_param, error_status) {
+
+	        }
+	    });
+
+	    notific = $.parseJSON(mycontent.responseText);
+
+	    if(notific.total_count > 0){
+	    	$('.heartbit').empty();
+	    	$('.heartbit').html(notific.total_count);
+	    	$('.notify').show();
+	    }else{
+	    	$('.notify').hide();
+	    }	    
+    }
+
+    function open_panel()
+    {
+	    slideIt();
+	    var a=document.getElementById("feedback_sidebar");
+	    a.setAttribute("id","feedback_sidebar1");
+	    a.setAttribute("onclick","close_panel()");
+    }
+
+    function slideIt()
+    {
+        var slidingDiv = document.getElementById("feedback_slider");
+        var stopPosition = 0;
+        
+        if (parseInt(slidingDiv.style.right) < stopPosition )
+        {
+            slidingDiv.style.right = parseInt(slidingDiv.style.right) + 2 + "px";
+            setTimeout(slideIt, 1); 
+        }
+    }
+        
+    function close_panel(){
+	    slideIn();
+	    a=document.getElementById("feedback_sidebar1");
+	    a.setAttribute("id","feedback_sidebar");
+	    a.setAttribute("onclick","open_panel()");
+    }
+
+    function slideIn()
+    {
+        var slidingDiv = document.getElementById("feedback_slider");
+        var stopPosition = -375;
+        
+        if (parseInt(slidingDiv.style.right) > stopPosition )
+        {
+            slidingDiv.style.right = parseInt(slidingDiv.style.right) - 2 + "px";
+            setTimeout(slideIn, 1); 
+        }
+    }
+
+    $(document).ready(function(){
+    	var frm = $('#FeedbackForm');
+    	frm.submit(function (e) {
+    		$.ajax({
+	            type: frm.attr('method'),
+	            url: frm.attr('action'),
+	            data: frm.serialize(),
+
+	            beforeSend: function(){
+	                $('#loader').show();
+	            },
+
+	            success: function (data) {
+	                $('body').loading('stop');
+	                console.log(data);
+	                close_panel();
+	            },
+	            error: function (data) {
+	                console.log('An error occurred.');
+	            },
+	        }); 
+	        return false;
+    	});
+
+    	$('.fa-hand-o-right').click(function(){
+    		close_panel();
+    	});
+    });
+
+</script>
+
+
+<div id="feedback_slider" style="right:-375px !important;">
+    <div id="feedback_header">            
+        <h2>Feedback Form</h2>
+		<?php echo form_open(base_url() . 'index.php?Ajax_controller/send_feedback', array('class' => 'form', 'id' => 'FeedbackForm')); ?>
+        <div class="col-xs-12 col-md-12 form-group">
+			<input type="text" class="form-control" placeholder="Title" name="title" value="<?php echo set_value('title') ?>" autocomplete="off" required="required">
+		</div>
+
+		<div class="col-xs-12 col-md-12 form-group"> 
+        	<textarea class="form-control" name="description" value="<?php echo set_value('description') ?>" rows="5" required placeholder="Description"></textarea>
+        </div>
+
+        <div class="col-xs-12 col-md-12 form-group"> 
+        	<input type="file" id="input-file-now" class="dropify" name="feedback_document" />        	
+        </div>
+
+        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d text-center sub-btn"><?php echo get_phrase('send'); ?></button>
+        <?php echo form_close(); ?>
+        	<i class="fa fa-hand-o-right fa-2x text-right" aria-hidden="true"></i>
+
+    </div>
+</div>

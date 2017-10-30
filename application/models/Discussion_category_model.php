@@ -211,9 +211,9 @@ if (!defined('BASEPATH'))
       
         public function get_user_type_id(){      
             $data                                                        =   array();
-            if($this->session->userdata('admin_login') == 1 ) {
-                $data['user_type']                                       =    'admin';
-                $data['user_id']                                         =    $this->session->userdata('admin_id');
+            if($this->session->userdata('school_admin_login') == 1 ) {
+                $data['user_type']                                       =    'school_admin';
+                $data['user_id']                                         =    $this->session->userdata('school_admin_id');
                 $data['user_name']                                       =    $this->session->userdata('name');
             }
             else if($this->session->userdata('teacher_login') == 1 ) {

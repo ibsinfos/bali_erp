@@ -78,7 +78,7 @@ class Main extends CI_Controller {
                     
                 if($return){
                     $this->session->set_flashdata('flash_message', get_phrase('fee_term_has_been_saved_successfully.'));
-                    redirect(base_url() . 'index.php?fees/main/terms', 'refresh');
+                    redirect(base_url('index.php?fees/main/terms'), 'refresh');
                 } else {
                     $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
                 }
@@ -121,7 +121,7 @@ class Main extends CI_Controller {
             }else {
                 $this->session->set_flashdata('flash_message_error', validation_errors());
             }
-            redirect(base_url() . 'index.php?fees/main/terms/', 'refresh');
+            redirect(base_url('index.php?fees/main/terms/'), 'refresh');
         } 
         $this->load->view('backend/school_admin/fees/modal_edit_term',$page_data);
     }
@@ -384,6 +384,9 @@ class Main extends CI_Controller {
             $this->form_validation->set_rules('name', 'Name', 'trim|required|_unique_field_sch[fee_concessions.name#running_year.'.$running_year.']');
             $this->form_validation->set_rules('description', 'Description', 'trim');
             //$this->form_validation->set_rules('fee_category_id', 'Fee Category', 'trim|required');
+            $this->form_validation->set_rules('discount_on', 'Discount on', 'trim|required');
+            if($this->input->post('discount_on')==1)
+                $this->form_validation->set_rules('fee_head_id', get_phrase('Fee Head'), 'trim|required');
             $this->form_validation->set_rules('amt_type', 'Amount Type', 'trim|required');
             $this->form_validation->set_rules('amount', 'Amount', 'trim|required');
             //$this->form_validation->set_rules('running_year', 'Current running year', 'trim|required');
@@ -394,6 +397,8 @@ class Main extends CI_Controller {
                 $save_data['name'] = $this->input->post('name');
                 $save_data['description'] = $this->input->post('description');
                 //$save_data['fee_category_id'] = $this->input->post('fee_category_id');
+                $save_data['discount_on'] = $this->input->post('discount_on');
+                $save_data['fee_head_id'] = $this->input->post('fee_head_id');
                 $save_data['amt_type'] = $this->input->post('amt_type');
                 $save_data['amount'] = $this->input->post('amount');
                 $save_data['running_year'] = $running_year;
@@ -404,7 +409,7 @@ class Main extends CI_Controller {
                     
                 if($return){
                     $this->session->set_flashdata('flash_message', get_phrase('fee_concession_has_been_saved_successfully.'));
-                    redirect(base_url() . 'index.php?fees/main/concessions/', 'refresh');
+                    redirect(base_url('index.php?fees/main/concessions/'), 'refresh');
                 } else {
                     $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
                 }
@@ -417,6 +422,7 @@ class Main extends CI_Controller {
         $page_data['page_title'] = get_phrase('fee_concessions');
         $page_data['account_type'] = $this->session->userdata('login_type');
         $page_data['records'] = $this->Fees_model->get_fee_concessions();
+        $page_data['fee_heads'] = $this->Fees_model->get_fee_heads(array('FH.non_enroll'=>0));
         //$page_data['fee_categories'] = $this->Fees_model->get_fee_categories();
         $this->load->view('backend/index', $page_data);
     }
@@ -432,6 +438,10 @@ class Main extends CI_Controller {
             $this->form_validation->set_rules('name', 'Name', 'trim|required'.$is_unique_name);
             $this->form_validation->set_rules('description', 'Description', 'trim');
             //$this->form_validation->set_rules('fee_category_id', 'Fee Category', 'trim|required');
+            $this->form_validation->set_rules('discount_on', 'Discount on', 'trim|required');
+            if($this->input->post('discount_on')==1)
+                $this->form_validation->set_rules('fee_head_id', get_phrase('Fee Head'), 'trim|required');
+
             $this->form_validation->set_rules('amt_type', 'Amount Type', 'trim|required');
             $this->form_validation->set_rules('amount', 'Amount', 'trim|required');
             //$this->form_validation->set_rules('running_year', 'Current running year', 'trim|required');
@@ -443,6 +453,8 @@ class Main extends CI_Controller {
                 $save_data['name'] = $this->input->post('name');
                 $save_data['description'] = $this->input->post('description');
                 //$save_data['fee_category_id'] = $this->input->post('fee_category_id');
+                $save_data['discount_on'] = $this->input->post('discount_on');
+                $save_data['fee_head_id'] = $this->input->post('fee_head_id');
                 $save_data['amt_type'] = $this->input->post('amt_type');
                 $save_data['amount'] = $this->input->post('amount');
                 $save_data['updated'] = date('Y-m-d H:i:s');
@@ -456,16 +468,17 @@ class Main extends CI_Controller {
             }else {
                 $this->session->set_flashdata('flash_message_error', validation_errors());
             }
-            redirect(base_url() . 'index.php?fees/main/concessions/', 'refresh');
+            redirect(base_url('index.php?fees/main/concessions/'), 'refresh');
         } 
         //$page_data['fee_categories'] = $this->Fees_model->get_fee_categories();
+        $page_data['fee_heads'] = $this->Fees_model->get_fee_heads(array('FH.non_enroll'=>0));
         $this->load->view('backend/school_admin/fees/modal_edit_concession',$page_data);
     }
 
     function concession_delete($id=false){
         if($this->input->server('REQUEST_METHOD')=='POST'){
             $this->Fees_model->concession_delete(array('id'=>$id));
-            echo json_encode(array('status'=>'success','msg'=>'Fee Concession Deleted!'));exit;
+            echo json_encode(array('status'=>'success','msg'=>get_phrase('fee_concession_has_been_deleted_successfully.')));exit;
         }
     }
     
@@ -476,7 +489,7 @@ class Main extends CI_Controller {
         if($this->input->server('REQUEST_METHOD')=='POST'){
             $flag = $this->Fees_model->save_concession_rel($id,$this->input->post('items'));
             $this->session->set_flashdata('flash_message', get_phrase('concession_has_been_assigned_successfully.'));
-            redirect(base_url() . 'index.php?fees/main/concessions/', 'refresh');
+            redirect(base_url('index.php?fees/main/concessions'), 'refresh');
         } 
         if($rec->type==1){
             $page_data['sel_records'] = $this->Fees_model->get_concess_rel_fee_groups($id,1);
@@ -515,9 +528,9 @@ class Main extends CI_Controller {
                 $whr = array('fee_group_id'=>$this->input->post('fee_group_id'),
                              'fee_term_id'=>$this->input->post('fee_term_id'));
                 $has_rec = $this->Fees_model->get_charge_setup_record($whr);    
-                if($rel_rec){
+                if($has_rec){
                     $this->session->set_flashdata('flash_message_error', get_phrase('setup_already_created_for_this_group_and_term.'));
-                    redirect(base_url() . 'index.php?fees/main/charge_setup/', 'refresh');
+                    redirect(base_url('index.php?fees/main/charge_setup'), 'refresh');
                 }    
 
 
@@ -537,7 +550,7 @@ class Main extends CI_Controller {
 
                 if($setup_id){
                     $this->session->set_flashdata('flash_message', get_phrase('fee_charge_setup_has_created_successfully.'));
-                    redirect(base_url() . 'index.php?fees/main/charge_setup/', 'refresh');
+                    redirect(base_url('index.php?fees/main/charge_setup'), 'refresh');
                 } else {
                     $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
                 }
@@ -591,7 +604,7 @@ class Main extends CI_Controller {
             }else {
                 $this->session->set_flashdata('flash_message_error', validation_errors());
             }
-            redirect(base_url() . 'index.php?fees/main/charge_setup/', 'refresh');
+            redirect(base_url('index.php?fees/main/charge_setup'), 'refresh');
         } 
         $page_data['page_name'] = 'fees/fee_setup_edit';
         $page_data['page_title'] = get_phrase('edit_charge_setup');
@@ -846,13 +859,13 @@ class Main extends CI_Controller {
                                 $return['html'] .= '</select>
                                                 </div>
                                             </div>
-
+                                            
                                             <div class="row mt5">
-                                                <div class="col-md-3"><label><strong>'.get_phrase('Amt/Percentage').'</strong></label></div>
+                                                <div class="col-md-3"><label><strong>'.get_phrase('Percentage').'</strong></label></div>
                                                 <div class="col-md-9">
                                                     <input type="hidden" name="terms['.$i.'][amt_type]" value="'.$term->amt_type.'"/>
-                                                    <input type="text" class="form-control input-sm" name="terms['.$i.'][amount]" placeholder="Amt/Percentage" 
-                                                    value="'.$term->amount.'"/>
+                                                    <input type="number" class="form-control input-sm no-neg percentage" name="terms['.$i.'][amount]" 
+                                                    placeholder="Percentage" required max="100" step="0.01" value="'.$term->amount.'"/>
                                                 </div>
                                             </div>
                                         </div><br/>';
@@ -860,27 +873,17 @@ class Main extends CI_Controller {
                 echo json_encode($return);exit;
             }else{
                 $return['status'] = 'success';
-                //$particulars= $this->Fees_model->get_group_particulars($group_id);
-                //$classes= $this->Fees_model->get_group_classes($group_id);
-                /* $head_total = 0;
-                $return['head_total'] = '<div class="row">
-                                            <div class="col-md-6"><strong>Fees Summary</strong></div>
-                                          </div>';
-                foreach($fee_grp_heads as $gr_head){
-                    $head_total += $gr_head->head_amount;
-                    $return['head_total'] .= '<div class="row">
-                                                <div class="col-md-6"><strong>'.$gr_head->name.'</strong></div>
-                                                <div class="col-md-6">'.$gr_head->head_amount.'</div>
-                                              </div>';
-                }                              
-                $return['head_total'] .= '<div class="row">
-                                            <div class="col-md-6"><strong>Total</strong></div>
-                                            <div class="col-md-6 summary-total">'.$head_total.'</div>
-                                          </div>'; */
-
                 $return['net_amt'] = 0;
                 $return['html'] = '';
+                $total_term_percent = 0;
                 for($i=0;$i<$fee_term_record->term_num;$i++){
+                    if(($i+1)!=$fee_term_record->term_num){
+                        $term_percent = round(100/$fee_term_record->term_num);
+                    }else{
+                        $term_percent = 100-$total_term_percent;
+                    }
+                    $total_term_percent += $term_percent;
+
                     $return['html'] .= '<div class="term-item" data-term-num="'.$i.'">
                                             <input type="hidden" name="terms['.$i.'][id]" value=""/>
                                             <div class="row">
@@ -924,10 +927,11 @@ class Main extends CI_Controller {
                                             </div>
 
                                             <div class="row mt5">
-                                                <div class="col-md-3"><label><strong>'.get_phrase('Amt/Percentage').'</strong></label></div>
+                                                <div class="col-md-3"><label><strong>'.get_phrase('Percentage').'</strong></label></div>
                                                 <div class="col-md-9">
                                                     <input type="hidden" name="terms['.$i.'][amt_type]" value="2"/>
-                                                    <input type="text" class="form-control input-sm" name="terms['.$i.'][amount]" placeholder="Amt/Percentage"/>
+                                                    <input type="number" class="form-control input-sm no-neg percentage" name="terms['.$i.'][amount]" 
+                                                    placeholder="Percentage" required max="100" step="0.50" value="'.$term_percent.'"/>
                                                 </div>
                                             </div>
                                         </div><br/>';
@@ -967,7 +971,7 @@ class Main extends CI_Controller {
             }else {
                 $this->session->set_flashdata('flash_message_error', validation_errors());
             }
-            redirect(base_url() . 'index.php?fees/main/transport_fee_setup/'.$setup_id, 'refresh');
+            redirect(base_url('index.php?fees/main/transport_fee_setup/'.$setup_id), 'refresh');
         } 
         $page_data['page_name'] = 'fees/transport_fee_setup';
         $page_data['page_title'] = get_phrase('transport_fee_setup');
@@ -1040,10 +1044,11 @@ class Main extends CI_Controller {
                                             </div>
 
                                             <div class="row mt5">
-                                                <div class="col-md-3"><label><strong>'.get_phrase('Amt/Percentage').'</strong></label></div>
+                                                <div class="col-md-3"><label><strong>'.get_phrase('Percentage').'</strong></label></div>
                                                 <div class="col-md-9">
-                                                    <input type="hidden" name="terms['.$i.'][amt_type]" value="2"/>
-                                                    <input type="text" class="form-control input-sm" name="terms['.$i.'][amount]" placeholder="Amt/Percentage"/>
+                                                    <input type="hidden" name="terms['.$i.'][amt_type]" value="'.$term->amt_type.'"/>
+                                                    <input type="number" class="form-control input-sm no-neg percentage" name="terms['.$i.'][amount]" 
+                                                    placeholder="Percentage" required max="100" step="0.50" value="'.$term->amount.'"/>
                                                 </div>
                                             </div>
                                         </div><br/>';
@@ -1051,27 +1056,16 @@ class Main extends CI_Controller {
                 echo json_encode($return);exit;
             }else{
                 $return['status'] = 'success';
-                //$particulars= $this->Fees_model->get_group_particulars($group_id);
-                //$classes= $this->Fees_model->get_group_classes($group_id);
-                /* $head_total = 0;
-                $return['head_total'] = '<div class="row">
-                                            <div class="col-md-6"><strong>Fees Summary</strong></div>
-                                          </div>';
-                foreach($fee_grp_heads as $gr_head){
-                    $head_total += $gr_head->head_amount;
-                    $return['head_total'] .= '<div class="row">
-                                                <div class="col-md-6"><strong>'.$gr_head->name.'</strong></div>
-                                                <div class="col-md-6">'.$gr_head->head_amount.'</div>
-                                              </div>';
-                }                              
-                $return['head_total'] .= '<div class="row">
-                                            <div class="col-md-6"><strong>Total</strong></div>
-                                            <div class="col-md-6 summary-total">'.$head_total.'</div>
-                                          </div>'; */
-
                 $return['net_amt'] = 0;
                 $return['html'] = '';
+                $total_term_percent = 0;
                 for($i=0;$i<$fee_term_record->term_num;$i++){
+                    if(($i+1)!=$fee_term_record->term_num){
+                        $term_percent = round(100/$fee_term_record->term_num);
+                    }else{
+                        $term_percent = 100-$total_term_percent;
+                    }
+                    $total_term_percent += $term_percent;
                     $return['html'] .= '<div class="term-item" data-term-num="'.$i.'">
                                             <input type="hidden" name="terms['.$i.'][id]" value=""/>
                                             <div class="row">
@@ -1115,10 +1109,11 @@ class Main extends CI_Controller {
                                             </div>
 
                                             <div class="row mt5">
-                                                <div class="col-md-3"><label><strong>'.get_phrase('Amt/Percentage').'</strong></label></div>
+                                                <div class="col-md-3"><label><strong>'.get_phrase('Percentage').'</strong></label></div>
                                                 <div class="col-md-9">
                                                     <input type="hidden" name="terms['.$i.'][amt_type]" value="2"/>
-                                                    <input type="text" class="form-control input-sm" name="terms['.$i.'][amount]" placeholder="Amt/Percentage"/>
+                                                    <input type="number" class="form-control input-sm no-neg percentage" name="terms['.$i.'][amount]" 
+                                                    placeholder="Percentage" required max="100" step="0.50" value="'.$term_percent.'"/>
                                                 </div>
                                             </div>
                                         </div><br/>';
@@ -1158,7 +1153,7 @@ class Main extends CI_Controller {
                     
                 if($return){
                     $this->session->set_flashdata('flash_message', get_phrase('fee_fine_has_been_saved_successfully.'));
-                    redirect(base_url() . 'index.php?fees/main/fines/', 'refresh');
+                    redirect(base_url('index.php?fees/main/fines'), 'refresh');
                 } else {
                     $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
                 }
@@ -1171,7 +1166,7 @@ class Main extends CI_Controller {
         $page_data['page_title'] = get_phrase('fee_fines');
         $page_data['records'] = $this->Fees_model->get_fee_fines();
         //$page_data['fee_categories'] = $this->Fees_model->get_fee_categories();
-        //echo '<pre>';print_r($page_data['records'] );exit;
+        //echo '<pre>';print_r($page_data['records']);exit;
         $this->load->view('backend/index', $page_data);
     }
     
@@ -1201,19 +1196,18 @@ class Main extends CI_Controller {
                 $return = $this->Fees_model->save_fine($save_data);
                     
                 if($return){
-                    $this->session->set_flashdata('flash_message', get_phrase('fee_fine_has_updated_successfully.'));
+                    $this->session->set_flashdata('flash_message', get_phrase('fee_fine_has_been_updated_successfully.'));
                 } else {
                     $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
                 }
             }else {
                 $this->session->set_flashdata('flash_message_error', validation_errors());
             }
-            redirect(base_url() . 'index.php?fees/main/fines/', 'refresh');
+            redirect(base_url('index.php?fees/main/fines') , 'refresh');
         } 
-        $page_data['page_name'] = 'fees/fine_edit';
-        $page_data['page_title'] = get_phrase('edit_collection_group');
+        $page_data['page_title'] = get_phrase('fine_edit');
         $page_data['account_type'] = $this->session->userdata('login_type');
-        $this->load->view('backend/index', $page_data);
+        $this->load->view('backend/school_admin/fees/fine_edit',$page_data);
     }
 
     function fine_delete($id=false){
@@ -1644,7 +1638,7 @@ class Main extends CI_Controller {
             }
             
             $page_data['page_name'] = 'fees/fi_category';
-            $page_data['page_title'] = 'finance categoty';
+            $page_data['page_title'] = 'finance category';
             $page_data['data'] = $this->Fees_model->get_all_fi_category();        
             $page_data['arrAllLinks'] = $this->session->userdata('arrAllLinks');
             $this->load->view('backend/index', $page_data);    
@@ -1653,6 +1647,162 @@ class Main extends CI_Controller {
         }
     }
     
+
+    /************************Wallet Functions*******************************/
+    function wallets(){
+        $page_data = $this->get_page_data_var();
+        $running_year = $page_data['running_year'];
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            $this->form_validation->set_rules('user_id', get_phrase('parent'), 'trim|required');
+            //$this->form_validation->set_rules('user_type', get_phrase('user_type'), 'trim|required');
+            //$this->form_validation->set_rules('amount',get_phrase('amount'), 'trim|required');
+            $this->form_validation->set_rules('description',get_phrase('description'), 'trim');
+            $this->form_validation->set_error_delimiters('', '');
+            
+            if ($this->form_validation->run() == TRUE) {
+                $save_data['user_id'] = $this->input->post('user_id');
+                $save_data['user_type'] = 'P';//$this->input->post('user_type');
+                $save_data['amount'] =  0;
+                $save_data['description'] =  $this->input->post('description');
+                $save_data['created'] = date('Y-m-d H:i:s');
+                $save_data['updated'] = date('Y-m-d H:i:s');
+                $save_data['school_id'] = _getSchoolid();
+                $return = $this->Fees_model->save_wallet($save_data);
+                    
+                if($return){
+                    $this->session->set_flashdata('flash_message', get_phrase('wallet_has_been_created_successfully.'));
+                    redirect(base_url('index.php?fees/main/wallets/'), 'refresh');
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
+                }
+            }else{
+                $this->session->set_flashdata('flash_message_error', validation_errors());
+            }
+        } 
+        
+        $page_data['page_name'] = 'fees/cashier/wallets';
+        $page_data['page_title'] = get_phrase('wallets');
+        $query_sql = ',CONCAT(P.father_name,P.father_lname) parent_name,
+                    (SELECT count(id) FROM fee_pay_transactions WHERE pay_method_ref_id=W.id) in_trans,
+                    (SELECT count(id) FROM wallet_transactions WHERE wallet_id=W.id) in_trans_rec';
+        $join_tables = array(array('parent P','P.parent_id=W.user_id','LEFT'));
+        $page_data['records'] = $this->Fees_model->get_wallets(array('W.user_type'=>'P'),$query_sql,$join_tables);
+        $page_data['parents'] = $this->Fees_model->get_parents();
+        //echo '<pre>';print_r($page_data['records'] );exit;
+        $this->load->view('backend/index', $page_data);
+    }
+    
+    function wallet_edit($id=false){
+        $page_data = $this->get_page_data_var();
+        $running_year = $page_data['running_year'];
+        $page_data['record'] = $rec = $this->Fees_model->get_wallet(array('id'=>$id));
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            //$this->form_validation->set_rules('user_id', get_phrase('parent'), 'trim|required');
+            //$this->form_validation->set_rules('user_type', get_phrase('user_type'), 'trim|required');
+            $this->form_validation->set_rules('amount',get_phrase('amount'), 'trim|required');
+            $this->form_validation->set_rules('description',get_phrase('description'), 'trim');
+            $this->form_validation->set_error_delimiters('', '');
+            
+            if ($this->form_validation->run() !== FALSE) {
+                $save_data['id'] = $id;
+                //$save_data['user_id'] = $this->input->post('user_id');
+                //$save_data['user_type'] = $this->input->post('user_type');
+                //$save_data['amount'] =  $this->input->post('amount');
+                $save_data['description'] =  $this->input->post('description');
+                $save_data['updated'] = date('Y-m-d H:i:s');
+                $flag = $this->Fees_model->save_wallet($save_data);
+                    
+                if($flag){
+                    $this->session->set_flashdata('flash_message', get_phrase('wallet_has_been_updated_successfully.'));
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
+                }
+            }else {
+                $this->session->set_flashdata('flash_message_error', validation_errors());
+            }
+            redirect(base_url('index.php?fees/main/wallets/'), 'refresh');
+        } 
+        $this->load->view('backend/school_admin/fees/cashier/modal_edit_wallet',$page_data);
+    }
+
+    function wallet_add_amount($wallet_id=false){
+        $page_data = $this->get_page_data_var();
+        $running_year = $page_data['running_year'];
+        
+        $page_data['wallet'] = $wallet = $this->Fees_model->get_wallet(array('W.id'=>$wallet_id));
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            //$this->form_validation->set_rules('wallet_id', get_phrase('wallet'), 'trim|required');
+            //$this->form_validation->set_rules('user_type', get_phrase('user_type'), 'trim|required');
+            $this->form_validation->set_rules('amount',get_phrase('amount'), 'trim|required|numeric|greater_than[0]');
+            $this->form_validation->set_error_delimiters('','');
+            
+            if ($this->form_validation->run() !== FALSE) {
+                $save_data['wallet_id'] = $wallet_id;
+                $save_data['amount'] = $amt = $this->input->post('amount');
+                $save_data['type'] =  '1';
+                $save_data['time'] = date('Y-m-d H:i:s');
+                $flag = $this->Fees_model->save_wallet_transaction($save_data);
+                    
+                if($flag){
+                    //New Wallet Amount
+                    $save_data = array('id'=>$wallet_id,'amount'=>($wallet->amount+$amt));
+                    $this->Fees_model->save_wallet($save_data);
+
+                    $this->session->set_flashdata('flash_message', get_phrase('record_created.'));
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
+                }
+            }else {
+                $this->session->set_flashdata('flash_message_error', validation_errors());
+            }
+            redirect(base_url('index.php?fees/main/wallets/'), 'refresh');
+        } 
+        $this->load->view('backend/school_admin/fees/cashier/modal_wallet_add_amount',$page_data);
+    }
+
+    function wallet_transactions($wallet_id=false){
+        $page_data = $this->get_page_data_var();
+        $running_year = $page_data['running_year'];
+        $page_data['wallet'] = $wallet = $this->Fees_model->get_wallet(array('W.id'=>$wallet_id));
+        $page_data['transactions'] = $this->Fees_model->get_wallet_transactions(array('wallet_id'=>$wallet_id,'cancelled'=>0));
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            //$this->form_validation->set_rules('wallet_id', get_phrase('wallet'), 'trim|required');
+            //$this->form_validation->set_rules('user_type', get_phrase('user_type'), 'trim|required');
+            $this->form_validation->set_rules('amount',get_phrase('amount'), 'trim|required|numeric|greater_than[0]');
+            $this->form_validation->set_error_delimiters('','');
+            
+            if ($this->form_validation->run() !== FALSE) {
+                $save_data['wallet_id'] = $wallet_id;
+                $save_data['amount'] = $amt = $this->input->post('amount');
+                $save_data['type'] =  '1';
+                $save_data['time'] = date('Y-m-d H:i:s');
+                $flag = $this->Fees_model->save_wallet_transaction($save_data);
+                    
+                if($flag){
+                    //New Wallet Amount
+                    $save_data = array('id'=>$wallet_id,'amount'=>($wallet->amount+$amt));
+                    $this->Fees_model->save_wallet($save_data);
+
+                    $this->session->set_flashdata('flash_message', get_phrase('record_created.'));
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('invalid_details.'));
+                }
+            }else {
+                $this->session->set_flashdata('flash_message_error', validation_errors());
+            }
+            redirect(base_url('index.php?fees/main/wallets/'), 'refresh');
+        } 
+        $this->load->view('backend/school_admin/fees/cashier/modal_wallet_transactions',$page_data);
+    }
+
+    function wallet_delete($id=false){
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            $this->Fees_model->wallet_delete(array('id'=>$id));
+            echo json_encode(array('status'=>'success','msg'=>get_phrase('wallet_deleted!')));exit;
+        }
+    }
+
+    //Get Page Data Var
     function get_page_data_var() {
         $this->load->model('Crud_model');
         $page_data = array();

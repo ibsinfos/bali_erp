@@ -29,7 +29,7 @@
 
                 </div>                      -->
                 <div class="col-md-12 text-right">
-                    <button type="submit" class="fcbtn btn btn-danger btn-outline" id="sa-success" name="save_details"><?php echo get_phrase('Submit');?></button>
+                    <button type="submit" class="fcbtn btn btn-danger btn-outline" id="sa-success" name="save_details"><?php echo get_phrase('edit_class');?></button>
                 </div>
             </div> 
         </div>            

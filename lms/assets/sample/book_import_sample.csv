@@ -1,4 +1,4 @@
-ISBN,Title,Author,Edition,Edition Year,Copy,PDF File Name/ ePub Link,price
+ISBN,Title(mandatory),Author(mandatory),Edition(mandatory),Edition Year,Copy(mandatory),PDF File Name/ ePub Link,price
 1234,Dead Soul,Nikolai Gogol,1st,2000,11,1654347893.pdf,500
 2345,Crime and Punishment,Dostoy o Voski,2nd,2001,12,1654347894.pdf,200
 123,War and Peace,Tolstoy,3rd,2002,22,http://xeroneit.net/183782.epub,100

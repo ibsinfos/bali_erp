@@ -155,15 +155,26 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
                     );
 
 		$childs_menu = "";
-		$parent_menu = "<div class='home_menu'><div role='main' class='menu-head main".$menuheightclass."' id='menu-shadow' style='display:none;'>
-				<ul id='main_ul' class='menu flex'>";
+//		$parent_menu = "<div class='home_menu'><div role='main' class='menu-head main".$menuheightclass."' id='menu-shadow' style='display:none;'><ul id='main_ul' class='menu flex'>
+                $parent_menu = "<div class='child_menus hide_ele' id='home_tiles'><span role='main' class='menu-head main".$menuheightclass."' id='menu-shadow' style='display:none;'>
+				<ul>";
 		$clas_drag = ($con == 'settings')? ' draggable-reports-li ': ''; // Add draggable class for dashbord 
 		
 		/*** commented to remove menu icon 07-08-2015 - START - ***
 		$parent_menu .= "<li id='main_parent_".DASHBOARD_MENU."' super-parent = 'main_parent_".DASHBOARD_MENU."' class = '".$clas_drag."clickable_menu ".$parent_menu_selected_class[DASHBOARD_MENU]."-main ".$tour_menu_class[DASHBOARD_MENU]."' menu-url ='".BASE_URL."welcome' selected-class = '".$parent_menu_selected_class[DASHBOARD_MENU]."' > <a id='".DASHBOARD_MENU."' ><span class='scroll-menu dashboard dashboard-selected-common super_selected'></span><b>Dashboard</b></a></li>";
 		*** commented to remove menu icon 07-08-2015 - END - ***/
-		$parent_menu .= "<li id='main_parent_".DASHBOARD_MENU."' super-parent = 'main_parent_".DASHBOARD_MENU."' class = '".$clas_drag."clickable_menu ".$parent_menu_selected_class[DASHBOARD_MENU]."-main ".$tour_menu_class[DASHBOARD_MENU]."' menu-url ='".BASE_URL."welcome' selected-class = '".$parent_menu_selected_class[DASHBOARD_MENU]."' > <a id='".DASHBOARD_MENU."' ><b>Dashboard</b></a></li>";
+                //$parent_menu .= "<li class='menu_collapse' onclick='hide_show_all_menus();'><span><a>Menu</a></span></li>";
+                
+		$parent_menu .= "<li id='main_parent_".DASHBOARD_MENU."' super-parent = 'main_parent_".DASHBOARD_MENU."' class = '' menu-url ='".BASE_URL."welcome' ><span><a id='".DASHBOARD_MENU."' >Dashboard</a></span></li>";
 		//sapp_Payrollcal:: pre($menuarr); die;
+                               
+                
+//                if(count($menuarr) > 0) {
+//                    $childs_menu = '<div class="menu_collapsible" onclick="hide_show_all_menus();">
+//                        <i class="fa fa-bars"></i>
+//                    </div>'; 
+//                }  
+                
 		foreach($menuarr as $menuid => $data)
 		{			
                     $for_childs_str = "";
@@ -171,35 +182,38 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
 
 					if(isset($data['childs']) && count($data['childs']) > 0)
                     {			   
+                           
                         $for_childs_str = "div_mchilds_".$menuid;
                         $parent_url = "";
-                        $childs_menu .= "<div class='side-menu ".$for_childs_str."' style='display:none;'>
-									<ul>";
+                        //$childs_menu .= "<div class='side-menu ".$for_childs_str."' style='display:none;'>
+									//<ul>";
+                        $childs_menu .= '<div class="child_menus '.$for_childs_str.' hide_ele" id="child_tiles_'.$menuid.'" style="display: none;"><ul><li onclick="show_parent_menu();"><span><a>Back</a></span></li>';
                         foreach($data['childs'] as $ch_menu_id => $ch_menu_data)
                         {
                             if(isset($ch_menu_data['childs']) && count($ch_menu_data['childs']) > 0)
                             { 
                                     if($ch_menu_data['id']!='207') {
-                                $childs_menu .= "<li class='acc_li'><span class='acc_li_toggle' id='acc_li_toggle_".$ch_menu_data['id']."' onclick='togglesubmenus(".$ch_menu_data['id'].");'><b>".$ch_menu_data['menuName']."</b></span><ul>";
+                                //$childs_menu .= "<li class='acc_li'><span class='acc_li_toggle' id='acc_li_toggle_".$ch_menu_data['id']."' onclick='togglesubmenus(".$ch_menu_data['id'].");'><b>".$ch_menu_data['menuName']."</b></span><ul>";
+                                      $childs_menu .=  "<li class='acc_li'><span id='acc_li_toggle_".$ch_menu_data['id']."' onclick='togglesubmenus(".$ch_menu_data['id'].");'>".$ch_menu_data['menuName']."</span></li><ul>";
                                     }else {
-                                            $childs_menu .= '<ul>';
-                                        }
+                                        $childs_menu .= '<ul>';
+                                    }
 								
                                 foreach($ch_menu_data['childs'] as $ch2_menu_id => $ch2_menu_data)
                                 {
-									if($con == 'settings')
+                                    if($con == 'settings')
                                     {
-										if($ch2_menu_id == MANAGE_POLICY_DOCS)
-										{
-											/** policy document categories is not built as menu items 
-											** for settings page
-											**/
-											
-										}
-										else
-										{ 
-											$childs_menu .= "<li class = 'clickable_menu' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch2_menu_data['url']."' parent-div = '".$for_childs_str."'><a id=".$ch2_menu_data['id']."		href='javascript:void(0);'>".$ch2_menu_data['menuName']."</a></li>";
-										}
+                                        if($ch2_menu_id == MANAGE_POLICY_DOCS)
+                                        {
+                                                /** policy document categories is not built as menu items 
+                                                ** for settings page
+                                                **/
+
+                                        }
+                                        else
+                                        { 
+                                            $childs_menu .= "<li class = '' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch2_menu_data['url']."' parent-div = '".$for_childs_str."'><span><a id=".$ch2_menu_data['id']."		href='javascript:void(0);'>".$ch2_menu_data['menuName']."</a></span></li>";
+                                        }
                                     }
 									else if($ch2_menu_id == MANAGE_POLICY_DOCS)
 									{
@@ -209,7 +223,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
                                     else
                                     {
                                         if($ch2_menu_data['parent']!='207') {
-                                            $childs_menu .= "<li class = 'clickable_menu' primary_parent = '".$ch2_menu_data['parent']."' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch2_menu_data['url']."' parent-div = '".$for_childs_str."'><a id=".$ch2_menu_data['id']." href='".rtrim(BASE_URL,"/").$ch2_menu_data['url']."/'>".$ch2_menu_data['menuName']."</a></li>";
+                                            $childs_menu .= "<li class = '' primary_parent = '".$ch2_menu_data['parent']."' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch2_menu_data['url']."' parent-div = '".$for_childs_str."'><span><a id=".$ch2_menu_data['id']." href='".rtrim(BASE_URL,"/").$ch2_menu_data['url']."/'>".$ch2_menu_data['menuName']."</a></span></li>";
                                         } else {
                                             $childs_menu .= '';
                                         }
@@ -236,7 +250,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
 									}
                                     else
                                     {
-                                        $childs_menu .= "<li class = 'clickable_menu single-menu' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch_menu_data['url']."' parent-div = '".$for_childs_str."'><a id=".$ch_menu_data['id']." href='javascript:void(0);'>".$ch_menu_data['menuName']."</a></li>";
+                                        $childs_menu .= "<li class = 'clickable_menu single-menu' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch_menu_data['url']."' parent-div = '".$for_childs_str."'><span><a id=".$ch_menu_data['id']." href='javascript:void(0);'>".$ch_menu_data['menuName']."</a></span></li>";
                                     }
                                 }
                                 else
@@ -257,7 +271,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
                                     	$condition = ($ch_menu_data['id'] == 168)? "<span class='beta_menu'></span>" : "";
 //                                        if(($ch_menu_data['id']=='10' || $ch_menu_data['id']=='12' || $ch_menu_data['id']=='20') && $loginSchoolId!='' && $loginSchoolId>0) {
 //                                        } else {
-                                            $childs_menu .= "<li class = 'clickable_menu single-menu' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch_menu_data['url']."' parent-div = '".$for_childs_str."'><a id=".$ch_menu_data['id']." href='".rtrim(BASE_URL,"/").$ch_menu_data['url']."/'>".$ch_menu_data['menuName'].$condition."</a></li>";
+                                            $childs_menu .= "<li class = 'clickable_menu single-menu' super-parent = 'main_parent_".$menuid."' menu-url = '".rtrim(BASE_URL,"/").$ch_menu_data['url']."' parent-div = '".$for_childs_str."'><span><a id=".$ch_menu_data['id']." href='".rtrim(BASE_URL,"/").$ch_menu_data['url']."/'>".$ch_menu_data['menuName'].$condition."</a></span></li>";
                                         //}
                                     }
 									
@@ -276,7 +290,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
                         
                     if($con == 'settings')
                     {
-                        $parent_menu .= "<li id='main_parent_".$menuid."' ".$dummy_parent_div." ".$super_str." super-parent = 'main_parent_".$menuid."' class = 'draggable-reports-li clickable_menu ".$parent_menu_selected_class[$menuid].($groupbasedclass!=''?"-main-common ":"-main ").$tour_menu_class[$menuid]."' menu-url ='".$parent_url."' for-childs = '".$for_childs_str."' selected-class = '".(($groupbasedclass!='')?$parent_menu_selected_class[$menuid]."-common":$parent_menu_selected_class[$menuid])."'><a id='".$menuid."'><span class='scroll-menu ".(($groupbasedclass!='')?$parent_menu_class[$menuid]."-common":$parent_menu_class[$menuid])."'></span><b>".$data['menuName']."</b></a></li>";
+                        $parent_menu .= "<li id='main_parent_".$menuid."' ".$dummy_parent_div." ".$super_str." super-parent = 'main_parent_".$menuid."' class = 'draggable-reports-li clickable_menu ".$parent_menu_selected_class[$menuid].($groupbasedclass!=''?"-main-common ":"-main ").$tour_menu_class[$menuid]."' menu-url ='".$parent_url."' for-childs = '".$for_childs_str."' selected-class = '".(($groupbasedclass!='')?$parent_menu_selected_class[$menuid]."-common":$parent_menu_selected_class[$menuid])."'><span><a id='".$menuid."'><span class='scroll-menu ".(($groupbasedclass!='')?$parent_menu_class[$menuid]."-common":$parent_menu_class[$menuid])."'></span>".$data['menuName']."</a></span></li>";
                     }
                     else 
                     { //echo $menuid."<br/>";
@@ -284,7 +298,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
 						if($menuid != TIMEMANAGEMENT) // || (($menuid != SITECONFIGURATION || $menuid != MANAGEMODUL) && $loginSchoolId > 0))
 						{
 							$groupclass= "";
-							$parent_menu .= "<li id='main_parent_".$menuid."' ".$dummy_parent_div." ".$super_str." super-parent = 'main_parent_".$menuid."' class = 'clickable_menu ".$parent_menu_selected_class[$menuid].($groupbasedclass!=''?"-main-common ":"-main ").$tour_menu_class[$menuid]."' menu-url ='".$parent_url."' for-childs = '".$for_childs_str."' selected-class = '".(($groupbasedclass!='')?$parent_menu_selected_class[$menuid]."-common":$parent_menu_selected_class[$menuid])."'><a id='".$menuid."'><span class='scroll-menu ".(($groupbasedclass!='')?$parent_menu_class[$menuid]."-common":$parent_menu_class[$menuid])."'></span><b>".$data['menuName']."</b></a></li>";
+							$parent_menu .= "<li id='main_parent_".$menuid."' ".$dummy_parent_div." ".$super_str." super-parent = 'main_parent_".$menuid."' class = 'clickable_menu ".$parent_menu_selected_class[$menuid].($groupbasedclass!=''?"-main-common ":"-main ").$tour_menu_class[$menuid]."' menu-url ='".$parent_url."' for-childs = '".$for_childs_str."' selected-class = '".(($groupbasedclass!='')?$parent_menu_selected_class[$menuid]."-common":$parent_menu_selected_class[$menuid])."'><span><a id='".$menuid."'><span class='scroll-menu ".(($groupbasedclass!='')?$parent_menu_class[$menuid]."-common":$parent_menu_class[$menuid])."'></span>".$data['menuName']."</a></span></li>";
 						}
 						
                     }
@@ -294,7 +308,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
 		//for time management
 		if(isset($act_menus[TIMEMANAGEMENT]) && $act_menus[TIMEMANAGEMENT]['isactive'] == 1 && $usergroup!=USERS_GROUP)
 		{
-			$parent_menu .= "<li id='main_parent_".TIMEMANAGEMENT."' super-parent = 'main_parent_".TIMEMANAGEMENT."' class = '".$clas_drag."clickable_menu ".$parent_menu_selected_class[TIMEMANAGEMENT]."-main ".$tour_menu_class[TIMEMANAGEMENT]."' menu-url ='".BASE_URL."timemanagement' selected-class = '".$parent_menu_selected_class[TIMEMANAGEMENT]."' > <a id='".TIMEMANAGEMENT."' ><b>".$act_menus[TIMEMANAGEMENT]['menuName']."</b></a></li>";
+			$parent_menu .= "<li id='main_parent_".TIMEMANAGEMENT."' super-parent = 'main_parent_".TIMEMANAGEMENT."' class = '".$clas_drag."clickable_menu ".$parent_menu_selected_class[TIMEMANAGEMENT]."-main ".$tour_menu_class[TIMEMANAGEMENT]."' menu-url ='".BASE_URL."timemanagement' selected-class = '".$parent_menu_selected_class[TIMEMANAGEMENT]."' ><span><a id='".TIMEMANAGEMENT."' >".$act_menus[TIMEMANAGEMENT]['menuName']."</a></span></li>";
 		}
 		
 		
@@ -315,7 +329,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
              /*** removing icon for Logs menu item 17-08-2015 - START ---  ****
 			 $parent_menu .= "<li selected-class='log-selected' id='main_parent_logs'  class='clickable_menu log-selected-main tour_logs' menu-url='' for-childs = 'div_mchilds_logs'><span class='scroll-menu log-module'></span><b>Logs</b></li>";
             **** END ****/
-			 $parent_menu .= "<li selected-class='log-selected' id='main_parent_logs'  class='clickable_menu log-selected-main tour_logs' menu-url='' for-childs = 'div_mchilds_logs'><b>Logs</b></li>";
+			 $parent_menu .= "<li selected-class='log-selected' id='main_parent_logs'  class=' log-selected-main tour_logs' menu-url='' for-childs = 'div_mchilds_logs'><span>Logs</span></li>";
 
 			/**
 			 * 
@@ -333,7 +347,7 @@ class Zend_View_Helper_Menubuilder extends Zend_View_Helper_Abstract {
 							  </div>";
 		}
 		$parent_menu .= " </ul>
-			 </div></div>
+			 </span></div>
 		";				             
 		
 			return array('parent_menu' => $parent_menu,'childs_menu' => $childs_menu);

@@ -35,7 +35,7 @@
                 <div class="col-xs-12 col-md-offset-1 col-md-5">
                     <div class="row">
                         <div class="col-xs-12">
-                            <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                            <label for="running_session"><?php echo get_phrase("current_session"); ?></label>
                             <input type="text" class="form-control" name="running_year" value="<?php echo $running_year?>" readonly />
                         </div>
                     </div>
@@ -117,11 +117,11 @@
                                         </div>
                                         
                                         <div class="row mt5">
-                                            <div class="col-md-3"><label><strong><?php echo get_phrase('Amt/Percentage')?></strong></label></div>
+                                            <div class="col-md-3"><label><strong><?php echo get_phrase('Percentage')?></strong></label></div>
                                             <div class="col-md-9">
                                                 <input type="hidden" name="terms[<?php echo $ci?>][amt_type]" value="<?php echo $term->amt_type?>"/>
-                                                <input type="text" class="form-control input-sm" name="terms[<?php echo $ci?>][amount]" 
-                                                placeholder="Amt/Percentage" required value="<?php echo $term->amount?>"/>
+                                                <input type="number" class="form-control input-sm no-neg percentage" name="terms[<?php echo $ci?>][amount]" 
+                                                placeholder="Percentage" required value="<?php echo $term->amount?>" max="100" step="0.50"/>
                                             </div>
                                         </div>
                                     </div><br/>
@@ -169,40 +169,27 @@ $(document).on('change','select[name=fee_term_id]',function (e) {
         });
 });
 
-function termUP(obj){
-    if(obj){
-        citem = $(obj).closest('.term-item');
-        totalAmt = 0;
-        $.each(citem.find('.head-amt'),function(i,o){
-            totalAmt += o.value?parseInt(o.value):0;        
+function termUP(event){
+    $.each($('.term-item'),function(t,ob){
+        citem = $(ob);
+        totalPrct = 0;
+        $.each(citem.find('.percentage'),function(i,o){
+            totalPrct += o.value?parseInt(o.value):0;        
         });
-        citem.find('.total-term-amt').val(totalAmt);
-     }else{
-        $.each($('.term-item'),function(t,ob){
-            citem = $(ob);
-            totalAmt = 0;
-            $.each(citem.find('.head-amt'),function(i,o){
-                totalAmt += o.value?parseInt(o.value):0;        
-            });
-            citem.find('.total-term-amt').val(totalAmt);
-        })
-    } 
-    matchAmt();
+        //citem.find('.total-term-amt').val(totalAmt);
+    });
+    if(totalPrct!=100){
+        event?event.preventDefault():false;
+        $.toast({text: '<?php echo get_phrase('total_percentage_should_equal_to_100')?>', heading: 'Error', icon: 'error'});
+    }
 }
 
-function matchAmt(){
-    netAmt = 0;    
-    $.each($('.total-term-amt'),function(i,o){
-        netAmt += this.value?parseInt(this.value):0;        
-    });    
-    $('.total-setup-amt').val(netAmt);
-}
-$(document).on('keyup change','.head-amt',function (e) {
-    termUP(this);
-});
+$(document).on('change keyup','.percentage',function(event){
+    termUP();
+})
 
 $('#form').on('submit',function(event){
-    termUP();
+    termUP(event);
     //summaryTotal = parseInt($('.summary-total').text());
     //netAmt = parseInt($('.total-setup-amt').val());
     //console.log(summaryTotal,netAmt);return false;

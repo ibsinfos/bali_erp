@@ -7,6 +7,7 @@ if (!defined('BASEPATH'))
 class Notice_board_model extends CI_Model {
 
     private $_table = "noticeboard";
+    private $_table_custom_message_noticeboard = "custom_message_noticeboard";
 
     function __construct() {
         parent::__construct();
@@ -32,8 +33,8 @@ class Notice_board_model extends CI_Model {
 
     function delete($param2)
     {
-        $this->db->where('notice_id', $param2);
-        $this->db->delete($this->_table);
+        $this->db->where('custom_message_id', $param2);
+        $this->db->delete($this->_table_custom_message_noticeboard);
     }
 
     /**

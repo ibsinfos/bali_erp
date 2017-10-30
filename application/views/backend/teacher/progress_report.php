@@ -6,7 +6,7 @@
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
-        <?php $BRC = get_bread_crumb(); $ExpBrd = explode('^', $BRC);?>
+        <?php $BRC = get_bread_crumb_old(); $ExpBrd = explode('^', $BRC);?>
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
             <li>
@@ -80,13 +80,13 @@ if($selected_section!=''){?>
                     </tbody>
                 </table>
                     <br>
-              <div class="form-group">
-                    <div class="text-right">
-        <button id="submit_button" class="fcbtn btn btn-danger btn-outline btn-1d" type="submit">
-              Submit
-        </button>
+        <div class="form-group">
+            <div class="text-right">
+                <button id="submit_button" class="fcbtn btn btn-danger btn-outline btn-1d" type="submit">
+                    Add Progress Report
+                </button>
             </div>
-              </div>
+        </div>
             </div>
       </div>
 </div>

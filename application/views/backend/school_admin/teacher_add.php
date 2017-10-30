@@ -239,7 +239,7 @@
 
                 <div class="tab-pane" id="advance4"> 
                     <div class="form-group">
-                        <label for="field-2" class="col-sm-1 control-label"><?php echo get_phrase('Card ID'); ?></label>
+                        <label for="field-2" class="col-sm-1 control-label"><?php echo get_phrase('Card_ID'); ?></label>
                         <div class="col-sm-11">
                             <input type="text" class="form-control" name="card_id" value="" data-validate="required" data-message-required="<?php echo get_phrase('value_required'); ?>">
                         </div> 

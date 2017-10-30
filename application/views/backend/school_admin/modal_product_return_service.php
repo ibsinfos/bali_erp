@@ -1,5 +1,12 @@
 <div>
-  
+<?php  
+
+    if(function_exists('date_default_timezone_set'))
+    {
+        date_default_timezone_set("Asia/Kolkata");
+    }
+                
+?>
     <div class="panel-body">
         <div class="row">
             <div class="col-xs-12">
@@ -35,7 +42,7 @@
     
 
             <div class="text-right">
-                 <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('save_changes');?></button>
+                 <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('return_from_service');?></button>
                     
                          
             </div>

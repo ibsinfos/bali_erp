@@ -1,0 +1,227 @@
+ body {
+	margin: 0;
+	padding: 0;
+ }
+ 
+ #background 
+{ 
+	 left: 0px; 
+	 top: 0px; 
+	 position: relative; 
+	 margin-left: auto; 
+	 margin-right: auto; 
+	 width: 1239px;
+	 height: 1749px; 
+	 overflow: hidden;
+	 z-index:0;
+	} 
+
+ #Background 
+{ 
+	 left: 0px; 
+	 top: 0px; 
+	 position: absolute; 
+	 width: 1239px;
+	 height: 1749px;
+	 z-index:1;
+} 
+
+ #BG 
+{ 
+	 left: 0px; 
+	 top: -4px; 
+	 position: absolute; 
+	 width: 1240px;
+	 height: 1757px;
+	 z-index:2;
+} 
+
+ #Shape6 
+{ 
+	 left: 20px; 
+	 top: 28px; 
+	 position: absolute; 
+	 width: 1200px;
+	 height: 1693px;
+	 z-index:3;
+} 
+
+ #Shape7 
+{ 
+	 left: 37px; 
+	 top: 45px; 
+	 position: absolute; 
+	 width: 1166px;
+	 height: 1659px;
+	 z-index:4;
+} 
+
+ #Ribbon 
+{ 
+	 left: 86px; 
+	 top: 163px; 
+	 position: absolute; 
+	 width: 1067px;
+	 height: 209px;
+	 z-index:5;
+} 
+
+ #Shape13 
+{ 
+	 left: 952px; 
+	 top: 217px; 
+	 position: absolute; 
+	 width: 54px;
+	 height: 51px;
+	 z-index:6;
+} 
+
+ #Shape14 
+{ 
+	 left: 235px; 
+	 top: 217px; 
+	 position: absolute; 
+	 width: 53px;
+	 height: 51px;
+	 z-index:7;
+} 
+
+ #Shape15 
+{ 
+	 left: 393px; 
+	 top: 379px; 
+	 position: absolute; 
+	 width: 451px;
+	 height: 3px;
+	 z-index:8;
+} 
+
+ #THISCERTIFICATEISPRE 
+{ 
+	 left: 371px; 
+	 top: 343px; 
+	 position: absolute; 
+	 width: 496px;
+	 height: 18px;
+	 z-index:9;
+} 
+
+ #CERTIFICATE 
+{ 
+	 left: 321px; 
+	 top: 215px; 
+	 position: absolute; 
+	 width: 596px;
+	 height: 58px;
+	 z-index:10;
+} 
+
+ #Shape18 
+{ 
+	 left: 458px; 
+	 top: 1227px; 
+	 position: absolute; 
+	 width: 324px;
+	 height: 297px;
+	 z-index:11;
+} 
+
+ #Shape19 
+{ 
+	 left: 498px; 
+	 top: 1264px; 
+	 position: absolute; 
+	 width: 243px;
+	 height: 223px;
+	 z-index:12;
+} 
+
+ #CERTIFIED 
+{ 
+	 left: 522px; 
+	 top: 1363px; 
+	 position: absolute; 
+	 width: 195px;
+	 height: 26px;
+	 z-index:13;
+} 
+
+ #Starsbottom 
+{ 
+	 left: 560px; 
+	 top: 1421px; 
+	 position: absolute; 
+	 width: 119px;
+	 height: 45px;
+	 z-index:14;
+} 
+
+ #Starstop 
+{ 
+	 left: 560px; 
+	 top: 1284px; 
+	 position: absolute; 
+	 width: 119px;
+	 height: 45px;
+	 z-index:15;
+} 
+
+ #DATE 
+{ 
+	 left: 156px; 
+	 top: 1552px; 
+	 position: absolute; 
+	 width: 91px;
+	 height: 25px;
+	 z-index:16;
+} 
+
+ #Shape16copy 
+{ 
+	 left: 72px; 
+	 top: 1537px; 
+	 position: absolute; 
+	 width: 260px;
+	 height: 4px;
+	 z-index:17;
+} 
+
+ #SIGNATURE 
+{ 
+	 left: 932px; 
+	 top: 1552px; 
+	 position: absolute; 
+	 width: 210px;
+	 height: 25px;
+	 z-index:18;
+} 
+
+ #Shape16 
+{ 
+	 left: 907px; 
+	 top: 1537px; 
+	 position: absolute; 
+	 width: 260px;
+	 height: 4px;
+	 z-index:19;
+} 
+
+ #Loremipsumdolorsitam 
+{ 
+	 left: 69px; 
+	 top: 823px; 
+	 position: absolute; 
+	 width: 1100px;
+	 height: 317px;
+	 z-index:20;
+} 
+
+ #JOHNSMITH 
+{ 
+	 left: 144px; 
+	 top: 581px; 
+	 position: absolute; 
+	 width: 951px;
+	 height: 122px;
+	 z-index:21;
+} 

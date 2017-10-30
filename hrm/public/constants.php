@@ -606,3 +606,6 @@ defined('PAYROLLCATEGORY_DELETE')|| define('PAYROLLCATEGORY_DELETE','payroll cat
 defined('PAYSLIPGROUP_DELETE')|| define('PAYSLIPGROUP_DELETE','payslip group'); 
 defined('PAYSLIPEMPLOYEE_DELETE')|| define('PAYSLIPEMPLOYEE_DELETE','Payslip Employee'); 
 defined('PAYROLLGROUP_DELETE')|| define('PAYROLLGROUP_DELETE','payroll group'); 
+defined('EMPLOYEE_TYPES')|| define('EMPLOYEE_TYPES', 218);
+defined('AUTHORITIES')|| define('AUTHORITIES', 219);
+defined('AUTHORITIES_DELETE')|| define('AUTHORITIES_DELETE','authorities'); 

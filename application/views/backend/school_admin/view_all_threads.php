@@ -24,14 +24,14 @@
 </div>
 <div class="row">
     <div class="col-md-12 m-b-20">
-        <a href="<?php echo base_url(); ?>index.php?discussion_forum/create_thread/" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Thread" data-step="5" data-intro="From here you can post a new disucssion topic." data-position='left'><i class="fa fa-plus"></i>
+        <a href="<?php echo base_url(); ?>index.php?discussion_forum/create_thread/" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Thread" data-step="5" data-intro="<?php echo get_phrase('From_here_you_can_post_a_new_disucssion_topic'); ?>" data-position='left'><i class="fa fa-plus"></i>
         </a>
     </div>
 </div>
 <div class="row">
     <div class="col-md-12">
 
-        <div class="white-box" data-step="6" data-position="top" data-intro="Here you can view the discussion posts."> 
+        <div class="white-box" data-step="6" data-position="top" data-intro="<?php echo get_phrase('Here_you_can_view_the_discussion_posts'); ?>."> 
             <table class= "custom_table table display" cellspacing="0" width="100%" id="example">
                 <thead>
                     <tr>

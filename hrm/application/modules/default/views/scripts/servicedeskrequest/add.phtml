@@ -77,12 +77,12 @@ if($this->ermsg !='')
 		
 		<span id="errors-maxdiv" class="errors"></span>		
 
-		<div class="new-form-ui-submit mrgetop60">
+                <div class="new-form-ui-submit mrgetop60">
        	<?php echo $this->form->submitbutton; ?>
 		<?php if($actionName == 'view'){?>
-			<input type="button" onclick="changeeditscreen('<?php echo $this->controllername;?>',<?php echo $this->id;?>);" value="Edit" />
+			<input type="button" onclick="changeeditscreen('<?php echo $this->controllername;?>',<?php echo $this->id;?>);" value="Edit" style="float: left;" />
 		<?php }?>
-		<button onclick="window.location.href='<?php echo BASE_URL; ?>servicedeskrequest';" type="button" id="Cancel" name="Cancel">Cancel</button>
+                        <button onclick="window.location.href='<?php echo BASE_URL; ?>servicedeskrequest';" type="button" id="Cancel" name="Cancel" style="float: left;">Cancel</button>
 		</div>
 	</div>
 </form>

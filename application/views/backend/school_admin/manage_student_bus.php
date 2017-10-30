@@ -42,7 +42,7 @@ if($this->session->flashdata('flash_message_error')) {?>
 
 
 <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('You can see the transportation details of students from here');?>" data-position='top'> 
-<table id="example23" class="display nowrap" cellspacing="0" width="100%">
+<table id="manage_student_bus" class="display nowrap" cellspacing="0" width="100%">
 <!----TABLE LISTING STARTS-->
         <thead>
             <tr>
@@ -53,8 +53,8 @@ if($this->session->flashdata('flash_message_error')) {?>
                 <th><div><?php echo get_phrase('section'); ?></div></th>
                 <th><div><?php echo get_phrase('route'); ?></div></th>
                 <th><div><?php echo get_phrase('bus'); ?></div></th>
-                <th><div><?php echo get_phrase('start_date'); ?></div></th>
-                <th><div><?php echo get_phrase('end_date'); ?></div></th>
+                <!-- <th><div><?php //echo get_phrase('start_date'); ?></div></th>
+                <th><div><?php //echo get_phrase('end_date'); ?></div></th> -->
                 <th><div data-step="7" data-intro="<?php echo get_phrase('You can edit or delete transport allocated to student from here');?>" data-position='left'><?php echo get_phrase('options'); ?></div></th>
             </tr>
         </thead>
@@ -70,8 +70,8 @@ if($this->session->flashdata('flash_message_error')) {?>
                     <td><?php echo $value['section_name']; ?></td>
                     <td><?php echo $value['route_name']; ?></td>
                     <td><?php echo $value['bus_name']; ?></td>
-                    <td><?php echo date('d/m/Y', strtotime($value['start_date'])); ?></td>
-                    <td><?php echo date('d/m/Y', strtotime($value['end_date'])); ?></td>
+                    <!-- <td><?php //echo date('d/m/Y', strtotime($value['start_date'])); ?></td>
+                    <td><?php //echo date('d/m/Y', strtotime($value['end_date'])); ?></td> -->
                      <td>                        
                         <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_edit_student_bus/<?php echo $value['student_bus_id']; ?>');">
                         <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" 

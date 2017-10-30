@@ -119,45 +119,66 @@ class Dynamic_field_model extends CI_Model {
     }
     
     function get_student_bulk_upload(){
-        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"1")->where('bulk_upload',"1")->get()->result_array();
+        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"1")->where('bulk_upload',"1")->where('enable','Y')->order_by('order_id','ASC')->get()->result_array();
         //echo $this->db->last_query();
         return $rs;
     }
     
     function get_student_bulk_upload_label(){
-        $rs=$this->db->select('GROUP_CONCAT(label) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"1")->where('bulk_upload',"1")->get()->result_array();
+        $rs=$this->db->select('GROUP_CONCAT(label) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"1")->where('bulk_upload',"1")->where('enable','Y')->order_by('order_id','ASC')->get()->result_array();
         //echo $this->db->last_query();
         return $rs;
     }
     
     function get_student_bulk_upload_mandatory(){
-        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"1")->where('bulk_upload',"1")->where('validation','m')->get()->result_array();
+        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"1")->where('bulk_upload',"1")->where('enable','Y')->where('validation','m')->order_by('order_id','ASC')->get()->result_array();
         return $rs;
     }
     
     function get_parent_bulk_upload(){
-        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"2")->where('bulk_upload',"1")->get()->result_array();
+        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"2")->where('bulk_upload',"1")->where('enable','Y')->order_by('order_id','ASC')->get()->result_array();
         return $rs;
     }
     
     function get_parent_bulk_upload_label(){
-        $rs=$this->db->select('GROUP_CONCAT(label) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"2")->where('bulk_upload',"1")->get()->result_array();
+        $rs=$this->db->select('GROUP_CONCAT(label) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"2")->where('bulk_upload',"1")->where('enable','Y')->order_by('order_id','ASC')->get()->result_array();
         //echo $this->db->last_query();
         return $rs;
     }
     
     function get_parent_bulk_upload_mandatory(){
-        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"2")->where('bulk_upload',"1")->where('validation','m')->get()->result_array();
+        $rs=$this->db->select('GROUP_CONCAT(db_field) AS tableCol')->from($this->_table_dynamic_field)->where('form_id',"2")->where('bulk_upload',"1")->where('validation','m')->where('enable','Y')->order_by('order_id','ASC')->get()->result_array();
+        //echo $this->db->last_query();die;
         return $rs;
     }
     
+    /// get_field_type for parent table 
     function get_field_type($db_field){
-        $rs= $this->db->select('validation_type')->from($this->_table_dynamic_field)->where('db_field',$db_field)->where('form_id','2')->get()->result_array();
+        $rs= $this->db->select('validation_type')->from($this->_table_dynamic_field)->where('db_field',$db_field)->where('form_id','2')->where('enable','Y')->order_by('order_id','ASC')->get()->result_array();
         if(!empty($rs)){
             return $rs[0]['validation_type'];
         }else{
             return FALSE;
         }
     }
+    
+    /// get_field_type for student table 
+    function get_field_type_student($db_field){
+        $rs= $this->db->select('validation_type')->from($this->_table_dynamic_field)->where('db_field',$db_field)->where('form_id','1')->get()->result_array();
+        if(!empty($rs)){
+            return $rs[0]['validation_type'];
+        }else{
+            return FALSE;
+        }
+    }
+	
+	function get_column_of_table($table)
+	{
+		$database=$this->db->database;
+	$query=	"SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='$database' 
+    AND `TABLE_NAME`='$table';";
+	 return $this->db->query($query)->result_array();
+		
+	}
     
 }

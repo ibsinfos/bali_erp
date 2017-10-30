@@ -40,11 +40,11 @@
         </nav>
         
         <div class="content-wrap">            
-            <section id="tabs-0"><?php  if(!empty($teachers)){?>
-                <table  class="custom_table table" id="example23">
+            <section id="tabs-0">
+                <table  class="custom_table table datatable display" id="datatable_1">
                     <thead>
                         <tr>
-                            <th><div><?php echo get_phrase('#'); ?></div></th>
+                            <th><div><?php echo get_phrase('s._no.'); ?></div></th>
                             <th><div><?php echo get_phrase('name'); ?></div></th>
                             <th><div><?php echo get_phrase("class"); ?></div></th>
                             <th><div><?php echo get_phrase("section"); ?></div></th>
@@ -52,7 +52,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php  if(!empty($teachers)){?>
         <?php $count = 1; if(count($teachers)){ foreach ($teachers as $teach): ?>
+                        <input type="hidden" id="section_ids" value="#datatable_1">
                         <tr>                                        
                             <td><?php echo $count++; ?></td>
                             <td><?php echo ucwords($teach['teacher'].' '.$teach['tea_middle_name'].' '.$teach['tea_last_name']); ?></td>
@@ -60,30 +62,18 @@
                             <td><?php echo $teach['section']; ?></td>
                             <td><?php echo $teach['cell_phone']; ?></td>
 
-                        </tr><?php endforeach; }?>
+                        </tr><?php endforeach; }
+                        } ?>
                     </tbody> 
                 </table>
-                 <?php } else { ?>
-                <table class="custom_table table" id="example23">
-                    <thead>
-                       <tr>
-                           <th><div></div></th> 
-                       <tr>
-                    </thead>
-                    <tbody>
-                       <tr>
-                           <td><div><label><?php echo get_phrase('no_records_available'); ?></label></div></td>
-                       </tr>
-                    </tbody>
-                </table>
-                <?php } ?>
             </section>
             
-            <section id="tabs-1"><?php  if(!empty($syllabus)){?>
-                <table class="custom_table table display" id="example24">
+            <section id="tabs-1">
+                <table class="custom_table table datatable display" id="datatable_2">
+                    <input type="hidden" id="section_ids" value="#datatable_2">
                     <thead>
                         <tr>
-                            <th><div><?php echo get_phrase('#'); ?></div></th>
+                            <th><div><?php echo get_phrase('s._no.'); ?></div></th>
                             <th><div><?php echo get_phrase('title'); ?></div></th>
                             <th><div><?php echo get_phrase("code"); ?></div></th>
                             <th><div><?php echo get_phrase("description"); ?></div></th>
@@ -92,6 +82,8 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <input type="hidden" id="section_ids" value="#datatable_2">
+                        <?php  if(!empty($syllabus)){?>
             <?php $count = 1; if(count($syllabus)){ foreach ($syllabus as $syb):?>
                         <tr>
                             <td><?php echo $count ++; ?></td>
@@ -108,27 +100,18 @@
         <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Download"><i class="fa fa-download"></i></button>
                                 </a>
                             </td>
-                        </tr><?php endforeach; }?>
+                        </tr><?php endforeach; 
+                         }
+                        }?>
                     </tbody>
                 </table>
-                <?php } else { ?>
-                <table class="custom_table table display" id="example24">
-                   <thead>
-                       <tr><th><div></div></th><tr>
-                   </thead>
-                   <tbody>
-                       <tr><td><div><label><?php echo get_phrase('no_records_available'); ?></label></div></td></tr>
-                   </tbody>
-               </table>
-                <?php } ?>
             </section>
             
             <section id="tabs-2">
-                <?php  if(!empty($study_info)){?>
-                <table class="custom_table table display" id="example24">
+                <table class="custom_table table display" id="datatable_3">
                     <thead>
                         <tr>
-                            <th><div><?php echo get_phrase('#'); ?></div></th>                            
+                            <th><div><?php echo get_phrase('s._no.'); ?></div></th>                            
                             <th><div><?php echo get_phrase('title'); ?></div></th>     
                             <th><div><?php echo get_phrase("description"); ?></div></th>
                             <!-- <th><div><?php echo get_phrase("filename"); ?></div></th> -->
@@ -136,8 +119,9 @@
                             <th><div><?php echo get_phrase("action"); ?></div></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody><?php  if(!empty($study_info)){?>
     <?php $count = 1; if(count($study_info)){ foreach ($study_info as $info): ?>
+                        <input type="hidden" id="section_ids" value="#datatable_3">
                             <tr>                                        
                                 <td><?php echo $count++; ?></td>
                                 <td><?php echo $info->title; ?></td>
@@ -154,28 +138,20 @@
                                     </a>
                                 </td>
                             </tr>
-                        <?php endforeach; }?>
+                        <?php endforeach; 
+                        
+                        }
+                    }?>
                     </tbody> 
                 </table>
-                <?php } else { ?>
-                <table class="custom_table table display" id="example24">
-                   <thead>
-                       <tr><th><div></div></th><tr>
-                   </thead>
-                   <tbody>
-                       <tr><td><div><label><?php echo get_phrase('no_records_available'); ?></label></div></td></tr>
-                   </tbody>
-               </table>
-                <?php } ?>
             </section>
             
             
             <section id="tabs-3">
-                <?php  if(!empty($books)){?>
-                <table class="custom_table table display" id="example25">
+                <table class="custom_table table display" id="datatable_4">
                     <thead>
                         <tr>
-                            <th><div><?php echo get_phrase('#'); ?></div></th>                            
+                            <th><div><?php echo get_phrase('s._no.'); ?></div></th>                            
                             <th><div><?php echo get_phrase('title'); ?></div></th>     
                             <th><div><?php echo get_phrase("author"); ?></div></th>
                             <th><div><?php echo get_phrase("description"); ?></div></th>
@@ -183,7 +159,7 @@
                             <th><div><?php echo get_phrase("price"); ?></div></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody> <?php  if(!empty($books)){?>
                 <?php $count = 1; if(count($books)){ foreach ($books as $bk): ?>
                         <tr>                                        
                             <td><?php echo $count++; ?></td>
@@ -193,23 +169,11 @@
                             <td><span class="label label-<?php if($bk->status =='available')echo 'success';else echo 'danger';?>"><?php echo $bk->status;?></span></td>
                             <td><?php echo $bk->price." ".$bk->currency; ?></td>
 
-                        </tr><?php endforeach; }?>
+                        </tr><?php endforeach;
+                        }
+                    }?>
                     </tbody> 
                 </table>
-                 <?php } else { ?>
-                <table class="custom_table table display" id="example25">
-                   <thead>
-                       <tr>
-                           <th><div></div></th> 
-                       <tr>
-                   </thead>
-                   <tbody>
-                       <tr>
-                           <td><div><label><?php echo get_phrase('no_records_available'); ?></label></div></td>
-                       </tr>
-                   </tbody>
-                </table>
-                <?php } ?>
             </section>
             
             

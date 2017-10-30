@@ -25,7 +25,7 @@
 <?php echo form_open(base_url() . 'index.php?school_admin/clinical_records', array('class' => 'form-horizontal form-groups-bordered', 'enctype' => 'multipart/form-data', 'id' => 'ClinicalRecords', 'method' => 'POST')); ?>
 <div class="col-xs-12 white-box">
     <div class="col-xs-6">
-        <div data-step="5" data-intro="<?php echo get_phrase('Please select class here.');?>" data-position='top'>
+        <div data-step="5" data-intro="<?php echo get_phrase('Please_select_class_here.');?>" data-position='top'>
             <label><?php echo get_phrase('select_class'); ?></label>
             <select name="class_id" id="class_id"  class="selectpicker" data-style="form-control" data-live-search="true" required="" >
                 <option value=""><?php echo get_phrase('select'); ?></option><?php $selected = '';
@@ -36,7 +36,7 @@ foreach ($classes as $row): if (isset($formSubmit)) {
         </div>
     </div>
     <div class="col-xs-6">
-        <div data-step="6" data-intro="<?php echo get_phrase('Please select section here/');?>" data-position='top'>
+        <div data-step="6" data-intro="<?php echo get_phrase('Please_select_section_here/');?>" data-position='top'>
             <label><?php echo get_phrase('select_section'); ?></label>
             <select name="from_section_id" id="from_section_selector_holder" class="selectpicker" data-style="form-control" data-live-search="true">
 <?php if (isset($formSubmit)) {
@@ -51,7 +51,7 @@ foreach ($classes as $row): if (isset($formSubmit)) {
     </div>
 
     <div class="col-sm-12 text-right">
-        <div class="btn-center-in-sm clinical-record"><button class="btn btn-danger m-t-20" type="submit" name="get_list" value="get_list" onclick="get_students_to_promote()" data-step="7" data-intro="<?php echo get_phrase('Click here to get records.');?>" data-position='bottom'>VIEW STUDENTS</button></div>
+        <div class="btn-center-in-sm clinical-record"><button class="btn btn-danger m-t-20" type="submit" name="get_list" value="get_list" onclick="get_students_to_promote()" data-step="7" data-intro="<?php echo get_phrase('Click_here_to_get_records.');?>" data-position='bottom'>VIEW STUDENTS</button></div>
         <div id="students_for_promotion_holder"></div>
     </div>
 </div>
@@ -60,7 +60,7 @@ foreach ($classes as $row): if (isset($formSubmit)) {
 <div class="row">
     <div class="col-sm-12">
         <div class="white-box">
-            <div class="table-responsive" data-step="8" data-intro="<?php echo get_phrase('Here records display');?>" data-position='top'>
+            <div class="table-responsive" data-step="8" data-intro="<?php echo get_phrase('Here_records_display');?>" data-position='top'>
                 <table id="example23" class="table display nowrap">
                     <thead>
                         <tr>

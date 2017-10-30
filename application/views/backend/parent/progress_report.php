@@ -28,8 +28,10 @@
 <?php
 $row = $student_details;
 ?>
+<div class="form-group col-sm-12 p-0">
 <div class="badge badge-danger badge-stu-name pull-right m-b-20">
             <i class="fa fa-user"></i> <?php echo $student_name; ?>
+</div>
 </div>
 <div class="row m-0">
     <div class="col-md-12 white-box">

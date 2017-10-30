@@ -51,7 +51,7 @@ class Disciplinary extends CI_Controller {
         $this->load->model('Violation_types_model');
         $page_data                  =   array();
         $page_data                  =   $this->get_page_data_var();
-        $page_data['page_title']    =   get_phrase('manage_violation_types');
+        $page_data['page_title']    =   get_phrase('violation_types');
         $page_data['page_name']     =   'manage_violation_types';
         $page_data['details']       =   $this->Violation_types_model->get_data_by_cols('*', array('status'=>'Active'), 'result_array');
         $this->load->view('backend/index', $page_data);
@@ -113,14 +113,39 @@ class Disciplinary extends CI_Controller {
     } 
     public function manage_incident() {
         $this->load->model('Incident_model');
+        $this->load->model('Teacher_model');
+        $this->load->model('School_Admin_model');
         $page_data                  =   array();
+        $details = array();
+        $raised_by = array();
         $page_data                  =   $this->get_page_data_var();
-        $page_data['page_title']    =   get_phrase('manage_incident');
+        $page_data['page_title']    =   get_phrase('manage_incidents');
         $page_data['page_name']     =   'manage_incident';
-        $page_data['details']       =   $this->Incident_model->get_details();
+        $details       =   $this->Incident_model->get_details();
+        $page_data['details'] = $details;
 //        pre($page_data['details']);exit;
+        if(!empty($details)){
+            foreach($details as $row):
+                if($row['user_type'] == 'Teacher'){
+                    $teacher_name  = $this->Teacher_model->get_teacher_name($row['raised_by_teacher_id']);
+                    if(!empty($teacher_name)){
+                    $raised_by[] = $teacher_name->name." ".$teacher_name->middle_name." ".$teacher_name->last_name;
+                    }else{
+                    $raised_by[] = "";    
+                    }
+                }else{
+                    $school_admin_name  = $this->School_Admin_model->get_school_admin_name($row['raised_by_teacher_id']);
+                    if(!empty($school_admin_name)){
+                    $raised_by[] = $school_admin_name->first_name." ".$school_admin_name->last_name."(".$school_admin_name->name.")";   
+                    }else{
+                    $raised_by[] = "";    
+                    }
+                }
+                $page_data['raised_by'] = $raised_by;
+            endforeach;
+        }
         $this->load->view('backend/index', $page_data);
-    }
+        }
     public function add_incident($param1='',$param2='') {
         $this->load->model('Incident_model');
         $this->load->model('Section_model');
@@ -133,7 +158,7 @@ class Disciplinary extends CI_Controller {
             if($this->input->post('parent_appeal')=="yes"){
                 $this->form_validation->set_rules('parent_statement', 'Parent Statement', 'trim|required');
             }
-            $this->form_validation->set_rules('verdict', 'Verdict', 'trim|required');
+            $this->form_validation->set_rules('verdict', 'Verdict', 'trim');
             $this->form_validation->set_rules('reporting_teacher', 'Reporting Teacher', 'trim|required');
             $this->form_validation->set_rules('corrective_action', 'Corrective Action', 'trim|required');
             $this->form_validation->set_rules('date_of_occurrence', 'Date of Occurrence', 'trim|required');
@@ -162,19 +187,24 @@ class Disciplinary extends CI_Controller {
                 $data['expiry_date']            =   date('Y-m-d', strtotime($this->input->post('expiry_date')));
                 //pre($data);exit;
                 $teacher                        =   $this->Section_model->get_teachername_by_class_section($data['class_id'],$data['section_id']);                    
-                if(!empty($teacher)){
-                     $data['raised_by_teacher_id']   =   $teacher[0]['teacher_id'];
-                }
+//                if(!empty($teacher)){
+//                     $data['raised_by_teacher_id']   =   $teacher[0]['teacher_id'];
+//                       $data['raised_by_teacher_id'] = $this->session->userdata('teacher_id');
+//                }
                 if($this->session->userdata('school_admin_login')){
                     $data['added_by']               =   "admin_".$this->session->userdata('school_admin_id');
+                    $data['raised_by_teacher_id']   =   $this->session->userdata('school_admin_id');
+                    $data['user_type']   =   "School_admin";
                 }
                 else if($this->session->userdata('teacher_login')){
                     $data['added_by']               =   "teacher_".$this->session->userdata('teacher_id');
+                    $data['raised_by_teacher_id']   =   $this->session->userdata('teacher_id');
+                     $data['user_type']   =  "Teacher";
                 }
                 $data['status']                 =   "Active";
                 $this->Incident_model->add_data($data);
                 $this->session->set_flashdata('flash_message', get_phrase('incident_added_successfully'));
-                redirect(base_url() . 'index.php?disciplinary/manage_incident', 'refresh');
+                redirect(base_url() . 'index.php?disciplinary/my_incident', 'refresh');
             }
         }
             if($param1  ==  "edit"){
@@ -236,8 +266,8 @@ class Disciplinary extends CI_Controller {
         $page_data['page_title']    =   get_phrase('add_incident');
         $page_data['page_name']     =   'add_incident';
         $this->load->view('backend/index', $page_data);
-        
     }
+    
     public function edit_incident($incident_id=""){
         $this->load->model('Incident_model');
         $page_data                  =   array();
@@ -257,7 +287,7 @@ class Disciplinary extends CI_Controller {
             $this->load->model('Incident_model');
             $page_data                  =   array();
             $page_data                  =   $this->get_page_data_var();
-            $page_data['page_title']    =   get_phrase('my_incident');
+            $page_data['page_title']    =   get_phrase('my_incidents');
             $page_data['page_name']     =   'my_incident';
             $added_by                   =   "admin_".$this->session->userdata('school_admin_id');
             $page_data['details']       =   $this->Incident_model->get_details_added_by($added_by);
@@ -268,7 +298,7 @@ class Disciplinary extends CI_Controller {
             $this->load->model('Incident_model');
             $page_data                  =   array();
             $page_data                  =   $this->get_page_data_var();
-            $page_data['page_title']    =   get_phrase('my_incident');
+            $page_data['page_title']    =   get_phrase('my_incidents');
             $page_data['page_name']     =   'my_incident';
             $added_by                   =   "teacher_".$this->session->userdata('teacher_id');
             $page_data['details']       =   $this->Incident_model->get_details_added_by($added_by);

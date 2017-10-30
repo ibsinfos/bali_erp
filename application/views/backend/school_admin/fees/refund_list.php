@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?<?php echo $this->session->userdata('login_type');?>/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>

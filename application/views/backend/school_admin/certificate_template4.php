@@ -2,7 +2,7 @@
 <style>
  .main_div{
     /*border-radius: 25px;*/
-    background: url('assets/images/certificate4.png');
+    /*background: url('assets/images/certificate4.png');*/
      background-repeat: no-repeat;
     width: 1200px;
     height: 900px; 
@@ -32,31 +32,49 @@
     <div class="col-md-12 white-box">
         <div id="print_div">
             <center>
+                <span class="text-right">Certificate No.<u> <?php echo $certificate_detail->certificate_id;  ?> </u></span>
                 <div class="main_div">
-                    <span class="m-t-20" id="title-name"><br><br><br><br><b><?php echo $system_name; ?></b></span>
+                    <span class="m-t-20" id="title-name"><br><b><?php echo $system_name; ?></b></span>
     <br/><br/>
-      <span class="m-t-20" id="sub-title"><?php echo ucfirst($certificate_detail->certificate_title); ?></span>
+      <span class="m-t-20" id="sub-title" style="font-family:Old English Text MT"><?php echo ucfirst($certificate_detail->certificate_type); ?></span>
                     <br>
-                    <span id="title-name">for</span>
+                    <span id="title-name" style='font-family: Edwardian Script ITC;'>for</span>
                     <br>
-                    <div id="for_merit_val" class="input_style"><?php echo ucfirst($certificate_detail->sub_title);  ?>&nbsp;</div>
+                    <div id="for_merit_val" class="input_style" style="font-family:Old English Text MT"><?php echo ucfirst($certificate_detail->sub_title);  ?>&nbsp;</div>
                     <br>
                     <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" />
-                    <br/>       <span id="title-name">Awarded to</span> <br/><br/>
-                    <span class="name_style"><?php echo ucfirst($certificate_detail->name) ." ". ($certificate_detail->mname!=''?$certificate_detail->mname:'') ." ". ucfirst($certificate_detail->lname); ?></span>
+                    <br/>    
+                    <span id="title-name" style="font-family:Brush Script MT;">Awarded to</span> <br/><br/>
+                    <span class="name_style" style="font-family:Brush Script MT;"><?php echo ucfirst($certificate_detail->name) ." ". ($certificate_detail->mname!=''?$certificate_detail->mname:'') ." ". ucfirst($certificate_detail->lname); ?></span>
                     <br/>       
                     <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" />
                     <br/>
-                    <div id="div11">
-                        <span class="date_content"><?php echo date("d M Y"); ?></span>
+                    <?php if(!empty($authorities)){
+                        foreach($authorities as $row): ?>
+                    <div style="height:100px; width: 100px; float: left; margin-top: 50px; margin-left: 150px; margin-right: 20px;">
+                        <!--<span class="date_content"><?php echo date("d M Y"); ?></span>-->
+                        <?php if(!empty($row->signature)){ ?>
+                        <img src="<?php echo base_url(); ?>/uploads/authorities_image/<?php echo $row->signature;  ?>" height="30px" width="80px" ><br>
+                        <?php } echo "<br>";?>
+                        <?php echo $row->authorities_name; ?><br>
+                        <?php echo $row->designaiton; ?><br>
                         <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>
+                        <span class="sub_title11s"> Signature </span>
+                    </div>
+                    <?php endforeach;
+                    }else{?>
+                     <div id="div11">
+                        <span class="date_content"><?php echo date("d M Y"); ?></span><br>
+<!--                        <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>-->
                         <span class="sub_title11s"> Date </span>
                     </div>
                     <div id="div33">
                         <span> </span><br>
-                        <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>
+                        <!--<img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>-->
                         <span class="sub_title11s"> Signature </span>
                     </div>
+                    
+                    <?php } ?>
                     <input type="hidden" name="student_id" id="student_id" value="<?php // echo $student_id; ?>">  
                 </div>
             </center>
@@ -142,7 +160,7 @@
     function Popup(data) {
         var myWindow = window.open('', 'my div', 'height=400,width=600');
         myWindow.document.write('<html><head><title></title>');
-        myWindow.document.write('<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/print_merit_certificate.css" type="text/css" /><style type="text/css"> .main_div{background-image: url("assets/images/certificate4.png"); width: 1200px; height: 900px; !important;} </style>');
+        myWindow.document.write('<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/print_merit_certificate.css" type="text/css" /><style type="text/css"> .main_div{background-image: url(); width: 1200px; height: 900px; !important;} </style>');
         myWindow.document.write('</head><body >');
         myWindow.document.write(data);
         myWindow.document.write('</body></html>');

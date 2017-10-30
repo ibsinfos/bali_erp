@@ -8,7 +8,7 @@
                 $student_image  =   '';
             }
         ?>
-        <div class="col-xs-3"><a href="#" class="profile-picture"><img src="<?php echo ($student_image != "" ?'uploads/student_image/'.$student_image:'uploads/user.jpg')?>" class="img-responsive " /></a></div>
+        <div class="col-xs-3"><a href="#" class="profile-picture"><img src="<?php echo ($student_image != "" ?'uploads/student_image/'.$student_image:'uploads/user.png')?>" class="img-responsive " /></a></div>
 
         <div class="col-sm-9"><ul class="p-l-20"><li class="list-unstyled">
                 <div class="profile-name">

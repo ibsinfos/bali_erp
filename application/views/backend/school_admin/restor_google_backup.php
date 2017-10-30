@@ -36,7 +36,7 @@
                             </div>
                         </div> 
                     <div class="col-md-12 col-xs-12 text-center">
-                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" ><?php echo get_phrase('restore_google_backup');?></button>
+                        <button type="submit" onclick="stopMeGoAhead();" class="fcbtn btn btn-danger btn-outline btn-1d" ><?php echo get_phrase('restore_google_backup');?></button>
                         </div>
                     </form>
                 </section>
@@ -44,3 +44,9 @@
         </div>
     </div>
 </div>
+<script type="text/javascript">
+    function stopMeGoAhead(btn){
+        //$(':input[type="submit"]').prop('disabled', true);
+        $('body').loading('start');
+    }
+</script>

@@ -24,13 +24,13 @@
 
 <div class="col-md-12 white-box">
     <?php echo form_open(base_url() . 'index.php?school_admin/seller_add', array('class' => 'validate', 'target' => '_top', 'enctype' => 'multipart/form-data')); ?>
-    <div class="row" data-step="6" data-intro="<?php echo get_phrase('You can add the particulars needed');?>" data-position='top'>
+    <div class="row" data-step="6" data-intro="<?php echo get_phrase('You_can_add_the_particulars needed');?>" data-position='top'>
         <div class="col-xs-12 col-md-6 form-group ">
             <label for="categoriesName">
                 <?php echo get_phrase('seller_name'); ?><span class="mandatory"> *</span>
             </label>
             <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-user"></i></div>
+                <div class="input-group-addon"><i class="fa fa-users"></i></div>
                 <input type="text" class="form-control" id="sellerName" placeholder="Seller Name" name="sellerName" value="<?php echo set_value('sellerName') ?>" autocomplete="off" required="required">
             </div>
             <span class="mandatory"> <?php echo form_error('sellerName'); ?></span>
@@ -52,7 +52,7 @@
                 <?php echo get_phrase('seller_email'); ?><span class="mandatory"> *</span>
             </label>
             <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-mail-forward"></i></div>
+                <div class="input-group-addon"><i class="fa fa-envelope"></i></div>
                 <input type="email" class="form-control" id="sellerEmail" placeholder="Seller Email" name="sellerEmail" value="<?php echo set_value('sellerEmail') ?>" autocomplete="off" required="required">
             </div>
             <span class="mandatory"> <?php echo form_error('sellerEmail'); ?></span>
@@ -63,7 +63,7 @@
                 <?php echo get_phrase('contact_person'); ?><span class="mandatory"> *</span>
             </label>
             <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-user"></i></div>
+                <div class="input-group-addon"><i class="fa fa-user-plus"></i></div>
                 <input type="text" class="form-control" id="contactName" placeholder="Contact Name" name="contactName" value="<?php echo set_value('contactName') ?>" autocomplete="off" required="required">
             </div>
             <span class="mandatory"> <?php echo form_error('contactName'); ?></span>
@@ -73,10 +73,10 @@
             <label for="sellerAddress">
                 <?php echo get_phrase('seller_address:'); ?><span class="mandatory"> *</span>
             </label>
-            <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-address-book"></i></div>
-                <textarea class="form-control" id="sellerAddress" name="sellerAddress" value="<?php echo set_value('sellerAddress') ?>" rows="9" required></textarea>
-            </div>
+            <!--<div class="input-group">-->
+                <!--<div class="input-group-addon"><i class="fa fa-address-book"></i></div>-->
+            <textarea class="form-control" id="sellerAddress" name="sellerAddress" value="<?php echo set_value('sellerAddress') ?>" rows="9" required placeholder="Please enter seller address"></textarea>
+            <!--</div>-->
             <span class="mandatory"> <?php echo form_error('sellerAddress'); ?></span>
         </div>
 
@@ -84,10 +84,10 @@
             <label for="sellerAddress">
                 <?php echo get_phrase('attach_business_card:'); ?>
             </label>
-            <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-address-book"></i></div>
+<!--            <div class="input-group">
+                <div class="input-group-addon"><i class="fa fa-address-book"></i></div>-->
                 <input type="file" id="input-file-now" class="dropify" name="attached_document" />
-            </div>
+            <!--</div>-->
         </div>
 
         <div class="text-right col-xs-12 p-t-10">

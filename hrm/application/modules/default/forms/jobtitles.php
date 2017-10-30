@@ -88,12 +88,12 @@ class Default_Form_jobtitles extends Zend_Form
         $jobpaygradecode->setRequired(true);
         $jobpaygradecode->addValidator('NotEmpty', false, array('messages' => 'Please enter job pay grade code.')); 
 		
-		$jobpayfrequency = new Zend_Form_Element_Select('jobpayfrequency');
-        $jobpayfrequency->setLabel('Job pay frequency');
-        $jobpayfrequency->addMultiOption('','Select Pay Frequency');		
-		$jobpayfrequency->setRequired(true);
-		$jobpayfrequency->addValidator('NotEmpty', false, array('messages' => 'Please select job pay frequency.')); 				
-		$jobpayfrequency->setRegisterInArrayValidator(false);	
+//		$jobpayfrequency = new Zend_Form_Element_Select('jobpayfrequency');
+//        $jobpayfrequency->setLabel('Job pay frequency');
+//        $jobpayfrequency->addMultiOption('','Select Pay Frequency');		
+//		$jobpayfrequency->setRequired(true);
+//		$jobpayfrequency->addValidator('NotEmpty', false, array('messages' => 'Please select job pay frequency.')); 				
+//		$jobpayfrequency->setRegisterInArrayValidator(false);	
       		
 		$comments = new Zend_Form_Element_Textarea('comments');
         $comments->setAttrib('rows', 10);
@@ -104,7 +104,7 @@ class Default_Form_jobtitles extends Zend_Form
 		$submit->setAttrib('id', 'submitbutton');
 		$submit->setLabel('Save');
 
-		 $this->addElements(array($id,$jobtitlecode,$jobtitlename,$jobdescription,$minexperiencerequired,$emptyflag,$jobpaygradecode,$jobpayfrequency,$comments,$submit));
+		 $this->addElements(array($id,$jobtitlecode,$jobtitlename,$jobdescription,$minexperiencerequired,$emptyflag,$jobpaygradecode,$comments,$submit));
          $this->setElementDecorators(array('ViewHelper')); 
 	}
 }

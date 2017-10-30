@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?teacher/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+<?php $BRC = get_bread_crumb_old(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -23,11 +23,15 @@
     </div>
     <!-- /.breadcrumb -->
 </div>
-<div>
-        <a href="<?php echo base_url(); ?>index.php?disciplinary/add_incident" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Incident" data-step="6" data-intro="From here you can add a new incident" data-position='left'>
+
+<div class="row">
+    <div class="col-md-12">
+        <a href="<?php echo base_url(); ?>index.php?disciplinary/add_incident" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Create New Incident" data-step="6" data-intro="From here you can create a new incident" data-position='left'>
             <i class="fa fa-plus"></i>
         </a> 
 </div>
+</div>
+<div class="clear-fix">&nbsp;</div>
 <?php     
 if($this->session->flashdata('flash_message_error')) {?>        
 <div class="alert alert-danger">
@@ -35,9 +39,6 @@ if($this->session->flashdata('flash_message_error')) {?>
 </div>
 <?php } ?>
    <div class="col-md-12 white-box" > 
-        <div class="text-center m-b-20" data-step="8" data-intro="<?php echo get_phrase('Here you can see the list of incident.');?>" data-position='top'>
-             <h3><?php echo get_phrase('my_incident');?></h3>
-        </div>
 <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
     <thead>
         <tr>
@@ -73,8 +74,8 @@ if($this->session->flashdata('flash_message_error')) {?>
             <td><?php echo $row['verdict']; ?></td>
             <td><?php echo $row['reporting_teacher']; ?></td>
             <td><?php echo $row['corrective_action']; ?></td>
-            <td><?php echo $row['date_of_occurrence']; ?></td>
-            <td><?php echo $row['expiry_date']; ?></td>
+            <td><?php echo date('d/m/Y',strtotime($row['date_of_occurrence'])); ?></td>
+            <td><?php echo date('d/m/Y',strtotime($row['expiry_date'])); ?></td>
             <td>
                 <div class="btn-group">
                 <a href="<?php echo base_url(); ?>index.php?disciplinary/edit_incident/<?php echo $row['incident_id']; ?>">

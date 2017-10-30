@@ -1,0 +1,67 @@
+<?php $months = array('1' => 'Jan', '2'=>'Feb', '3'=>'Mar', '4'=>'Apr', '5'=>'May', '6'=>'Jun', '7'=>'Jul', '8'=>'Aug', '9'=>'Sep', '10'=>'Oct', '11'=>'Nov', '12'=>'Dec');?>
+<div id="grid_employee" class="all-grid-control">
+    <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: 250px; height: auto;">
+        <div id="employee1" class="details_data_display_block newtablegrid" style="overflow: hidden; width: 250px; height: auto; padding-bottom: 10px;">
+            <table class="grid" width="100%" cellspacing="0" cellpadding="4" border="0" align="center">
+                <tr>
+                    <td>
+                        Select Month : <br />
+                        <label>
+                            <select name="month" id="month">
+                                <?php foreach ($months AS $k => $v):
+                                    if($k==(date('n'))){
+                                        break;
+                                    }
+                                    if($k<10){
+                                        $k="0".$k;
+                                    }?>
+                                <option value="<?php echo $k;?>"><?php echo $v;?></option>
+                                <?php endforeach;?>
+                            </select>
+                        </label>
+                    </td>
+                </tr>
+                <tr align='center'>
+                    <td align='center' style="text-align: center;">
+                        <div class="new-form-ui-submit" align='center'>
+                            <input type="button" name="generate" id="generate" value="Generate">
+                        </div>
+                    </td>
+                    <!--<td>
+                        <input type="button" name="estimate" id="estimate" value="Get next month estimate">
+                    </td>-->
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#generate').on('click',function(){
+        var month = $('#month').val();
+        var ajaxURL='<?php echo BASE_URL;?>payslipemployee/generateemployeepayslip/id/<?php echo $this->id; ?>';
+        $.blockUI({ width:'50px',message: $("#spinner").html() });
+        $.ajax({
+            url:ajaxURL,
+            type :'POST',
+            data:'month='+month,
+            success:function(msg){ 
+               // console.log(msg); exit();
+                $.unblockUI();
+                if(msg == false){
+                    window.location = '<?php echo BASE_URL;?>payslipemployee';
+                    //alert('Month of employee joining date must be less than current month to prepare payslip for previous month.');
+                } else if(msg == 2) {
+                    window.location = '<?php echo BASE_URL;?>payslipemployee';
+                }else {
+                    window.location = '<?php echo BASE_URL;?>payslipemployee';
+                }
+            },
+            error: function(xhr, status, error) {
+                var err = eval("(" + xhr.responseText + ")");
+                alert(err.Message);
+              }
+        });
+    });
+});
+</script>

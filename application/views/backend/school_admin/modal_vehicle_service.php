@@ -1,6 +1,6 @@
  <div class="row">
-	<div class="col-sm-12">    
-        <div class="white-box">
+	<div class="col-md-12">    
+        <!--<div class="">-->
         <?php echo form_open(base_url() . 'index.php?school_admin/manage_vehicle_details/service/'.$param2 ,  array('class' => ' form-material form-groups-bordered validate', 'enctype' => 'multipart/form-data')); ?>
 
                 <div class="form-group">
@@ -34,11 +34,10 @@
                 </div>
                 </div>
                 <div class="form-group">
-                    <div class="text-right">
-                        <input  type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Submit"/>
+                    <div class="text-center">
+                        <input  type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Send to Service"/>
                     </div>
                     </div>
-                </div>   
             <?php echo form_close(); ?>
         </div>
     </div>

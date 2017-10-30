@@ -30,19 +30,19 @@
 
 <link rel="stylesheet" href="<?php echo base_url('assets/css/gallery-grid.css')?>"/>
 <style>
-.taggd__button {
-    
-}
-.taggd__popup {    
-    padding: .75rem;
+.tagview {
+    border: 1px solid #ea1553;
+    width: 100px;
+    height: 100px;
     position: absolute;
-    left: 50%;
-    top: 125%;
-    color: #fff;
+    display: block;
+    opacity: 0;
+    color: #FFFFFF;
     text-align: center;
-    white-space: nowrap;
-    background-color: rgba(219, 50, 92, 0.75);
-    transform: translateX(-50%);
+    z-index:9;
+}
+.tagview:hover {
+    display: block !important;
 }
 </style>
 
@@ -58,10 +58,6 @@
 <script src="<?php echo base_url('assets/bower_components/photoswipe/dist/photoswipe.min.js')?>"></script> 
 <!-- UI JS file -->
 <script src="<?php echo base_url('assets/bower_components/photoswipe/dist/photoswipe-ui-default.min.js')?>"></script> 
-
-
-<link rel="stylesheet" href="<?php echo base_url('assets/bower_components/taggd/dist/taggd.css')?>"> 
-<script src="<?php echo base_url('assets/bower_components/taggd/dist/taggd.js')?>"></script> 
 
 <div class="row m-0">
     <div class="col-md-12 white-box">
@@ -81,18 +77,37 @@
             <div class="col-md-12">
                 <div class="row">
                     <?php foreach($images as $i=>$img){
-                        echo (($i % 6) == 0)?'</div><div class="row">':'';?>
+                        echo ($i!=0 && ($i % 6) == 0)?'</div><div class="row">':'';?>
                         <div class="col-md-2 mt10">
-                            <a class="btn btn-primary btn-xs pull-lefft" href="<?php echo base_url('index.php?school_admin/gallery_img_edit/'.$img->id);?>">
-                                <i class="fa fa-pencil"></i>
-                            </a>
-                            <a class="btn btn-danger btn-xs pull-right" href="javascript:void(0)" 
-                                onclick="confirm_act('<?php echo base_url('index.php?school_admin/gallery_img_delete/'.$img->id);?>')"><i class="fa fa-trash-o"></i>
-                            </a>
+                            <div class="btn-group pull-right">
+                                <a class="btn btn-primary btn-xs" 
+                                    onClick="window.location.href='<?php echo base_url('index.php?'.$this->session->userdata('login_type').'/gallery_img_edit/'.$img->id);?>'">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
+                                <a class="btn btn-danger btn-xs" href="javascript:void(0)" 
+                                    onclick="confirm_act('<?php echo base_url('index.php?'.$this->session->userdata('login_type').'/gallery_img_delete/'.$img->id);?>')"><i class="fa fa-trash-o"></i>
+                                </a>
+                            </div>
                             <br><br>
-                            <a class="lightbox mt5" href="<?php echo $img->bucket.$img->main?>" data-type="thumb-a" data-size="<?php echo $img->size?>"
-                                style="width:170px;height:170px;">
-                                <img src="<?php echo $img->bucket.$img->thumb?>" class="img-thumbnail">
+                            <a class="lightbox mt5" href="<?php echo $img->bucket.$img->main?>" data-type="thumb-a" data-size="<?php echo $img->size?>">
+                                <img src="<?php echo $img->bucket.$img->thumb?>" class="img-thumbnail" alt="<?php echo $img->title?>">
+                                <small style="word-wrap: break-word;"><?php echo $img->title?></small><br/>
+                                <small class="posted-by" style="word-wrap: break-word;"><?php echo get_phrase('posted_by').': '.$img->created_by_name?></small>
+                                <p class="photo-brief dis-none"><?php echo $img->brief?></p>
+                                <p class="photo-tags dis-none" data-tags="<?php echo count($img->peoples)?>">
+                                    <?php foreach($img->peoples as $pi=>$peo){?>
+                                        <?php echo $peo->user_name.($pi+1==count($img->peoples)?'':',')?>
+                                    <?php }?>
+                                </p>
+                                <div class="face-tags dis-none">
+                                    <?php foreach($img->faces as $i=>$face){?>
+                                        <div class="tagview" style="left:<?php echo $face->mouesX?>px; top:<?php echo $face->mouseY?>px;" 
+                                            data-num="<?php echo $i?>" data-imgW="<?php echo $face->imgW?>" data-imgH="<?php echo $face->imgH?>">
+                                            <div class="square"></div>
+                                            <div class="person"><?php echo $face->user_name?></div>
+                                        </div>
+                                    <?php }?>
+                                </div>
                             </a>
                         </div>
                     <?php }?>
@@ -106,7 +121,7 @@
 <div id="add-images" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <!-- Modal content-->
-    <form method="post" action="<?php echo base_url('index.php?school_admin/photo_gallery_images/'.$gallery->id)?>" enctype="multipart/form-data">
+    <form method="post" action="<?php echo base_url('index.php?'.$this->session->userdata('login_type').'/photo_gallery_images/'.$gallery->id)?>" enctype="multipart/form-data">
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -244,6 +259,15 @@ var initPhotoSwipeFromDOM = function(gallerySelector) {
             if(mg.attr('alt')) {
                 item.title = mg.attr('alt'); 
             }
+            if($(figureEl).find('.photo-brief').html()!='') {
+                item.title = item.title+'<br/><small>'+$(figureEl).find('.photo-brief').html()+'</small>'; 
+            }
+            if($(figureEl).find('.photo-tags').data('tags')>0) {
+                item.title = item.title+'<br/><small>Tags: '+$(figureEl).find('.photo-tags').html()+'</small>'; 
+            }
+            if($(figureEl).find('.posted-by').length>0) {
+                item.title = item.title+'<br/><small>'+$(figureEl).find('.posted-by').text()+'</small>'; 
+            }
 
             if(figureEl.children.length > 0) {
                 // <img> thumbnail element, retrieving thumbnail url
@@ -268,16 +292,18 @@ var initPhotoSwipeFromDOM = function(gallerySelector) {
         e.preventDefault ? e.preventDefault() : e.returnValue = false;
 
         var eTarget = e.target || e.srcElement;
+        if(eTarget.tagName.toUpperCase() !== 'IMG'){
+            //console.log($(eTarget).parent());
+            return false;
+        }
 
         // find root element of slide
         var clickedListItem = closest(eTarget, function(el) {
-            //console.log('a',eTarget,el,el.tagName,'end');
+            //console.log('--',eTarget,el,el.tagName,'end');
             //return (el.tagName && el.tagName.toUpperCase() === 'FIGURE');
+
             return (el.tagName && el.tagName.toUpperCase() === 'IMG');
         });
-        //console.log($(eTarget).attr('src'));
-        //console.log('qw',clickedListItem);
-        //console.log(clickedListItem.parentNode,clickedListItem.parentNode.childNodes,clickedListItem.parentNode.childNodes.length);
 
         if(!clickedListItem) {
             return;
@@ -397,6 +423,55 @@ var initPhotoSwipeFromDOM = function(gallerySelector) {
         // Pass data to PhotoSwipe and initialize it
         gallery = new PhotoSwipe( pswpElement, PhotoSwipeUI_Default, items, options);
         gallery.init();
+
+        gallery.listen('imageLoadComplete', function(index, item) { 
+            resizeTags();
+        });
+
+        gallery.listen('afterChange', function() { 
+            resizeTags();
+        });
+
+        // Viewport size changed
+        /* gallery.listen('resize', function() { 
+            resizeTags();
+        }); */
+
+        gallery.listen('initialZoomOut', function() { resizeTags(); });
+
+        // Closing zoom out animation finished
+        gallery.listen('initialZoomOutEnd', function() { resizeTags(); });
+
+        function resizeTags(){
+            faceTags = $('.lightbox:eq('+gallery.getCurrentIndex()+')').find('.face-tags').html();
+            $(gallery.currItem.container).find('.tagview').remove();
+            $(gallery.currItem.container).append(faceTags);
+            
+            $curImg = $(gallery.currItem.container.children[0]);
+            newWh = {w:$curImg.width(),h:$curImg.height()};
+            $(gallery.currItem.container).find('.tagview').each(function(i,o){
+                var lastWh = {w:$(o).data('imgw'),h:$(o).data('imgh')};
+                Y = $(o).css('top').slice(0,-2);    
+                X = $(o).css('left').slice(0,-2); 
+                  
+                Ph = (parseFloat(newWh.h)/parseFloat(lastWh.h))*100;
+                NY = parseFloat(Y*Ph/100);
+                $(o).css('top',NY+'px');
+                
+                Pw = (parseFloat(newWh.w)/parseFloat(lastWh.w))*100;
+                NX = parseFloat(X*Pw/100);
+                $(o).css('left',NX+'px');
+                
+                $(o).data('imgw',newWh.w);
+                $(o).data('imgh',newWh.h);
+
+                
+                ObW = parseFloat($(o).width()*Pw/100);
+                ObH = parseFloat($(o).height()*Ph/100);
+                $(o).css('width',ObW);
+                $(o).css('height',ObH);
+            });
+        }
     };
 
     // loop through all gallery elements and bind events
@@ -417,6 +492,13 @@ var initPhotoSwipeFromDOM = function(gallerySelector) {
 
 // execute above function
 initPhotoSwipeFromDOM('.tz-gallery');
+
+$(document).on('mouseover','.tagview',function( ) {
+    var pos = $( this ).position();
+    $(this).css({ opacity: 1.0 }); // div appears when opacity is set to 1.
+}).on('mouseout','.tagview',function( ) {
+    $(this).css({ opacity: 0.0 }); // hide the div by setting opacity to 0.
+});
 
 $('form').submit(function(){
     $('#add-images').modal('hide');

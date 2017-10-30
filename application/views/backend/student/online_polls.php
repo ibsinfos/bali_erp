@@ -29,8 +29,8 @@
             <?php } } ?>
         </div>
 
-        <div class="col-md-12 text-right no-padding">                    
-            <button disabled="true" value="" onclick="submitPoll(<?php echo $row['poll_id'];?>)" class="poll_submit fcbtn btn btn-danger btn-outline btn-1d" id="pollsubmit_<?php echo $row['poll_id'];?>" >Submit Poll</button>
+        <div class="col-md-12 text-center no-padding">                    
+            <button disabled="true" value="" onclick="submitPoll(<?php echo $row['poll_id'];?>)" class="poll_submit fcbtn btn btn-danger btn-outline btn-1d" id="pollsubmit_<?php echo $row['poll_id'];?>" >Vote</button>
         </div>
     </div>
 </div>
@@ -51,6 +51,8 @@ if($count == 0) {  ?>
     }
     
     function submitPoll(poll_id) {
+        $('body').loading('start');
+        disabledButton(poll_id);
         var answer_id           =   $('#pollsubmit_'+poll_id).val(); 
         $.ajax({
             url: '<?php echo base_url(); ?>index.php?ajax_controller/poll_student/',
@@ -64,5 +66,9 @@ if($count == 0) {  ?>
                 //alert("error");
             }
         });
+    }
+    
+    function disabledButton (poll_id) {
+        $('#pollsubmit_'+poll_id).prop("disabled", true);
     }
 </script>

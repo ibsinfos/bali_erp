@@ -431,7 +431,7 @@ class Default_TimezoneController extends Zend_Controller_Action
 				}
 				
 				
-				$timezonesData = $timezonemodel->fetchAll("isactive = '1' AND school_id ='".$school_id."'",'timezone')->toArray();
+				$timezonesData = $timezonemodel->fetchAll("isactive = '1'",'timezone')->toArray();
 				$opt ='';   
 				foreach($timezonesData as $record)
 				{

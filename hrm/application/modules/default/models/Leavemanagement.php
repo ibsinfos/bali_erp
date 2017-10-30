@@ -194,10 +194,16 @@ class Default_Model_Leavemanagement extends Zend_Db_Table_Abstract
 	
 	public function SaveorUpdateLeaveManagementData($data, $where)
 	{
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
 	    if($where != ''){
 			$this->update($data, $where);
 			return 'update';
 		} else {
+                        $data['school_id'] = $school_id;
 			$this->insert($data);
 			$id=$this->getAdapter()->lastInsertId('main_leavemanagement');
 			return $id;
@@ -225,10 +231,15 @@ class Default_Model_Leavemanagement extends Zend_Db_Table_Abstract
 	
 	public function getsatholidaycount()
 	{
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
 	   $select = $this->select()
     					   ->setIntegrityCheck(false)	
                            ->from(array('l'=>'main_leavemanagement'),array('satholiday'=>'if(l.is_satholiday = 1,"yes","no")'))
-						   ->where('l.isactive = 1');  		   					   				
+						   ->where('l.isactive = 1 and l.school_id='.$school_id);  		   					   				
 		return $this->fetchAll($select)->toArray(); 
 	
 	}
@@ -258,12 +269,17 @@ class Default_Model_Leavemanagement extends Zend_Db_Table_Abstract
 	
 	public function getWeekendDetails($deptid)
 	{
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
             if($deptid != '')
             {
                 $select = $this->select()
                                 ->setIntegrityCheck(false)	
                                 ->from(array('l'=>'main_leavemanagement'),array('weekendstartday'=>'l.weekend_startday','weekendday'=>'l.weekend_endday','is_halfday','is_leavetransfer','is_skipholidays'))
-                                ->where('l.department_id = '.$deptid.' AND l.isactive = 1');  		   					   				
+                                ->where('l.department_id = '.$deptid.' AND l.isactive = 1 AND l.school_id='.$school_id);  		   					   				
                 return $this->fetchAll($select)->toArray(); 		
             }
             else 
@@ -272,14 +288,19 @@ class Default_Model_Leavemanagement extends Zend_Db_Table_Abstract
 	
 	public function getWeekendNamesDetails($deptid)
 	{
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
             if(!empty($deptid))
             {
-	   $select = $this->select()
+                $select = $this->select()
     					   ->setIntegrityCheck(false)	
                            ->from(array('l'=>'main_leavemanagement'),array('weekendstartday'=>'l.weekend_startday','weekendday'=>'l.weekend_endday','is_halfday','is_leavetransfer','is_skipholidays'))
 						   ->joinLeft(array('w'=>'tbl_weeks'), 'w.week_id=l.weekend_startday',array('daystartname'=>'w.week_name'))	
                            ->joinLeft(array('wk'=>'tbl_weeks'), 'wk.week_id=l.weekend_endday',array('dayendname'=>'wk.week_name'))
-						   ->where('l.department_id = '.$deptid.' AND l.isactive = 1');  		   					   				
+						   ->where('l.department_id = '.$deptid.' AND l.isactive = 1 AND l.school_id='.$school_id);  		   					   				
 		return $this->fetchAll($select)->toArray(); 
             }
             else 
@@ -289,10 +310,15 @@ class Default_Model_Leavemanagement extends Zend_Db_Table_Abstract
 	
 	public function getActiveleavemanagementId($id)
 	{
+            $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
 	  $select = $this->select()
 						->setIntegrityCheck(false)
 						->from(array('l'=>'main_leavemanagement'),array('l.*'))
-					    ->where('l.id = '.$id.' AND l.isactive = 1');
+					    ->where('l.id = '.$id.' AND l.isactive = 1 AND l.school_id='.$school_id);
 	
 		return $this->fetchAll($select)->toArray();
 	
@@ -300,13 +326,17 @@ class Default_Model_Leavemanagement extends Zend_Db_Table_Abstract
 	
 	public function getEmployeeUsedLeavesName($id,$year)
 	{
-		$db = Zend_Db_Table::getDefaultAdapter();
-		if($id)
-		{
-			$leaveData = $db->query("select * from (select leavetype_name leavetype,sum(appliedleavescount) count from main_leaverequest_summary where user_id= $id and year(createddate) = '".$year."' and isactive=1 and leavestatus = 2 group by leavetypeid) details where count<>0 ");									
-		}
-		$result= $leaveData->fetchAll();
-		return $result;
-		
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
+            $db = Zend_Db_Table::getDefaultAdapter();
+            if($id)
+            {
+                    $leaveData = $db->query("select * from (select leavetype_name leavetype,sum(appliedleavescount) count from main_leaverequest_summary where user_id= $id and year(createddate) = '".$year."' and isactive=1 and leavestatus = 2 and school_id='".$school_id."' group by leavetypeid) details where count<>0 ");									
+            }
+            $result= $leaveData->fetchAll();
+            return $result;
 	}
 }

@@ -24,7 +24,9 @@ class Hostel_registration_model extends CI_Model {
                 $data['school_id'] = $school_id;
             } 
         }
+		
         $sql = $this->db->insert($this->_table, $data);
+		
         return $sql;
     }
     public function update($data, $hostel_reg_id){
@@ -49,7 +51,27 @@ class Hostel_registration_model extends CI_Model {
         $rs = $this->db->query($sql)->result_array();
         return $rs;
     }
-    
+	
+	
+	
+    function get_available_students($class_id, $section_id,$year) {
+        $school_id = ''; $where = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $where = " and s.school_id = '".$school_id."'";
+            } 
+        }
+        $sql = 'select s.name,s.student_id, e.enroll_code from student s , enroll e LEFT JOIN hostel_registration t2 ON t2.student_id = e.student_id WHERE t2.student_id IS NULL and e.class_id="' . $class_id . '" and e.section_id="' . $section_id . '"and e.year="' . $year . '" and s.student_id=e.student_id'.$where;
+		
+		
+        $rs = $this->db->query($sql)->result();
+		
+		
+		return $rs;
+	 }
+	 
+	 
     public function get_student_info_parents($student_id){
         $school_id = ''; $where = '';
         if(($this->session->userdata('school_id'))) {
@@ -178,7 +200,7 @@ class Hostel_registration_model extends CI_Model {
                 $this->db->where('hr.school_id',$school_id);
             } 
         }
-        $this->db->select('*, s.name student_name, d.name hostel_name, hr.status, c.name class_name, sec.name section_name');
+        $this->db->select('*,hr.room_no room_detail, s.name student_name, d.name hostel_name, hr.status, c.name class_name, sec.name section_name');
         $this->db->from('hostel_registration hr');
         $this->db->join('student s', 's.student_id = hr.student_id', 'left');
         $this->db->join('enroll e', 'e.student_id = hr.student_id', 'left');
@@ -213,6 +235,9 @@ class Hostel_registration_model extends CI_Model {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
         }
+		
+		//echo $this->db->last_query();
+		
     }
     
     function get_datatables() {

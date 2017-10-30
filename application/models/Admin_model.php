@@ -247,15 +247,15 @@ if (!defined('BASEPATH'))
         return $this->db->get_where('admin', array('admin_id' => $id))->row()->image;
     }
 
-    public function get_admin_list($school_id) {
+    public function get_admin_list($school_id = '') {
         $this->db->select('admin_id id, name fname, email');
-        $this->db->where('school_id', $school_id);
+        //$this->db->where('school_id', $school_id);
 
         $data = $this->db->get($this->_table)->result_array();
 
         if(count($data)){
             foreach($data as $k => $datum){
-                $where = array('original_user_type' => 'A', 'main_user_id' => $datum['id'], 'school_id'=>$school_id);
+                $where = array('original_user_type' => 'A', 'main_user_id' => $datum['id']);
                 $this->db->from($this->_table_user_role_transaction);
                 $this->db->where($where);
                 $query = $this->db->get();

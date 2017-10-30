@@ -71,17 +71,18 @@ class Default_PayslipreportController extends Zend_Controller_Action {
         //ini_set("display_errors", 1);
         $this->_helper->layout()->disableLayout();
         //$this->_helper->viewRenderer->setNoRender();
-        $content="judhisthira";
+        $content="Rarome";
+        $year=  $this->_getParam('year', date('Y'));
         $month=  $this->_getParam('month', date('m'));
         $roll_id=  $this->_getParam('roll', "");
-        $emp_name=  $this->_getParam('emp_name', "");
+        $emp_name=  ''; //$this->_getParam('emp_name', "");
         
         $empsalarydetailsModal = new Default_Model_Empsalarydetails();
         $empLeavesModel = new Default_Model_Employeeleaves();
                 
         $filterData = array();
         $payslipDetails=new Default_Model_Payrollpayslip();
-        $filterData=$payslipDetails->get_data_with_filter($month,$roll_id,$emp_name);
+        $filterData=$payslipDetails->get_data_with_filter($month,$roll_id,$emp_name,$year);
         
         $i = 0;
         foreach($filterData as $key=>$data) {

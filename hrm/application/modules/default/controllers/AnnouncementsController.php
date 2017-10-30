@@ -236,7 +236,7 @@ class Default_AnnouncementsController extends Zend_Controller_Action
 					$loginUserId = $auth->getStorage()->read()->id;
 					$loginuserRole = $auth->getStorage()->read()->emprole;
 					$loginuserGroup = $auth->getStorage()->read()->group_id;
-					$loginuserbusinessunit_id = $auth->getStorage()->read()->businessunit_id;
+					//$loginuserbusinessunit_id = $auth->getStorage()->read()->businessunit_id;
 		}
 	 	
 		$id = $this->getRequest()->getParam('id');
@@ -256,21 +256,21 @@ class Default_AnnouncementsController extends Zend_Controller_Action
 					
 					if((isset($data[0]['status']) && $data[0]['status']==1) || $loginuserRole == SUPERADMINROLE || $loginuserGroup == HR_GROUP || $loginuserGroup == MANAGEMENT_GROUP) //
 					{
-						$bu_model = new Default_Model_Businessunits();
-						$bu_arr = $bu_model->getBU_report();
-						if(!empty($bu_arr))
-				        {
-				        	foreach ($bu_arr as $bu)
-				            {
-				            	/* if($loginuserGroup == HR_GROUP && $bu['id'] == $loginuserbusinessunit_id)
-				            		$announcementsForm->businessunit_id->addMultiOption($bu['id'],utf8_encode($bu['bu_name']));
-				            	if($loginuserGroup != HR_GROUP) */
-				            		$announcementsForm->businessunit_id->addMultiOption($bu['id'],utf8_encode($bu['bu_name']));
-							}
-				        }
+//						$bu_model = new Default_Model_Businessunits();
+//						$bu_arr = $bu_model->getBU_report();
+//						if(!empty($bu_arr))
+//				        {
+//				        	foreach ($bu_arr as $bu)
+//				            {
+//				            	/* if($loginuserGroup == HR_GROUP && $bu['id'] == $loginuserbusinessunit_id)
+//				            		$announcementsForm->businessunit_id->addMultiOption($bu['id'],utf8_encode($bu['bu_name']));
+//				            	if($loginuserGroup != HR_GROUP) */
+//				            		$announcementsForm->businessunit_id->addMultiOption($bu['id'],utf8_encode($bu['bu_name']));
+//							}
+//				        }
 						
 						$dept_model = new Default_Model_Departments();
-		                $dept_data = $dept_model->getDepartmentWithCodeList_bu($data[0]['businessunit_id']);
+		                $dept_data = $dept_model->getDepartmentWithCodeList_bu('');
 		                if(!empty($dept_data))
 		                {
 		                    foreach($dept_data as $dept)
@@ -284,7 +284,7 @@ class Default_AnnouncementsController extends Zend_Controller_Action
 							$data = $data[0];
 							$announcementsForm->populate($data);
 							$announcementsForm->post_description->setValue($data['description']);
-							$announcementsForm->businessunit_id->setValue(explode(',', $data['businessunit_id']));
+							//$announcementsForm->businessunit_id->setValue(explode(',', $data['businessunit_id']));
 							if($data['department_id'])
 								$announcementsForm->department_id->setValue(explode(',', $data['department_id']));
 							$announcementsForm->setAttrib('action',BASE_URL.'announcements/edit/id/'.$id);
@@ -342,7 +342,7 @@ class Default_AnnouncementsController extends Zend_Controller_Action
 			$loginUserId = $auth->getStorage()->read()->id;
 			$loginuserRole = $auth->getStorage()->read()->emprole;
 			$loginuserGroup = $auth->getStorage()->read()->group_id;
-			$loginuserbusinessunit_id = $auth->getStorage()->read()->businessunit_id;
+			//$loginuserbusinessunit_id = $auth->getStorage()->read()->businessunit_id;
 		} 
 	    $announcementsModel = new Default_Model_Announcements();
 		$msgarray = array();
@@ -356,7 +356,7 @@ class Default_AnnouncementsController extends Zend_Controller_Action
 				$tableid  = '';
 
 				$status_value = 1;         
-	          	$businessunit_id = $this->_getParam('businessunit_id',null);
+	          	//$businessunit_id = $this->_getParam('businessunit_id',null);
                 $department_id = $this->_getParam('department_id',null);
                 $title = $this->_getParam('title',null);
                 $description = $this->_getParam('post_description',null);
@@ -380,7 +380,7 @@ class Default_AnnouncementsController extends Zend_Controller_Action
                 	$status_value = 2;
 				
 			   	$data = array(
-                                    'businessunit_id' => count($businessunit_id) > 0?implode(',', $businessunit_id):null,
+                                    //'businessunit_id' => count($businessunit_id) > 0?implode(',', $businessunit_id):null,
                                     'department_id' => count($department_id) > 0?implode(',', $department_id):null,
                                     'title' => $title,
                                     'description' => strip_tags(trim($description)),
@@ -442,7 +442,7 @@ class Default_AnnouncementsController extends Zend_Controller_Action
 			}
 	        catch(Exception $e)
 	      	{
-	        	$msgarray['businessunit_id'] = "Something went wrong, please try again.";
+	        	//$msgarray['businessunit_id'] = "Something went wrong, please try again.";
 	            return $msgarray;
 	        }
 		} else {
@@ -476,18 +476,18 @@ class Default_AnnouncementsController extends Zend_Controller_Action
             $msgarray['file_original_names'] = $file_original_names;
             $msgarray['file_new_names'] = $file_new_names;
             
-			$bu_id = $this->_getParam('businessunit_id',null);
+			//$bu_id = $this->_getParam('businessunit_id',null);
             $options = "";
-            if(!empty($bu_id))
-            {
+//            if(!empty($bu_id))
+//            {
 				//if superadmin
-				if(strtoupper(gettype($bu_id)) == 'ARRAY')
-				{
-					$bu_id = implode(',', $bu_id);	
-				}
+//				if(strtoupper(gettype($bu_id)) == 'ARRAY')
+//				{
+//					$bu_id = implode(',', $bu_id);	
+//				}
 
                 $dept_model = new Default_Model_Departments();
-                $dept_data = $dept_model->getDepartmentWithCodeList_bu($bu_id);
+                $dept_data = $dept_model->getDepartmentWithCodeList_bu('');
                 if(!empty($dept_data))
                 {
                     foreach($dept_data as $dept)
@@ -495,7 +495,7 @@ class Default_AnnouncementsController extends Zend_Controller_Action
                     	$announcementsForm->department_id->addMultiOption($dept['id'],$dept['unitcode']." ".$dept['deptname']);
                     }
                 }
-            }
+            //}
 			return $msgarray;	
 		}	
 	}

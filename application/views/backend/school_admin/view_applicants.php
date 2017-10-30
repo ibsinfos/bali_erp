@@ -33,7 +33,7 @@
 	<button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d pull-right" onclick="showAjaxModal('<?php //echo base_url();?>index.php?modal/popup/modal_fees_seetings');" data-step="5" data-intro="On click of Fees Settings,Fees setting page will open" data-position='left'><?php //echo get_phrase("fees_settings");?></button>
 </div> -->
 
-    <table id="table" class="table_edjust table-responsive display nowrap" cellspacing="0" width="100%"  data-step="5" data-intro="<?php echo get_phrase('Lists the applicants who submitted the application to school.');?>" data-position='top'>
+    <table id="table" class="table_edjust table-responsive display nowrap" cellspacing="0" width="100%"  data-step="5" data-intro="<?php echo get_phrase('Lists_the_applicants_who_submitted_the_application_to_school.');?>" data-position='top'>
         <thead>
             <tr>
                 <th><div><?php echo get_phrase('no'); ?></div></th>   
@@ -44,7 +44,7 @@
                 <th><div><?php echo get_phrase('email_id'); ?></div></th>
                 <th><div><?php echo get_phrase('phone'); ?></div></th>
                 <!-- <th><div><?php //echo get_phrase('fees_paid'); ?></div></th> -->
-                <th data-step="6" data-position="left" data-intro="<?php echo get_phrase('Select the checkbox and enter the Form No. to generate admission form of the student.');?>"><div><?php echo get_phrase('form_status'); ?></div></th>
+                <th data-step="6" data-position="left" data-intro="<?php echo get_phrase('Select_the_checkbox_and_enter_the_Form_No._to_generate_admission_form_of_the_student.');?>"><div><?php echo get_phrase('form_status'); ?></div></th>
                 <th><div><?php echo get_phrase('form_no'); ?></div></th>
                 <th><div><?php echo get_phrase('form_id'); ?></div></th>
                 <th><div><?php echo get_phrase('counselling'); ?></div></th>
@@ -56,7 +56,7 @@
     
    <div class="row m-t-20">
      <div class="text-right col-xs-12">
-        <button type="submit"  data-step="7" data-position="left" data-intro="<?php echo get_phrase('Click on the Generate Admission button to generate the Admission Form.');?>" class="fcbtn btn btn-danger btn-outline btn-1d" id="generate_admission" name = "generate_admission" value="generate_admission"><?php echo get_phrase('generate_admisson_form'); ?></button>
+        <button type="submit"  data-step="7" data-position="left" data-intro="<?php echo get_phrase('Click_on_the_Generate_Admission_button_to_generate_the_Admission_Form.');?>" class="fcbtn btn btn-danger btn-outline btn-1d" id="generate_admission" name = "generate_admission" value="generate_admission"><?php echo get_phrase('generate_admisson_form'); ?></button>
     </div>
     
 </div> 

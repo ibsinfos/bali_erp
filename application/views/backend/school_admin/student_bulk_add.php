@@ -85,7 +85,7 @@
                     </div>
                     <div class="form-group">
                         <input type="text" name="card_id[]" id="card_id" class="form-control" style="width: 100px; margin-left: 5px;"
-                               placeholder="<?php echo get_phrase('Card Id'); ?>">
+                               placeholder="<?php echo get_phrase('Card_Id'); ?>">
                     </div>
 
                     <div class="form-group">

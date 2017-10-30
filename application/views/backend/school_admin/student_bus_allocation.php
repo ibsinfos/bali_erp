@@ -32,14 +32,14 @@
 </div>
 
 
-<?php if ($this->session->flashdata('flash_message_error')) { ?>        
+<?php if ($this->session->flashdata('flash_validation_error')) { ?>        
     <div class="alert alert-danger">
-        <?php echo $this->session->flashdata('flash_message_error'); ?>
+        <?php echo $this->session->flashdata('flash_validation_error'); ?>
     </div>
 <?php } ?>
 
 <div class="row m-0">
-<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('From here you can manage the student bus allocation.');?>" data-position="top">
+<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('From_here_you_can_manage_the_student_bus_allocation.');?>" data-position="top">
 
 
     <?php echo form_open(base_url() . 'index.php?school_admin/add_student_bus', array('class' => 'form-groups-bordered validate', 'target' => '_top')); ?> 
@@ -103,8 +103,7 @@
             </select>
         </div>
          <div class="col-md-6 form-group">
-                    <label><?php echo get_phrase('bus_stops'); ?><span class="error" style="color: red;"> *</span></label>
-                    
+                    <label><?php echo get_phrase('bus_stops'); ?><span class="error" style="color: red;"> *</span></label>                    
                         <select name="bustop_id" class="selectpicker" data-style="form-control" data-live-search="true" style="width:100%;" id="bus_stops_holder" required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_bus_stop'); ?>" onchange="get_bus();">
                             <option value=""><?php echo get_phrase('select_bus_stop'); ?></option>
                         </select>
@@ -125,18 +124,18 @@
                 <option value=""><?php echo get_phrase('select_route_first'); ?></option>
             </select>
         </div>  
-        <div class="col-md-6 form-group">
+        <!-- <div class="col-md-6 form-group">
             <label for='start_date'><?php echo get_phrase('start_date'); ?></label>
             <div class="input-group">
                 <div class="input-group-addon"><i class="icon-calender"></i></div>
                 <input id= "start_date" type="text" class="form-control mydatepicker"  name="start_date" placeholder="mm/dd/yyyy" data-validate="required" data-message-required ="Please pick a date">
             </div>
-        </div>
+        </div> -->
     </div>
 
 <!--<span  id="route_fare"></span>-->
     
-    <div class="row">    
+    <!-- <div class="row">    
         <div class="col-md-6 form-group">
             <label for='end_date'><?php echo get_phrase('end_date'); ?></label>
             <div class="input-group"><div class="input-group-addon"><i class="icon-calender"></i></div>
@@ -144,11 +143,11 @@
             </div>
         </div>
     
-    </div>
+    </div> -->
 
     <div class="text-right">
         <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d">
-	    <?php echo get_phrase('submit'); ?>
+	    <?php echo get_phrase('assign_bus'); ?>
 	</button>
     </div>
     <?php echo form_close(); ?>

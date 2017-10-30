@@ -73,6 +73,7 @@ $data = $storage->read();
 <link href="<?php echo MEDIA_PATH; ?>css/jquery.alert.css"	rel="stylesheet" type="text/css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/fonts.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/style.css" />
+<link rel="stylesheet" type="text/css"	href="<?php echo MEDIA_PATH; ?>css/erp_custom.css"/>
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/wizard_css.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/jquery.maxlength.css" />
 
@@ -202,7 +203,7 @@ function closeDialogPopup(id) {
 </script>
 <script type="text/javascript" charset="utf-8">
 $(function() {
-	setTimeout('hideMessg()',3000);
+	setTimeout('hideMessg()',10000);
 });
 function hideMessg() {
     if($("#dispmsgmenu").is(":visible"))

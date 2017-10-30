@@ -401,13 +401,100 @@
      //*******************************************Transport Transaction Functions **************************/           
 
     /*************************************Roles and Rights Fucntions****************************************/
-     function getUserRole($user_id, $user_type)
-     {
-        $school_id = $_SESSION['school_id'];
-         $query = $this->db->get_where('user_role_transaction', array('main_user_id' => $user_id, 
-             'original_user_type' => $user_type, "school_id" => $school_id))->row();
+    function getStructure($form_id)
+    {
+        // 1 for student
+        switch($form_id)
+        {
+            case '1':
+                $query = "SHOW COLUMNS FROM student";
+                $result = $this->db->query($query)->result();
+                $arrFields = array();
+                foreach($result as $row)
+                {
+                    $arrFields[] = $row->Field;
+                }
+                $query = "SHOW COLUMNS FROM sys_stud_feeconfig";
+                $result = $this->db->query($query)->result();
+                
+                foreach($result as $row)
+                {
+                    $arrFields[] = $row->Field;
+                }
+                $query = "SHOW COLUMNS FROM enroll";
+                $result = $this->db->query($query)->result();
+                
+                foreach($result as $row)
+                {
+                    $arrFields[] = $row->Field;
+                }
+            break;
+            case '2':
+                $query = "SHOW COLUMNS FROM parent";
+                $result = $this->db->query($query)->result();
+                $arrFields = array();
+                foreach($result as $row)
+                {
+                    $arrFields[] = $row->Field;
+                }
+                $query = "SHOW COLUMNS FROM guardian;";
+                $result = $this->db->query($query)->result();
+                
+                foreach($result as $row)
+                {
+                    $arrFields[] = $row->Field;
+                }
+            break;
+            case '3':
+                $query = "SHOW COLUMNS FROM enquired_students;";
+                $result = $this->db->query($query)->result();
+                $arrFields = array();
+                foreach($result as $row)
+                {
+                    $arrFields[] = $row->Field;
+                }
+                $query = "SHOW COLUMNS FROM guardian;";
+                $result = $this->db->query($query)->result();
+                
+                foreach($result as $row)
+                {
+                    $arrFields[] = $row->Field;
+                }
+               
+            break;
+        } 
       
-         $arr = array();
+        return $arrFields;
+    }
+    
+    function alter_table_varchar($table_name, $field)
+    {
+        $query = "ALTER TABLE $table_name ADD $field VARCHAR(50);"; 
+        $result = $this->db->query($query);
+    }
+    function alter_table_enum($table_name, $field, $arr_values)
+    {
+     
+        $arr_values = array_unique($arr_values);
+        $string =  "'" . implode("','", $arr_values) . "'";
+        $query = "ALTER TABLE $table_name ADD $field  enum($string);"; 
+        $result = $this->db->query($query);
+    }
+    
+    function getUserRole($user_id, $user_type)
+     {
+        if($user_type != 'A')
+        {    
+            $school_id = (!empty($_SESSION['school_id'])) ? $_SESSION['school_id'] : 0 ;
+            $query = $this->db->get_where('user_role_transaction', array('main_user_id' => $user_id, 
+             'original_user_type' => $user_type, "school_id" => $school_id))->row();
+        }
+        else
+        {    
+            $query = $this->db->get_where('user_role_transaction', array('main_user_id' => $user_id, 
+             'original_user_type' => $user_type))->row();
+        }
+        $arr = array();
          if(empty($query->role_id))
          {
              echo "<br>No Role Selected";
@@ -435,24 +522,36 @@
      
     function get_all_links($role_id=false)
     {
-        $school_id = $_SESSION['school_id'];
-        $sql = "SELECT LM.* FROM role_link_transaction
+       $school_id = (!empty($_SESSION['school_id'])) ? $_SESSION['school_id'] : 0 ;
+       $sql = "SELECT LM.* FROM role_link_transaction
                 INNER JOIN link_modules LM ON LM.`id` = role_link_transaction.`link_id`
-                WHERE role_link_transaction.role_id = '".$role_id."' and role_link_transaction.school_id = '".$school_id."' ORDER BY LM.orders";
+                WHERE role_link_transaction.role_id = '".$role_id."' and LM.school_id = '".$school_id."'  ORDER BY LM.orders";
+
                   
         return $this->db->query($sql)->result_array();
     }
 
     function getModuleLinks($role_id)
     {
-        $school_id = $_SESSION['school_id'];
+        $school_id = (!empty($_SESSION['school_id'])) ? $_SESSION['school_id'] : 0 ;
+        if($school_id > 0)
+        {    
         $sql = "
         SELECT name, link_modules.id AS link_id, image as image1
         FROM 
         role_link_transaction
         INNER JOIN link_modules ON link_modules.`id` = role_link_transaction.`link_id`
-        WHERE role_id = $role_id AND parent_id = 0 and role_link_transaction.school_id = '$school_id' order by link_modules.orders";
-        
+        WHERE role_id = $role_id AND parent_id = 0 and link_modules.school_id = '$school_id' order by link_modules.orders";
+        }
+        else
+        {
+                    $sql = "
+        SELECT name, link_modules.id AS link_id, image as image1
+        FROM 
+        role_link_transaction
+        INNER JOIN link_modules ON link_modules.`id` = role_link_transaction.`link_id`
+        WHERE role_id = $role_id AND parent_id = 0  order by link_modules.orders";
+        }    
         $query = $this->db->query($sql);
        
         return $query->result_array();
@@ -473,7 +572,7 @@
         if(count($query)>0)
         {
             
-                $sql =   "SELECT GROUP_CONCAT('', NAME) AS link_name, 
+                $sql = "SELECT GROUP_CONCAT('', NAME) AS link_name, 
                     GROUP_CONCAT('', link) AS links,GROUP_CONCAT('', image) AS image FROM link_modules
                     $join role_link_transaction on role_link_transaction.link_id = link_modules.id
                     WHERE parent_id = $link order by link_modules.orders";
@@ -508,7 +607,7 @@
            if(count($query)>0)
            {
               
-                 $sql =   "SELECT GROUP_CONCAT('', NAME) AS link_name, 
+                 $sql = "SELECT GROUP_CONCAT('', NAME) AS link_name, 
                         GROUP_CONCAT('', link) AS links,GROUP_CONCAT('', image) AS image FROM link_modules
                         $join role_link_transaction on role_link_transaction.link_id = link_modules.id
                         WHERE parent_id = $link order by link_modules.orders";
@@ -839,9 +938,13 @@
                    $this->db->where('school_id',$school_id);
                 } 
             }
-            $query = $this->db->get_where('exam', array(
-                'year' => $this->db->get_where('settings', array('type' => 'running_year'))->row()->description
-            ));
+//            $query = $this->db->get_where('exam', array(
+//                'year' => $this->db->get_where('settings', array('type' => 'running_year'))->row()->description
+//            ))->order_by('exam_id', 'desc');           
+            
+            $running_year = $this->db->get_where('settings', array('type' => 'running_year'))->row()->description;
+//            echo $running_year; die;
+            $query = $this->db->order_by('exam_id', 'desc')->get_where('exam',array('year' => $running_year)); 
             return $query->result_array();
         }
 
@@ -1070,12 +1173,22 @@
                 $image_url = base_url() . 'uploads/' . $type . '_image/' . $id . '.jpg';
                 //echo $image_url; exit;
             }else
-                $image_url = base_url() . 'uploads/user.jpg';
+                $image_url = base_url() . 'uploads/user.png';
             //echo $image_url. "fgfg"; exit; http://localhost/beta_ag/uploads/admin_image/1.jpg
             return $image_url;
         }
 
         ////////STUDY MATERIAL//////////
+        
+        public function save_dynamic_data($table, $arrData)
+        {
+            
+            $this->db->set($arrData);
+            $insert_id = $this->db->insert($table);
+            $last_id = $this->db->insert_id();
+            return $last_id;
+            
+        }
         function save_study_material_info(){
             $school_id = '';
             if(($this->session->userdata('school_id'))) {
@@ -1087,7 +1200,8 @@
             //$data['timestamp']      = strtotime($this->input->post('timestamp'));
             $data['title']          = $this->input->post('title');
             $data['description']    = $this->input->post('description');
-            $data['teacher_id']     = $this->session->userdata('teacher_id');
+            $data['uploader_id']    = $this->session->userdata('login_user_id');
+            $data['uploader_type']  = $this->session->userdata('u_type');
             $tempFile               = $_FILES['file_name']['tmp_name'];
             $data['file_name']      = $_FILES["file_name"]["name"];
             $data['file_type']      = $_FILES["file_name"]["type"];           
@@ -1142,11 +1256,13 @@
             $data['class_id'] = $this->input->post('class_id');            
             $data['file_type'] = $_FILES["file_name"]["type"];
             $data['file_name'] = $_FILES["file_name"]["name"];
+            $data['uploader_id']    = $this->session->userdata('login_user_id');
+            $data['uploader_type']  = $this->session->userdata('u_type');
             if($this->session->userdata('admin_login') == 1 ) {
-                $data['teacher_id'] = $this->input->post('teacher_id');
-                $data['modified_by']    =    'admin';
+                //$data['teacher_id'] = $this->input->post('teacher_id');
+                $data['modified_by']    =    'school_admin';
             } else if($this->session->userdata('teacher_login') == 1 ) {
-                $data['teacher_id'] = $this->session->userdata('teacher_id');
+                //$data['teacher_id'] = $this->session->userdata('teacher_id');
                 $data['modified_by']            =    'teacher';
             }
             $targetPath = "uploads/document/";
@@ -1378,7 +1494,7 @@
             return $unread_message_counter;
         }
 
-        function count_unread_message_of_thread($message_thread_code, $school_id)
+        function count_unread_message_of_thread($message_thread_code, $school_id = '')
         {
             $unread_message_counter = 0;
             $current_user = $this->session->userdata('login_type') . '-' . $this->session->userdata('login_user_id');
@@ -1567,7 +1683,7 @@
             $school_id = '';
             if(($this->session->userdata('school_id'))) {
                 $school_id = $this->session->userdata('school_id');
-                if($school_id > 0){
+                if($school_id > 0 && $table_name!='school_admin'){
                    $this->db->where('school_id',$school_id);
                 } 
             }
@@ -1765,10 +1881,11 @@
                 } 
             }
             $return             =   array();
-            $this->db->select( 'd.*,cls.name as classname, cls.class_id as class_id, t.name as teacher_name');
+            //$this->db->select( 'd.*,cls.name as classname, cls.class_id as class_id, t.name as teacher_name');
+            $this->db->select( 'd.*,cls.name as classname, cls.class_id as class_id');
             $this->db->from( 'document as d' );           
             $this->db->join( 'class as cls', ' cls.class_id = d.class_id ');
-            $this->db->join( 'teacher as t', ' t.teacher_id = d.teacher_id' );
+            //$this->db->join( 'teacher as t', ' t.teacher_id = d.teacher_id' );
             $this->db->where(array('cls.class_id' => $class_id)); 
             $this->db->order_by("d.timestamp", 'DESC'); 
             $return = $this->db->get()->result_array();

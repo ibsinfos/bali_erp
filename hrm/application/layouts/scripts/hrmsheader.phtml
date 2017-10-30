@@ -23,6 +23,11 @@
 ?>
 
 <?php
+if($_SERVER['HTTP_HOST']=='52.14.91.109' || $_SERVER['HTTP_HOST']=='localhost'){
+$url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST'].'/'.SH_CURRENT_INSTANCE."/index.php?school_admin/dashboard";
+} else {
+$url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST']."/index.php?school_admin/dashboard";
+}
 
 $status =  sapp_Global::_checkstatus();
 if($status == 'false')
@@ -89,10 +94,13 @@ if($actionName == 'viewsettings'){
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
 <meta http-equiv="Content-Language" content="en-us" />
 <link rel="shortcut icon" href="<?php echo MEDIA_PATH;?>images/sharad_logo.ico?v=2" />
+
+
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/fonts.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/style.css" />
-
-<link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/font-awesome.css">
+<link rel="stylesheet" type="text/css"	href="<?php echo MEDIA_PATH; ?>css/erp_custom.css"/>
+<link rel="stylesheet" type="text/css"	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+<!--<link rel="stylesheet" type="text/css" href="<?php //echo MEDIA_PATH; ?>css/font-awesome.css">-->
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/jquery.simplyscroll.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/jquerytour.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/jquery.jqplot.min.css" />
@@ -317,7 +325,7 @@ $(document).ready(function(){
         
     //start of menu clicks
     //$('.clickable_menu').click(function(){
-    $(document).on('click', ".clickable_menu", function() {    
+    $(document).on('click', ".clickable_menu", function() {
         var menu_url = $(this).attr("menu-url");
         var for_childs = $(this).attr("for-childs");
        
@@ -342,6 +350,8 @@ $(document).ready(function(){
     //end of menu clicks
 
     // Themes apply - START
+
+
 
     $('#themes_id').click(function() {
         $('#themes_div').toggle('slow');
@@ -382,7 +392,7 @@ function setTheme(themeName)
 </script>
 <script type="text/javascript" charset="UTF-8">
 $(function() {
-	setTimeout('hideMessg()',3000);
+	setTimeout('hideMessg()',10000);
 });
 function hideMessg() {
     if($("#messageData").is(":visible"))
@@ -894,7 +904,16 @@ else
          
        
 ?>
-            <a href="<?php echo $baseUrl; ?>/index/logout" style="text-decoration:none;" class="logo">
+            <div class="collapse_btn" onclick='hide_show_all_menus();'>
+                <div class="collapse_div">
+                    <button>
+                        <span class="menu_icon_bar"></span>
+                        <span class="menu_icon_bar"></span>
+                        <span class="menu_icon_bar"></span>
+                    </button>
+                </div>
+            </div>             
+            <a href="<?php echo $url; ?>" style="text-decoration:none;" class="logo">
                 <img src="<?php echo $orgLogoImg; ?>" onerror="this.src='<?php echo MEDIA_PATH; ?>images/hrms-logo-new.png'">
             </a>
             
@@ -981,15 +1000,26 @@ if($loginuserRole == SUPERADMINROLE)
     // if($controllerName != 'reports')
     // {
         if($controllerName == 'dashboard'  && $actionName == 'viewsettings')
-        {
+        { 
 	?>
             <div class='dragableBox tour_modulesegment'>
-                <?php echo $menu_data['parent_menu'];?>
+                
+                <?php  include "navigation.phtml"; //echo $menu_data['parent_menu'];?>
             </div>		
 	<?php
         }else 
         {
-            echo $menu_data['parent_menu'];
+            ?>
+<!--    <div class="child_menus">
+        <ul>
+            <li><a>Dashboard</a></li>
+            <li><a>Self Service</a></li>
+            <li><a>HR</a></li>
+        </ul>
+    </div>-->
+            <?php
+            include "navigation.phtml";
+           //echo $menu_data['parent_menu'];
 ?>	
 <?php				
        }
@@ -1012,35 +1042,60 @@ if($loginuserRole == SUPERADMINROLE)
 <!-- <div id="wrapper">  --> <!-- Toggle Left Menu --> <!-- <div class="toggleleftwrapper">Close</div> --> <!-- End Toggle Left Menu -->
 <div class="active" id="wrappernew">      
     <!-- Sidebar -->
-      <div id="sidebar-wrapper">
+    <div id="sidebar-wrapper" style="width:0;">
           <!--Menu-->
-      <ul class="sidebar-nav" id="sidebar_menu">
-           <li class="sidebar-brand">
-               <a href="#" id="menu-toggle">
-                  <!--<span class="glyphicon glyphicon-chevron-left" id="main_icon"></span>-->
-                  <span class="fa fa-caret-right mtg mtg-off"></span>
-                  <span class="fa fa-caret-left mtg mtg-on"></span>
-               </a>
-            </li>
-      </ul>
+<!--        <ul class="sidebar-nav" id="sidebar_menu">
+             <li class="sidebar-brand">
+                 <a href="#" id="menu-toggle">
+                    <span class="glyphicon glyphicon-chevron-left" id="main_icon"></span>
+                    <span class="fa fa-caret-right mtg mtg-off"></span>
+                    <span class="fa fa-caret-left mtg mtg-on"></span>
+                 </a>
+              </li>
+        </ul>-->
        								    
 <?php 
     if($loginuserRole == 1 || in_array($data->group_id,array(SYSTEMADMIN_GROUP,MANAGEMENT_GROUP,HR_GROUP,MANAGER_GROUP,EMPLOYEE_GROUP,USERS_GROUP,CUSTOM_GROUP)))
     {
         if($actionName != 'viewsettings')
-        {                         
-            echo $menu_data['childs_menu'];            
+        {     
+            ?>
+          
+          <?php
+           //echo $menu_data['childs_menu'];                       
+?>
+<!--          <div class="child_menus" style="display: none;">
+              <ul>
+                  <li>
+                      <i class="fa fa-list"></i>
+                      <span>Employees</span>
+                  </li>
+                  <li>
+                      <i class="fa fa-list"></i>
+                      <span>Employees</span>
+                  </li>
+                  <li>
+                      <i class="fa fa-list"></i>
+                      <span>Employees</span>
+                  </li>
+                  <li>
+                      <i class="fa fa-list"></i>
+                      <span>Employees</span>
+                  </li>
+              </ul>
+          </div>        -->
+<?php
         }
         else
         { ?>
-            <div class='dragableBox tour_modulesegment'><ul><?php echo $menu_data['childs_menu']; ?></ul></div>
+            <div class='dragableBox tour_modulesegment'><ul><?php //echo $menu_data['childs_menu']; ?></ul></div>
     <?php	
 
         }
     }
     
 ?>
- <div class="shortcuts"><h1>Shortcuts</h1><div class="short-text-ctrl"><?php echo $this->shortcuticons($loginUserId); ?></div></div>
+            <div class="shortcuts"><h1>Shortcuts</h1><div class="short-text-ctrl"><?php //echo $this->shortcuticons($loginUserId); ?></div></div>
                                         
 </div>
 <div id="page-content-wrapper">
@@ -1090,7 +1145,7 @@ $notdraggablemenuArr = array('viewsettings','dashboard','welcome','index','polic
    
 if(!in_array($controllerName,$notdraggablemenuArr) && $actionName == 'index'){ 
 ?>
-    <div id="pageshortcutdiv" class="shortcut_div help_appri_list">
+        <div id="pageshortcutdiv" class="shortcut_div help_appri_list" style="display: none;">
 		<?php 
 		if(in_array($controllerName,$appraisalmenuArr))
 		 	{
@@ -1380,4 +1435,7 @@ function parent_menu_selected(selected_obj)
     }
         
 }
+
+
+
 </script>				

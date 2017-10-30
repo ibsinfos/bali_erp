@@ -13,7 +13,11 @@
     </div>
     <!-- /.breadcrumb -->
 </div>
-
+<?php if ($this->session->flashdata('flash_validation_error')) { ?>        
+    <div class="alert alert-danger">
+        <?php echo $this->session->flashdata('flash_validation_error'); ?>
+    </div>
+<?php } ?>
 <div class="panel panel-danger block6" data-step="5" data-intro="<?php echo get_phrase('For Information');?>" data-position='bottom'>
     <div class="panel-heading">Dear Students,
         <div class="pull-right">
@@ -22,7 +26,7 @@
     </div>
 
     <div class="panel-wrapper collapse in" aria-expanded="true">
-        <div class="panel-body"><p> Please feel free to share your valuable feedback about the faculties. We are happy to hear from you.</p></div>
+        <div class="panel-body"><p>Please feel free in sharing your valuable feedback with us! We feel happy hearing from you.</p></div>
     </div>
 </div>
 
@@ -32,7 +36,7 @@
             <div class="white-box" data-step="6" data-intro="<?php echo get_phrase('Here you just fill information');?>" data-position='top'>
                 <div class ="row m-0">
                     <div class="col-sm-6 form-group">
-                        <label for="teacher_id" class="control-label"><?php echo get_phrase('select_teacher'); ?>:<span class="mandatory"> *</span></label>
+                        <label for="teacher_id" class="control-label m-b-5"><?php echo get_phrase('select_teacher'); ?>:<span class="mandatory"> *</span></label>
 
                         <select data-style="form-control" data-live-search="true" class="selectpicker" name="teacher_id" id="teacher">
                             <option value=" "><?php echo get_phrase('select_teacher');?></option><?php foreach($teacher_list as $list):?>
@@ -43,9 +47,9 @@
                     </div> 
 
                     <div class="col-sm-6 form-group">
-                        <label class="control-label col-sm-2" for="rating"><?php echo get_phrase('Rating');?>:<span class="mandatory"> *</span></label>
-
-                        <fieldset class="rating m-top">
+                        <label class="control-label m-l-20 m-b-3" for="rating"><?php echo get_phrase('Rating');?>:<span class="mandatory"> *</span></label>
+                        <br>
+                        <fieldset class="rating control-label m-l-15">
                             <input type="radio" id="star5" name="rating" value="5" /><label class = "full" for="star5" title="Excellent - 5 stars"></label>
                             <input type="radio" id="star4" name="rating" value="4" /><label class = "full" for="star4" title="Pretty good - 4 stars"></label>
                             <input type="radio" id="star3" name="rating" value="3" /><label class = "full" for="star3" title="Good - 3 stars"></label>
@@ -57,7 +61,7 @@
 
                 <div class="row m-0">
                     <div class="col-sm-12 form-group p-r-0">
-                        <label for="feed_back" class="control-label"><?php echo get_phrase('enter_your_feed_back'); ?>:<span class="mandatory"> *</span></label>
+                        <label for="feed_back" class="control-label m-b-5"><?php echo get_phrase('enter_your_feed_back'); ?>:<span class="mandatory"> *</span></label>
                         <br/>
                         <div class="input-group col-sm-12">
                             <div class="input-group-addon"><i class="fa fa-tags"></i></div>
@@ -69,7 +73,7 @@
                 
                 <div class="row m-0">
                     <div class="col-xs-12 text-right">
-                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit');?></button>
+                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('add_feedback');?></button>
                     </div>  
                 </div>
             </div>

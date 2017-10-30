@@ -31,12 +31,12 @@ $cYear = date('Y') + 1;
 <div class="">
 
     <div class="m-b-0 text-right">
-        <span value="Advance Filter" id="FilterStudentData" value="Advance Filter" name="FilterStudentData" onclick="window.open('<?php echo base_url() . "index.php?admin_report/student_misc_report_advance_filter/"; ?>');" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Advance Filter" data-step="5" data-intro="From here you can filter search the students." data-position='left'>
+        <span value="Advance Filter" id="FilterStudentData" value="Advance Filter" name="FilterStudentData" onclick="window.open('<?php echo base_url() . "index.php?admin_report/student_misc_report_advance_filter/"; ?>');" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Advance Filter" data-step="5" data-intro="<?php echo get_phrase('From_here_you_can_filter_search_the_students.'); ?>" data-position='left'>
             <i class="fa fa-filter"></i>
         </span>
     </div>
 
-    <div class="col-md-12 white-box m-t-20" data-step="6" data-intro="<?php echo get_phrase('Here you can select the running session and the class.');?>" data-position="top">
+    <div class="col-md-12 white-box m-t-20" data-step="6" data-intro="<?php echo get_phrase('Here_you_can_select_the_running_session_and_the_class.');?>" data-position="top">
         <div class="col-sm-6 form-group">
             <label class="control-label" style="margin-bottom: 5px;"><?php echo get_phrase('running_session'); ?></label>
             <span class="error" style="color: red;"> </span>
@@ -87,7 +87,7 @@ $cYear = date('Y') + 1;
 <div class="">
 
 
-    <div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('Here you can view the list of students.');?>" data-position="top">
+    <div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('Here_you_can_view_the_list_of_students.');?>" data-position="top">
 
         <div class="sttabs tabs-style-flip">
 

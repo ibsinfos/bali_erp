@@ -1,0 +1,330 @@
+@font-face {
+    font-family: 'rubiklight';
+    src: url('../fonts/rubik-light-webfont.woff2') format('woff2'),
+         url('../fonts/rubik-light-webfont.ttf') format('truetype'),
+         url('../fonts/rubik-light-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+*{
+    font-family: rubiklight;
+}
+
+body{
+/*    font-family: 'rubiklight';*/
+}
+
+#header{
+    background-color: #707CD2;
+    min-height: 60px;
+}
+
+#header a.logo{
+    margin: 16px 0 0 10px;
+}
+
+#header a.logo img{
+    width: 190px;
+    max-height: 40px;
+    max-width: 100%;
+    height: auto;
+}
+
+#header .links{
+    background-color: #707CD2;
+}
+
+a.userprofilepic img{
+    border: 1px solid #707CD2;
+}
+
+.home_menu .menu-head{
+    background: #707CD2 !important;
+    padding: 7px 0 7px 10px !important;
+}
+
+.menu-head ul li.link-selected b{
+    background: #FF7676 none repeat scroll 0 0 !important;
+}
+
+.wrapper-dropdown-sf, .wrapper-dropdown-sf.active{
+    background: #FF7676;
+    color: #fff;
+}
+
+.wrapper-dropdown-sf::after{
+    border-color: #fff transparent;
+}
+
+.child_menus{
+    background-color: #707CD2;height: 100px; width: 60%; float: left; position: absolute; z-index: 99999; height: 100%; overflow:auto; margin-left: -2px; top: 0; left: 0;
+}
+
+.hide_ele{
+    display: none !important;
+}
+
+.show_ele{
+    display: block !important;
+}
+
+
+.child_menus ul li, .child_menus ul li ul li{
+    float: left; padding: 15px 15px; background-color: #707CD2;border-right: 1px solid #6875cc; border-bottom: 1px solid #6875cc; list-style: none;
+    color: #fff;
+    cursor: pointer;
+    width: 21.09%;
+    height: 150px;
+    z-index: 99999;
+    text-align: center;
+}
+
+.child_menus ul li span{
+    width: 100%;
+    height: inherit;
+}
+
+.child_menus ul li span a{
+    width: 100%;
+    height: 100%;
+    float: left;
+}
+
+.child_menus ul li:hover{
+    background-color: #FF7676;
+}
+
+.child_menus ul li i{
+    display: block;
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+.child_menus ul li span{
+    display: block; line-height: 26px;
+    margin-top: 20px;font-size: 18px;
+}
+
+.child_menus ul li span a, .child_menus ul li span a:hover{
+    color: #fff !important;
+    text-decoration: none;
+    font-size: 20px;
+}
+
+.menu_collapsible{
+    background-color: #707CD2;
+    color: #fff;
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 0px;
+    cursor: pointer;
+    padding: 12px 15px;
+    margin-left: -2px;
+    position: absolute;
+    z-index: 999999;
+    width: 15%;
+    text-align: left;
+}
+
+#wrappernew.active .mtg-on, .sidebar-nav > .sidebar-brand{
+    display: none;
+}
+
+#wrappernew.active #sidebar-wrapper{
+    text-align: left;
+}
+
+.shortcuts{
+    margin-top: 25px;
+}
+
+.uploadbut_exel{
+    background-color: #FF7676;
+}
+
+.menu_icon_bar{
+    width: 20px;
+    background-color: #fff;
+    height: 2px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+a.side-menu-selected{
+    background: none !important;
+    color: #fff !important;
+}
+/*
+.child_menus ul li span.scroll-menu{
+    display: none;
+    margin-top: 0;
+}
+
+.menu-head ul li{
+    margin: 0 !important;
+}*/
+
+.collapse_btn{
+    float: left;
+    text-align: center;
+    padding-left: 0;
+    margin-top: 0px;
+    background-color: #6875CC;
+    height: 60px;
+    padding-right: 0;
+    cursor: pointer;
+    width: 4%;
+    z-index: 9999999 !important;
+}
+
+.collapse_div{
+    margin-top: 0;
+    height: 60px;
+    padding: 0 10px;
+    cursor: pointer;
+     z-index: 9999999 !important;
+}
+
+.collapse_div button{
+    margin-top: 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+     z-index: 9999999 !important;
+}
+
+.acc_li{
+    display: none;
+}
+
+.parent_menu_class{
+    position: relative;
+}
+
+.parent_menu_class ul{
+    position: absolute;
+    display: inline-block;
+    background-color: #008000;
+    z-index: 100000000000;
+    margin-top: 482px;
+    width: 100%;
+    float: left;
+    min-height: 100px;
+    display:none;
+}
+
+#wrappernew.active{
+    padding-left: 0;
+}
+
+.logonew_place{
+    background: url(../images/logo_ag.png) !important;
+    background-repeat: no-repeat;
+    background-size: 100% 100px !important;
+    height: 100px !important;
+    width: 100%;
+}
+
+a.userprofilepic{
+    height: 60px;
+}
+
+a.userprofilepic img {
+    margin: 15px 0 0 15px;
+}
+
+a.userprofilepic span{
+    margin: 20px 0 0 10px;
+}
+
+a.userprofilepic b{
+    margin: 27px 10px 0 0;
+}
+
+.shortcuts {
+    display:none;
+}
+
+
+
+/* header plus icon remove */
+
+.wrapper-demo{
+    display: none;
+}
+
+/*.wrapper-dropdown-sf::after{
+    display:none;
+}
+
+.wrapper-dropdown-sf span, .wrapper-dropdown-sf.active span{
+    display: none !important;
+}
+.wrapper-dropdown-sf{
+    width: auto;
+}*/
+
+table.grid thead th a{
+        font-family: 'Roboto Bold',sans-serif !important;
+    }
+    
+    
+.more_subnav{
+    font-size: 12px !important; 
+    text-align: right;
+    margin-top:-6px;
+}
+
+    
+.more{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin-top: 0;
+    font-size: 14px !important; 
+/*    font-size: 12px !important; 
+    text-align: right;
+    margin-top:2px;*/
+}
+
+.configurewizard{
+    margin-top: 16px;
+}
+
+#back_btn span a i {
+    margin-top: 30%;
+    font-size: 40px;
+}
+
+#maincontentdiv{
+    border: solid 1px #ccc;
+    padding: 15px;
+    width: 94%;
+}
+
+#generate{
+    background-color: #208bbd;
+color: #fff;
+padding: 5px 15px;
+margin-top: 0px;
+}
+
+.table th.info, .table td {
+    width: 25%;
+}
+
+.new-form-ui-submit button{
+    text-align: center;
+    float:none;
+}
+
+.new-form-ui-submit{
+    text-align: center;
+    margin-left: 0 !important;
+}
+
+.new-form-ui-submit input[type="submit"], .new-form-ui-submit input[type="button"], .cancel-set .new-form-ui-submit input[type="submit"], .cancel-set .new-form-ui-submit input[type="button"], .create_new_group{
+    float: none;
+}

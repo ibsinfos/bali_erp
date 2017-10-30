@@ -122,7 +122,6 @@ class Zend_View_Helper_Grid extends Zend_View_Helper_Abstract {
             $editpopup_str = '<a id="edit{{id}}" onclick="displaydeptform(\'' . BASE_URL . $dataArray['objectname'] . '/' . $editaction . '/id/{{id}}' . $con . '/popup/1\',\'' . $menunamestr . '\')" name="{{id}}" class="sprite edit"  title=\'Edit\' ></a>';
             $deletepopup_str = '<a name="{{id}}" id="del{{id}}" onclick= changestatus(\'' . $dataArray['objectname'] . '\',\'{{id}}\',\'' . $msgdta . '\')	href= javascript:void(0) title=\'Delete\' class="sprite delete" ></a>';
 
-
             if (!in_array('view', $actions_arr) && !in_array('edit', $actions_arr) && !in_array('delete', $actions_arr)) {
                 if ($dataArray['objectname'] == 'processes') {
 
@@ -152,7 +151,11 @@ class Zend_View_Helper_Grid extends Zend_View_Helper_Abstract {
 								</div>');
                 }
             }
-        } else {
+            
+            
+            
+        } else { 
+            
             $formgridVal = '';
             if ($dataArray['objectname'] == 'payrollgroup' || $dataArray['objectname'] == 'payrollcategory')
                 $view_str = '';
@@ -163,6 +166,10 @@ class Zend_View_Helper_Grid extends Zend_View_Helper_Abstract {
                 //echo 'll'.PHP_EOL;
                 $view_str = '<a href= "' . BASE_URL . $dataArray['objectname'] . '/view/id/{{id}}" name="{{id}}" class="sprite view"  title=\'View\'></a>';
             }
+            
+            
+            
+            
             if ($dataArray['objectname'] == 'appraisalconfig' || $dataArray['objectname'] == 'appraisalcategory' || $dataArray['objectname'] == 'appraisalquestions' || $dataArray['objectname'] == 'appraisalmanager' || $dataArray['objectname'] == 'feedforwardquestions' || $dataArray['objectname'] == 'announcements' || $dataArray['objectname'] == 'disciplinarymyincidents')
                 $edit_str = '<a href= "' . BASE_URL . $dataArray['objectname'] . '/edit/id/{{id}}" name="{{id}}" id="edit{{id}}" class="sprite edit"  title=\'Edit\'></a>';
             elseif ($dataArray['objectname'] == 'manageremployeevacations') {
@@ -170,11 +177,17 @@ class Zend_View_Helper_Grid extends Zend_View_Helper_Abstract {
             } else {
                 if ($controllerName != 'payslipgroup') 
                     $edit_str = '<a href= "' . BASE_URL . $dataArray['objectname'] . '/edit/id/{{id}}" name="{{id}}" class="sprite edit"  title=\'Edit\'></a>';                                //echo $edit_str.PHP_EOL;
+                if($controllerName == 'payrollgroup'){
+                    $edit_str = '<a href= "' . BASE_URL . $dataArray['objectname'] . '/edit/id/{{id}}" name="{{id}}" title=\'Edit\'>Assign</a>';               
+                }
             }
             if ($controllerName == 'payslipgroup' || $controllerName == 'payslipemployee') {
-                $delete_str = '<a href="' . BASE_URL . $controllerName.'/generate/id/{{id}}" onclick="return showConfirm();" name="{{id}}" id="generate_payslip_{{id}}"  title="Generate">Generate</a>';
+                $delete_str = '';
+                //$delete_str = '<a href="' . BASE_URL . $controllerName.'/generateemployeepayslip/id/{{id}}" onclick="return showConfirm();" name="{{id}}" id="generate_payslip_{{id}}"  title="Generate">Generate</a>&nbsp;'
+                       // . '<a class="sprite generate_icon" href="' . BASE_URL . $controllerName.'/generateemployeepayslip/id/{{id}}" onclick="return showConfirm();" name="{{id}}" id="generate_payslip_new_{{id}}" style="display:none;" title="Generate"></a>';
                 if($controllerName == 'payslipemployee'){
-                    $delete_str='<input type="checkbox" name="emp_id" class="checkbox" value="{{id}}" id="generate_payslip_remove_{{id}}"/> &nbsp;'.$delete_str;
+                    $delete_str='<input type="checkbox" name="emp_id" class="checkbox" value="{{id}}" id="generate_payslip_remove_{{id}}" style="float:left; margin-right:10px;" /> &nbsp;'.$delete_str.'<a name="{{id}}" id="generate_payslip_{{id}}"  title="Generate"></a>';
+                    
                 }
                 //$delete_str="";
             } elseif ($dataArray['objectname'] == 'payrollgroup') {
@@ -229,6 +242,8 @@ class Zend_View_Helper_Grid extends Zend_View_Helper_Abstract {
 										</div>');
                 }
             }
+            
+            
         }
         //echo 'kk '.PHP_EOL;die;
         $extra['options'] = array();
@@ -368,7 +383,7 @@ class Zend_View_Helper_Grid extends Zend_View_Helper_Abstract {
         }
         $output .= "<div id='" . $name . "' class='details_data_display_block newtablegrid'>";
         $output .= "<table class='grid' align='center'  width='100%' cellspacing='0' cellpadding='4' border='0'><thead><tr>";
-        // this foreach loop display the column header  in ï¿½thï¿½ tag.
+        // this foreach loop display the column header  in Ã¯Â¿Â½thÃ¯Â¿Â½ tag.
         $colinr = 0;
         //sapp_Payrollcal::pre($fields);die;
         if (!empty($fields)) {
@@ -639,13 +654,16 @@ class Zend_View_Helper_Grid extends Zend_View_Helper_Abstract {
                                 }
                                 
                                 //sapp_Payrollcal::pre($p['firstname'].' - '.$p['paysllip_status']);
+                                ////$('#generate_payslip_'+" . $p['id'] . ").html('');
+                                //$('#generate_payslip_new_'+" . $p['id'] . ").show();
                                 if($controllerName == 'payslipemployee' && $p['paysllip_status'] == '1') {
                                     echo "<script type='text/javascript'>
                                     $(document).ready(function() { 
-                                        $('#generate_payslip_'+" . $p['id'] . ").html('View Payslip');
-                                        $('#generate_payslip_remove_'+" . $p['id'] . ").remove();
                                         var new_link='".BASE_URL."emppayslips/view/userid/".$p['id']."';
-                                        $('#generate_payslip_'+" . $p['id'] . ").attr('href','".BASE_URL."emppayslips/view/userid/".$p['user_id']."');
+                                        $('#generate_payslip_'+" . $p['id'] . ").attr('href','".BASE_URL."emppayslips/view/payslipid/".$p['payslip_id']."/userid/".$p['user_id']."');
+                                        $('#generate_payslip_'+" . $p['id'] . ").attr('title','View Payslip');
+                                        $('#generate_payslip_'+" . $p['id'] . ").addClass('sprite view');
+                                        
                                     });
                                     </script>";
                                 }

@@ -37,6 +37,9 @@ $('#example').DataTable({
         buttons: [
             "pageLength",
             'copy', 'excel', 'pdf', 'print'
+        ],
+        "columnDefs": [
+            { "targets": [0], "orderable": false },                 
         ]
     });
 </script>

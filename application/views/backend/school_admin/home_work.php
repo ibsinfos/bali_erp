@@ -34,10 +34,9 @@
             <nav>
                 <ul>
                     <li id="section1">
-                        <a href="#section-flip-1" class="sticon fa fa-list "data-step="5" data-intro="<?php echo get_phrase('You can see list of home work type.');?>" data-position='right'><span><?php echo get_phrase('home_work_types'); ?></span></a></li>
+                        <a href="#section-flip-1" class="sticon fa fa-list "data-step="5" data-intro="<?php echo get_phrase('You can see list of homework types.');?>" data-position='right'><span><?php echo get_phrase('homework_types'); ?></span></a></li>
                     <li id="section2">
-                        <a href="#section-flip-2" class="sticon fa fa-plus" data-step="6" data-intro="<?php echo get_phrase('Form here you will add a home work type.');?>" data-position='left'><span><?php echo get_phrase('add_home_work_type'); ?></span></a></li>
-
+                        <a href="#section-flip-2" class="sticon fa fa-plus" data-step="6" data-intro="<?php echo get_phrase('Form here you can create a homework type.');?>" data-position='left'><span><?php echo get_phrase('add_homework_type'); ?></span></a></li>
                 </ul>
             </nav>                                    
             <div class="content-wrap">
@@ -49,7 +48,7 @@
                             <th><div><?php echo get_phrase('no'); ?></div></th>
                             <th><div><?php echo get_phrase('name'); ?></div></th>
                             <th><div><?php echo get_phrase('description'); ?></div></th>
-                            <!--<th><div><?php echo get_phrase('no_of_home_works'); ?></div></th>-->
+                            <!--<th><div><?php echo get_phrase('no_of_homeworks'); ?></div></th>-->
                             <th><div><?php echo get_phrase('options'); ?></div></th>
                         </tr>
                     </thead>
@@ -107,7 +106,7 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit'); ?></button>
+                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('create_homework'); ?></button>
                     </div>
                     <?php echo form_close(); ?> 
                 </section>             

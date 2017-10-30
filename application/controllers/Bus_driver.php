@@ -61,6 +61,8 @@ class Bus_driver extends CI_Controller {
        // $this->session->set_userdata('route_id', $page_data['bnr']->transport_id);
         $this->session->set_userdata('bus_id', $page_data['driver']->bus_id);
         //$page_data['groups'] = $this->Bus_driver_modal->get_route_group($this->session->userdata('route_id'));
+        $page_data['driver_detail'] = $this->Bus_driver_modal->get_bus_driver_with_bus($this->session->userdata('login_user_id'));
+//        pre($page_data['driver_detail']); die;
         $this->load->view('backend/index', $page_data);
     }
 
@@ -239,35 +241,44 @@ class Bus_driver extends CI_Controller {
     
     public function manage_students() {
         $page_data= $this->get_page_data_var();
-        $students = get_data_generic_fun('student_bus_allocation', '*', array(), 'result_array',array('student_bus_id'=>'desc'));
-        foreach ($students as $value) {
-            $student_name = get_data_generic_fun('student', 'name', array('student_id' => $value['student_id']), 'result_array');
-
-            if (!empty($student_name)) {
-                $students_name[]['student_name'] = $student_name[0]['name'];
-            } else {
-                $students_name[]['student_name'] = '';
-            }
-            $route_name = get_data_generic_fun('transport', 'route_name', array('transport_id' => $value['route_id']), 'result_array');
-            if (!empty($route_name)) {
-                $routes_name[]['route_name'] = $route_name[0]['route_name'];
-            } else {
-                $routes_name[]['route_name'] = '';
-            }
-            $bus = get_data_generic_fun('bus', 'name', array('bus_id' => $value['bus_id']), 'result_array');
-            if (!empty($bus)) {
-                $bus_name[]['bus_name'] = $bus[0]['name'];
-            } else {
-                $bus_name[]['bus_name'] = '';
-            }
-        }
-        $i = 0;
-        $newArray = array();
-        foreach ($students as $row) {
-            $newArray[$i] = array_merge($row, $students_name[$i], $routes_name[$i], $bus_name[$i]);
-            $i++;
-        }
-        $page_data['student_details'] = $newArray;
+//        $students = get_data_generic_fun('student_bus_allocation', '*', array(), 'result_array',array('student_bus_id'=>'desc'));
+        //        pre($students); die;
+//        foreach ($students as $value) {
+//            $student_name = get_data_generic_fun('student', 'name', array('student_id' => $value['student_id']), 'result_array');
+//
+//            if (!empty($student_name)) {
+//                $students_name[]['student_name'] = $student_name[0]['name'];
+//            } else {
+//                $students_name[]['student_name'] = '';
+//            }
+//            $route_name = get_data_generic_fun('transport', 'route_name', array('transport_id' => $value['route_id']), 'result_array');
+//            if (!empty($route_name)) {
+//                $routes_name[]['route_name'] = $route_name[0]['route_name'];
+//            } else {
+//                $routes_name[]['route_name'] = '';
+//            }
+//            $bus = get_data_generic_fun('bus', 'name', array('route_id' => $value['route_id'],'bus_id' => $bus_id->bus_id), 'result_array');
+////            echo $this->db->last_query(); die;
+//            if (!empty($bus)) {
+//                $bus_name[]['bus_name'] = $bus[0]['name'];
+//            } else {
+//                $bus_name[]['bus_name'] = '';
+//            }
+//        }
+//        $i = 0;
+//        $newArray = array();
+//        foreach ($students as $row) {
+//            $newArray[$i] = array_merge($row, $students_name[$i], $routes_name[$i], $bus_name[$i]);
+//            $i++;
+//        }
+//        
+//        $page_data['student_details'] = $newArray;
+//        pre($page_data['student_details']);die;
+//        
+        $bus_driver_id = $this->session->userdata('login_user_id');        
+        $bus_id = $this->Bus_driver_modal->get_bus_id($bus_driver_id);
+        $page_data['student_details'] = $this->Bus_driver_modal->get_student_by_bus_id($bus_id->bus_id);
+//        
         $page_data['page_title'] = get_phrase('manage_student');
         $page_data['page_name'] = 'manage_student_bus';
         $this->load->view('backend/index', $page_data);
@@ -275,8 +286,9 @@ class Bus_driver extends CI_Controller {
     
     public function bus_details() {
         $page_data= $this->get_page_data_var();
-        $bus_driver_id = $this->session->userdata('login_user_id');
-        $page_data['buses'] = $this->Bus_driver_modal->get_bus_with_route1();
+        $bus_driver_id = $this->session->userdata('login_user_id');        
+        $bus_id = $this->Bus_driver_modal->get_bus_id($bus_driver_id);
+        $page_data['buses'] = $this->Bus_driver_modal->get_bus_with_route1($bus_id->bus_id);
         $page_data['page_title'] = get_phrase('manage_bus');
         $page_data['page_name'] = 'bus_manage';
         $this->load->view('backend/index', $page_data);
@@ -290,15 +302,26 @@ class Bus_driver extends CI_Controller {
         $this->load->view('backend/index', $page_data);
     }
     
-    public function manage_attendance(){
+    /* public function manage_attendance(){
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            $this->form_validation->set_rules('bus_id', 'Bus', 'required');
+            $this->form_validation->set_rules('timestamp', 'Date', 'required');
+            if ($this->form_validation->run() == TRUE) {
+                $bus_id = $this->input->post('bus_id');
+                $date = $this->input->post('timestamp');
+                $date = date('Y-m-d',strtotime($date));
+                redirect(base_url() . 'index.php?bus_driver/manage_attendance_view/'.$bus_id.'/'.$date,'refresh');
+            }    
+        }
+
         $page_data= $this->get_page_data_var();    
         $driver_id       =    $this->session->userdata('bus_driver_id');
         $page_data['busses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
         $page_data['page_title'] = get_phrase('manage_attendance');
         $page_data['page_name'] = 'manage_attendance';
         $this->load->view('backend/index', $page_data);
-    }
-    
+    } */
+
     public function attendance_selector(){
         $page_data= $this->get_page_data_var();
         $this->load->model('Bus_driver_attendence_model');
@@ -311,7 +334,7 @@ class Bus_driver extends CI_Controller {
             $page_data['bus_id'] = $this->input->post('bus_id');
             $page_data['year'] = $this->input->post('year');
             $page_data['timestamp'] = $this->input->post('timestamp');
-            $page_data['query'] = $this->Bus_driver_attendence_model->get_data_by_cols("*", array('bus_id' => $page_data['bus_id'], 'year' => $page_data['year'], 'timestamp' => $page_data['timestamp']), "result_array");
+            /* $page_data['query'] = $this->Bus_driver_attendence_model->get_data_by_cols("*", array('bus_id' => $page_data['bus_id'], 'year' => $page_data['year'], 'timestamp' => $page_data['timestamp']), "result_array");
             if (count($page_data['query']) < 1) {
                 $page_data['students'] = $this->Student_bus_allocation_model->get_students_by_bus($page_data['bus_id']);                
             } 
@@ -344,7 +367,8 @@ class Bus_driver extends CI_Controller {
                 } 
             } 
             $page_data['attendance_of_students'] = $this->Bus_driver_attendence_model->get_data_by_cols('*', array('bus_id' => $attn_data['bus_id'], 'student_id' => $attn_data['student_id'], 'year' => $attn_data['year'], 'timestamp' => $attn_data['timestamp']), 'result_type');
-            redirect(base_url() . 'index.php?bus_driver/manage_attendance_view/' . $page_data['bus_id'] . '/' . $page_data['year'] . '/' . $page_data['timestamp'], 'refresh');
+             */
+            redirect(base_url() . 'index.php?bus_driver/manage_attendance_view/' . $page_data['bus_id'].'/'.$page_data['timestamp'], 'refresh');
         } else {
             
             $page_data['busses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
@@ -352,20 +376,160 @@ class Bus_driver extends CI_Controller {
             $this->load->view('backend/index', $page_data);
         }
     }
-    
 
-    function manage_attendance_view($bus_id='', $year='', $timestamp='' ) {
-        $driver_id       =    $this->session->userdata('bus_driver_id');
+    /* function manage_attendance_view($bus_id='',$date='',$mark_today=false) {
+        $driver_id = $this->session->userdata('bus_driver_id');
         $page_data= $this->get_page_data_var();
         $this->load->model('Bus_driver_attendence_model');
         $this->load->model("Section_model");
         $this->load->model("Class_model");
-        $page_data['timestamp'] = $timestamp;
+        $page_data['date'] = $date;
+        $date = date('Y-m-d',strtotime($date));
         $page_data['page_title'] = get_phrase('manage_attendance_of_class');
-        $page_data['att_of_students'] = $this->Bus_driver_attendence_model->getstudents_attendence($bus_id, $year,$timestamp);
-        $page_data['bus_id'] = $bus_id;
+        //$page_data['att_of_students'] = $this->Bus_driver_attendence_model->getstudents_attendence($bus_id, $year,$timestamp);
+        $page_data['stu_attendance'] = $this->Bus_driver_attendence_model->get_student_bus_attendance(array('SBA.bus_id'=>$bus_id),$date);   
+        //echo '<pre>';print_r( $page_data['stu_attendance']);exit; 
+        $page_data['bus_id'] = $bus_id; 
+        $page_data['mark_today'] = $mark_today;
         $page_data['buses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
         $page_data['page_name'] = 'manage_attendance_view';
+        $this->load->view('backend/index', $page_data);
+    } */
+
+    function manage_pick_up_attendance(){
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            //echo 124;exit;
+            $this->form_validation->set_rules('bus_id', 'Bus', 'required');
+            //$this->form_validation->set_rules('timestamp', 'Date', 'required');
+            if ($this->form_validation->run() == TRUE) {
+                $bus_id = $this->input->post('bus_id');
+                $date = date('Y-m-d');
+                redirect(base_url() . 'index.php?bus_driver/manage_pick_up_attendance_view/'.$bus_id.'/'.$date.'/1','refresh');
+            }    
+        }
+
+        $page_data= $this->get_page_data_var();    
+        $page_data['mark_today'] = true;
+        $driver_id       =    $this->session->userdata('bus_driver_id');
+        $page_data['busses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
+        $page_data['page_title'] = get_phrase('manage_pick_up_attendance');
+        $page_data['page_name'] = 'manage_pick_up_attendance';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function manage_pick_up_attendance_view($bus_id='',$date='',$mark_today=false) {
+        $driver_id = $this->session->userdata('bus_driver_id');
+        $page_data= $this->get_page_data_var();
+        $this->load->model('Bus_driver_attendence_model');
+        $page_data['date'] = $date;
+        $date = date('Y-m-d',strtotime($date));
+        $page_data['page_title'] = get_phrase('manage_attendance_of_class');
+        //$page_data['att_of_students'] = $this->Bus_driver_attendence_model->getstudents_attendence($bus_id, $year,$timestamp);
+        $page_data['stu_attendance'] = $this->Bus_driver_attendence_model->get_student_bus_attendance(array('SBA.bus_id'=>$bus_id),$date);   
+        //echo '<pre>';print_r( $page_data['stu_attendance']);exit; 
+        $page_data['bus_id'] = $bus_id; 
+        $page_data['mark_today'] = $mark_today;
+        $page_data['buses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
+        $page_data['page_name'] = 'manage_pick_up_attendance_view';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function manage_drop_attendance(){
+        if($this->input->server('REQUEST_METHOD')=='POST'){
+            //echo 124;exit;
+            $this->form_validation->set_rules('bus_id', 'Bus', 'required');
+            //$this->form_validation->set_rules('timestamp', 'Date', 'required');
+            if ($this->form_validation->run() == TRUE) {
+                $bus_id = $this->input->post('bus_id');
+                $date = date('Y-m-d');
+                redirect(base_url() . 'index.php?bus_driver/manage_drop_attendance_view/'.$bus_id.'/'.$date.'/1','refresh');
+            }    
+        }
+
+        $page_data= $this->get_page_data_var();    
+        $page_data['mark_today'] = true;
+        $driver_id       =    $this->session->userdata('bus_driver_id');
+        $page_data['busses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
+        $page_data['page_title'] = get_phrase('manage_drop_attendance');
+        $page_data['page_name'] = 'manage_drop_attendance';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function manage_drop_attendance_view($bus_id='',$date='',$mark_today=false) {
+        $driver_id = $this->session->userdata('bus_driver_id');
+        $page_data= $this->get_page_data_var();
+        $this->load->model('Bus_driver_attendence_model');
+        $page_data['date'] = $date;
+        $date = date('Y-m-d',strtotime($date));
+        $page_data['page_title'] = get_phrase('manage_attendance_of_class');
+        //$page_data['att_of_students'] = $this->Bus_driver_attendence_model->getstudents_attendence($bus_id, $year,$timestamp);
+        $page_data['stu_attendance'] = $this->Bus_driver_attendence_model->get_student_bus_attendance(array('SBA.bus_id'=>$bus_id),$date);   
+        //echo '<pre>';print_r( $page_data['stu_attendance']);exit; 
+        $page_data['bus_id'] = $bus_id; 
+        $page_data['mark_today'] = $mark_today;
+        $page_data['buses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
+        $page_data['page_name'] = 'manage_drop_attendance_view';
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function attendance_report() {
+        if($this->input->server('REQUEST_METHOD')=='POST'){    
+            $this->form_validation->set_rules('bus_id', 'Bus', 'required');
+            $this->form_validation->set_rules('month', 'Month', 'required');
+            if ($this->form_validation->run() == TRUE) {
+                redirect(base_url() . 'index.php?bus_driver/attendance_report_view/'.$this->input->post('bus_id').'/'.$this->input->post('month'), 'refresh');
+            }       
+        }
+    
+        $page_data = $this->get_page_data_var();
+        $page_data['month'] = date('m');
+        $page_data['page_name'] = 'attendance_report';
+        $page_data['page_title'] = get_phrase('attendance_report');
+        $driver_id = $this->session->userdata('bus_driver_id');
+        $page_data['busses'] = $this->Bus_driver_modal->get_bus_for_driver($driver_id);
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function attendance_report_view($bus_id=false,$month = '') {
+        
+        $this->load->model('Holiday_model');
+        $this->load->model('Bus_driver_attendence_model');
+        //$this->load->model('Student_model');
+        $page_data = $this->get_page_data_var();
+            
+        $holidays = $this->Holiday_model->get_holiday_list_attendance();
+        $holiday_dates = array();
+        foreach ($holidays as $holiday) {
+            $holiday_dates[] = $holiday['date_start'];
+            for ($i = 0; $i < ($holiday['number_of_days'] - 1); $i++) {
+                $holiday_dates[] = date('Y-m-d', strtotime($holiday['date_start'] . ' + ' . $i . ' days'));
+            }
+        }
+        $page_data['holidays'] = $holiday_dates;
+
+        $running_year = $this->globalSettingsRunningYear;
+        $years = explode('-', $running_year);
+        $page_data['year'] = $year = date('m')>4?$years[0]:$years[1];
+        $page_data['days'] = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+
+        
+        $page_data['students'] = array();
+        $students = $this->Bus_driver_attendence_model->get_student_bus_attendance(array('SBA.bus_id'=>$bus_id));   
+        foreach ($students as $k => $row){
+            $p = 0;
+            for ($i = 1; $i <= $page_data['days']; $i++) {
+                $date = $year.'-'.$month.'-'.$i;
+                $whr = array('year' => $running_year, 'DATE(date)' => $date, 'student_id' => $row->student_id,'bus_id'=>$row->bus_id); 
+                //$atten = 
+                $page_data['students'][$k] = $row;
+                $page_data['students'][$k]->atten[$i] = $this->db->get_where('bus_attendence',$whr)->row();
+            }
+        }
+        //echo '<pre>';print_r($page_data['students']);exit;
+        $page_data['bus_id'] = $bus_id;
+        $page_data['month'] = $month;
+        $page_data['page_title'] = get_phrase('bus_attendance_report_of_student');
+        $page_data['page_name'] = 'attendance_report_view';
         $this->load->view('backend/index', $page_data);
     }
 
@@ -388,7 +552,7 @@ class Bus_driver extends CI_Controller {
         return $page_data;
     }
     
-    function attendance_update($bus_id = '', $year = '', $timestamp = '') {
+    /* function attendance_update($bus_id = '', $year = '', $timestamp = '') {
         $this->load->model('Bus_driver_attendence_model');
         $page_data['year'] = $this->globalSettingsRunningYear;
         $attendance_of_students = $this->Bus_driver_attendence_model->get_data_by_cols("*",array("bus_id"=> $bus_id,"year"=> $year, "timestamp"=> $timestamp), 'result_type');
@@ -402,6 +566,18 @@ class Bus_driver extends CI_Controller {
         }
         $this->session->set_flashdata('flash_message', get_phrase('attendance_updated'));
         redirect(base_url() . 'index.php?bus_driver/manage_attendance_view/' . $bus_id . '/' . $year . '/' . $timestamp, 'refresh');
-    }
+    } */
     
+    
+  function manage_vehicle_details($param1 = '', $param2 = '', $param3 = '') {
+    $page_data = $this->get_page_data_var();
+        $this->load->model('Vehicle_details');
+        $bus_driver_id = $this->session->userdata('login_user_id');        
+        $bus_id = $this->Bus_driver_modal->get_bus_id($bus_driver_id);
+        $page_data['details'] = $this->Vehicle_details->get_all_details_by_busDriver($bus_driver_id,$bus_id->bus_id);
+        $page_data['page_title'] = get_phrase('manage_vehicle_details');
+        $page_data['page_name'] = 'manage_vehicle_details';
+        $this->load->view('backend/index', $page_data);
+  }
+  
 }

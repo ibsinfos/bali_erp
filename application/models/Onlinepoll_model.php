@@ -78,7 +78,7 @@ class Onlinepoll_model extends CI_Model {
         $this->db->from($this->_table.' poll');
         $this->db->join('poll_answers answ','answ.poll_id = poll.poll_id','left');
         if ($this->session->userdata('school_admin_login') != 1)
-            $this->db->where('status','1');
+            $this->db->where('status !=','3');
         else    
             $this->db->where('status !=','3');
         if(!empty($condition) && is_array($condition)) {

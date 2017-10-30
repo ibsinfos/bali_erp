@@ -353,8 +353,13 @@ setTimeout(function(){
 	
 	function changeempviewscreen(controllername,id)
 	{
+            if(controllername == 'payslipemployee'){
+                $.blockUI({ width:'50px',message: $("#spinner").html() });
+                window.location.href = base_url+'/'+controllername;
+            } else {
 		$.blockUI({ width:'50px',message: $("#spinner").html() });
 	      window.location.href = base_url+'/'+controllername+'/view/userid/'+id;
+          }
 	}
 	
 	function changemyempviewscreen(controllername,actionname,id)
@@ -4157,26 +4162,34 @@ function calcDays(from_date_id, to_date_id,obj,conText,userId)
   }
 
 function displayempstatusmessage()
-{
- var empstatusval = $("#emp_status_id").val();
- var empstatustext = $("#emp_status_id option:selected").text();
+{ 
+    var empstatusval = $("#emp_status_id").val();
+    var empstatustext = $("#emp_status_id option:selected").text();
+
+    if(empstatusval == 6) {
+        $('#vendor_list').show();
+        $('#vendor_id').parent().parent().find('label').addClass('required');
+    } else {
+        $('#vendor_list').hide();
+        $('#vendor_id').parent().parent().find('label').removeClass('required');
+    }
  
-	 if(empstatusval == 8 || empstatusval == 9 || empstatusval == 10)
-	 {
-	  $("#empstatusmessage").html("You are trying to change the employment status of this employee to "+empstatustext+". The employee will not be able to log into the system.");
-	    $("#empstatus-alert").dialog({
-       		draggable:false, 
-			resizable: false,
-		    width:252,
-			title: "Alert",
-		    modal: true, 
-		    buttons : {
-		        "Ok" : function() {
-				$(this).dialog("close");								
-		        }
-		      }
-		    });
-	 }
+    if(empstatusval == 8 || empstatusval == 9 || empstatusval == 10)
+    {
+     $("#empstatusmessage").html("You are trying to change the employment status of this employee to "+empstatustext+". The employee will not be able to log into the system.");
+       $("#empstatus-alert").dialog({
+           draggable:false, 
+                   resizable: false,
+               width:252,
+                   title: "Alert",
+               modal: true, 
+               buttons : {
+                   "Ok" : function() {
+                           $(this).dialog("close");								
+                   }
+                 }
+               });
+    }
 }
 
 function gobacktocontroller(context)
@@ -5578,7 +5591,7 @@ function displayNormalDepartments(eleId)
 	  id= $("#businessunit_id").val();		
 	  params = 'business_id='+id;
 	
-	if(id !='')
+	if(id ==null)
 	{
 		$.ajax({
                 url: base_url+"/index/getdepartments/format/html",   				

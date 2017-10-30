@@ -368,7 +368,7 @@ class Default_Model_Users extends Zend_Db_Table_Abstract
                     }
               
                 }
-                //echo $qry; die;
+                //echo $qry; die; 
                 if($qry != '')
                 {                    
                     $reportingManagersData = $db->query($qry);

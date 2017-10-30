@@ -46,6 +46,14 @@
                 </a>
             </li>
 
+            <!-- CLASS ROUTINE -->
+            <li class="p-0 menu-item-tile">
+                <a href="<?php echo base_url(); ?>index.php?<?php echo $account_type; ?>/photo_galleries" class="waves-effect active menu-items text-center">
+                    <i class="icon-size fa fa-camera"></i>
+                    <span class="menu-text"><?php echo get_phrase('photo_galleries'); ?></span>
+                </a>
+            </li>
+
             <!-- STUDY MATERIAL -->
             <li class="p-0 menu-item-tile">
                 <a href="<?php echo base_url(); ?>index.php?<?php echo $account_type; ?>/study_material" class="waves-effect active menu-items text-center">
@@ -167,7 +175,34 @@
                 </a>
             </li>
             </ul>
-            <li class="p-0 menu-item-tile">
+            <li class="p-0 menu-item-tile has-submenu">
+                <a href='#' class='waves-effect active menu-items text-center'>
+                    <i class='fa fa-bars more'></i>
+                    <i class='icon-size fa fa-graduation-cap'></i>
+                    <span class='menu-text'><?php echo get_phrase('online_polls');?></span>
+                </a>
+            </li>
+            <ul class="nav p-r-0 list-inline">
+                <?php /*<li class="p-0 menu-item-tile">
+                    <a href='<?php echo base_url(); ?>index.php?<?php echo $sub_link; ?>' class='waves-effect active menu-items text-center'>
+                        <i class='icon-size fa fa-book'></i>
+                        <span class='menu-text'><?php echo get_phrase($main_link); ?></span>
+                    </a>
+                </li>*/?>
+                <li class="p-0 menu-item-tile">
+                    <a href="<?php echo base_url(); ?>index.php?<?php echo $account_type; ?>/online_polls" class="waves-effect active menu-items text-center">
+                        <i class="icon-size fa fa-bar-chart"></i>
+                        <span class="menu-text"><?php echo get_phrase('online_polls'); ?></span>
+                    </a>
+                </li>
+                <li class="p-0 menu-item-tile">
+                    <a href="<?php echo base_url(); ?>index.php?<?php echo $account_type; ?>/online_polls_result" class="waves-effect active menu-items text-center">
+                        <i class="icon-size fa fa-bar-chart"></i>
+                        <span class="menu-text"><?php echo get_phrase('online_polls_results'); ?></span>
+                    </a>
+                </li>
+            </ul>
+            <?php /*<li class="p-0 menu-item-tile">
                 <a href="<?php echo base_url(); ?>index.php?<?php echo $account_type; ?>/online_polls" class="waves-effect active menu-items text-center">
                     <i class="icon-size fa fa-bar-chart"></i>
                     <span class="menu-text"><?php echo get_phrase('online_polls'); ?></span>
@@ -178,18 +213,18 @@
                     <i class="icon-size fa fa-bar-chart"></i>
                     <span class="menu-text"><?php echo get_phrase('online_polls_results'); ?></span>
                 </a>
-            </li>
+            </li>*/?>
 
             <li class="p-0 menu-item-tile">
                 <a href="<?php echo base_url(); ?>index.php?<?php echo $account_type; ?>/my_exam" class="waves-effect active menu-items text-center">
-                  <i class="icon-size fa fa-puzzle-piece"></i>
-                    <span class="menu-text"><?php echo get_phrase('my_exam'); ?></span>
+                  <i class="icon-size fa fa-desktop"></i>
+                    <span class="menu-text"><?php echo get_phrase('my_online_exam'); ?></span>
                 </a>
             </li>
             <li class="p-0 menu-item-tile">
                 <a href="<?php echo base_url(); ?>index.php?<?php echo $account_type; ?>/my_online_result" class="waves-effect active menu-items text-center">
                   <i class="icon-size fa fa-table"></i>
-                    <span class="menu-text"><?php echo get_phrase('my_online_result'); ?></span>
+                    <span class="menu-text"><?php echo get_phrase('my_online_exam_result'); ?></span>
                 </a>
             </li>
             <li class="p-0 menu-item-tile">

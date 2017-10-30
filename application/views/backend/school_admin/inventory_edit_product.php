@@ -5,7 +5,7 @@
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
-        <a href="javascript: void(0);" target="_blank" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
+        <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/Dashboard"><?php echo get_phrase('dashboard'); ?></a></li>
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/manage_product"><?php echo get_phrase('manage_products'); ?></a></li>
@@ -14,13 +14,14 @@
     </div>
     <!-- /.breadcrumb -->
 </div>
-<?php extract($product); ?>
+<?php 
+extract($product); ?>
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12" data-step="5" data-intro="<?php echo get_phrase('From here you can edit a Existing inventory product.');?>" data-position="top">
         <div class="white-box">
 
             <form action="<?php echo base_url(); ?>index.php?school_admin/product/do_update/<?php echo $product_id; ?>" method="post">
-                <div class="row">
+                <div class="row" >
                     <div class="col-md-6 form-group">
                         <label for="field-1"><?php echo get_phrase("product_name"); ?></label>
                         <div class="input-group">
@@ -51,9 +52,9 @@
                             <?php echo get_phrase('status'); ?>
                             <span class="error mandatory" > *</span></label>
                         <?php // pre($classes); exit;  ?>
-                        <select class="selectpicker" data-style="form-control" data-live-search="true" id="status" name="status" required="required">
+                        <select class="selectpicker" data-style="form-control" data-live-search="true" id="status" name="status" required="required" disabled="">
                             <option value="Available" <?php if($status=='Available'){ echo 'selected';} ?>>Available</option>
-                            <option value="Not Available" <?php if($status=='Not Available'){ echo 'selected';} ?>>Not Available</option>
+                            <option value="Alloted" <?php if($status=='Alloted'){ echo 'selected';} ?>>Not Available</option>
                         </select>
                     </div>
                 </div>
@@ -115,7 +116,7 @@
                 </div>
 
                 <div class="text-right">
-                    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('update'); ?></button>
+                    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="6" data-intro="<?php echo get_phrase('click to this button, all information will update.');?>" data-position="top"><?php echo get_phrase('edit_product'); ?></button>
                 </div>
             </form>
         </div>

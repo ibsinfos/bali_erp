@@ -8,7 +8,7 @@
         </div>
     </div>
     <!--end here-->    
-    <div class="text-right">
+    <div class="text-center">
         <input type="submit" value="upload" class="fcbtn btn btn-danger btn-outline btn-1d"/>        
     </div>
 <?php echo form_close();  ?>

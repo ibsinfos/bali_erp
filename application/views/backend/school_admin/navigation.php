@@ -1,6 +1,4 @@
-<script src="<?php echo base_url();?>assets/js/jquery-3.2.1.min.js"></script>
-<?php
-?>
+<!-- <script src="<?php //echo base_url();?>assets/js/jquery-3.2.1.min.js"></script> -->
 <div class="navbar-default sidebar custom-sidebar-width" role="navigation">
     <div class="sidebar-nav"><!--slimscrollsidebar-->
         <div class="sidebar-head custom-sidebar-color">

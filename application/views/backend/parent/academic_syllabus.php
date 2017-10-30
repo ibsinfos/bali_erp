@@ -19,7 +19,7 @@
     <div class="col-md-12 hidden-xs">
         <div class="form-group col-sm-12 p-0">
 <?php foreach ($student_name as $name) { ?>
-                <div class="label label-primary pull-right badge-stu-name">
+            <div class="badge badge-danger badge-stu-name pull-right m-b-20">
                     <i class="fa fa-user"></i><?php echo " ".$name['name'];
 }
 ?>
@@ -54,6 +54,7 @@
                 <tbody>
                     <?php
                     $count = 1;
+//                    pre($syllabus);
                     if (!empty($syllabus)) {
                         foreach ($syllabus as $row):
                             if (!empty($row)) {
@@ -63,23 +64,22 @@
                                         <td><?php echo $count++; ?></td>
                                         <td><?php echo $value['title']; ?></td>
                                         <td><?php echo $value['description']; ?></td>
-                                        <td>
-                                            <?php
-                                            echo $value['name'] . ' ( ' . $value['uploader_type'] . ' )';
-                                            ?>
-                                        </td>
+                                        <td><?php echo $value['name'] . ' ( ' . $value['uploader_type'] . ' )'; ?> </td>
                                         <td><?php echo date("d/m/Y", $value['timestamp']); ?></td>
                                         <td><?php echo substr($value['file_name'], 0, 20); ?><?php if (strlen($value['file_name']) > 20) echo '...'; ?></td>
                                         <td>
-
-            <a href="javascript: void(0);" onclick="showDocumentPreview('<?php echo base_url(); ?>index.php?modal/popup/academic_syllabus_preview/<?php echo $value['academic_syllabus_code']; ?>');">
-            <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view') ?>" title="<?php echo get_phrase('view') ?>"><i class="fa fa-eye"></i></button>
+                                            <!--file_name-->
+                                           <?php if (!empty($value['file_name']) && file_exists(FCPATH.'uploads/syllabus/'.$value['file_name'])){ ?>
+                                          <a href="javascript: void(0);" onclick="showDocumentPreview('<?php echo base_url(); ?>index.php?modal/popup/academic_syllabus_preview/<?php echo $value['academic_syllabus_code']; ?>');">
+            <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view') ?>" title="<?php echo get_phrase('view') ?>"><i class="fa fa-eye"></i></button></a>
+                               <a href="<?php echo base_url(); ?>index.php?parents/download_academic_syllabus/<?php echo $value['academic_syllabus_code']; ?>"><button type="button" class="btn btn-default  btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('download') ?>" title="<?php echo get_phrase('download') ?>"><i class="fa fa-download"></i></button></a>
+                                          <?php }else{ ?>
+                                            <a href="#"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Available" disabled=""><i class="fa fa-eye"></i></button> 
                                             </a>
-                                            
-                                <a href="<?php echo base_url(); ?>index.php?parents/download_academic_syllabus/<?php echo $value['academic_syllabus_code']; ?>">
-        <button type="button" class="btn btn-default  btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('download') ?>" title="<?php echo get_phrase('download') ?>"><i class="fa fa-download"></i></button>
-                                            </a>
-
+                                            <a><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Attachment" disabled="">
+                                    <i class="fa fa-download"></i>
+                                    </button></a>
+                                    <?php } ?>
                                         </td>
                                     </tr>
                                 <?php

@@ -31,6 +31,7 @@ class Student extends CI_Controller {
         $this->load->model('Subject_model');
         $this->load->model('Section_model');
         $this->load->model('Exam_model');
+         $this->load->model('Holiday_model');
         /* cache control */
         $this->output->set_header('Last-Modified: ' . gmdate("D, d M Y H:i:s") . ' GMT');
         //$this->output->set_header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
@@ -81,10 +82,56 @@ class Student extends CI_Controller {
         $page_data['active_sms_service'] = $this->globalSettingsActiveSmsService;
         $page_data['running_year'] = $this->globalSettingsRunningYear;
         $student_id = $this->session->userdata('student_id');
-        $page_data['attendance'] = $this->Attendance_model->get_attendence_student_month($student_id);
-        foreach ($page_data['attendance'] as $value) {
-            $page_data['percentage'] = $value['percent'];
+        $page_data['student_personal_info'] = $this->Student_model->get_student_details($student_id);
+//     /   $page_data['attendance'] = $this->Attendance_model->get_attendence_student_month($student_id);
+//     foreach ($page_data['attendance'] as $value) {
+         //   $page_data['percentage'] = $value['percent'];
+//            pre($page_data['percentage']) ; die;
+//        }
+          // Attendance Data
+        $attData = '';
+        $adata = array();
+        $status = 0;
+        $year  = $page_data['running_year'];
+        $year1 = explode('-', $page_data['running_year']);
+        $date = date('m');
+        $month = explode("0", $date);
+        $page_data['month'] = date('m');
+        $page_data['section_id'] = $page_data['student_personal_info']->section_id;
+        $page_data['class_id'] = $page_data['student_personal_info']->class_id;
+        $total_days = 0;
+        $percentage='';
+        $attendance_percentege = array(); 
+        for ($k = 1; $k <= $page_data['month']; $k++) { 
+            $present = 0;
+            $days = cal_days_in_month(CAL_GREGORIAN, $k, $year1[0]);
+            $total_days = $days;
+            for ($i = 1; $i <= $days; $i++) {
+                $timestamp = strtotime($i . '-' . $k . '-' . $year1[0]);
+                $attendance = $this->Attendance_model->get_data_by_cols_groupby('', array('section_id' => $page_data['section_id'], 'class_id' => $page_data['class_id'], 'year' => $year, 'timestamp' => $timestamp, 'student_id' => $student_id), 'result_array', '', '', 'timestamp');
+                $status = "";
+                foreach ($attendance as $row1):
+                    $month_dummy = date('j', $row1['timestamp']);
+                    if ($i == $month_dummy) {
+                        $status = $row1['status'];
+                    }
+                    if ($status == 1) {
+                        $present = $present + 1;
+                    } else if ($status == 2) {
+                        
+                    } else {
+                        
+                    }
+                endforeach;
+            }
+            $percentage = $present / $total_days * 100;
+            $attendance_percentege[] = $percentage;
+//            $attData .= date("F", mktime(0, 0, 0, $k, 1)) . '</b></td><td>' . $total_days . '</td><td>' . round($attendance_percentege, 2) . '%</td></tr>';
         }
+        $page_data['attendance_percentege'] = $attendance_percentege;
+//        echo "success"; die;
+//        $page_data['attendance'] = $attData;
+//        pre($page_data['attendance']);die;
         $page_data['student_details'] = $this->Student_model->get_student_details($student_id);
         $class_id = $this->Student_model->get_class_id_by_student($student_id);
         $cls_id = '';
@@ -96,6 +143,8 @@ class Student extends CI_Controller {
         if (!empty($section_id)) {
             $sec_id = $section_id[0]['section_id'];
         }
+        $page_data['holidays'] = $this->Holiday_model->getHolidaysByMonth();
+//        pre($page_data['holidays']); die;
         $page_data['student_subject_details'] = $this->Subject_model->get_subject_dashboard($cls_id, $sec_id, $page_data['running_year']);
         $page_data['notifications'] = $this->Notification_model->get_last_threedays_notifcations('push_notifications');
         $student_details = $this->Student_model->get_data_by_cols('*', array('student_id' => $this->session->userdata('student_id')), 'result_array');
@@ -152,6 +201,17 @@ class Student extends CI_Controller {
         $this->load->model('Student_model');
         $this->load->model('Exam_model');
         $this->load->model('Event_model');
+
+        $school_id = '';
+        if (($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+        }        
+        $receiver_id = $this->session->userdata('login_user_id');
+        $where2 = array('message_schedule_status'=>'1', 'push_notify'=>'1', 'receiver_id'=>$receiver_id, 'receiver_type'=>'T', 'school_id'=>$school_id);
+        $this->db->where($where2);
+        $this->db->update('custom_message_noticeboard', 
+            array('is_read'=>'1'));
+        
         $children_of_parent = array();
         $children_of_parent = $this->Student_model->get_data_by_cols('*', array('student_id' => $this->session->userdata('student_id')), 'result_array');
         $novotipo = $this->input->post("novotipo");
@@ -675,9 +735,12 @@ class Student extends CI_Controller {
         $this->load->model("Notification_model");
         $student_id = $this->session->userdata('student_id');
         $class_id = $this->Student_model->get_class_id_by_student($student_id);
-        if (!empty($class_id)) {
+
+        $page_data['notices'] = $this->Notification_model->getNotices_for_students($student_id, $class_id[0]['class_id']);
+
+        /*if (!empty($class_id)) {
             $page_data['notices'] = $this->Notification_model->getNoticesbyclass($class_id[0]['class_id']);
-        }
+        }*/
         $page_data['page_name'] = 'noticeboard';
         $page_data['page_title'] = get_phrase('noticeboard');
         $page_data['total_notif_num'] = $this->get_no_of_notication();
@@ -1049,13 +1112,23 @@ class Student extends CI_Controller {
      */
 
     public function get_no_of_notication() {
-        $page_data = $this->get_page_data_var();
+        /*$page_data = $this->get_page_data_var();
         $this->load->model("Notification_model");
         $user_id = $this->session->userdata('login_user_id');
         $user_notif_user = $this->Notification_model->get_notifications('push_notifications', 'parent', $user_id);
         $user_notif_user_type = $this->Notification_model->get_notifications('push_notifications', 'parent');
         $user_notif_common = $this->Notification_model->get_notifications('push_notifications');
         $total_count = count($user_notif_user) + count($user_notif_user_type) + count($user_notif_common);
+        return $total_count;*/
+
+        $this->load->model("Student_model");
+        $this->load->model("Notification_model");
+
+        $student_id =   $this->session->userdata('login_user_id');
+        $class_id = $this->Student_model->get_class_id_by_student($student_id);
+        
+        $data = $this->Notification_model->get_notifications_new('1', 'S', $student_id, $class_id[0]['class_id']);
+        $total_count = count($data);
         return $total_count;
     }
 
@@ -1095,7 +1168,7 @@ class Student extends CI_Controller {
                 }
                 redirect(base_url() . 'index.php?student/faculty_feedback');
             } else {
-                $this->session->set_flashdata('flash_message_error', validation_errors());
+                $this->session->set_flashdata('flash_validation_error', validation_errors());
                 redirect(base_url() . 'index.php?student/faculty_feedback');
             }
         }
@@ -1500,7 +1573,7 @@ class Student extends CI_Controller {
             
         }
         if($action == 'polled') {
-            $this->session->set_flashdata('flash_message', get_phrase('poll_updated_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('vote_submitted'));
             redirect(base_url() . 'index.php?student/online_polls/' , 'refresh');
         }
         
@@ -1830,4 +1903,71 @@ class Student extends CI_Controller {
         $page_data['online_polls']          =   $online_poll_list;
         $this->load->view('backend/index', $page_data);
    }
+
+   
+    /************************Photo Gallery*******************************/
+    function photo_galleries($student_id=false){
+        if ($this->session->userdata('student_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $this->load->model('Gallery_model');    
+        $page_data = $this->get_page_data_var();
+       
+        $page_data['page_name'] = 'gallery/photo_galleries';
+        $page_data['page_title'] = get_phrase('photo_galleries');
+        $whr_in = array('PG.class_id'=>array(0));
+        $page_data['records'] = $this->Gallery_model->get_galleries_for_parent_student(array(),'PG.id DESC',$whr_in,$student_id);
+        //echo '<pre>';print_r($page_data['records']);exit;
+        $this->load->view('backend/index', $page_data);
+    }
+    
+    //Gallery Images
+    function photo_gallery_images($gallery_id=false){
+        if ($this->session->userdata('student_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $this->load->model(array('Gallery_model','S3_model'));
+        $page_data = $this->get_page_data_var();
+        $instance = $this->Crud_model->get_instance_name();
+        $page_data['bucket'] = $bucket = 'https://'.S3_model::$bucket.'.s3.amazonaws.com/';
+        $page_data['gallery'] = $rec = $this->Gallery_model->get_gallery_record($gallery_id);
+        if(!$page_data['gallery']){
+            redirect(base_url(), 'refresh');
+        }
+
+        $page_data['page_name'] = 'gallery/images';
+        $page_data['page_title'] = get_phrase('photo_galleries_images');
+        $page_data['images'] = $this->Gallery_model->get_gallery_images_for_parent_student(array('IM.gallery_id'=>$gallery_id));  
+        //echo '<pre>';print_r($page_data['objects']);exit;
+        $this->load->view('backend/index', $page_data);
+    }  
+   
+   function get_holidays_by_month($month) {
+        if ($this->session->userdata('student_login') != 1)
+        redirect(base_url(), 'refresh');        
+        $page_data = $this->get_page_data_var();
+        $holiday_data = $this->Holiday_model->getstudent_dashboardHolidays($month);
+        if(count($holiday_data) > 0) {
+            $data = '';
+            $data = '<ul class="earning-box">';
+                foreach($holiday_data as $holiday){ 
+                    $data.='<li>
+                        <div class="er-row">
+                            <div class="er-text">
+                                <h3>'.ucfirst($holiday['title']).'</h3>
+                                <span class="text-muted">'.date('l', strtotime($holiday['date_start'])).'</span>
+                            </div>
+                            <div class="er-count ">'.date('d-m-Y', strtotime($holiday['date_start'])).'</div>
+                        </div>
+                    </li>';
+                }
+                    $data.='</ul>';
+                }
+        else {
+            $data = 'No holidays in this month.';
+        }
+        
+        echo $data;
+        exit();
+    }
 }

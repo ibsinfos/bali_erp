@@ -81,7 +81,7 @@
                     <?php echo form_open(base_url('index.php?fees/main/scholarships'), array('class' => 'form-horizontal form-groups-bordered validate', 'target' => '_top')); ?>
                     <div class="row">
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="running_session"><?php echo get_phrase('running_session'); ?></label>
+                            <label for="running_session"><?php echo get_phrase('current_session'); ?></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                                 <input type="text" class="form-control" name="name" value="<?php echo $running_year?>" readonly/> 

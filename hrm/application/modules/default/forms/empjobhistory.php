@@ -67,56 +67,56 @@ class Default_Form_empjobhistory extends Zend_Form
 		$end_date->setAttrib('readonly', 'true');	
 		$end_date->setAttrib('onfocus', 'this.blur()');
 		
-        $received_amount = new Zend_Form_Element_Text("received_amount");        
-        $received_amount->setLabel("Amount Received");
-		$received_amount->setAttrib('maxLength', 10);
-		$received_amount->addValidators(array(
-											array(
-												'validator'   => 'Regex',
-												'breakChainOnFailure' => true,
-												'options'     => array( 
-													'pattern'=>'/^[0-9\.]*$/', 
-													'messages' => array('regexNotMatch'=>'Please enter only numbers.'
-													)
-												)
-											)
-										));		
-		
-		$paid_amount = new Zend_Form_Element_Text("paid_amount");        
-        $paid_amount->setLabel("Amount Paid");
-		$paid_amount->setAttrib('maxLength', 10);
-		$paid_amount->addValidators(array(
-											array(
-												'validator'   => 'Regex',
-												'breakChainOnFailure' => true,
-												'options'     => array( 
-													'pattern'=>'/^[0-9\.]*$/', 
-													'messages' => array('regexNotMatch'=>'Please enter only numbers.'
-													)
-												)
-											)
-										));			
-
-		$client = new Zend_Form_Element_Select('client');
-		$client->setLabel('Client');
-		$client->setRegisterInArrayValidator(false);
-		$client->setRequired(true);
-		$client->addValidator('NotEmpty', false, array('messages' => 'Please select a client.'));		
-		
-		$vendor = new Zend_Form_Element_Text("vendor");        
-        $vendor->setLabel("Vendor");
-		$vendor->addValidator("regex",true,array(                           
-                           'pattern'=>'/^[a-zA-Z.&\- ?]+$/',
-                           'messages'=>array(
-                               'regexNotMatch'=>'Please enter a valid vendor name.'
-                           )
-        			));		
-		
+//        $received_amount = new Zend_Form_Element_Text("received_amount");        
+//        $received_amount->setLabel("Amount Received");
+//		$received_amount->setAttrib('maxLength', 10);
+//		$received_amount->addValidators(array(
+//											array(
+//												'validator'   => 'Regex',
+//												'breakChainOnFailure' => true,
+//												'options'     => array( 
+//													'pattern'=>'/^[0-9\.]*$/', 
+//													'messages' => array('regexNotMatch'=>'Please enter only numbers.'
+//													)
+//												)
+//											)
+//										));		
+//		
+//		$paid_amount = new Zend_Form_Element_Text("paid_amount");        
+//        $paid_amount->setLabel("Amount Paid");
+//		$paid_amount->setAttrib('maxLength', 10);
+//		$paid_amount->addValidators(array(
+//											array(
+//												'validator'   => 'Regex',
+//												'breakChainOnFailure' => true,
+//												'options'     => array( 
+//													'pattern'=>'/^[0-9\.]*$/', 
+//													'messages' => array('regexNotMatch'=>'Please enter only numbers.'
+//													)
+//												)
+//											)
+//										));			
+//
+//		$client = new Zend_Form_Element_Select('client');
+//		$client->setLabel('Client');
+//		$client->setRegisterInArrayValidator(false);
+//		$client->setRequired(true);
+//		$client->addValidator('NotEmpty', false, array('messages' => 'Please select a client.'));		
+//		
+//		$vendor = new Zend_Form_Element_Text("vendor");        
+//        $vendor->setLabel("Vendor");
+//		$vendor->addValidator("regex",true,array(                           
+//                           'pattern'=>'/^[a-zA-Z.&\- ?]+$/',
+//                           'messages'=>array(
+//                               'regexNotMatch'=>'Please enter a valid vendor name.'
+//                           )
+//        			));		
+//		
 		$submit = new Zend_Form_Element_Submit('submit');
 		$submit->setAttrib('id', 'submitbutton');
 		$submit->setLabel('Save');
 		
-		$this->addElements(array($id,$userid,$positionheld,$jobtitleid,$department,$start_date,$end_date,$received_amount,$paid_amount,$client,$vendor,$submit));
+		$this->addElements(array($id,$userid,$positionheld,$jobtitleid,$department,$start_date,$end_date,$submit));
         $this->setElementDecorators(array('ViewHelper'));
          $this->setElementDecorators(array(
                     'UiWidgetElement',

@@ -38,10 +38,11 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
     public function getRequisitionData($sort, $by, $pageNo, $perPage,$searchQuery,$userid,$usergroup,$req_type,$filter='')
     {
         $auth = Zend_Auth::getInstance();
-        if($auth->hasIdentity())
-        {
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
             $school_id = $auth->getStorage()->read()->school_id;
-        }
+        } 
+		
         $where = "r.isactive = 1 ";
 		if($req_type == 3)
 			$where .= " AND r.req_status = 3 ";
@@ -67,10 +68,10 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 		}
 		else
 			$where .= " AND r.req_status = 1 ";
-			
+		$where.=" AND r.school_id = '".$school_id."'";	
         if($searchQuery)
             $where .= " AND ".$searchQuery; 
-	$where .= " AND school_id = '".$school_id."'";		
+			
 		if($usergroup == MANAGEMENT_GROUP || $usergroup == HR_GROUP)
 			$where .= "";
 		else if((  $usergroup == MANAGER_GROUP ) && $req_type == 1)
@@ -87,7 +88,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 			$loginuserGroup = $auth->getStorage()->read()->group_id;
 		} 
 	
-        $roleData = $this->select()
+       $roleData = $this->select()
                         ->setIntegrityCheck(false)
                         ->from(array('r'=>"main_requisition_summary"),array('id'=>'req_id','requisition_code'=>'requisition_code',
                                'onboard_date'=>'date_format(r.onboard_date,"'.DATEFORMAT_MYSQL.'")',
@@ -113,6 +114,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
      	if($auth->hasIdentity()){
 			$userid = $auth->getStorage()->read()->id;			
 			$usergroup = $auth->getStorage()->read()->group_id;
+                        $school_id = $auth->getStorage()->read()->school_id;
 		} 
 		
     	$db = Zend_Db_Table::getDefaultAdapter();
@@ -129,6 +131,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
     	{
     		$where = "r.isactive = 1  AND r.req_status = 1";
     	}
+        $where.=" AND r.school_id = '".$school_id."'";
 		
 		if($usergroup == MANAGEMENT_GROUP  || $usergroup == HR_GROUP)
 			$where .= "";
@@ -233,13 +236,19 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 	}
     public function getRequisitionForEdit($id,$login_id)
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select p.*,if(".$login_id." in (approver1,approver2,approver3),'approver','creator') aflag,
                   case when approver1 = ".$login_id." then '1' when approver2 = ".$login_id." then '2' when approver3 = ".$login_id." then '3' end aorder,j.client_name
                   from ".$this->_name." p
 				 
 				  left join tm_clients j on j.id = p.client_id and j.is_active = 1 
-				  where p.isactive = 1 and p.id =".$id;
+				  where p.isactive = 1 and p.id =".$id." AND p.school_id = '".$school_id."'";
         $result = $db->query($query);
         $row = $result->fetch();
         return $row;
@@ -292,7 +301,12 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
      */
     public function SaveorUpdateRequisitionData($data, $where)
     {
-		
+	$auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
         if($where != '')
         {
             $this->update($data, $where);
@@ -300,11 +314,6 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
         }
         else 
         {
-            $auth = Zend_Auth::getInstance();
-            if($auth->hasIdentity())
-            {
-                $school_id = $auth->getStorage()->read()->school_id;
-            }
             $data['school_id'] = $school_id;
             $this->insert($data);
             $id=$this->getAdapter()->lastInsertId($this->_name);
@@ -318,12 +327,13 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
      */
     public function getMaxReqCode($prefix)
     {
-        $auth = Zend_Auth::getInstance();
-            if($auth->hasIdentity())
-            {
-                $school_id = $auth->getStorage()->read()->school_id;
-            }
-		/** added on 10-08-2015 
+	$auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
+        /** added on 10-08-2015 
 		** fix for requisition id generation in add screen
 		**/
 		$len = strlen($prefix)+1;
@@ -351,10 +361,16 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
      */
     public function getReqCodes($req_status,$flag = '')
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
         if($flag != '')
-                 $data = $this->fetchAll("isactive = 1 and req_status in ('Approved','In process')")->toArray();
+                 $data = $this->fetchAll("isactive = 1 and req_status in ('Approved','In process') and school_id = '".$school_id."'")->toArray();
         else 
-            $data = $this->fetchAll("isactive = 1 and req_status = '".$req_status."' ")->toArray();
+            $data = $this->fetchAll("isactive = 1 and req_status = '".$req_status."' and school_id = '".$school_id."'")->toArray();
         return $data;
     }
     
@@ -365,6 +381,12 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
      */
     public function getAppReqById($id)
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
         $req_arr = array();
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select r.onboard_date,r.req_skills,r.req_qualification,r.req_exp_years,
@@ -379,7 +401,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
                   inner join main_departments d on d.id = p.departmentid and d.isactive = 1 
                   left join main_jobtitles j on j.id = p.jobtitleid and j.isactive = 1 
                   inner join main_employmentstatus es on es.id = r.emp_type and es.isactive = 1 
-                  where r.id = ".$id;
+                  where r.id = ".$id." AND r.school_id = '".$school_id."'";
         $result = $db->query($query);
         $req_arr = $result->fetch();
         return $req_arr;
@@ -391,16 +413,17 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
     public function getReportingmanagers($role = '',$loginid,$id='',$dept='',$flag = '')
     {       
         $auth = Zend_Auth::getInstance();
-            if($auth->hasIdentity())
-            {
-                $school_id = $auth->getStorage()->read()->school_id;
-            }
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
         $db = Zend_Db_Table::getDefaultAdapter();
 		$roles = '';
 		/* Get the roles who have requisition permissions */
 		if($flag == 'interviewer')
 		{
-			$roleIdsData = $db->query("select role from main_privileges where editpermission = 'Yes' AND viewpermission = 'Yes' AND object = ".SCHEDULEINTERVIEWS." AND role is not null AND group_id in (".MANAGER_GROUP.",".HR_GROUP.",".EMPLOYEE_GROUP.",".SYSTEMADMIN_GROUP.") AND school_id = '".$school_id."'");				
+			$roleIdsData = $db->query("select role from main_privileges where editpermission = 'Yes' AND viewpermission = 'Yes' AND object = ".SCHEDULEINTERVIEWS." AND role is not null AND group_id in (".MANAGER_GROUP.",".HR_GROUP.",".EMPLOYEE_GROUP.",".SYSTEMADMIN_GROUP.")");				
 			
 			$roleIds = $roleIdsData->fetchAll();
 			$roles = '';
@@ -441,7 +464,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 						INNER JOIN main_employees e ON u.id = e.user_id 											
 						INNER JOIN main_roles r ON u.emprole = r.id 
                                                 left join main_jobtitles j on j.id = e.jobtitle_id
-						where r.group_id = ".MANAGEMENT_GROUP."  AND u.isactive=1 AND r.isactive=1 ".$whereidText.") app order by app.name asc";
+						where r.group_id = ".MANAGEMENT_GROUP."  AND u.isactive=1 AND u.school_id = '".$school_id."' AND r.isactive=1 ".$whereidText.") app order by app.name asc";
                                 
 				$managerData = $db->query($query);
 				$emp_options = array();
@@ -451,7 +474,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 				
                                 
 				$managerData = $db->query("select u.id,u.userfullname as name from main_users u
-										join main_roles r on u.emprole = r.id where r.group_id = ".MANAGER_GROUP." AND userstatus='old';");// AND u.id=".$loginid."
+										join main_roles r on u.emprole = r.id where r.group_id = ".MANAGER_GROUP." AND userstatus='old' AND u.school_id = '".$school_id."'");// AND u.id=".$loginid."
 										
 				$emp_options = $managerData->fetch();
 			}
@@ -465,8 +488,8 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
         if($auth->hasIdentity())
         {            
             $loginUserId = $auth->getStorage()->read()->id;	
+             $school_id = $auth->getStorage()->read()->school_id;
         } 
-        
         $db = Zend_Db_Table::getDefaultAdapter();
         $roleIdsData = $db->query("select role from main_privileges 
                                   where editpermission = 'Yes' AND viewpermission = 'Yes' 
@@ -496,7 +519,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
                     INNER JOIN main_roles r ON u.emprole = r.id 
                     left join main_jobtitles j on j.id = e.jobtitle_id
                     where r.group_id = ".MANAGEMENT_GROUP."  AND u.isactive=1 
-                        AND r.isactive=1 AND e.user_id not in (".$rept_id.")) app order by app.name asc;";
+                        AND r.isactive=1 AND u.school_id = '".$school_id."' AND e.user_id not in (".$rept_id."))  app order by app.name asc;";
 
             $result = $db->query($query);
             $options = $result->fetchAll();
@@ -507,16 +530,22 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 	**/
 	public function getEmpStatusOptions($id='')
 	{
+            $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
 		$db = Zend_Db_Table::getDefaultAdapter();
 		if($id!=''){
 			$empstatusData = $db->query("select mn.id,tb.employemnt_status from main_employmentstatus mn
-							inner join tbl_employmentstatus tb on mn.workcodename = tb.id where mn.id=".$id.";");
+							inner join tbl_employmentstatus tb on mn.workcodename = tb.id where mn.id=".$id." AND mn.school_id = '".$school_id."'");
 			return $data = $empstatusData->fetch();
 		}
 		else
 		{
 			$empstatusData = $db->query("select mn.id,tb.employemnt_status from main_employmentstatus mn
-						inner join tbl_employmentstatus tb on mn.workcodename = tb.id where mn.isactive = 1;");
+						inner join tbl_employmentstatus tb on mn.workcodename = tb.id where mn.isactive = 1 AND mn.school_id = '".$school_id."'");
 			$data = $empstatusData->fetchAll();
 			$options = array();
 			foreach($data as $emp)
@@ -530,11 +559,11 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
         public function getStatusOptionsForRequi()
         {
             $auth = Zend_Auth::getInstance();
-            if($auth->hasIdentity())
-            {
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
                 $school_id = $auth->getStorage()->read()->school_id;
-            }
-            
+            } 	
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select mn.id,tb.employemnt_status 
                       from main_employmentstatus mn
@@ -579,10 +608,11 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 	public function getJobTitleList($id='')
 	{	
             $auth = Zend_Auth::getInstance();
-            if($auth->hasIdentity())
-            {
-                $school_id = $auth->getStorage()->read()->school_id;
-            }
+     	if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
 		$db = Zend_Db_Table::getDefaultAdapter();	
 		if($id!='')
 		{
@@ -606,43 +636,50 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 	**/
 	public function getDepartmentList($bussinessunitid,$id='')
 	{
-	  $auth = Zend_Auth::getInstance();
-            if($auth->hasIdentity())
-            {
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
                 $school_id = $auth->getStorage()->read()->school_id;
+            } 	
+            $db = Zend_Db_Table::getDefaultAdapter();	
+            if($id!='')
+            {
+                    $empstatusData = $db->query("select * from main_departments where isactive = 1 AND id=".$id." AND school_id = '".$school_id."' order by deptname;");
+                    return $data = $empstatusData->fetch();
             }
-		$db = Zend_Db_Table::getDefaultAdapter();	
-		if($id!='')
-		{
-			$empstatusData = $db->query("select * from main_departments where isactive = 1 AND id=".$id." AND school_id = '".$school_id."' order by deptname;");
-			return $data = $empstatusData->fetch();
-		}
-		else
-		{
-			$empstatusData = $db->query("select * from main_departments where isactive = 1 AND school_id = '".$school_id."' order by deptname;");
-			$data = $empstatusData->fetchAll();
-			$options_arr = array();
-			foreach($data as $option)
-			{
-				$options_arr[$option['id']] = $option['deptname'];
-			}
-			return $options_arr;
-		}
+            else
+            {
+                    $empstatusData = $db->query("select * from main_departments where isactive = 1 AND school_id = '".$school_id."' order by deptname;");
+                    $data = $empstatusData->fetchAll();
+                    $options_arr = array();
+                    foreach($data as $option)
+                    {
+                            $options_arr[$option['id']] = $option['deptname'];
+                    }
+                    return $options_arr;
+            }
 	}
 	
 	/**
 	**/
 	public function getPositionOptions($jobtitle_id,$id='')
 	{	   
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
 		$db = Zend_Db_Table::getDefaultAdapter();	
 		if($id!='')
 		{
-			$empstatusData = $db->query("select * from main_positions where id = ".$id." AND jobtitleid = ".$jobtitle_id." order by positionname;"); //isactive = 1 AND 
+			$empstatusData = $db->query("select * from main_positions where id = ".$id." AND jobtitleid = ".$jobtitle_id." AND school_id='".$school_id."' order by positionname;"); //isactive = 1 AND 
 			return $data = $empstatusData->fetch();
 		}
 		else
 		{
-			$empstatusData = $db->query("select * from main_positions where jobtitleid = ".$jobtitle_id." order by positionname;");//isactive = 1 AND 
+			$empstatusData = $db->query("select * from main_positions where jobtitleid = ".$jobtitle_id." AND school_id='".$school_id."' order by positionname;");//isactive = 1 AND 
 			$data = $empstatusData->fetchAll();
 			$options_arr = array();
 			foreach($data as $option)
@@ -680,6 +717,12 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
 	}
         public function getRequisitionsForCV($filters)
         {
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "SELECT `r`.`id`, `r`.`requisition_code`,j.jobtitlename,req_status
 						FROM `main_requisition` AS `r` 
@@ -687,20 +730,26 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
                         left JOIN `main_positions` AS `p` ON p.id = r.position_id and p.isactive = 1 
                         INNER JOIN `main_users` AS `mu` ON mu.id = r.createdby and mu.isactive = 1 
                         INNER JOIN `main_users` AS `u` ON u.id = r.reporting_id and u.isactive = 1 
-                        WHERE (r.isactive = 1 AND r.req_status in (".$filters.") ) order by r.requisition_code desc";
+                        WHERE (r.isactive = 1) AND r.school_id = '".$school_id."' order by r.requisition_code desc";
             $result = $db->query($query);
             $rows = $result->fetchAll();
             return $rows;
         }
         public function getReqForInterviews()
         {
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select r.id,r.requisition_code,j.jobtitlename,r.department_id 
                       from main_requisition r 
                       inner join main_candidatedetails c on c.isactive = 1 
                       and c.cand_status = 'Not Scheduled' and r.id = c.requisition_id 
                        left join main_jobtitles j on j.id = r.jobtitle
-                      where r.isactive = 1 and r.req_status = 'In process' group by r.id order by r.id desc";
+                      where r.isactive = 1 and r.req_status = 'In process' and r.school_id='".$school_id."' group by r.id order by r.id desc";
             $result = $db->query($query);
             $rows = $result->fetchAll();
             return $rows;
@@ -708,7 +757,6 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
         public function getReqDataForView($req_id)
         {
             $db = Zend_Db_Table::getDefaultAdapter();
-            
             
             $query = "select * from main_requisition_summary where req_id = ".$req_id." and isactive = 1";
             $result = $db->query($query);
@@ -735,12 +783,18 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
         }
         public function getreq_for_interviewrpt()
         {
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
             $db = Zend_Db_Table::getDefaultAdapter();
             $query = "select r.id req_id,concat(r.requisition_code,', ',j.jobtitlename) req_name 
                       from main_requisition r 
                       inner join main_candidatedetails c on c.isactive = 1 and c.requisition_id = r.id 
                       left join main_jobtitles j on j.id = r.jobtitle 
-                      where r.isactive = 1 and r.req_status not in ('Rejected','Initiated') 
+                      where r.isactive = 1 and r.req_status not in ('Rejected','Initiated') and r.school_id = '".$school_id."'
                       group by req_id order by req_id ;";
             $result = $db->query($query);
             $rows = $result->fetchAll();
@@ -748,6 +802,12 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
         }
         public function getdata_for_interviewrpt($param_arr,$sort_name,$sort_type,$page_no,$per_page)
         {
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
             $search_str = "";
             foreach($param_arr as $key => $value)
             {
@@ -766,7 +826,7 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
             $count_query = "select count(*) cnt 
                             from main_requisition_summary rs 
                             inner join main_interviewrounds_summary ins on rs.req_id = ins.requisition_id and ins.isactive = 1 
-                            where rs.isactive = 1  ".$search_str;
+                            where rs.isactive = 1  AND rs.school_id = '".$school_id."'".$search_str;
             $count_result = $db->query($count_query);
             $count_row = $count_result->fetch();
             $count = $count_row['cnt'];
@@ -785,28 +845,40 @@ class Default_Model_Requisition extends Zend_Db_Table_Abstract
                       ins.interview_feedback,ins.interview_comments,ins.round_status 
                       from main_requisition_summary rs 
                       inner join main_interviewrounds_summary ins on rs.req_id = ins.requisition_id and ins.isactive = 1 
-                      where rs.isactive = 1 ".$search_str." order by ".$sort_name." ".$sort_type." ".$limit_str;
+                      where rs.isactive = 1 and rs.school_id = '".$school_id."' ".$search_str." order by ".$sort_name." ".$sort_type." ".$limit_str;
             $result = $db->query($query);
             $rows = $result->fetchAll();
             return array('rows' => $rows,'page_cnt' => $page_cnt);
         }
 	public function getRequisitionStats()
 	{
-		$db = Zend_Db_Table::getDefaultAdapter();
-		$query = "select count(case when req_status = 'Initiated' then (id) end) as initiated_req, count(case when req_status = 'Approved' then (id) end) as approved_req, count(case when req_status = 'Rejected' then (id) end) as rejected_req,count(case when req_status = 'Closed' then (id) end) as closed_req,
-count(case when req_status = 'On hold' then (id) end) as onhold_req, count(case when req_status = 'Complete' then (id) end) as complete_req, count(case when req_status = 'In process' then (id) end) as inprocess_req from main_requisition where isactive = 1 and year(createdon) = year(now());";
-		$result = $db->query($query);
-		$rows = $result->fetchAll();
-		return $rows;
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
+            $db = Zend_Db_Table::getDefaultAdapter();
+            $query = "select count(case when req_status = 'Initiated' then (id) end) as initiated_req, count(case when req_status = 'Approved' then (id) end) as approved_req, count(case when req_status = 'Rejected' then (id) end) as rejected_req,count(case when req_status = 'Closed' then (id) end) as closed_req,
+count(case when req_status = 'On hold' then (id) end) as onhold_req, count(case when req_status = 'Complete' then (id) end) as complete_req, count(case when req_status = 'In process' then (id) end) as inprocess_req from main_requisition where isactive = 1 and school_id = '".$school_id."' and year(createdon) = year(now())";
+            $result = $db->query($query);
+            $rows = $result->fetchAll();
+            return $rows;
 	}
 
 	public function getUserloginStats()
 	{
-		$db = Zend_Db_Table::getDefaultAdapter();
-		$query = "select count(id) as cnt, day(logindatetime) as logindate from main_userloginlog group by day(logindatetime);"; 
-		$result = $db->query($query);
-		$rows = $result->fetchAll();
-		return $rows;
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
+            $db = Zend_Db_Table::getDefaultAdapter();
+            $query = "select count(id) as cnt, day(logindatetime) as logindate from main_userloginlog where school_id = '".$school_id."' group by day(logindatetime);"; 
+            $result = $db->query($query);
+            $rows = $result->fetchAll();
+            return $rows;
 	}
 
 	/**
@@ -823,8 +895,14 @@ count(case when req_status = 'On hold' then (id) end) as onhold_req, count(case 
 
 	public function getCountRequisitions($searchQuery = 1)
 	{
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
 		$where = "1";
-
+                $where .= " AND school_id = '".$school_id."'";
 		if($searchQuery)
 		$where .= " AND ".$searchQuery;
 
@@ -843,46 +921,58 @@ count(case when req_status = 'On hold' then (id) end) as onhold_req, count(case 
 	 * To show it in Requisition Report filters 
 	 */
 	public function getYearFirstRequisitionRaised(){
-		$db = Zend_Db_Table::getDefaultAdapter();
-        $query = "select MIN(rs.createdon) first_requisition_raised_in from main_requisition_summary rs where 1";
-        return $result = $db->query($query)->fetch();
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
+            $db = Zend_Db_Table::getDefaultAdapter();
+            $query = "select MIN(rs.createdon) first_requisition_raised_in from main_requisition_summary rs where 1 AND school_id = '".$school_id."'";
+            return $result = $db->query($query)->fetch();
 	}
 	
 	public function getReportData($param_arr,$per_page,$page_no,$sort_name,$sort_type, $userid, $usergroup,$req_type)
 	{
-        $where = "isactive = 1 ";
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
+            $where = "isactive = 1 ";
 			
-		if($usergroup == MANAGEMENT_GROUP ){
-			$where .= "";
-		}else if((  $usergroup == MANAGER_GROUP || $usergroup == HR_GROUP) && $req_type == 1){
-			$where .= " AND (rs.createdby = ".$userid." or (".$userid." in (approver1,approver2,approver3) and 'Initiated' in (case when approver1 = ".$userid." then appstatus1 when approver2 = ".$userid." then appstatus2 when approver3 = ".$userid." then appstatus3 end)) )";
-		}else if($usergroup == MANAGER_GROUP && $req_type == 2){
-			$where .= " AND rs.createdby = ".$userid." ";
-		}else if($usergroup == MANAGER_GROUP && $req_type == 3){
-			$where .= " AND rs.createdby = ".$userid." ";
-		}
+            if($usergroup == MANAGEMENT_GROUP ){
+                    $where .= "";
+            }else if((  $usergroup == MANAGER_GROUP || $usergroup == HR_GROUP) && $req_type == 1){
+                    $where .= " AND (rs.createdby = ".$userid." or (".$userid." in (approver1,approver2,approver3) and 'Initiated' in (case when approver1 = ".$userid." then appstatus1 when approver2 = ".$userid." then appstatus2 when approver3 = ".$userid." then appstatus3 end)) )";
+            }else if($usergroup == MANAGER_GROUP && $req_type == 2){
+                    $where .= " AND rs.createdby = ".$userid." ";
+            }else if($usergroup == MANAGER_GROUP && $req_type == 3){
+                    $where .= " AND rs.createdby = ".$userid." ";
+            }
 		
-		// To remove unwanted post values in the query 
-		$remove_elements = array('search_criteria', 'previous_search', 'hid_raised_by_name', 'hid_reporting_manager_name');
-		foreach($remove_elements as $ele){
-			if(isset($param_arr[$ele])){
-				unset($param_arr[$ele]);
-			}
-		}
+            // To remove unwanted post values in the query 
+            $remove_elements = array('search_criteria', 'previous_search', 'hid_raised_by_name', 'hid_reporting_manager_name');
+            foreach($remove_elements as $ele){
+                    if(isset($param_arr[$ele])){
+                            unset($param_arr[$ele]);
+                    }
+            }
 		
-		if(!empty($param_arr)){
-            foreach($param_arr as $field => $value){
-	            if(!empty($value)){
-		            switch($field){
-		            	case 'createdon':
-		                    $where .= " and YEAR(".$field.") = '".$value."'";
-		                    break;
-		            	default:
-		                    $where .= " and ".$field." = '".$value."'";
-		            }
+            if(!empty($param_arr)){
+                foreach($param_arr as $field => $value){
+                    if(!empty($value)){
+                        switch($field){
+                            case 'createdon':
+                                $where .= " and YEAR(".$field.") = '".$value."'";
+                                break;
+                            default:
+                                $where .= " and ".$field." = '".$value."'";
+                        }
+                    }
                 }
             }
-		}
             
             
             // To get count of total requisitions
@@ -890,7 +980,7 @@ count(case when req_status = 'On hold' then (id) end) as onhold_req, count(case 
 	            $offset = ($per_page*$page_no) - $per_page;
 	            $limit_str = " limit ".$per_page." offset ".$offset;
             }
-            
+            $where.=" and school_id='".$school_id."'";
             $count_query = "select count(id) cnt from main_requisition_summary rs where ".$where;
             
             $db = Zend_Db_Table::getDefaultAdapter();
@@ -915,10 +1005,16 @@ count(case when req_status = 'On hold' then (id) end) as onhold_req, count(case 
     
     public function getAutoReportRequisition($search_str)
     {
+        $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select DISTINCT(r.id) id, r.requisition_code requisition_code
                   from main_candidatedetails c LEFT JOIN main_requisition r ON c.requisition_id = r.id 
-                  WHERE r.requisition_code like '%".$search_str."%' 
+                  WHERE r.requisition_code like '%".$search_str."%'  and r.school_id = '".$school_id."'
                   order by requisition_code desc
                   limit 0,10";
         $result = $db->query($query);
@@ -936,7 +1032,12 @@ count(case when req_status = 'On hold' then (id) end) as onhold_req, count(case 
      */
     public function getcandidates_forinterview($req_id,$loginUserGroup,$loginUserId)
     {
-        
+        $auth = Zend_Auth::getInstance();
+        if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
         $jobtitleModel = new Default_Model_Jobtitles();
         $candsmodel = new Default_Model_Candidatedetails();			
 				

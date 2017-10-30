@@ -36,18 +36,10 @@
     <div class="col-md-12">
         <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('This is the form of hostel registration.');?>" data-position='top'>
 
-            <?php echo form_open(base_url() . 'index.php?school_admin/hostel_registration/create', array('class' => 'form-groups-bordered  validate', 'target' => '_top')); ?> 
+            <?php echo form_open(base_url() . 'index.php?school_admin/hostel_registration/create', array('class' => 'form-groups-bordered  validate', 'target' => '_top','id'=>'hostel_registration')); ?> 
 
             <div class="row">
-                <div class="col-xs-12 col-md-6 form-group">
-                    <label for="field-1"><?php echo get_phrase("user_type"); ?></label>
-                    <div class="input-group">
-                        <div class="input-group-addon"><i class="ti-user"></i></div>                  
-                        <input type="text" class="form-control" name="user_type" value="<?php echo get_phrase('student'); ?>" disabled="disabled">
-                    </div> 
-                </div>
-
-                <div class="col-xs-12 col-md-6 form-group">
+                 <div class="col-xs-12 col-md-6 form-group">
                     <label for="field-1">
                         <?php echo get_phrase('class'); ?><span class="error mandatory"> *</span>
                     </label>
@@ -62,9 +54,6 @@
 
                     </select>
                 </div>
-            </div>
-
-            <div class="row">         
                 <div class="col-xs-12 col-md-6 form-group">
                     <label for="field-1">
                         <?php echo get_phrase('section'); ?><span class="error mandatory"> *</span>
@@ -73,6 +62,10 @@
                         <option value=""><?php echo get_phrase('select_section'); ?></option>
                     </select> 
                 </div>
+            </div>
+
+            <div class="row">         
+                
 
                 <div class="col-xs-12 col-md-6 form-group">
                     <label for="field-1"> <?php echo get_phrase('student'); ?><span class="error mandatory"> *</span>
@@ -80,6 +73,14 @@
                     <select name="student_id" class="selectpicker" data-style="form-control" data-live-search="true" id="student_selection_holder"
                             required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_name'); ?>" onchange="get_student_dormatory(this.value)">
                         <option value=""><?php echo get_phrase('select_class_and_section_first'); ?></option>
+                    </select>
+                </div>
+                <div class="col-xs-12 col-md-6 form-group">
+                    <label for="field-1"> <?php echo get_phrase('hostel_name'); ?><span class="error mandatory"> *</span>
+                    </label> 
+                    <select name="hostel_name" class="selectpicker" data-style="form-control" data-live-search="true"  id="hostel_name"
+                            required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_type'); ?>">
+                        <option value=""><?php echo get_phrase('select_student_first'); ?></option>
                     </select>
                 </div>
             </div> 
@@ -97,14 +98,7 @@
                                     </select>                 
                                 </div>-->
 
-                <div class="col-xs-12 col-md-6 form-group">
-                    <label for="field-1"> <?php echo get_phrase('hostel_name'); ?><span class="error mandatory"> *</span>
-                    </label> 
-                    <select name="hostel_name" class="selectpicker" data-style="form-control" data-live-search="true"  id="hostel_name"
-                            required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_type'); ?>">
-                        <option value=""><?php echo get_phrase('select_student_first'); ?></option>
-                    </select>
-                </div>
+                
                 <div class="col-xs-12 col-md-6 form-group">
                     <label for="field-1"> <?php echo get_phrase('floor_name'); ?><span class="error mandatory"> *</span>
                     </label> 
@@ -113,40 +107,7 @@
                         <option value=""><?php echo get_phrase('select_hostel_name_first'); ?></option>
                     </select>
                 </div>
-            </div>
-
-            <div class="row">         
-
-
-                <div class="col-xs-12 col-md-6 form-group">
-                    <label for="field-1"> <?php echo get_phrase('room_no.'); ?><span class="error mandatory"> *</span>
-                    </label> 
-                    <select name="hostel_room" class="selectpicker" data-style="form-control" data-live-search="true" id="hostel_room"
-                             data-validate="required" data-message-required ="<?php echo get_phrase('please_select_floor'); ?>">
-                        <option value=""><?php echo get_phrase('select_floor_first'); ?></option>
-                    </select>
-                    <label class="mandatory hide" id="no_bed_error">Beds not available.</label>
-                </div>
                 <div class="col-xs-12 col-md-6 form-group form-group">
-                    <label for="field-1"><?php echo get_phrase("hostel_registration_date"); ?></label>
-                    <div class="input-group">
-                        <div class="input-group-addon"><i class="icon-calender"></i></div>
-                        <input id= "register_date" type="text" class="form-control mydatepicker"  name="register_date" placeholder="Pick a date" data-validate="required" data-message-required ="Please pick a date">
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">         
-
-
-                <div class="col-xs-12 col-md-6 form-group form-group">
-                    <label for="field-1"><?php echo get_phrase("vacating_date"); ?></label>
-                    <div class="input-group">
-                        <div class="input-group-addon"><i class="icon-calender"></i></div>
-                        <input id= "vacating_date" type="text" class="form-control mydatepicker"  name="vacating_date" placeholder="Pick a date" data-validate="required" data-message-required ="Please pick a date">
-                    </div>
-                </div>
-                 <div class="col-xs-12 col-md-6 form-group form-group">
                 <label for="field-1"> <?php echo get_phrase('food'); ?><span class="error mandatory"> *</span>
                     <div class="">
                         <input type="radio" name="food" value="yes">
@@ -157,7 +118,10 @@
                     </div>
             </div>
             </div>
-
+            <div id="ajax_hostel_room_view" class="row">
+                
+                </div>
+            
            
 
 
@@ -170,28 +134,14 @@
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-
-        $('#register_date').datepicker({
-            format: "dd/mm/yyyy"
-        }).on('change', function () {
-            $('.datepicker').hide();
-        });
-
-        $('#vacating_date').datepicker({
-            format: "dd/mm/yyyy"
-        }).on('change', function () {
-            $('.datepicker').hide();
-        });
-
-    });
+   
     $('#section').change(get_class_students);
     function get_class_students() {
         var section_id = $(this).val();
         var class_id = $("#class_id option:selected").val();
 
         $.ajax({
-            url: '<?php echo base_url(); ?>index.php?school_admin/get_students/' + class_id + '/' + section_id,
+            url: '<?php echo base_url(); ?>index.php?school_admin/get_available_students_for_hostel/' + class_id + '/' + section_id,
             success: function (response)
             {
                 jQuery('#student_selection_holder').html(response).selectpicker('refresh');
@@ -242,17 +192,21 @@
     function get_hostel_room() {
         var hostel_id = $("#hostel_name option:selected").val();
         var floor = $("#floor option:selected").val();
+		$('body').loading('start');
         $.ajax({
-            url: '<?php echo base_url(); ?>index.php?school_admin/get_hostel_room/' + floor + '/' + hostel_id,
+            url: '<?php echo base_url(); ?>index.php?school_admin/get_hostel_room_with_beds/' + floor + '/' + hostel_id,
             success: function (response)
             {
-                var splitArr = response.split('||**||');
+               
+                jQuery('#ajax_hostel_room_view').html(response)
+                $('body').loading('stop');
+				/*var splitArr = response.split('||**||');
                 jQuery('#hostel_room').html(splitArr[1]).selectpicker('refresh');
                 if(splitArr[0] == 1){
                     $('#no_bed_error').removeClass('hide');
                 } else {
                     $('#no_bed_error').addClass('hide');
-                }
+                }*/
             }
         });
     }

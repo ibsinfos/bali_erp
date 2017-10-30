@@ -32,20 +32,18 @@
                 <div class="col-xs-12 col-md-offset-3 col-md-6">
                     <label for="field-1"><?php echo get_phrase("status"); ?><span class="mandatory"> *</span></label>
                     <select class="form-control" id="categoriesStatus" data-style="form-control" name="categoriesStatus" required="required" data-live-search="true">
-                        <?php if (!empty($categories_status)) { ?>
-                            <option value="<?php echo $categories_status; ?>"><?php echo $categories_status; ?></option>
-                        <?php } ?>
-                        <option value="Available">Available</option>
-                        <option value="Not Available">Not Available</option>
+                        <option value="Available" <?php if($categories_status == "Available"){ echo "selected"; }?>>Available</option>
+                        <option value="Alloted" <?php if($categories_status == "Alloted"){ echo "selected"; }?>>Not Available</option>
                     </select>
                 </div>
             </div>
+            <div class="clearfix">&nbsp;</div>
             <!-- /form-group-->
             <div class="text-right">
                 <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('update'); ?></button>
-                <a href="<?php echo base_url(); ?>index.php?school_admin/inventory_category/">
-                    <button  type="button" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('cancel'); ?>
-                    </button></a>
+<!--                <a href="<?php // echo base_url(); ?>index.php?school_admin/inventory_category/">
+                    <button  type="button" class="fcbtn btn btn-danger btn-outline btn-1d"><?php // echo get_phrase('cancel'); ?>
+                    </button></a>-->
             </div>
 
         </form>

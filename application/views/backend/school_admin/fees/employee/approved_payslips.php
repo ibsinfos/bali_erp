@@ -28,7 +28,8 @@
     <div class="col-md-12 white-box">
         <div class="row">
             <form method="post" action="<?php echo base_url('index.php?fees/main/approved_payslips')?>">
-                <div class="col-md-3">
+                <div class="col-md-6">
+                    <label><?php echo get_phrase('select_role')?></label>
                     <select class=" selectpicker" data-style="form-control" name="role_id">
                         <option value=""><?php echo get_phrase('select_role')?></option>
                         <?php foreach($roles as $role){?>
@@ -36,11 +37,13 @@
                         <?php }?>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <input type="text" class="form-control dtp" name="month" placeholder='Salary Month' value="<?php echo $month?>" required/>
+                <div class="col-md-6">
+                    <label><?php echo get_phrase('select_month')?></label>
+                    <input type="text" class="form-control dtp" name="month" placeholder='Salary Month' value="<?php echo date('F-Y');?>" required/>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-info">View</button>
+                <div class="col-md-12 text-center">&nbsp;</div>
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-danger btn-outline btn-1d">View</button>
                 </div>
             </form>
         </div>
@@ -74,8 +77,8 @@
                         <td><?php echo decrypt_salary($row->salary);?></td>
                         <td><?php echo $row->net_pay;?></td>
                         <td>
-                            <a href="<?php echo base_url('index.php?fees/prints/employee_payslip/'.$row->payslip_id)?>" class="btn btn-primary btn-xs" target="_blank">
-                                <i class="fa fa-eye"></i> View Paylip
+                            <a href="<?php echo base_url('index.php?fees/prints/employee_payslip/'.$row->payslip_id)?>" target="_blank">
+                                <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Payslip"><i class="fa fa-eye"></i></button>
                             </a>  
                         </td>
                     </tr>
@@ -89,7 +92,7 @@
 $(function(){
     $('.dtp').datepicker({//startView:1,
                             autoclose:true,
-                            format: 'mm-yyyy',
+                            format: 'MM-yyyy',
                             viewMode: "months", 
                             minViewMode: "months",
                             clearBtn: true});

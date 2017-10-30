@@ -1,0 +1,300 @@
+<?php 
+/********************************************************************************* 
+ *  This file is part of Sentrifugo.
+ *  Copyright (C) 2014 Sapplica
+ *   
+ *  Sentrifugo is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Sentrifugo is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Sentrifugo.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Sentrifugo Support <support@sentrifugo.com>
+ ********************************************************************************/
+
+
+if (count($this->messages)) {?>
+	<div id="dispmsgemp" class="settingssuccess">
+		<?php 
+			foreach ($this->messages as $message)
+			{
+				$flag = array();				
+				$flag = array_keys($message);
+				echo "<div id='messageData' class='ml-alert-1-$flag[0]'><div style='display:block;'><span class='style-1-icon $flag[0]'></span>";
+				echo $message[$flag[0]];
+				echo "</div></div>";
+			} 
+		?>
+	</div>	
+	
+<?php }	
+if($this->dataArray[0]['emptyroles'] == 1)
+{
+ ?>
+	 <div class="ml-alert-1-info m1-info-set">
+		<div class="style-1-icon info"></div>
+			Employees grid will not work as Roles are not added yet.
+	</div>
+ <?php	} else	{	?>
+
+<?php
+if($this->call != 'ajaxcall')
+{
+    if(!empty($this->popConfigPermission))
+    {
+?>
+<div>
+
+<!-- For excel Upload -->
+<div class="profile-tabs-right-2">
+    <div class="flt_right">
+      	
+        <div class="actions_div">
+
+            <span class="uploadbut_exel uploadbutsel flt_left marginfiv" id="upload_custom_div" >Import Employees</span>
+			<a target="_blank" href="<?php echo DOMAIN; ?>public/downloads/import_employees.xlsx" class="importformatlink flt_left">Import format</a>
+			<a target="_blank" href="<?php echo DOMAIN; ?>public/downloads/importguide.pdf" class="importformatlink flt_left">Help</a>
+            <div id="loaderimgprofile" style="display:none;"><img src="<?php echo DOMAIN; ?>public/media/images/loaderwhite_21X21.gif" style="width:21px; height: 21px; float: none; "/></div>								
+        </div>                 					
+    </div>
+    <input type="hidden" id="uploadimagepath" name="uploadimagepath" value=""/>
+    <input type="hidden" name="emp_excel" value=""/>							    	
+               				                        					
+</div>
+</div>
+
+<span id="error_message"></span>
+<div id="upload_error" style="display:none;clear:both;"></div>	
+<!-- End excel Upload -->
+<?php
+    }
+}
+//echo '<pre>';
+// print_r($this->dataArray);
+
+if($this->call == 'ajaxcall'){
+	$div = ''; $endDiv = ''; 
+} else { 
+	$div = '<div id="grid_'.$this->dataArray[0]['objectname'].'" class="all-grid-control">'; $endDiv = '</div>';
+}
+	echo $div;
+?>
+  <?php $months = array('1' => 'Jan', '2'=>'Feb', '3'=>'Mar', '4'=>'Apr', '5'=>'May', '6'=>'Jun', '7'=>'Jul', '8'=>'Aug', '9'=>'Sep', '10'=>'Oct', '11'=>'Nov', '12'=>'Dec');?>
+<div class="table-header"><span>Generate WPS Report</span></div>
+<div class="col-md-12" style="width: 100%; float: left;">
+    <div class="col-md-3" style="float:left;">
+        <select name="wps_types" onchange="showEmployeesByType(this.value);">
+            <option value="">Select WPS Status</option>
+            <?php foreach($this->employmentstatusdata as $key=>$val){ ?>
+            <option value="<?php echo $val['workcodename']; ?>" <?php if($this->type==$val['workcodename']) { ?> selected="selected" <?php } ?>><?php echo $val['statusname']; ?></option>
+            <?php } ?>
+        </select>
+        <select id="year_val">
+            <option value="">Select Year</option>
+            <?php for($k=2000;$k<=date('Y');$k++){ ?>
+            <option value="<?php echo $k; ?>"><?php echo $k; ?></option>
+            <?php } ?>
+        </select>
+        <select id="month_val">
+            <option value="">Select Month</option>
+            <?php for($k=1;$k<=count($months);$k++){ $n=$k<10?'0'.$k:$k; ?>
+            <option value="<?php echo $n; ?>"><?php echo $months[$k]; ?></option>
+            <?php $month++; } ?>
+        </select>
+    </div>
+    <div class="col-md-3 new-form-ui-submit" style="float: left; width: 40%; clear: none; margin-left: 4%;">
+        <button type="button" id="generate" onclick="bulkGenerate();">Generate</button>
+    </div>
+</div>
+
+<div class="col-md-12" style="width: 100%; height: 15px; float: left; margin-bottom: 15px;">&nbsp;</div>
+<form method="post" name="frm_selected_emp_ids" id="frm_selected_emp_ids" action="<?php echo BASE_URL.'/generatewpsreport/generatebulkreport/';?>">
+<div class="slimScrollDiv" style="position: relative; overflow: hidden; width: 250px; height: auto;">
+    <div id="generatewpsreport" class="details_data_display_block newtablegrid" style="overflow: hidden; width: 250px; height: auto; background: rgb(204, 204, 204) none repeat scroll 0% 0%; padding-bottom: 10px;">
+        <table class="grid" align="center" width="100%" cellspacing="0" cellpadding="4" border="0">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" name="check_all" value="1" id="select_all" style="float:left;" /> 
+                    </th>
+                    <th>
+                        <a href="javascript:void(0);" onclick="javascript:paginationndsorting(BASE_URL.'/generatewpsreport/index/sort/ASC/by/firstname/objname/generatewpsreport/page/1/per_page/20');">First Name</a>
+                       </th>
+                    <th>
+                        <a href="javascript:void(0);" onclick="javascript:paginationndsorting(BASE_URL.'/generatewpsreport/index/sort/ASC/by/lastname/objname/generatewpsreport/page/1/per_page/20');">Last Name</a>
+                    </th>
+                    <th>
+                        <a href="javascript:void(0);" onclick="javascript:paginationndsorting(BASE_URL.'/generatewpsreport/index/sort/ASC/by/lastname/objname/generatewpsreport/page/1/per_page/20');">Employment Status</a>
+                    </th>
+                    <th>
+                        <a href="javascript:void(0);">Mode of Salary Transfer</a>
+                    </th>
+                    <th>
+                        <a href="javascript:void(0);">Document Reference No.</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach($this->dataArray[0] as $key=>$data) { ?>
+                <tr onclick="selectrow(generatewpsreport,this);" class="row1">
+                    <td>
+                        <span title="generate">
+                            <input type="checkbox" class="checkbox" name="check_user[]" value="<?php echo $data['id']; ?>" />
+<!--                            <a href="<?php //echo BASE_URL.'/generatewpsreport/generate/id/'.$data['id'];?>">
+                                Generate
+                            </a>-->
+                        </span>
+                    </td>
+                    <td><span title="<?php echo $data['firstname']; ?>"><?php echo $data['firstname']; ?></span></td>
+                    <td><span title="<?php echo $data['lastname']; ?>"><?php echo $data['lastname']; ?></span></td>
+                    <td><span title="<?php echo $data['emp_status_name']; ?>"><?php echo $data['emp_status_name']; ?></span></td>
+                    <td>
+                        <select name="mode_of_salary_transfer_<?php echo $data['id']; ?>">
+                            <option value="1">Bank Transfer</option>
+                            <option value="2">Cheque</option>
+                            <option value="3">Cash</option>
+                            <option value="4">Exchange</option>
+                        </select>
+                    </td>
+                    <td><input type="text" name="reference_no_<?php echo $data['id']; ?>" /></td>
+                </tr>
+                <?php } ?>
+        </table>
+    </div>
+    <input type="hidden" name="selected_emp_ids" id="selected_emp_ids" value=""> 
+    <input type="hidden" name="month" id="month" />
+    <input type="hidden" name="year" id="year" />
+</div>
+
+
+    
+</form>
+
+<?php
+                
+        echo $endDiv;
+?>
+<?php	}	?>
+<script type='text/javascript'>
+$(document).ready(function(){
+<?php if (count($this->messages)) {?>
+      setTimeout(function(){
+			$('#dispmsgemp').fadeOut('slow');
+		},10000);
+
+<?php } ?>
+
+})
+</script>
+
+<?php 
+if($this->call != "ajaxcall")
+{
+
+?>
+
+<script type="text/javascript">
+function showEmployeesByType(value){
+    window.location = "<?php echo BASE_URL; ?>/generatewpsreport/index/type/"+value;
+}
+    
+function bulkGenerate(){
+    if(is_generated_selectetd()==false){
+        jAlert("Please select any employee to generate the report.");
+        return false;
+    }
+    jConfirm("Are you sure to generate WPS report for selected employees?","Generate WPS Report",function(r){
+        if(r==true){
+            $('#month').val($('#month_val').val());
+            $('#year').val($('#year_val').val());
+          $("#frm_selected_emp_ids").submit();
+        }else{
+             return false;
+        }
+    });
+}    
+$(document).ready(function(){
+    $('#select_all').on('click',function(){
+        if(this.checked){ 
+            $('.checkbox').each(function(){
+                this.checked = true;
+                //console.log(this.value);
+                var selelctedIds=$("#selected_emp_ids").val();
+                if(selelctedIds==""){
+                    $("#selected_emp_ids").val(this.value);
+                }else{
+                    selelctedIds=selelctedIds+","+this.value;
+                    $("#selected_emp_ids").val(selelctedIds);
+                }
+            });
+        }else{
+             $('.checkbox').each(function(){
+                this.checked = false;
+            });
+            $("#selected_emp_ids").val("");
+        }
+        //var selelctedIds=$("#selected_emp_ids").val();
+        //console.log(selelctedIds);
+    });
+    
+    $('.checkbox').on('click',function(){
+        if($('.checkbox:checked').length == $('.checkbox').length){
+            $('#select_all').prop('checked',true);
+        }else{
+            $('#select_all').prop('checked',false);
+        }
+        $("#selected_emp_ids").val("");
+        $('.checkbox').each(function(){
+            if(this.checked){
+                var selelctedIds=$("#selected_emp_ids").val();
+                if(selelctedIds==""){
+                    $("#selected_emp_ids").val(this.value);
+                }else{
+                    selelctedIds=selelctedIds+","+this.value;
+                    $("#selected_emp_ids").val(selelctedIds);
+                }
+            }
+        });
+    });
+});
+
+function is_generated_selectetd(){
+    var item_checked=false;
+    $('.checkbox').each(function(){
+        if(this.checked){
+            item_checked=true;
+        }
+    });
+    return item_checked;
+}
+</script>
+
+<?php 
+}
+?>
+
+<script type='text/javascript' language='javascript'>
+//    $('#generatewpsreport').slimScrollHorizontal({
+//alwaysVisible: false,
+//start: 'left',
+//position: 'bottom',
+//
+//}).css({ background: '#ccc', paddingBottom: '10px' }); 
+//
+//$(document).ready(function(){
+//                                                                        
+//if($('.searchtxtbox_generatewpsreport').is(':visible'))
+//{
+//    $('#search_tr_generatewpsreport').show();	
+//}
+//else 
+//    $('#search_tr_generatewpsreport').hide();	
+//});
+</script>

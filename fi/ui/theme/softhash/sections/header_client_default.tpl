@@ -110,14 +110,13 @@ License: You must have a valid license purchased only from envato(the above link
                         <li class="dropdown navbar-user">
 
                             <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
-
-                                {if $user['img'] eq 'gravatar'}
+                                {*if $user['img'] eq 'gravatar'}
                                     <img src="http://www.gravatar.com/avatar/{($user['email'])|md5}?s=200" class="img-circle" alt="{$user['fullname']}">
                                 {elseif $user['img'] eq ''}
                                     <img src="{$app_url}ui/lib/imgs/default-user-avatar.png" alt="">
                                 {else}
                                     <img src="{$app_url}sysfrm/uploads/user-pics/{$user['img']}" class="img-circle" alt="{$user['account']}">
-                                {/if}
+                                {/if*}
 
                                 <span class="hidden-xs">{*$_L['Welcome']*} {$user['account']}</span> {*<b class="caret"></b>*}
                             </a>

@@ -72,7 +72,7 @@ $report_opt = $this->report_opt;
 ?>
 <div class="right-block-data right-over-border"> 
 	<div id="error_message" style="display:none;"></div>
-	<form name="<?php echo $this->form->getName(); ?>" id="<?php echo $this->form->getId(); ?>" action="<?php echo $this->form->getAction();?>" method="<?php echo $this->form->getMethod(); ?>">
+	<form name="<?php echo $this->form->getName(); ?>" id="<?php echo $this->form->getId(); ?>" action="<?php echo $this->form->getAction();?>" method="<?php echo $this->form->getMethod(); ?>" enctype="multipart/form-data">
             <input type="hidden" name="tmp_emp_name" id="tmp_emp_name" />
 			 <input type="hidden" id="hidact_inact" name ="act_inact" value="0" />
 			<?php echo $this->form->id; ?>
@@ -277,7 +277,7 @@ $report_opt = $this->report_opt;
                         if($this->data['is_orghead'] == 0){
                         ?>
 				<div class="new-form-ui">
-				  <label class="required">Employment Status</label>
+				  <label class="required">Employment Type (WPS)</label>
 				<div class="division"><?php echo $this->form->emp_status_id; ?>
             				<?php if(isset($this->msgarray['emp_status_id'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->emp_status_id->getId(); ?>"><?php echo $this->msgarray['emp_status_id'];?></span>
@@ -288,6 +288,18 @@ $report_opt = $this->report_opt;
                                         { ?>	
 					<span class="add-coloum" onclick="displaydeptform('<?php echo BASE_URL.'employmentstatus/addpopup' ?>','Employment Status');"> Add Employment Status</span>			
 				<?php } ?></div>
+				</div>
+                                                                
+                                <div class="new-form-ui" id="vendor_list" style="display:none;">
+				  <label class="required">Vendors</label>
+                                    <div class="division">
+                                        <?php echo $this->form->vendor_id; ?>
+                                        <?php if(isset($this->msgarray['vendor_id'])){?>
+                                           <span class="errors" id="errors-<?php echo $this->form->vendor_id->getId(); ?>">
+                                               <?php echo $this->msgarray['vendor_id'];?>
+                                           </span>
+                                        <?php }?>
+                                    </div>
 				</div>
                         <?php }?>			
 				<div class="new-form-ui">
@@ -319,7 +331,7 @@ $report_opt = $this->report_opt;
 				</div>
 				
 				<div class="new-form-ui">
-				  <label ><?php echo $this->form->office_number->getLabel(); ?></label>
+                                    <label class="required"><?php echo $this->form->office_number->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->office_number; ?></div>
 				<?php if(isset($this->msgarray['office_number'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->office_number->getId(); ?>"><?php echo $this->msgarray['office_number'];?></span>
@@ -341,6 +353,23 @@ $report_opt = $this->report_opt;
 				   <span class="errors" id="errors-<?php echo $this->form->office_faxnumber->getId(); ?>"><?php echo $this->msgarray['office_faxnumber'];?></span>
 				<?php }?>
 				</div>
+                                                                
+                                <div class="new-form-ui">
+				  <label >Profile Photo</label>
+                                    <div class="division">
+                                        <input type="file" name="profile_photo" id="profile_photo" />
+                                        <input type="hidden" name="old_img" value="<?php echo $this->employeedata['profileimg']; ?>" />
+                                    </div>
+                                    <?php if(isset($this->msgarray['profile_photo'])){?>
+                                       <span class="errors" id="errors-<?php echo $this->form->profile_photo->getId(); ?>"><?php echo $this->msgarray['profile_photo'];?></span>
+                                    <?php }?>
+                                    <?php if(isset($this->employeedata['profileimg']) && file_exists(USER_UPLOAD_PATH.'/'.$this->employeedata['profileimg'])) { ?>
+                                       <img style="margin-top:5px; float: left;" src="<?php echo DOMAIN.'public/uploads/profile/'.$this->employeedata['profileimg']; ?>" width="70" height="80" />
+                                       <div style="width:100%;">&nbsp;</div>
+                                    <?php } ?>
+				</div>                                    
+                                 
+                                                                
 			<div class="new-form-ui-submit">
 					<?php echo $this->form->submit; ?>
 					<button onclick="window.location.href='<?php echo BASE_URL; ?>employee';" type="button" id="Cancel" name="Cancel">Cancel</button>
@@ -462,7 +491,7 @@ $("#emprole").change(function()
 <?php if (count($this->messages)) {?>
       setTimeout(function(){
 			$('#dispmsgemp').fadeOut('slow');
-		},3000);
+		},10000);
 
 <?php } ?>    
     $("#empdetails").addClass('active');
@@ -809,7 +838,23 @@ $("#emprole").change(function()
 	    $("#final_emp_id").val(empCode+empId);
 	});
 
+var empStatusId = "<?php echo @$_POST['emp_status_id']?@$_POST['emp_status_id']:@$this->data['emp_status_id']; ?>"; 
+    if(empStatusId == 6){   
+        $('#vendor_list').show();
+    }
+
 });//end of ready function
+
+
+
+
+$('#vendor_id').on('blur',vendor_id_empty);
+
+function vendor_id_empty(){
+    $('#vendor_id').parent().append("<span class='errors' id='errors-vendor_id'>Please select vendor name.</span>");
+}
+
+
 function saveEmployee()
 {
 	var emp_name = $('#rccandidatename option:selected').text();

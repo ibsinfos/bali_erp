@@ -1,3 +1,16 @@
+
+<style type="text/css">
+    .compose-message-editor{margin-top: 20px; margin-bottom: 10px;}
+    #sample_wysiwyg{min-height: 175px;}
+    .WellOuter{margin:0px !important;}
+    .error{color: red; display: none;}
+    .required{color: red !important;}
+    #loader, #loader2, .AfterSend{display: none;}
+    .AfterSend{text-align: center;}
+    .loader2{color: green; font-weight: bold; padding-top: 0px;}
+    .continue_outer{padding: 0px 0px 0px 0px;}
+</style>
+
 <div class="row bg-title">
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
         <h4 class="page-title"><?php echo get_phrase('MANAGE NEW NOTICES'); ?></h4>
@@ -14,98 +27,127 @@
         </ol>
     </div>
 </div>
-<div class="row">
-<div class="col-sm-12">    
-    <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('From here you can manage new notices.');?>" data-position='top'> 
-        <?php echo form_open(base_url() . 'index.php?teacher/send_notices/create' , array('class' => 'validate'));?>
-        <div class ="row">
-            <div class="col-sm-6 form-group">
-            <label for="field-2" class="control-label"><?php echo get_phrase('class'); ?><span class="error" style="color: red;"> *</span></label>
-                <select name="class_id" data-style="form-control" data-live-search="true" class="selectpicker" id = "class_id"  onchange="window.location = this.options[this.selectedIndex].value">
-                    <option value=" "><?php echo get_phrase('select_class'); ?></option>
-                    <?php if(empty($class_uri)){ foreach ($teacher_class as $row): ?>
-                    <option <?php if($class_id == $row['class_id']) {  echo 'selected'; } ?> value="<?php echo base_url(); ?>index.php?teacher/send_notices/get_sections/<?php echo $row['class_id']; ?>"><?php echo $row['class']; ?></option>
-                    <?php endforeach;} else{ foreach ($teacher_class as $row):?>
-                        <option <?php if($class_uri == $row['class_id']) {  echo 'selected'; } ?> value="<?php echo base_url(); ?>index.php?teacher/send_notices/get_sections/<?php echo $row['class_id']; ?>"><?php echo $row['class']; ?></option>
-                    <?php endforeach; }  ?>
-                </select> 
-            <input type ="hidden" name ="get_class_id" value ="<?php echo $row['class_id']; ?>">
-            <label class="mandatory"> <?php echo form_error('class_id'); ?></label>
-            </div>
-            
-            <div class="col-sm-6 form-group">
-            <label for="field-2" class="control-label"><?php echo get_phrase('section'); ?><span class="error" style="color: red;"> *</span></label>
-                <select name="section_id" data-style="form-control" data-live-search="true" class="selectpicker" onchange="window.location = this.options[this.selectedIndex].value" required>
-                    <option value=""><?php echo get_phrase('select_section'); ?></option>
-                    <?php  if(empty($section_uri)){ foreach ($sections as $sec): ?>
-                    <option value="<?php echo base_url(); ?>index.php?teacher/send_notices/get_students/<?php echo $class_uri. '/'.$sec['section_id']; ?>"><?php echo $sec['name']; ?></option>
-                    <?php endforeach; }else{  foreach ($section_all as $sec): ?>
-                     <option <?php if($section_uri == $sec['section_id']) {  echo 'selected'; } ?> value="<?php echo base_url(); ?>index.php?teacher/send_notices/get_students/<?php echo $class_uri. '/'.$sec['section_id']; ?>"><?php echo $sec['name']; ?></option>
-                    <?php endforeach; } ?>
-                </select>  
-            <label class="mandatory"> <?php echo form_error('section_id'); ?></label>
-            </div>                                                                                  
-        </div>
-        
-        <div class ="row" >
-            <div class="col-sm-6 form-group">
-                <label for="field-1"><?php echo get_phrase('students');?><span class="error" style="color: red;"> *</span></label>
-                <select name="student_id[]" data-style="form-control" data-live-search="true" class="selectpicker" multiple data-actions-box="true" >
-                    <?php  foreach ($students as $stud): ?>
-                        <option value="<?php echo $stud['student_id']; ?>"><?php echo $stud['name']; ?></option>
-                    <?php endforeach;  ?>
-                </select>
-            </div>
 
-            <div class="col-sm-6 form-group">
-            <label for="field-2" class="control-label"><?php echo get_phrase('parents'); ?></label>
-                <select name="parent_id[]" data-style="form-control" data-live-search="true" class="selectpicker" multiple data-actions-box="true">
-                    <?php  foreach ($students as $stud): ?>
-                    <option value="<?php echo $stud['parent_id']; ?>"><?php echo $stud['father_name']; ?></option>
-                    <?php endforeach;  ?>
-                </select>                                
-            </div>                                                                                  
+<div class="row">
+<div class="col-sm-12">
+<div class="white-box">
+    <div class="tab-pane box active" id="list">
+        <div class="box-content">
+                <?php echo form_open(base_url() . 'index.php?teacher/create_custom_message', array('class' => 'form', 'id' => 'ReceiverTypeForm')); ?>
+                    <div class="row">
+                        <div class="form-group col-sm-5" data-step="5" data-intro="<?php echo get_phrase('Select a class.');?>" data-position='bottom'>
+                            <label class="control-label"><?php echo get_phrase('class'); ?><span class="required">*</span></label>
+
+                            <input type="hidden" name="reciever_class_id[]" id="reciever_class_id" value="">
+                            <select class="selectpicker" multiple data-style="form-control" onchange="get_class()" id="class_id" name="class_id[]" data-live-search="true" data-actions-box="true">
+
+        <?php foreach ($teacher_class as $row): ?>
+                                <option value="<?php echo $row['class_id']; ?>"><?php echo $row['class']; ?></option>
+        <?php endforeach;?>
+                            </select>
+
+                            <p class="error cls_error">Please select class</p>
+                        </div>
+
+                        <div class="form-group col-sm-5" data-step="6" data-intro="<?php echo get_phrase('Select receiver type.');?>" data-position='bottom'>
+                            <label class="control-label"><?php echo get_phrase('receiver'); ?><span class="required">*</span></label>
+
+                            <input type="hidden" name="reciever_type_id[]" id="reciever_type_id" value="">
+                        <select class="selectpicker" multiple data-style="form-control" onchange="get_receiver()" id="receiver_type" name="receiver_type[]" data-live-search="true" data-actions-box="true">
+                                <option value="1">Parent</option>
+                                <option value="2">Student</option>
+                            </select>
+                            <p class="error rcv_error">Please select receiver type</p>
+                        </div>                                            
+                    </div>
+
+                    <div class="continue_outer" data-step="7" data-intro="<?php echo get_phrase('Click for get message form');?>" data-position='bottom'>
+                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d">
+                            <?php echo get_phrase('continue'); ?>
+                        </button>
+                    </div>
+            <?php echo form_close(); ?>
         </div>
-        
-        <div class ="row" >
-            <div class="col-sm-12 form-group">
-                <label for="field-1"><?php echo get_phrase('title');?><span class="error" style="color: red;"> *</span></label>
-                <div class="input-group">
-                    <div class="input-group-addon"><i class="fa fa-tags"></i></div>
-                    <input type="text" class="form-control" name="notice_title" placeholder="Enter a title" required/>                                        
-                </div>
-                <label class="mandatory"> <?php echo form_error('notice_title'); ?></label>
-            </div>
-        </div>
-        <?php $date = date('Y-m-d H:i:s');?>
-        <input type="hidden"  name="create_timestamp" value="<?php echo $date;?>"/>
-        <div class="row">
-            <div class="col-sm-12 form-group">
-                <label for="field-1"><?php echo get_phrase('description');?><span class="error" style="color: red;"> *</span></label>
-                <div class="input-group">
-                    <div class="input-group-addon"><i class="fa fa-newspaper-o"></i></div>
-                    <textarea name="notice" id="ttt" rows="3" placeholder=" " class="form-control" required></textarea>                                        
-                </div>
-                <label class="mandatory"> <?php echo form_error('notice'); ?></label>                                
-            </div>
-        </div>
-        
-        <div class="text-right">
-            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" ><?php echo get_phrase('send_notice');?></button>
-        </div>
-        <?php echo form_close();?>
     </div>
 </div>
 </div>
+</div>
 
-<script>
-    function get_class_sections_by_teacher(teacher_id) {
-        var class_id = $('#class_id').val(); 
-        $.ajax({
-            url: '<?php echo base_url(); ?>index.php?ajax_controller/get_class_sections_by_teachers/' + teacher_id +'/'+class_id,
-            success: function (response) {
-                jQuery('#section_selector_holder').html(response).selectpicker('refresh');
-            }     
+<div id="loader"><center><img src="assets/images/preloader.gif"></center></div>
+
+<div id="BottomPart"></div>
+
+<script type="text/javascript">
+    function get_class(){
+        var reciever_class_id = []; 
+        $('#class_id :selected').each(function(i, selected){ 
+            reciever_class_id[i] = $(selected).val(); 
         });
+        $('#reciever_class_id').val(reciever_class_id);           
     }
+
+    function get_receiver(){
+        var reciever_type_id = []; 
+        $('#receiver_type :selected').each(function(i, selected){ 
+            reciever_type_id[i] = $(selected).val(); 
+        });
+        $('#reciever_type_id').val(reciever_type_id);           
+    }
+
+    var TotalClass = TotalReceiver = 0;
+
+    var frm = $('#ReceiverTypeForm');
+    frm.submit(function (e) {
+        TotalClass =$('#class_id :selected').length;
+        TotalReceiver =$('#receiver_type :selected').length;
+
+        if((TotalClass == 0) && (TotalReceiver == 0)){
+            $('.cls_error').show();
+            $('.rcv_error').show();
+            return false;
+        }else{
+            $('.cls_error').hide();
+            $('.rcv_error').hide();
+        }
+
+        if(TotalClass == 0){
+            $('.cls_error').show();
+            return false;
+        }else{
+            $('.cls_error').hide();
+        }
+
+        if(TotalReceiver == 0){
+            $('.rcv_error').show();
+            return false;
+        }else{
+            $('.rcv_error').hide();
+        }
+
+        if((TotalClass)&&(TotalReceiver)){
+            $.ajax({
+                type: frm.attr('method'),
+                url: frm.attr('action'),
+                data: frm.serialize(),
+
+                beforeSend: function(){
+                    $('#loader').show();
+                },
+
+                success: function (data) {
+                    $('#loader').hide();
+                    $('#BottomPart').empty();
+                    $('#BottomPart').html(data);
+                },
+                error: function (data) {
+                    console.log('An error occurred.');
+                    console.log(data);
+                },
+            }); 
+            return false;           
+        }else{
+            e.preventDefault();
+        }
+    });
+
 </script>

@@ -492,7 +492,7 @@ class Progress_model extends CI_Model {
     }
     
     //Get Datatable list
-     private function _get_datatables_query($class_id,$section_id,$subject_id) {      
+     private function _get_datatables_query($class_id,$section_id,$running_year) {      
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
@@ -500,13 +500,15 @@ class Progress_model extends CI_Model {
                 $this->db->where('enroll.school_id',$school_id);
             } 
         }
-         $this->db->select("enroll.student_id,student.name,student.stud_image");
+        $this->db->select("enroll.student_id,student.name,student.stud_image");
         $this->db->from('enroll');
         $this->db->join('student', 'student.student_id = enroll.student_id');
-        $this->db->where("class_id", $class_id);
+        $this->db->where("enroll.class_id", $class_id);
+        $this->db->where("enroll.section_id", $section_id);
+        $this->db->where('enroll.year', $running_year);
         $this->db->where("student.isActive", '1');
         $this->db->where("student.student_status", '1');
-        $this->db->where("section_id", $section_id);
+        
        
         $i = 0;
         foreach ($this->column_search as $item) { // loop column 
@@ -533,21 +535,21 @@ class Progress_model extends CI_Model {
     }
     
     
-     function get_datatables($class_id,$section_id,$subject_id) {
-        $list = $this->_get_datatables_query($class_id,$section_id,$subject_id);
+     function get_datatables($class_id,$section_id,$running_year) {
+        $list = $this->_get_datatables_query($class_id,$section_id,$running_year);
         if ($_POST['length'] != -1)
         $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
         return $query->result();
     }
    
-    function count_filtered($class_id,$section_id,$subject_id) {
-        $this->_get_datatables_query($class_id,$section_id,$subject_id);
+    function count_filtered($class_id,$section_id,$running_year) {
+        $this->_get_datatables_query($class_id,$section_id,$running_year);
         $query = $this->db->get();
         return $query->num_rows();
     }
     
-    public function count_all($class_id,$section_id,$subject_id) 
+    public function count_all($class_id,$section_id,$running_year) 
     { 
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
@@ -559,8 +561,11 @@ class Progress_model extends CI_Model {
         $this->db->select("enroll.student_id,student.name,student.stud_image");
         $this->db->from('enroll');
         $this->db->join('student', 'student.student_id = enroll.student_id');
-        $this->db->where("class_id", $class_id);
-        $this->db->where("section_id", $section_id);
+        $this->db->where("enroll.class_id", $class_id);
+        $this->db->where("enroll.section_id", $section_id);
+        $this->db->where('enroll.year', $running_year);
+        $this->db->where("student.isActive", '1');
+        $this->db->where("student.student_status", '1');
         return $this->db->count_all_results();
     }
 }

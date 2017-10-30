@@ -35,6 +35,7 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
     	$request = Zend_Controller_Front::getInstance();
      	if($auth->hasIdentity()){
             $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
             $loginUserRole = $auth->getStorage()->read()->emprole;
             try {
                 $school_id = $auth->getStorage()->read()->school_id;
@@ -58,8 +59,10 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
         if(!empty($school_id) && $school_id > 0) {
                     $where .= " AND e.school_id = '".$school_id."'";
                 }
+                
+        //SET @count:=0;
 
-        $employeesData = $this->select()
+                $employeesData = $this->select()
                                 ->setIntegrityCheck(false)	                                
                                 ->from(array('e' => 'main_employees_summary'),
                                         array('*','id'=>'e.user_id','extn'=>new Zend_Db_Expr('case when e.extension_number is not null then concat(e.office_number," (ext ",e.extension_number,")") when e.extension_number is null then e.office_number end'),'astatus'=> new Zend_Db_Expr('case when e.isactive = 0 then "Inactive" when e.isactive = 1 then "Active" when e.isactive = 2 then "Resigned"  when e.isactive = 3 then "Left" when e.isactive = 4 then "Suspended" end')
@@ -89,11 +92,10 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
          */
 	public function getsingleEmployeeData($id)
 	{
-		
             $db = Zend_Db_Table::getDefaultAdapter();
             $empData = $db->query("SELECT e.*,u.*,p.prefix,p.isactive as active_prefix FROM main_employees e 
                 INNER JOIN main_users u ON e.user_id = u.id left JOIN main_prefix p ON e.prefix_id = p.id
-                           WHERE e.user_id = ".$id."   AND  u.isactive IN (1,2,3,4,0) AND u.userstatus ='old'");
+                           WHERE e.user_id = ".$id." AND  u.isactive IN (1,2,3,4,0) AND u.userstatus ='old'");
             $res = $empData->fetchAll(); 
             if (isset($res) && !empty($res)) 
             {	
@@ -114,6 +116,13 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
          */
         public function getdata_emp_report($param_arr,$per_page,$page_no,$sort_name,$sort_type)
         {
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
 	        $search_str = " e.isactive != 5 ";
 	  
             foreach($param_arr as $key => $value)
@@ -140,6 +149,8 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
                             }	
                     }
             }
+            
+            $search_str.=" and e.school_id = '".$school_id."'";
             
             
             $offset = ($per_page*$page_no) - $per_page;
@@ -291,7 +302,7 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
         $objName = 'employee';
 				        
 			
-        $tableFields = array('action'=>'Action','firstname'=>'First Name','lastname'=>'Last Name','emailaddress'=>'Email',
+        $tableFields = array('serial_number'=>'S. No.','action'=>'Action','firstname'=>'First Name','lastname'=>'Last Name','emailaddress'=>'Email',
                              'employeeId' =>'Employee ID','department_name' => 'Department','astatus' =>'User Status','extn'=>'Work Phone',
                              'jobtitle_name'=>'Job Title','reporting_manager_name'=>'Reporting Manager','contactnumber'=>'Contact Number',
                              'emp_status_name' =>'Employment Status','emprole_name'=>"Role");
@@ -616,8 +627,8 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
 	public function getEmployeesForServiceDesk($bunitid='',$deptid='')
 	{
 		$where = 'e.isactive=1 AND r.group_id IN (2,3,4,6)';
-		if($bunitid != '' && $bunitid !='null')
-			$where .= ' AND e.businessunit_id = '.$bunitid.'';
+//		if($bunitid != '' && $bunitid !='null')
+//			$where .= ' AND e.businessunit_id = '.$bunitid.'';
 		if($deptid !='' && $deptid !='null')
 			$where .= ' AND e.department_id = '.$deptid.'';	
 		
@@ -1001,6 +1012,7 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
     // to get hr employees
     public function getHrEmployees()
     {
+        
     	$db = Zend_Db_Table::getDefaultAdapter();
     	$query = "	select es.id,es.user_id,es.userfullname from main_employees_summary es where es.user_id in (
 					select s.user_id from main_employees_summary s
@@ -1023,13 +1035,34 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
 	}
         
         public function employeeCheckExistByMainUserId($userId){
-        $db = Zend_Db_Table::getDefaultAdapter();
-        $sql="SELECT count(id) as Tot FROM `main_users` WHERE `id`='$userId'";
-        //die($sql);
-        $usersData = $db->query($sql);
-        $usersResult = $usersData->fetchAll();
-        return $usersResult;
-    }
+            $db = Zend_Db_Table::getDefaultAdapter();
+
+            $empData="SELECT user_id FROM `main_employees_summary` WHERE `id`='$userId'";
+            //die($sql);
+            $employeeData = $db->query($empData);
+            $employeeResult = $employeeData->fetchAll();
+
+            $sql="SELECT count(id) as Tot FROM `main_users` WHERE `id`='".$employeeResult[0]['user_id']."'";
+            //die($sql);
+            $usersData = $db->query($sql);
+            $usersResult = $usersData->fetchAll();
+            return $usersResult;
+        }
+        
+        public function employeeDetailsByMainUserId($userId){
+            $db = Zend_Db_Table::getDefaultAdapter();
+
+            $empData="SELECT user_id FROM `main_employees_summary` WHERE `id`='$userId'";
+            //die($sql);
+            $employeeData = $db->query($empData);
+            $employeeResult = $employeeData->fetchAll();
+
+            $sql="SELECT * FROM `main_users` WHERE `id`='".$employeeResult[0]['user_id']."'";
+            //die($sql);
+            $usersData = $db->query($sql);
+            $usersResult = $usersData->fetchAll();
+            return $usersResult;
+        }
         
         public function getGridForPayslipEmployee($sort, $by, $perPage, $pageNo, $searchData,$call,$dashboardcall,$loginUserId){
         $searchQuery = '';
@@ -1053,7 +1086,7 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
         $objName = 'payslipemployee';
 
         $tableFields = array(
-            'generate' => '<span class="action-text"> <label><input type="checkbox" id="select_all" /> Select all &nbsp;</label> <a href="javascript:void(0);" onclick="bulkGenerate();">Generate</a></span>',
+            'generate' => '<span class="action-text"> <label><input type="checkbox" id="select_all" /> Select all &nbsp;</label></span>',
             'firstname' => 'First Name',
             'lastname' => 'Last Type',
             'employeeId' => 'Employee Id',
@@ -1099,6 +1132,7 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
      	if($auth->hasIdentity()){
             $loginUserGroup = $auth->getStorage()->read()->group_id;
             $loginUserRole = $auth->getStorage()->read()->emprole;
+            $school_id = $auth->getStorage()->read()->school_id;
         }
 	
         //$controllerName = $request->getRequest()->getControllerName();
@@ -1114,6 +1148,13 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
         }else{
             $where .=" e.isactive = 1";
         }
+        
+        if(trim($where)!=""){
+            $where .=" AND e.school_id = '".$school_id."'";
+        }else{
+            $where .=" e.school_id = '".$school_id."'";
+        }
+        
         //echo //$where;die;
      /*$payrollEmployeeData = $this->select()
 		->setIntegrityCheck(false)
@@ -1124,15 +1165,82 @@ class Default_Model_Employee extends Zend_Db_Table_Abstract
 		->order("$by $sort")
 		->limitPage($pageNo, $perPage); //die;
       */ //echo 
+        $month = date('m',strtotime('-1 month'));
         $payrollEmployeeData = $this->select()
                                 ->setIntegrityCheck(false)	                                
                                 ->from(array('e' => 'main_employees_summary'),
-                                        array('e.*','paysllip_status'=>new Zend_Db_Expr('(SELECT pp.status FROM `payroll_payslip` AS pp WHERE MONTH(pp.`generate_date`)=MONTH(CURRENT_DATE()) AND YEAR(pp.`generate_date`)=YEAR(CURRENT_DATE()) AND pp.`emp_id`=e.user_id ORDER BY pp.id DESC LIMIT 0,1)')
+                                        array('e.*','paysllip_status'=>new Zend_Db_Expr('(SELECT pp.status FROM `payroll_payslip` AS pp WHERE pp.payslip_month="'.$month.'" AND pp.payslip_year=YEAR(CURRENT_DATE()) AND pp.`emp_id`=e.user_id ORDER BY pp.id DESC LIMIT 0,1)'),'payslip_id'=>new Zend_Db_Expr('(SELECT pp.id FROM `payroll_payslip` AS pp WHERE pp.payslip_month="'.$month.'" AND pp.payslip_year=YEAR(CURRENT_DATE()) AND pp.`emp_id`=e.user_id ORDER BY pp.id DESC LIMIT 0,1)')
                                             ))
                                 ->where($where)
                                 ->order("$by $sort")
-                                ->limitPage($pageNo, $perPage); //die;
+                                ->limitPage($pageNo, $perPage);
         return $payrollEmployeeData;
     }
+    
+    public function getGridForWPS($sort,$by,$perPage,$pageNo,$searchData,$call,$dashboardcall,$exParam1='',$exParam2='',$exParam3='',$exParam4='',$school_id)
+    {
+    	$auth = Zend_Auth::getInstance();
+    	$request = Zend_Controller_Front::getInstance();
+     	if($auth->hasIdentity()){
+            $loginUserGroup = $auth->getStorage()->read()->group_id;
+            $loginUserId = $auth->getStorage()->read()->id;
+            $loginUserRole = $auth->getStorage()->read()->emprole;
+            try {
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            catch(Exception $e){
+            }
+	}
+		$controllerName = $request->getRequest()->getControllerName();
+        //the below code is used to get data of employees from summary table.
+        $employeesData=""; 
+        if($controllerName=='employee' && ($loginUserRole == SUPERADMINROLE || $loginUserGroup == HR_GROUP || $loginUserGroup == MANAGEMENT_GROUP))                            
+        	$where = "  e.isactive != 5 AND e.user_id != ".$loginUserId." ";
+        else	  
+        	$where = "  e.isactive = 1 AND e.user_id != ".$loginUserId." ";
+        
+        if($managerid !='')
+            $where .= " AND e.reporting_manager = ".$managerid." ";
+        if($searchQuery != '')
+            $where .= " AND ".$searchQuery;
+
+        if(!empty($school_id) && $school_id > 0) {
+                    $where .= " AND e.school_id = '".$school_id."'";
+                }
+        
+        if(isset($exParam1) && $exParam1!='') {
+            $where .= " AND e.emp_status_id = '".$exParam1."'";
+        }
+
+        $employeesData = $this->select()
+                                ->setIntegrityCheck(false)	                                
+                                ->from(array('e' => 'main_employees_summary'),
+                                        array('*','id'=>'e.user_id','extn'=>new Zend_Db_Expr('case when e.extension_number is not null then concat(e.office_number," (ext ",e.extension_number,")") when e.extension_number is null then e.office_number end'),'astatus'=> new Zend_Db_Expr('case when e.isactive = 0 then "Inactive" when e.isactive = 1 then "Active" when e.isactive = 2 then "Resigned"  when e.isactive = 3 then "Left" when e.isactive = 4 then "Suspended" end')
+                                            ))                               
+                                ->where($where)
+                                ->order("$by $sort") 
+                                ->query()->fetchAll();                    
+
+        return $employeesData;       		
+    }
+    
+    public function getLastEmployeeUserId(){
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $empData="SELECT MAX(user_id) AS last_user_id FROM `main_employees_summary`";
+        
+        $employeeData = $db->query($empData);
+        $employeeResult = $employeeData->fetchAll();
+        return $employeeResult[0]['last_user_id'];
+    }
+    
+    public function getEmployeeByEmpId($id){
+        $db = Zend_Db_Table::getDefaultAdapter();
+        $empData = "SELECT user_id FROM `main_employees_summary` where id = '".$id."'";
+        
+        $employeeData = $db->query($empData);
+        $employeeResult = $employeeData->fetchAll();
+        return $employeeResult[0]['user_id'];
+    }
+    
 }
 ?>

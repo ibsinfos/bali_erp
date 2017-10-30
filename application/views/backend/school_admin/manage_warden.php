@@ -31,7 +31,7 @@
 <div class="row m-0">
     <div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('You can see the list of warden.');?>" data-position='top'>
     <!----TABLE LISTING STARTS-->
-        <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
+        <table class= "custom_table table display" cellspacing="0" width="100%" id="ex">
             <thead>
                 <tr>
 

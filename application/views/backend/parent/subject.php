@@ -41,7 +41,7 @@
         <div class=" col-md-12 white-box" data-step="6" data-intro="<?php echo get_phrase('List of subject,teacher and teacher\'s email_id ');?> <?php if(!empty($class_name) || !empty($section_name)){?>
 <?php echo "of".get_phrase('class_:_').$class_name. " ". get_phrase('section:_').$section_name;?>
 <?php }?>" data-position='top'>           
-                  <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
+                  <table class= "custom_table table display" cellspacing="0" width="100%" id="ex">
                     <thead>
                         <tr>
                             <th width="10%"><div><?php echo get_phrase('s._no.'); ?></div></th>

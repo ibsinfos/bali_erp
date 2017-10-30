@@ -128,7 +128,7 @@
 		        if($this->empdata['is_orghead'] == 0)
 				{ 
 					
-				sapp_Helper::viewBody('nor','Business Unit',(!empty($this->data['businessunit_id']))?$this->data['businessunit_id']:"...",'Department',(!empty($this->data['department_id']))?$this->data['department_id']:"...");
+				//sapp_Helper::viewBody('nor','Business Unit',(!empty($this->data['businessunit_id']))?$this->data['businessunit_id']:"...",'Department',(!empty($this->data['department_id']))?$this->data['department_id']:"...");
 				sapp_Helper::viewBody('alt','Reporting Manager',(!empty($this->data['reporting_manager']))?$this->data['reporting_manager']:"...",'','');
 				}
 				
@@ -210,7 +210,7 @@ var yearrange = <?php echo "'".date("Y", strtotime("-30 years")).':'.date('Y')."
 <?php if (count($this->messages)) {?>
       setTimeout(function(){
 			$('#dispmsgemp').fadeOut('slow');
-		},3000);
+		},10000);
 
 <?php } ?>    
     $("#empdetails").addClass('active');

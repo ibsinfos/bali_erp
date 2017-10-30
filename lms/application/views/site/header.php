@@ -165,5 +165,21 @@ is_int=1;
       })
       
     });
+	
+
+  
+  
+    $(document).on('click', function(e) {
+        if (e.target.class === 'noty_message') {
+            alert('Div Clicked !!');
+        } else {
+            $('.noty_message').hide();
+        }
+
+    });
+
+
+	
+	
   });
 </script>

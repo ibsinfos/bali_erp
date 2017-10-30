@@ -12,7 +12,7 @@
 </div>
 
 <div class="col-sm-12 white-box">        
-<table id="example23" class="display nowrap" >
+<table class = "custom_table table display" cellspacing="0" width="100%" id="example23">
     <thead>
         <tr>
             <th><div><?php echo get_phrase('s._no.'); ?></div></th>

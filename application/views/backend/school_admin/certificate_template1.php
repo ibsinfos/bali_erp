@@ -33,33 +33,28 @@
         <div id="print_div">
             <center>
                 <div class="main_div"><br><br>
-                    <!--<span class="m-t-20" id="title-name1"><br>&nbsp;<b><?php echo $system_name; ?></b></span>-->
+                    <span class="m-t-20" id="title-name1"><br>&nbsp;<b><?php echo $system_name; ?></b></span>
                     <br/><br/><br>
-      <span class="m-t-20" id="sub-title"><?php echo ucfirst($certificate_detail->certificate_title); ?></span>
+      <span class="m-t-20" id="sub-title" style="font-family:Old English Text MT"><?php echo ucfirst($certificate_detail->certificate_title); ?></span>
                     <br><br/><br><br/>
                     <span id="title-name">for</span>
                    
                     <div id="for_merit_val" class="input_style"><?php echo ucfirst($certificate_detail->sub_title);  ?>&nbsp;</div>
-                    
-                    <!--<img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" />-->
-                    
                     <span id="title-name">Awarded to</span> <br/><br/>
                     <span class="name_style"><?php echo ucfirst($certificate_detail->name) ." ". ($certificate_detail->mname!=''?$certificate_detail->mname:'') ." ". ucfirst($certificate_detail->lname); ?></span>
                     <br/>       
-                    <!--<img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" />-->
+                    
                     <br/>
-                    <br><br><br><br><br>
+                    <br><br><br><br>
                     <div id="div111">
                         <span class="date_content"><?php echo date("d M Y"); ?></span><br>
-<!--                        <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>-->
                         <span class="sub_title11s"> Date </span>
                     </div>
                     <div id="div333">
                         <span class="date_content"> </span><br>
-                        <!--<img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>-->
                         <span class="sub_title11s"> Signature </span>
                     </div>
-                    <input type="hidden" name="student_id" id="student_id" value="<?php // echo $student_id; ?>">  
+                    <input type="hidden" name="student_id" id="student_id" value="">  
                 </div>
             </center>
         </div>
@@ -70,30 +65,23 @@
     <div class="col-md-12 white-box">
             <center>
                 <div class="main_div"><br><br>
-                    <!--<span class="m-t-20" id="title-name1"><br>&nbsp;<b><?php echo $system_name; ?></b></span>-->
+                    <span class="m-t-20" id="title-name1"><br>&nbsp;<b><?php echo $system_name; ?></b></span>
                     <br/><br/><br>
       <span class="m-t-20" id="sub-title">Certificate Title</span>
                     <br><br/><br><br/>
-                    <span id="title-name">for</span>
-                   
+                    <span id="title-name">for</span>                   
                     <div id="for_merit_val" class="input_style">Sub Title&nbsp;</div>
-                    
-                    <!--<img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" />-->
-                    
                     <span id="title-name">Awarded to</span> <br/><br/>
                     <span class="name_style">Student Name</span>
-                    <br/>       
-                    <!--<img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" />-->
+                    <br/>
                     <br/>
                     <br><br><br><br><br>
                     <div id="div111">
                         <span class="date_content"><?php echo date("d M Y"); ?></span><br>
-<!--                        <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>-->
                         <span class="sub_title11s"> Date </span>
                     </div>
                     <div id="div333">
                         <span> </span><br>
-                        <!--<img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" /><br/>-->
                         <span class="sub_title11s"> Signature </span>
                     </div>
                     <input type="hidden" name="student_id" id="student_id" value="<?php // echo $student_id; ?>">  

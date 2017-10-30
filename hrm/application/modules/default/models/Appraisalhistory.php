@@ -141,7 +141,7 @@ class Default_Model_Appraisalhistory extends Zend_Db_Table_Abstract
                     $objName = 'appraisalhistoryteam';
                     $tablecontent = $this->getTeamAppraisalHistory($sort, $by, $pageNo, $perPage,$searchQuery);  
                 }
-		$tableFields = array('action'=>'Action','unitname' => 'Business Unit','deptname' => 'Department','fin_year' => 'Financial Year',
+		$tableFields = array('action'=>'Action','deptname' => 'Department','fin_year' => 'Financial Year',
                     'appraisal_mode'=>'Appraisal Mode','app_period' => 'Period');
 		
 		$dataTmp = array(

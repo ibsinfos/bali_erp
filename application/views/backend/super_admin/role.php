@@ -38,8 +38,9 @@
                                     <thead>
                                         <tr>
                                             <th><div><?php echo get_phrase('sl_no.'); ?></div></th>
+											<th><div><?php echo get_phrase('school_name'); ?></div></th>
                                             <th><div><?php echo get_phrase('role_name'); ?></div></th>
-                                            <th  data-step="7" data-intro="From here you can edit and delete the subject." data-position='top'><div><?php echo get_phrase('options'); ?></div></th>
+                                            <th  data-step="7" data-intro="From here you can edit and delete the role." data-position='top'><div><?php echo get_phrase('options'); ?></div></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -50,7 +51,8 @@
                                             ?>
                                             <tr>
                                                 <td><?php echo $count++; ?></td>
-                                                <td><?php echo ucfirst($row['name']); ?></td>
+												<td><?php echo ucfirst($row['school_name']); ?></td>
+                                                <td><?php echo ucfirst($row['role_name']); ?></td>
                                                 <td>
                                                            <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_edit_role/<?php echo $row['id']; ?>');">
                                                         <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil-square-o"></i></button></a>

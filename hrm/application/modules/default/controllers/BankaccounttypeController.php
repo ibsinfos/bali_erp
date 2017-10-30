@@ -269,6 +269,7 @@ class Default_BankaccounttypeController extends Zend_Controller_Action
 				}
 				else
 				{
+                                        $data['school_id'] = $school_id;
 					$data['createdby'] = $loginUserId;
 					$data['createddate'] = gmdate("Y-m-d H:i:s");
 					$data['isactive'] = 1;

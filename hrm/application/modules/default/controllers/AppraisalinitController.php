@@ -58,12 +58,12 @@ class Default_AppraisalinitController extends Zend_Controller_Action
 
     public function checkappadminAction()
     {
-        $businessunit_id = $this->_getParam('businessunit_id',null);
+        //$businessunit_id = $this->_getParam('businessunit_id',null);
         $department_id = $this->_getParam('department_id',null);                     
         $result = array('status' => "success",'frequency' => "",'ratings'=>"",'implid'=>"");
         $ratings = '';
-        if($businessunit_id != '')
-        {
+//        if($businessunit_id != '')
+//        {
 			$app_init_model = new Default_Model_Appraisalinit();
 			$app_cnt = $app_init_model->checkappadmin($businessunit_id,$department_id);
             if($app_cnt > 0)
@@ -85,17 +85,17 @@ class Default_AppraisalinitController extends Zend_Controller_Action
                 $result['implid'] = $app_id;
             }
 
-        }
+        //}
         $this->_helper->json($result);
     }
     public function getdepartmentsadminAction()
     {
-        $businessunit_id = $this->_getParam('businessunit_id',null);
+        //$businessunit_id = $this->_getParam('businessunit_id',null);
         $options = "<option value=''>Select Department</option>";
-        if($businessunit_id != '')
-        {
+//        if($businessunit_id != '')
+//        {
             $app_init_model = new Default_Model_Appraisalinit();
-            $dept_data = $app_init_model->getdeparmentsadmin($businessunit_id);
+            $dept_data = $app_init_model->getdeparmentsadmin();
             
             if(count($dept_data) > 0)
             {
@@ -104,7 +104,7 @@ class Default_AppraisalinitController extends Zend_Controller_Action
                     $options .= "<option value='".$dept['id']."'>".$dept['deptname']."</option>";
                 }
             }
-        }
+        //}
         $this->_helper->json(array('options' => $options));
     }
     public function discardsteptwoAction()
@@ -830,7 +830,7 @@ class Default_AppraisalinitController extends Zend_Controller_Action
 		{
 			$from_year = $this->_getParam('from_year',null);
 			$to_year = $this->_getParam('to_year',null);
-			$bunit = $this->_getParam('bunit',null);
+			//$bunit = $this->_getParam('bunit',null);
 			$dept_id = $this->_getParam('dept_id',null);
 			$dept_flag = $this->_getParam('flag',null);
 			$mode = $this->_getParam('mode',null);
@@ -863,7 +863,7 @@ class Default_AppraisalinitController extends Zend_Controller_Action
 				}
 			}
 		}
-		$exist_appraisal = $app_init_model->checkappadmin($bunit,$dept_id);
+		$exist_appraisal = $app_init_model->checkappadmin($dept_id);
 		$period = 0;
 		if(!$exist_appraisal)
 		{
@@ -1006,14 +1006,14 @@ class Default_AppraisalinitController extends Zend_Controller_Action
         {
             $empSummaryModel = new Default_Model_Employee();
             $empData = $empSummaryModel->getEmp_from_summary($loginUserId);
-			$this->view->businessunit_id = $businessunit_id;
-			$checkActiveApp = $appInitModel->checkAppraisalExists($businessunit_id,$department_id);
+			//$this->view->businessunit_id = $businessunit_id;
+			$checkActiveApp = $appInitModel->checkAppraisalExists($department_id);
 			if(count($checkActiveApp) == 0)
 			{
-				$appraisalInitForm->businessunit_name->setValue($empData['businessunit_name']);
+				//$appraisalInitForm->businessunit_name->setValue($empData['businessunit_name']);
 				$appraisalInitForm->department_name->setValue($empData['department_name']);
 				$appraisalInitForm->department_id->setValue($empData['department_id']);
-				$appraisalInitForm->businessunit_id->setValue($empData['businessunit_id']);
+				//$appraisalInitForm->businessunit_id->setValue($empData['businessunit_id']);
 			} 
 			else 
 			{
@@ -1022,9 +1022,9 @@ class Default_AppraisalinitController extends Zend_Controller_Action
         }
         else//for super admin
         {
-            $businessunits = $appInitModel->getbusinnessunits_admin('');
-            $this->view->businessunits = $businessunits;
-            $this->view->businessunit_id = $businessunit_id;
+//            $businessunits = $appInitModel->getbusinnessunits_admin('');
+//            $this->view->businessunits = $businessunits;
+//            $this->view->businessunit_id = $businessunit_id;
         }
         $employmentstatusModel = new Default_Model_Employmentstatus();
         $employmentStatusData = $employmentstatusModel->getempstatusActivelist();
@@ -1520,7 +1520,7 @@ class Default_AppraisalinitController extends Zend_Controller_Action
 	                            
 	                            $empSummaryModel = new Default_Model_Employee();
 	                            $empData = $empSummaryModel->getEmp_from_summary($loginUserId);
-	                            $appraisalinitform->businessunit_name->setValue($empData['businessunit_name']);
+	                            //$appraisalinitform->businessunit_name->setValue($empData['businessunit_name']);
 	
 	                            if($performance_app_flag == 0)
 								{
@@ -1535,8 +1535,8 @@ class Default_AppraisalinitController extends Zend_Controller_Action
 	                        {
 	                            // $appImpleData = sapp_PerformanceHelper::check_per_implmentation($data['businessunit_id'], $data['department_id']);
 	                            
-	                            $businessunits = $appraisalinitmodel->getbusinnessunits_admin($data['businessunit_id']);
-	                            $this->view->businessunits = $businessunits;
+//	                            $businessunits = $appraisalinitmodel->getbusinnessunits_admin($data['businessunit_id']);
+//	                            $this->view->businessunits = $businessunits;
 	                            $dept_model = new Default_Model_Departments();
 	                            if($performance_app_flag == 0)
 	                            {
@@ -1604,7 +1604,7 @@ class Default_AppraisalinitController extends Zend_Controller_Action
 	                        $this->view->period_disp = $this->period_helper($data['appraisal_mode'], $data['appraisal_period']);
 	                        $this->view->data = $data;
 	                        $this->view->category_id_value = $data['category_id'];
-	                        $this->view->businessunit_id = $businessunit_id;
+	                       // $this->view->businessunit_id = $businessunit_id;
 	                        $this->view->employmentStatusData = $employmentStatusData;
         					$this->view->eligibilityvalue = $eligibilityvalue;
                         }

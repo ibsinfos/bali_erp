@@ -234,7 +234,8 @@ class Default_SitepreferenceController extends Zend_Controller_Action
         $passworddataArr = array();
         $timezonemodel = new Default_Model_Timezone();
 				
-        $allTimezoneData = $timezonemodel->fetchAll('isactive=1','timezone')->toArray();
+        //$allTimezoneData = $timezonemodel->fetchAll('isactive=1','timezone')->toArray();
+        $allTimezoneData = $timezonemodel->get_all_timezones();
         if(sapp_Global::_checkprivileges(CURRENCY,$loginuserGroup,$loginuserRole,'add') == 'Yes'){
 			array_push($popConfigPermission,'currency');
 		}  
@@ -398,6 +399,7 @@ class Default_SitepreferenceController extends Zend_Controller_Action
             }
             catch (Exception $e) 
             {
+               // print_r($e); die;
                 $trDb->rollBack();
                 $this->_helper->getHelper("FlashMessenger")->addMessage(array("success"=>"Something went wrong,please try again later."));					   
             }

@@ -55,21 +55,21 @@ $round_count = $this->round_count;
 <div class="new-form-ui inputheight"><label <?php echo $clsnam; ?>>Candidate Status</label><div class="division"><?php echo $form->cand_status; ?>
 			<span id="errors-interview_mode" class="errors"><?php echo (isset($messages['cand_status'])?$messages['cand_status']:"");?></span>
 			<span id="candistatus" class="errors"></span></div></div>			
-<div class="new-form-ui-submit sche-submit-setup">
+                        <div class="new-form-ui-submit sche-submit-setup" style="width:100% !important;">
         <?php if($clsnam != '' && $this->loginuserGroup != MANAGER_GROUP && $this->loginuserGroup != EMPLOYEE_GROUP && $this->loginuserGroup != SYSTEMADMIN_GROUP) { ?>
 		<?php echo $form->submit;?>
-		<input type ="button" class="clssbmtbtn" id="idbtn" value="Update" />
+                            <input type ="button" class="clssbmtbtn" id="idbtn" value="Update" style="float:left;" />
 		<?php }
                 if($cancel_name == 'Cancel')
                 {
                 ?>
-        <button type="button" onclick="window.location.href='<?php echo BASE_URL.'scheduleinterviews';?>'" id="Cancel" name="Cancel" value="Cancel">Cancel</button>
+        <button type="button" onclick="window.location.href='<?php echo BASE_URL.'scheduleinterviews';?>'" style="float:left;" id="Cancel" name="Cancel" value="Cancel">Cancel</button>
         <?php 
                 }
                 else 
                 {
 ?>
-        <input type="button" onclick="window.location.href='<?php echo BASE_URL.'scheduleinterviews';?>'" id="Back" name="Back" value="Back" />
+        <input type="button" onclick="window.location.href='<?php echo BASE_URL.'scheduleinterviews';?>'" id="Back" name="Back" value="Back" style="float:left;" />
 <?php         
                 }
         ?>

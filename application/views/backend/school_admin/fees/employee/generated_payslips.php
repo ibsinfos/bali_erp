@@ -28,7 +28,8 @@
     <div class="col-md-12 white-box">
         <div class="row">
             <form method="post" action="<?php echo base_url('index.php?fees/main/generated_payslips')?>">
-                <div class="col-md-3">
+                <div class="col-md-6">
+                    <label>Select Role</label>
                     <select class=" selectpicker" data-style="form-control" name="role_id">
                         <option value=""><?php echo get_phrase('select_role')?></option>
                         <?php foreach($roles as $role){?>
@@ -36,11 +37,13 @@
                         <?php }?>
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <input type="text" class="form-control dtp" name="month" placeholder='Salary Month' value="<?php echo $month?>" required/>
+                <div class="col-md-6">
+                    <label>Select Month</label>
+                    <input type="text" class="form-control dtp" name="month" placeholder='Salary Month' value="<?php echo date('F-Y');?>" required/>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-info">View</button>
+                <div class="col-md-12 text-center">&nbsp;</div>
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-danger btn-outline btn-1d">View</button>
                 </div>
             </form>
         </div>
@@ -146,7 +149,7 @@
 $(function(){
     $('.dtp').datepicker({//startView:1,
                             autoclose:true,
-                            format: 'mm-yyyy',
+                            format: 'MM-yyyy',
                             viewMode: "months", 
                             minViewMode: "months",
                             clearBtn: true});

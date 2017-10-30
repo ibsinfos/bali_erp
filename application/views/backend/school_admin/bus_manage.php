@@ -48,7 +48,7 @@
             <th><div><?php echo get_phrase('route'); ?></div></th>
             <th><div><?php echo 'IMEI'; ?></div></th>
             <th><div><?php echo get_phrase('available_seats'); ?></div></th>
-            <th data-step='7' data-intro="<?php echo get_phrase('From here you can Edit and Delete the details of Bus.');?>" data-position="left"><div><?php echo get_phrase('options'); ?></div></th>
+            <th data-step='7' data-intro="<?php echo get_phrase('From here you can Edit and Delete the details of Bus.');?>" data-position="left"><div><?php echo get_phrase('action'); ?></div></th>
         </tr>
     </thead>
     <tbody>

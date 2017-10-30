@@ -163,7 +163,7 @@
                 </div>
             </td>
             <td>
-                <button type="submit" class="fcbtn btn btn-danger btn-outline"><?php echo get_phrase('go_for_student_photo_update');?></button>
+                <button type="submit" class="fcbtn btn btn-danger btn-outline"><?php echo get_phrase('update_photos');?></button>
             </td>
         <?php echo form_close();?>
         </tr>
@@ -238,33 +238,6 @@
             </td>
             <td>
                 <button type="submit" class="fcbtn btn btn-danger btn-outline"><?php echo get_phrase('upload_and_import');?></button>
-            </td>
-        <?php echo form_close();?>
-        </tr>
-        
-        
-        <!----For Marks Upload--->
-        <tr>
-        <?php //echo form_open(base_url() . 'index.php?school_admin/marks_bulk_upload/import_excel/' , array('class' => 'validate', 'enctype' => 'multipart/form-data'));?>
-        <?php echo form_open(base_url() . 'index.php?school_admin/view_marks_bulk_upload/' , array('class' => 'validate', 'enctype' => 'multipart/form-data'));?>
-            <td><?php echo $count++; ?></td>
-            <td><?php echo get_phrase('Marks Details');?></div></td>
-            <td>
-                <?php /*<a href="<?php echo base_url();?>uploads/Marks_Upload_Template.xlsx" target="_blank">
-                    <button type="button" class="btn btn-info btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" 
-                       data-placement="top" data-original-title="<?php echo get_phrase('download') ?>">
-                        <i class="fa fa-download"></i>
-                    </button>
-                </a> */?>
-            </td>
-            <td>
-                <div class="form-group">
-                    <!--<input type="file" name="userfile" id="userfile" class="form-control bor_no_here required" required>-->
-                    
-                </div>
-            </td>
-            <td>
-                <button type="submit" class="fcbtn btn btn-danger btn-outline"><?php echo get_phrase('go_for_mark_bulk_upload');?></button>
             </td>
         <?php echo form_close();?>
         </tr>
@@ -345,6 +318,31 @@
             </td>
         <?php echo form_close();?>
         </tr>    
+        <!----For Marks Upload--->
+        <tr>
+        <?php //echo form_open(base_url() . 'index.php?school_admin/marks_bulk_upload/import_excel/' , array('class' => 'validate', 'enctype' => 'multipart/form-data'));?>
+        <?php echo form_open(base_url() . 'index.php?school_admin/view_marks_bulk_upload/' , array('class' => 'validate', 'enctype' => 'multipart/form-data'));?>
+            <td><?php echo $count++; ?></td>
+            <td><?php echo get_phrase('Marks Details');?></div></td>
+            <td>
+                <?php /*<a href="<?php echo base_url();?>uploads/Marks_Upload_Template.xlsx" target="_blank">
+                    <button type="button" class="btn btn-info btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" 
+                       data-placement="top" data-original-title="<?php echo get_phrase('download') ?>">
+                        <i class="fa fa-download"></i>
+                    </button>
+                </a> */?>
+            </td>
+            <td>
+                <div class="form-group">
+                    <!--<input type="file" name="userfile" id="userfile" class="form-control bor_no_here required" required>-->
+                    
+                </div>
+            </td>
+            <td>
+                <button type="submit" class="fcbtn btn btn-danger btn-outline"><?php echo get_phrase('go_for_mark_bulk_upload');?></button>
+            </td>
+        <?php echo form_close();?>
+        </tr>        
     </tbody>
 </table>
 </div>

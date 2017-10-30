@@ -23,9 +23,6 @@
     </div>
     <!-- /.breadcrumb -->
 </div>
-
-
-
 <?php if ($this->session->flashdata('flash_message_error')) { ?>        
 <div class="alert alert-danger">
     <?php echo $this->session->flashdata('flash_message_error'); ?>
@@ -57,17 +54,15 @@
 </div>
 <?php if ($class_id != ''): ?>
     <!------CONTROL TABS START------>
-
-<div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('This shows list of subject details.');?>" data-position='top'>
-        
-                                <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
+<div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('This shows list of subject details.');?>" data-position='top'>        
+                                <table class = "custom_table table display" cellspacing="0" width="100%" id="example23">
                                     <thead>
                                         <tr>
                                             <th><div><?php echo get_phrase('class'); ?></div></th>
                                             <th><div><?php echo get_phrase('section'); ?></div></th>
                                             <th><div><?php echo get_phrase('subject_name'); ?></div></th>
                                             <th><div><?php echo get_phrase('teacher'); ?></div></th>
-                                            <th  data-step="8" data-intro="<?php echo get_phrase('From here you can edit and delete the subject.')?>" data-position='top'><div><?php echo get_phrase('options'); ?></div></th>
+                                            <th  data-step="8" data-intro="<?php echo get_phrase('From here you can edit and delete the subject.')?>" data-position='top'><div><?php echo get_phrase('action'); ?></div></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -105,7 +100,4 @@
         </div>    
    
 <?php endif; ?>
-
-
-
 <!-----  DATA TABLE EXPORT CONFIGURATIONS ---->                      

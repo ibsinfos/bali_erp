@@ -52,5 +52,22 @@
                 </div>
             </div>
         </div>
+
+    </div>
+	<div class="row">
+             <div class="col-md-12" data-step="6" data-intro="<?php echo get_phrase('Here you can see the overview of staff in school.');?>" data-position="top">        
+            <div class="panel panel-success" data-collapsed="0" style="margin-bottom:0px; border-color:#ddd;">       
+                <div class="col-md-12" style="margin-top:30px;">
+                    <div class="col-md-6">
+                        <?php echo $overview_paichart;?>
+                    </div>
+                    <div class="col-md-6">
+                        <?php echo $overview_column_line_mix_linner_chart;?>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>

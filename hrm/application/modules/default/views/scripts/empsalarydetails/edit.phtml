@@ -73,7 +73,7 @@
 		?>
 			<div class="total-form-controller">
 				<div class="new-form-ui">
-				  <label><?php echo $this->form->currencyid->getLabel(); ?></label>
+				  <label class="required"><?php echo $this->form->currencyid->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->currencyid; ?>
 				<?php if(isset($this->msgarray['currencyid'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->currencyid->getId(); ?>"><?php echo $this->msgarray['currencyid'];?></span>
@@ -86,7 +86,7 @@
 				
 				</div>
 				
-				<div class="new-form-ui">
+				<?php /* <div class="new-form-ui">
 				  <label><?php echo $this->form->salarytype->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->salarytype; ?>
 				<?php if(isset($this->msgarray['salarytype'])){?>
@@ -97,10 +97,10 @@
 					<span class="add-coloum" onclick="displaydeptform('<?php echo BASE_URL.'payfrequency/addpopup' ?>','Pay Frequency');"> Add Pay Frequency</span>			
 			   		<?php } ?>
 			   	</div>	
-				</div>
+				</div> */ ?>
 				
 				<div class="new-form-ui">
-				  <label><?php echo $this->form->salary->getLabel(); ?> <span id='salarytext'></span></label>
+				  <label class="required"><?php echo $this->form->salary->getLabel(); ?> <span id='salarytext'></span></label>
 				<div class="division"><?php echo $this->form->salary; ?></div>
 				<?php if(isset($this->msgarray['salary'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->salary->getId(); ?>"><?php echo $this->msgarray['salary'];?></span>
@@ -108,7 +108,7 @@
 				</div>
 				
 				<div class="new-form-ui">
-				  <label><?php echo $this->form->bankname->getLabel(); ?></label>
+                                    <label class="required"><?php echo $this->form->bankname->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->bankname; ?></div>
 				<?php if(isset($this->msgarray['bankname'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->bankname->getId(); ?>"><?php echo $this->msgarray['bankname'];?></span>
@@ -116,7 +116,7 @@
 				</div>
 		
 				<div class="new-form-ui">
-			   <label><?php echo $this->form->accountholder_name->getLabel(); ?></label>
+                                    <label class="required"><?php echo $this->form->accountholder_name->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->accountholder_name; ?></div>
 				<?php if(isset($this->msgarray['accountholder_name'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->accountholder_name->getId(); ?>"><?php echo $this->msgarray['accountholder_name'];?></span>
@@ -131,7 +131,7 @@
 				<?php }?>
 				</div>
 				
-				<div class="new-form-ui">
+				<?php /* <div class="new-form-ui">
 				  <label><?php echo $this->form->accountclasstypeid->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->accountclasstypeid; ?>
 				<?php if(isset($this->msgarray['accountclasstypeid'])){?>
@@ -143,10 +143,10 @@
 				<?php } ?>
                 </div>
 				
-				</div>
+				</div> */ ?>
 												
 				<div class="new-form-ui">
-				  <label><?php echo $this->form->bankaccountid->getLabel(); ?></label>
+				  <label class="required"><?php echo $this->form->bankaccountid->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->bankaccountid; ?>
 				
 				<?php if(isset($this->msgarray['bankaccountid'])){?>
@@ -161,7 +161,7 @@
 				</div>	
 				
 				<div class="new-form-ui">
-			   <label><?php echo $this->form->accountnumber->getLabel(); ?></label>
+                                    <label class="required"><?php echo $this->form->accountnumber->getLabel(); ?></label>
 				<div class="division"><?php echo $this->form->accountnumber; ?></div>
 				<?php if(isset($this->msgarray['accountnumber'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->accountnumber->getId(); ?>"><?php echo $this->msgarray['accountnumber'];?></span>

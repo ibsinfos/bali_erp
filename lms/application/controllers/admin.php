@@ -1408,7 +1408,7 @@ exit();*/
 						//die();
                     }
                     $success = 1;
-                    $this->session->set_flashdata('success_message', 1);
+                    $this->session->set_flashdata('success_custom', 'Book has been added.you can generate catalog');
                 } else {
                     $this->session->set_flashdata("error_message", 1);
                     // return $this->add_book();
@@ -2174,7 +2174,7 @@ exit();*/
                     $table = 'daily_read_material';
                     $data = array('book_id'=>$book_id,'read_at'=>$present_date_time);
                     if ($this->basic->insert_data($table, $data)) {
-                        $this->session->set_flashdata('success_message', 1);
+                        $this->session->set_flashdata('success_custom', 'Daily read material added successfully');
                         redirect('admin/daily_read_material', 'location');
                     } else {
                         $this->session->set_flashdata('error_message', 1);
@@ -2265,17 +2265,38 @@ exit();*/
             if(!empty($info))    $last_id = $info[0]['id'];
             //end of section last id.*********************************
             //section for insertinr csv data. ************************
-            $query="LOAD DATA LOCAL INFILE '$path'
+            $csvData = file_get_contents($filename);
+            $lines = explode(PHP_EOL, $csvData);
+            $array = array();
+            foreach ($lines as $line) {
+              $array[] = str_getcsv($line);
+                }
+               // print_r($array);
+            foreach($array as $k=>$v)
+            {
+                if($k>0 && array_key_exists(1, $v)&& $v[1]!='')
+                {
+                $query = "INSERT INTO `$table` (isbn, title, author,edition, edition_year, number_of_books, pdf,price) VALUES ("
+                        . "'$v[0]','$v[1]','$v[2]','$v[3]','$v[4]','$v[5]','$v[6]','$v[7]' )";
+                
+                 for($i=0;$i<$v[5];$i++)
+                 {
+                  $this->db->query($query);   
+                 }
+                }
+               
+            }
+            /*$query="LOAD DATA LOCAL INFILE '$path'
                 INTO TABLE {$table}
                 Fields TERMINATED BY ','
                 LINES TERMINATED BY '\n'
                 (isbn, title, author,edition, edition_year, number_of_books, pdf,price)";  
-              /*$query="LOAD DATA INFILE '$path'
+              $query="LOAD DATA INFILE '$path'
                 INTO TABLE {$table}
                 Fields TERMINATED BY ','
                 LINES TERMINATED BY '\n'
                 (isbn, title, author,edition, edition_year, number_of_books, pdf,price)";*/    
-		    $this->db->query($query);
+		   // $this->db->query($query);
     //end of section of inserting csv data. ********************  
     //section for update add-date.*****************************
             $add_date = date("Y-m-d H:i:s");

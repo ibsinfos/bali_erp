@@ -3527,10 +3527,7 @@ h4.dashbord_title{ font-size:14px; color:#4b4b4b; font-family: 'Roboto Medium'; 
 .company_announc ul li{ margin-bottom:10px; padding:20px 10px; cursor:pointer; position:relative;}
 .multi_files{ background: url(../images/multi-attach.png) no-repeat right center; height:25px; display: block; position: absolute; top: 3px; right: 3px; padding-right: 23px; text-align:right;}
 .single_file{ background: url(../images/single-attach.png) no-repeat right center; height:20px; display: block; position: absolute; top: 3px; right: 6px; padding-right: 16px; text-align:right;}
-.company_announc ul li:nth-child(1){ background:#fafbf4;}
-.company_announc ul li:nth-child(2){ background:#f0fbff;}
-.company_announc ul li:nth-child(3){ background:#f2fbf8;}
-.company_announc ul li:nth-child(4){ background:#fff5f5;}
+.company_announc ul li{ background:#f0fbff;}
 .company_announc ul li .annou_txt{ color:#333333; font-family: 'Roboto Light'; font-size:12px; word-wrap: break-word;}
 .company_announc ul li .annou_date{color:#a5a6a5; font-family: 'Roboto Regular'; font-size:12px;}
 .view_more_annou, .announcements_link a{ color:#208bbd; font-size:13px; font-family: 'Roboto Regular'; float:right; text-decoration:none;}

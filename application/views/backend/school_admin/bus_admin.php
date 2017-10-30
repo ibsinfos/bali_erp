@@ -25,7 +25,7 @@
 
 <div class="row">   
     <div class="col-md-12 hidden-xs">
-         <div class="form-group col-sm-12 p-0">      
+         <div class="form-group col-sm-12 p-0"> 
         <a href="javascript:;" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_bus_admin_add/');" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Bus Admin" data-step="5" data-intro="<?php echo get_phrase('From here you can add a new Bus Admin.');?>" data-position="left">
            <i class="fa fa-plus"></i>
             </a>      
@@ -35,7 +35,7 @@
 
 <div class="row m-0">
 <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Here you can view a list of Bus Admin.');?>" data-position="top">      
-<table id="example23" class="display nowrap" cellspacing="0" width="100%">
+<table id="BusAdmin" class="display nowrap" cellspacing="0" width="100%">
     <thead>
         <tr>
             <th><div><?php echo get_phrase('s._no.'); ?></div></th>
@@ -45,7 +45,7 @@
             <th><div><?php echo get_phrase('gender'); ?></div></th>
             <th data-step="7" data-intro="<?php echo get_phrase('From here you can edit or remove a Bus Admin by clicking on a specific icon.'); ?>" data-position="left">
                 <div>
-                <?php echo get_phrase('options'); ?>
+                <?php echo get_phrase('action'); ?>
                 </div>
             </th>
         </tr>
@@ -71,6 +71,3 @@
 </table>
 </div>
 </div>
- 
-
-

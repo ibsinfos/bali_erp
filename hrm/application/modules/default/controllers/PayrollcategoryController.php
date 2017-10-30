@@ -19,8 +19,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
     
     public function indexAction()
     { 
-//        error_reporting(E_ALL);
-//        ini_set('display_errors', 'on');
+        
         $auth = Zend_Auth::getInstance();
         $popConfigPermission = array();
         if($auth->hasIdentity()){
@@ -141,6 +140,8 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
     }
     
     public function addAction(){
+//        error_reporting(E_ALL);
+//        ini_set('display_errors',1);
         $emptyFlag=0;
         $report_opt = array();
         $popConfigPermission = array();
@@ -162,7 +163,10 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
         $payrollvalueModel = new Default_Model_Payrollvalue();
         $employeeModel = new Default_Model_Employee();
         $currentOrgHead = $employeeModel->getCurrentOrgHead();
-
+	$categories=$payrollcategoryModel->payroll_get_all_category();
+		
+		
+		
         if(empty($currentOrgHead)){
                 $this->addorganisationhead($loginUserId);
         }else{
@@ -184,6 +188,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
         }
         
         $this->view->popConfigPermission = $popConfigPermission;
+		$this->view->categories = $categories;
         $error=FALSE;
         $err_msg_arr=array();
         $this->view->error=FALSE;
@@ -214,7 +219,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
                     $dataArr['name']=$category_name;
                 }else{
                     $error=TRUE;
-                    $err_msg_arr['category_name']=$category_name." is already exist in the payroll grooup.";
+                    $err_msg_arr['category_name']=$category_name." is already exist in the payroll group.";
                 }
             }
             
@@ -297,7 +302,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
                     //echo '<pre>LL';print_r($dataArr);print_r($dataArr1);die;
                     $dataArr2['payroll_category_id']=$payrollcategoryModel->save_payroll_category($dataArr);
                     //echo '<pre>LL';print_r($dataArr);print_r($dataArr1);die;
-                    $dataArr2['value_category_id']=$payrollcategoryModel->save_category_values($dataArr1);
+                    $dataArr2['value_category_id']=$payrollcategoryModel->save_category_values($dataArr1,'');
                     $payrollvalueModel->save_payroll_value($dataArr2);
                     
                     $trDb->commit();
@@ -357,7 +362,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
                     $trDb->commit();
                     $this->_helper->flashMessenger('Payroll catetgory deleted successfully.');
                 }else{
-                    $this->_helper->flashMessenger('Payroll catetgory assign too many rolls, so unable to delete.');
+                    $this->_helper->flashMessenger('Payroll catetgory has been assigned to many roles, so unable to delete.');
                 }
             } catch (Exception $ex) {
                 //sapp_Payrollcal::pre($ex->getMessage());die;
@@ -376,8 +381,8 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
     }
     
     function editAction(){
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
+//        error_reporting(E_ALL);
+//        ini_set('display_errors', 1);
         $emptyFlag=0;
         $report_opt = array();
         $popConfigPermission = array();
@@ -403,7 +408,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
         $payrollvalueModel = new Default_Model_Payrollvalue();
         $employeeModel = new Default_Model_Employee();
         $currentOrgHead = $employeeModel->getCurrentOrgHead();
-
+	$categories=$payrollcategoryModel->payroll_get_all_category();
         if(empty($currentOrgHead)){
                 $this->addorganisationhead($loginUserId);
         }else{
@@ -429,6 +434,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
         $err_msg_arr=array();
         $this->view->error=FALSE;
         $this->view->err_msg_arr=$err_msg_arr;
+		$this->view->categories = $categories;
         $id = $this->_request->getParam('id');
         $this->view->id=$id;
         $empcategory = $this->_request->getParam('empcategory');
@@ -660,7 +666,8 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
         $payrollvalueModel = new Default_Model_Payrollvalue();
         $employeeModel = new Default_Model_Employee();
         $currentOrgHead = $employeeModel->getCurrentOrgHead();
-
+        $categories=$payrollcategoryModel->payroll_get_all_category();
+        
         if(empty($currentOrgHead)){
                 $this->addorganisationhead($loginUserId);
         }else{
@@ -682,6 +689,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
         }
         
         $this->view->popConfigPermission = $popConfigPermission;
+        $this->view->categories = $categories;
         $error=FALSE;
         $err_msg_arr=array();
         $this->view->error=FALSE;
@@ -707,13 +715,14 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
                 $error=TRUE;
                 $err_msg_arr['category_name']="Invalid data for 'Name'";
             }else{
-                $rsNameArr=$payrollcategoryModel->is_name_exist($category_name);
-                if(count($rsNameArr)==0){
-                    $dataArr['name']=$category_name;
-                }else{
-                    $error=TRUE;
-                    $err_msg_arr['category_name']=$category_name." is already exist in the payroll grooup.";
-                }
+                $dataArr['name']=$category_name;
+//                $rsNameArr=$payrollcategoryModel->is_name_exist($category_name);
+//                if(count($rsNameArr)==0){
+//                    $dataArr['name']=$category_name;
+//                }else{
+//                    $error=TRUE;
+//                    $err_msg_arr['category_name']=$category_name." is already exist in the payroll grooup.";
+//                }
             }
             
             if($category_code==""){
@@ -790,7 +799,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
                 $dataArr2['school_id']=$school_id;
             }
             $dataArr2['emp_id'] = $userid;
-            //echo '<pre>LL';print_r($err_msg_arr);die;
+            
             if($error==FALSE){
                 $trDb = Zend_Db_Table::getDefaultAdapter();
                 $trDb->beginTransaction();
@@ -825,6 +834,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
                 }
                 $close = 'close';
                 $this->view->popup=$close;
+                $_SESSION['reload'] = 1;
             }else{
                 $this->view->error=TRUE;
                 $this->view->err_msg_arr=$err_msg_arr;
@@ -834,8 +844,8 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
 	}
         
         function editpopupAction(){
-            error_reporting(E_ALL);
-            ini_set('display_errors', 1);
+//            error_reporting(E_ALL);
+//            ini_set('display_errors', 1);
             $emptyFlag=0;
             $report_opt = array();
             $popConfigPermission = array();
@@ -1106,7 +1116,7 @@ class Default_PayrollcategoryController extends Zend_Controller_Action{
                         $trDb->commit();
 
                         $baseUrl = new Zend_View_Helper_BaseUrl();
-                        $this->_helper->flashMessenger('Payroll category and rolles updated successfully.');
+                        $this->_helper->flashMessenger('Payroll category and roles updated successfully.');
                         $this->getResponse()->setRedirect($baseUrl->baseUrl().'/index.php/payrollgroup');
 
                         //$this->_redirect('payrollgroup');

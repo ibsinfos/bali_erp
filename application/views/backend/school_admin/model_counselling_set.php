@@ -4,9 +4,16 @@
     <div class="col-md-12">
         <?php echo form_open(base_url() . 'index.php?school_admin/counselling/' . $param2); ?>
         <div class="form-group">
-            <label class="control-label"><?php echo get_phrase('date'); ?></label>
-            <input type="text" class="form-control " name="date"  value="" id="dtmpicker"
-                   data-validate="required" data-message-required="<?php echo get_phrase('value_required'); ?>" required="required"/>
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="control-label pull-right"><strong><?php echo get_phrase('date');?></strong></label>
+                </div>
+                
+                <div class="col-md-9">
+                    <input type="text" class="form-control " name="date"  value="" id="dtmpicker"
+                        data-validate="required" data-message-required="<?php echo get_phrase('value_required'); ?>" required="required"/>
+                </div>
+            </div>
         </div>
         <div class="form-group">
             <div class="col-md-12 text-right no-padding">
@@ -20,7 +27,10 @@
 
 <script>
     $(function () {
-        $('#dtmpicker').datetimepicker({startDate:new Date()});
+        $('#dtmpicker').datetimepicker({
+                    startDate:new Date(),
+                    autoClose:true    
+                });
     });
 
     $("#type").click(function () {

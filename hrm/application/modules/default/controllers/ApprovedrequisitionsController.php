@@ -269,6 +269,7 @@ class Default_ApprovedrequisitionsController extends Zend_Controller_Action
 	
 	public function editAction()
 	{
+		
 		$id = $this->getRequest()->getParam('id');
 		$data = array();$jobtitle = '';
 		$auth = Zend_Auth::getInstance();
@@ -300,94 +301,93 @@ class Default_ApprovedrequisitionsController extends Zend_Controller_Action
                     {
 			$data = $requi_model->getRequisitionDataById($id);  
 			if(count($data)>0 && $data['req_status'] != 'Initiated' && $data['req_status'] != 'Rejected')
-                        {
-			$data['jobtitlename'] = '';
-			$business_units_list = $requi_model->getBusinessUnitsList($data['businessunit_id']);
-			$data['businessunit_name']	=	$business_units_list['unitname'];			
-			
-			$departments_list = $requi_model->getDepartmentList($data['businessunit_id'],$data['department_id']);			
-			$data['dept_name'] = $departments_list['deptname'];			
-			
-			$job_data = $requi_model->getJobTitleList($data['jobtitle']);
-			$data['titlename'] = $job_data['jobtitlename'];			
-			
-			$pos_data = $requi_model->getPositionOptions($data['jobtitle'],$data['position_id']);
-			$data['posname'] = $pos_data['positionname'];			
-			
-			$emptype_options = $requi_model->getEmpStatusOptions($data['emp_type']); 
-			$data['empttype'] = $emptype_options['employemnt_status'];
-						
-                        $report_manager_options = $user_model->getUserDataById($data['reporting_id']);
-			$data['mngrname'] = $report_manager_options['userfullname'];
-			
-			$raisedby = $requi_model->getrequisitioncreatername($data['createdby']);
-			$data['raisedby'] = $raisedby['userfullname'];
-			
-                        $app1_data = $user_model->getUserDataById($data['approver1']);
-                        $data['app1_name'] = $app1_data['userfullname'];
-                        
-                        if($data['approver2'] != '')
-                        {
-                            $app2_data = $user_model->getUserDataById($data['approver2']);
-                            $data['app2_name'] = $app2_data['userfullname'];
-                        }
-                        else 
-                        {
-                            $data['app2_name'] = 'No Approver';
-                        }
-                        
-                        if($data['approver3'] != '')
-                        {
-                            $app3_data = $user_model->getUserDataById($data['approver3']);
-                            $data['app3_name'] = $app3_data['userfullname'];
-                        }
-                        else 
-                        {
-                            $data['app3_name'] = 'No Approver';
-                        }
-					if($data['client_id'] != '')
-					{
-						$clien_data = $clientsModel->getClientDetailsById($data['client_id']);
-					    $data['client_id']=$clien_data[0]['client_name'];
-					}  
-					if($data['recruiters'] != '')
-					{
-						$name = '';
-						$recData=$usersModel->getUserDetailsforView($data['recruiters']);
-						if(count($recData)>0)
-						{
-							foreach($recData as $dataname){
-								$name = $name.','.$dataname['name'];
-							}
+                        { 
+                            $data['jobtitlename'] = '';
+                            //$business_units_list = $requi_model->getBusinessUnitsList($data['businessunit_id']);
+                            //$data['businessunit_name']	=	$business_units_list['unitname'];			
+                            //echo $data['department_id']; die;
+                            $departments_list = $requi_model->getDepartmentList('',$data['department_id']);			
+                            $data['dept_name'] = $departments_list['deptname'];		
+                            //print_r($departments_list); die;
+                            $job_data = $requi_model->getJobTitleList($data['jobtitle']);
+                            $data['titlename'] = $job_data['jobtitlename'];			
 
-						}
-						$data['recruiters']=ltrim($name,',');
-					}     
+                            $pos_data = $requi_model->getPositionOptions($data['jobtitle'],$data['position_id']);
+                            $data['posname'] = $pos_data['positionname'];			
+
+                            $emptype_options = $requi_model->getEmpStatusOptions($data['emp_type']); 
+                            $data['empttype'] = $emptype_options['employemnt_status'];
+                            $report_manager_options = $user_model->getUserDataById($data['reporting_id']);
+                            $data['mngrname'] = $report_manager_options['userfullname'];
+
+                            $raisedby = $requi_model->getrequisitioncreatername($data['createdby']);
+                            $data['raisedby'] = $raisedby['userfullname'];
+
+                            $app1_data = $user_model->getUserDataById($data['approver1']);
+                            $data['app1_name'] = $app1_data['userfullname'];
                         
-			$jobttlArr = $jobtitleModel->getsingleJobTitleData($data['jobtitle']);
-			if(!empty($jobttlArr) && $jobttlArr != 'norows')
-			{
-				$jobtitle = $jobttlArr[0]['jobtitlename'];
-				$data['jobtitlename'] = $jobttlArr[0]['jobtitlename'];
-			}
-			
-			foreach($data as $key=>$val)
-			{
-				//$data[$key] = htmlentities(($val), ENT_QUOTES, "UTF-8");
-			}
-                        $onboard_date_org = $data['onboard_date'];
-			$data['onboard_date'] = sapp_Global::change_date($data['onboard_date'], 'view');
-			if($data['req_status'] == 'Approved')
-			{
+                            if($data['approver2'] != '')
+                            {
+                                $app2_data = $user_model->getUserDataById($data['approver2']);
+                                $data['app2_name'] = $app2_data['userfullname'];
+                            }
+                            else 
+                            {
+                                $data['app2_name'] = 'No Approver';
+                            }
+
+                            if($data['approver3'] != '')
+                            {
+                                $app3_data = $user_model->getUserDataById($data['approver3']);
+                                $data['app3_name'] = $app3_data['userfullname'];
+                            }
+                            else 
+                            {
+                                $data['app3_name'] = 'No Approver';
+                            }
+                            if($data['client_id'] != '')
+                            {
+                                    $clien_data = $clientsModel->getClientDetailsById($data['client_id']);
+                                $data['client_id']=$clien_data[0]['client_name'];
+                            }  
+                            if($data['recruiters'] != '')
+                            {
+                                    $name = '';
+                                    $recData=$usersModel->getUserDetailsforView($data['recruiters']);
+                                    if(count($recData)>0)
+                                    {
+                                            foreach($recData as $dataname){
+                                                    $name = $name.','.$dataname['name'];
+                                            }
+
+                                    }
+                                    $data['recruiters']=ltrim($name,',');
+                            }     
+                        
+                            $jobttlArr = $jobtitleModel->getsingleJobTitleData($data['jobtitle']);
+                            if(!empty($jobttlArr) && $jobttlArr != 'norows')
+                            {
+                                    $jobtitle = $jobttlArr[0]['jobtitlename'];
+                                    $data['jobtitlename'] = $jobttlArr[0]['jobtitlename'];
+                            }
+
+                            foreach($data as $key=>$val)
+                            {
+                                    //$data[$key] = htmlentities(($val), ENT_QUOTES, "UTF-8");
+                            }
+                            $onboard_date_org = $data['onboard_date'];
+                            $data['onboard_date'] = sapp_Global::change_date($data['onboard_date'], 'view');
+                            if($data['req_status'] == 'Approved')
+                            {
 				$form->req_status->addMultiOptions(array(
 								'Approved'				=>		'Approved',
 								'Closed'		=>		'Closed',
 								'On hold'		=> 		'On hold',
 								'Complete'		=> 		'Complete'							
 									));
-			}else if($data['req_status'] == 'Complete'){
-				$form->req_status->addMultiOptions(array(
-								'Complete'		=> 		'Complete'							
+                            }else if($data['req_status'] == 'Complete'){
+                                    $form->req_status->addMultiOptions(array(
+                                                                    'Complete'		=> 		'Complete'							
 							));
 				$form->req_status->setAttrib('disabled','disabled');
 				$form->removeElement('submit');
@@ -456,38 +456,38 @@ class Default_ApprovedrequisitionsController extends Zend_Controller_Action
                         $cand_status_opt = array('' => 'All','Shortlisted' => 'Shortlisted','Selected' => 'Selected','Rejected' => 'Rejected',
                                                 'On hold' => 'On hold','Disqualified' => 'Disqualified','Scheduled' => 'Scheduled',
                                                 'Not Scheduled' => 'Not Scheduled','Recruited' => 'Recruited','Requisition Closed/Completed' => 'Requisition Closed/Completed');
-                        $dataTmp = array(
-                                'sort' => $sort,
-                                'by' => $by,
-                                'pageNo' => $pageNo,
-                                'perPage' => $perPage,				
-                                'tablecontent' => $tablecontent,
-                                'objectname' => $objName,
-                                'extra' => array(),
-                                'tableheader' => $tableFields,
-                                'jsGridFnName' => 'getAjaxgridData',
-                                'jsFillFnName' => '',
-                                'formgrid' => 'true',
-                                'searchArray' => $searchArray,
-                                'menuName' => 'Candidate details',
-                                'call'=>'',
-                                'search_filters' => array(
-                                    'cand_status' => array(
-                                        'type' => 'select',
-                                        'filter_data' => $cand_status_opt,
+                            $dataTmp = array(
+                                    'sort' => $sort,
+                                    'by' => $by,
+                                    'pageNo' => $pageNo,
+                                    'perPage' => $perPage,				
+                                    'tablecontent' => $tablecontent,
+                                    'objectname' => $objName,
+                                    'extra' => array(),
+                                    'tableheader' => $tableFields,
+                                    'jsGridFnName' => 'getAjaxgridData',
+                                    'jsFillFnName' => '',
+                                    'formgrid' => 'true',
+                                    'searchArray' => $searchArray,
+                                    'menuName' => 'Candidate details',
+                                    'call'=>'',
+                                    'search_filters' => array(
+                                        'cand_status' => array(
+                                            'type' => 'select',
+                                            'filter_data' => $cand_status_opt,
+                                        ),
                                     ),
-                                ),
-                                
-                        );			
-                        array_push($data,$dataTmp);
-                        $this->view->dataArray = $dataTmp;
-			if($this->getRequest()->getPost())
-			{
-				$result = $this->save($form,$data);	
-				$this->view->msgarray = $result; 
-				$this->view->messages = $result;				
-			}
-			$this->view->nodata = '';
+
+                            );			
+                            array_push($data,$dataTmp);
+                            $this->view->dataArray = $dataTmp;
+                            if($this->getRequest()->getPost())
+                            {
+                                    $result = $this->save($form,$data);	
+                                    $this->view->msgarray = $result; 
+                                    $this->view->messages = $result;				
+                            }
+                            $this->view->nodata = '';
                         }
                         else 
                         {

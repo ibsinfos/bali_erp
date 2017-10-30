@@ -174,19 +174,23 @@ class Super_admin extends CI_Controller {
         if (($param1 != '') && ($param1 != 'create') && ($school_id != '')) {
             $RlName = $this->Role_model->get_role_name($param1, $school_id);
             $RoleName = strtolower($RlName);
-
+         
             if ($RoleName == 'admin') {
                 $this->load->model('Admin_model');
-                $page_data['data'] = $this->Admin_model->get_admin_list($school_id);
+                $page_data['data'] = $this->Admin_model->get_admin_list();
             } else if ($RoleName == 'teacher') {
                 $this->load->model('Teacher_model');
                 $page_data['data'] = $this->Teacher_model->get_teacher_list($school_id);
-            } else if ($RoleName == 'parent') {
+            }else if (strtolower($RoleName) == 'bus_driver') {
+                $this->load->model('Bus_driver_modal');
+                $page_data['data'] = $this->Bus_driver_modal->get_driver_list($school_id);
+            } 
+            else if ($RoleName == 'parent') {
                 $this->load->model('Parent_model');
                 $page_data['data'] = $this->Parent_model->get_parent_list($school_id);
             } else if ($RoleName == 'school_admin') {
                 $this->load->model('School_Admin_model');
-                $page_data['data'] = $this->School_Admin_model->get_school_admin_list();
+                $page_data['data'] = $this->School_Admin_model->get_school_admin_list($school_id);
             } else if ($RoleName == 'accountant') {
                 $this->load->model('fees/Accountant_model');
                 $page_data['data'] = $this->Accountant_model->get_school_accountant_list($school_id);
@@ -194,18 +198,22 @@ class Super_admin extends CI_Controller {
                 $this->load->model('fees/Cashier_model');
                 $page_data['data'] = $this->Cashier_model->get_school_cashier_list($school_id);
             }
+            else if ($RoleName == 'bus_admin') {
+                $this->load->model('Bus_administrator_model');
+                $page_data['data'] = $this->Bus_administrator_model->get_admin_list($school_id);
+            }
         } else if ($param1 == 'create') {
             $data = $this->input->post();
-            $where = array('school_id' => $data['school_id']);
+            $where = array('r.school_id' => $data['school_id']);
             $roles = $this->Role_model->get_role_array($where);
 
             $RoleKey = array();
             if (count($roles)) {
                 foreach ($roles as $role) {
-                    $RoleKey[$role['id']] = $role['name'];
+                    $RoleKey[$role['id']] = $role['role_name'];
                 }
             }
-            //pre($_POST);
+           
             //        pre($data);
             $chk = 1;
             if (count($data['assigned_user'])) {
@@ -224,9 +232,9 @@ class Super_admin extends CI_Controller {
                             $user_type = 'L';
                         } else if (strtolower($RoleKey[$data['assign_role'][$datum]]) == 'warden') {
                             $user_type = 'HA';
-                        } else if (strtolower($RoleKey[$data['assign_role'][$datum]]) == 'Bus Driver') {
+                        } else if (strtolower($RoleKey[$data['assign_role'][$datum]]) == 'bus_driver') {
                             $user_type = 'BD';
-                        } else if (strtolower($RoleKey[$data['assign_role'][$datum]]) == 'Bus Administrator') {
+                        } else if (strtolower($RoleKey[$data['assign_role'][$datum]]) == 'bus_admin') {
                             $user_type = 'BA';
                         } else if (strtolower($RoleKey[$data['assign_role'][$datum]]) == 'school_admin') {
                             $user_type = 'SA';
@@ -238,10 +246,10 @@ class Super_admin extends CI_Controller {
                             $user_type = 'T';
 
                         $original_user_type = explode('assign_role/', $data['original_user_type']);
-                        //pre($original_user_type);    
+ 
                         $original_user_type = explode("/", $original_user_type[1]);
                         $OUT = $original_user_type[0];
-                        //echo "<br>here out is :".$OUT;
+                        
                         if (strtolower($RoleKey[$OUT]) == 'admin') {
                             $OUTkEY = 'A';
                         } else if (strtolower($RoleKey[$OUT]) == 'teacher') {
@@ -254,9 +262,9 @@ class Super_admin extends CI_Controller {
                             $OUTkEY = 'L';
                         } else if (strtolower($RoleKey[$OUT]) == 'warden') {
                             $OUTkEY = 'HA';
-                        } else if (strtolower($RoleKey[$OUT]) == 'Bus Driver') {
+                        } else if (strtolower($RoleKey[$OUT]) == 'bus_driver') {
                             $OUTkEY = 'BD';
-                        } else if (strtolower($RoleKey[$OUT]) == 'Bus Administrator') {
+                        } else if (strtolower($RoleKey[$OUT]) == 'bus_admin') {
                             $OUTkEY = 'BA';
                         } else if (strtolower($RoleKey[$OUT]) == 'school_admin') {
                             $OUTkEY = 'SA';
@@ -265,7 +273,7 @@ class Super_admin extends CI_Controller {
                         } else if (strtolower($RoleKey[$OUT]) == 'cashier') {
                             $OUTkEY = 'CASH';
                         }
-
+                        
                         $this->Role_model->delete_exist_user_role_data(array('main_user_id' => $datum, 'original_user_type' => $OUTkEY, 'school_id' => $data['school_id']));
                         //echo "<br>here user type is:".$user_type;
                         $save_data['main_user_id'] = $datum;
@@ -274,9 +282,12 @@ class Super_admin extends CI_Controller {
                         $save_data['original_user_type'] = $OUTkEY;
 
 
-
-                        $save_data['school_id'] = $data['school_id'];
-
+                        if($OUTkEY == 'A')
+                            $save_data['school_id'] = '';
+                        else {
+                            $save_data['school_id'] = $data['school_id'];
+                        }
+                        
 
                         $id = $this->Role_model->assign_role($save_data);
                         if (!$id) {
@@ -298,7 +309,7 @@ class Super_admin extends CI_Controller {
 
         $page_data['roles'] = array();
         if ($school_id != '') {
-            $where = array('school_id' => $school_id);
+            $where = array('r.school_id' => $school_id);
             $page_data['roles'] = $this->Role_model->get_role_array($where);
         }
 
@@ -416,17 +427,17 @@ class Super_admin extends CI_Controller {
             $data = $this->input->post();
 
             if (count($data['link_id']) && $data['role_id'] != '' && $data['user_type'] != '' && ($data['school_id'] != '')) {
-
                 $this->Role_model->delete_old_permission_data(array('role_id' => $data['role_id'], 'school_id' => $data['school_id']));
-
                 foreach ($data['link_id'] as $datum) {
                     if ($datum != '') {
                         $save_data['role_id'] = $data['role_id'];
                         $save_data['user_type'] = $data['user_type'];
                         $save_data['link_id'] = $datum;
 
-                        $save_data['school_id'] = $data['school_id'];
-
+                        if($save_data['user_type']!='A'){
+                            $save_data['school_id'] = $data['school_id'];
+                        }
+                        
                         $id = $this->Role_model->save_update_permission($save_data);
                     }
                 }
@@ -445,14 +456,13 @@ class Super_admin extends CI_Controller {
             }
 
             $page_data['UserType'] = $param2;
-
             $page_data['data'] = $this->Role_model->get_permission_data(array('user_type' => $param2, 'parent_id' => 0));
         }
+        //echo '<pre>';print_r( $page_data['data']);exit;
 
         $page_data['roles'] = array();
-
         if ($school_id != '') {
-            $where = array('school_id' => $school_id);
+            $where = array('r.school_id' => $school_id);
             $page_data['roles'] = $this->Role_model->get_role_array($where);
         }
 
@@ -540,7 +550,7 @@ class Super_admin extends CI_Controller {
             $data['place_holder'] = $this->input->post('place_holder');
             $data['form_id'] = $this->input->post('form_name');
             $val = $this->Dynamic_filed_model->add($data);
-            $this->session->set_flashdata("flash_message", get_phrase("data_added_successfully"));
+            $this->session->set_flashdata("flash_message", get_phrase("dynamic_field_added_successfully"));
             redirect(base_url() . 'index.php?super_admin/dynamic_fields', 'refresh');
         }
         if ($param1 == 'update') {
@@ -562,13 +572,13 @@ class Super_admin extends CI_Controller {
             $data['form_id'] = $this->input->post('form_name');
             if ($param2 != '') {
                 $this->Dynamic_filed_model->update_field($data, array("id" => $param2));
-                $this->session->set_flashdata("flash_message", get_phrase("data_updated"));
+                $this->session->set_flashdata("flash_message", get_phrase("dynamic_field_updated"));
                 redirect(base_url() . 'index.php?super_admin/dynamic_fields', 'refresh');
             }
         }
         if ($param1 == 'delete') {
             $this->Dynamic_filed_model->delete_field($param2);
-            $this->session->set_flashdata("flash_message", get_phrase("data_deleted"));
+            $this->session->set_flashdata("flash_message", get_phrase("dynamic_field_deleted"));
             redirect(base_url() . 'index.php?super_admin/dynamic_fields', 'refresh');
         }
         //         if (($param1 == 'ToggleEnable') && ($param3!= '')) {
@@ -593,10 +603,10 @@ class Super_admin extends CI_Controller {
         if ($param1 == 'status_change') {
             if ($param3 == 'N') {
                 $data['enable'] = "Y";
-                $messge = "data_enable_successfully";
+                $messge = "dynamic_field_enable_successfully";
             } else {
                 $data['enable'] = "N";
-                $messge = "data_disable_successfully";
+                $messge = "dynamic_field_disable_successfully";
             }
             //            pre($data); die;
             $this->Dynamic_filed_model->update_staus($data, array("id" => $param2));
@@ -614,16 +624,36 @@ class Super_admin extends CI_Controller {
         $page_data = $this->get_page_data_var();
         $this->load->model('Dynamic_group_model');
         $this->load->model('Dynamic_form_model');
+		
         $page_data['dynamic_form_list'] = $this->Dynamic_form_model->get_formname_array();
         $page_data['group_name'] = $this->Dynamic_group_model->get_groupname_array();
         $page_data['page_name'] = 'add_field';
         $page_data['page_title'] = get_phrase('add_fields');
         $this->load->view('backend/index', $page_data);
     }
-
+	function ajax_get_columns($param1='')
+	{
+		$this->load->model('Dynamic_field_model');
+		//$table='student';
+		if (strpos(strtolower($param1), 'student') !== false) {
+    $table="student";
+		}
+		if (strpos(strtolower($param1), 'parent') !== false) {
+    $table="parent";
+		}
+		$columns = $this->Dynamic_field_model->get_column_of_table($table);
+		
+		$response_html = '<option value="">Select Field</option>';
+    foreach ($columns as $column) {
+        $response_html .= '<option value="' . $column['COLUMN_NAME'] . '">' . $column['COLUMN_NAME'] . '</option>';
+    }
+	$response_html .= '<option value="9999">Add new field</option>';
+    echo $response_html;
+	}
     function dynamic_form($param1 = '', $param2 = '', $param3 = '') {
         $page_data = $this->get_page_data_var();
         $this->load->model('Dynamic_form_model');
+        $this->load->model("Dynamic_filed_model");
         $page_data['UserType'] = '';
         if ($param1 == 'create') {
             $data['name'] = $this->input->post('form_name');
@@ -798,6 +828,21 @@ class Super_admin extends CI_Controller {
         $page_data['feature_id'] = $param1;
         $page_data['page_name'] = 'link_module_features';
         $page_data['page_title'] = get_phrase('link_module_features');
+        $this->load->view('backend/index', $page_data);
+    }
+    
+    public function edit_field($param1 = '') {
+        $page_data = $this->get_page_data_var();
+        $this->load->model('Dynamic_group_model');
+                $this->load->model('Dynamic_filed_model');
+                $this->load->model('Dynamic_form_model');
+                $page_data['page_title'] = "Edit Field";
+				
+                $page_data['dynamic_form_list'] = $this->Dynamic_form_model->get_formname_array();
+                $page_data['group_name'] = $this->Dynamic_group_model->get_groupname_array();
+                $page_data['edit_data'] = $this->Dynamic_filed_model->get_data_by_id(urldecode($param1));
+        $page_data['page_name'] = 'modal_edit_field';
+        $page_data['page_title'] = get_phrase('Edit_Field');
         $this->load->view('backend/index', $page_data);
     }
 }

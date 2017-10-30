@@ -1,0 +1,178 @@
+<?php
+$request = Zend_Controller_Front::getInstance();
+$controllerName = $request->getRequest()->getControllerName();
+$actionName = $request->getRequest()->getActionName();
+
+$auth = Zend_Auth::getInstance();
+
+$loginUserName = ""; 
+$loginUserId = '';
+$tourflag = 0;
+$loginProfileImgSrc = MEDIA_PATH.'images/default-profile-pic.jpg';
+$loginuserRole = '';
+$userfullname = '';
+$loginuserGroup = '';
+
+if($auth->hasIdentity())
+{
+    $loginUserId = $auth->getStorage()->read()->id;
+    
+    $userProfileImage = $auth->getStorage()->read()->profileimg;
+    if (!empty($userProfileImage) && file_exists("public/uploads/profile/".$userProfileImage)) {
+    	$loginProfileImgSrc = DOMAIN."public/uploads/profile/".$userProfileImage;
+    }
+    $loginUserName =$auth->getStorage()->read()->employeeId;	    
+    $loginuserRole = $auth->getStorage()->read()->emprole;	
+    $loginuserGroup = $auth->getStorage()->read()->group_id;
+    $tourflag = $auth->getStorage()->read()->tourflag;
+    $userfullname = $auth->getStorage()->read()->userfullname;
+}
+
+$menu_model = new Default_Model_Menu();
+if($actionName == 'viewsettings'){
+    $marr = $menu_model->getgroup_formenu($loginuserGroup, $loginuserRole, '');
+}else{
+    $marr = $menu_model->getgroup_formenu($loginuserGroup, $loginuserRole, '');
+}
+$menuarr = $marr['tmpArr'];
+
+$active_menus = $menu_model->getisactivemenus();
+$act_menus = array();
+if(!empty($active_menus))
+{
+    foreach($active_menus as $act)
+    {
+            $act_menus[$act['id']] = $act;
+    }
+}
+//echo '<pre>'; print_r($menuarr); die;
+?>
+<div class="child_menus hide_ele" id="navigation_menus">
+    <ul>
+        <li id="<?php echo DASHBOARD_MENU; ?>" class="parent_menu_class" onclick="window.location= '<?php echo BASE_URL.'welcome'; ?>';">
+            <span>
+                <a href="<?php echo BASE_URL.'welcome'; ?>">
+                    <i class="fa fa-home" aria-hidden="true"></i>
+                    Dashboard
+                </a>
+            </span>
+        </li>
+<?php 
+foreach($menuarr as $menuid => $data)
+{
+?>
+        <li id="nav_<?php echo $data['id']; ?>" class="parent_menu_class <?php if(isset($data['childs']) && count($data['childs']) > 0) { ?> has_sub_menu <?php } ?>" <?php if(isset($data['childs']) && count($data['childs']) == 0) { ?> onclick="window.location= '<?php echo BASE_URL.$data['url']; ?>';" <?php } ?>>
+            <span>
+                <a id="<?php echo $data['id']; ?>" href="<?php if(isset($data['childs']) && count($data['childs']) > 0) { ?>javascript:void(0);<?php } else { ?><?php echo BASE_URL.$data['url']; ?><?php } ?>">
+                    <?php if($data['menuName'] == 'Analytics') { ?>
+                    <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'HR') { ?>
+                    <i class="fa fa-handshake-o" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Site Config') { ?>
+                    <i class="fa fa-cogs" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Modules') { ?>
+                    <i class="fa fa-life-ring" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Disciplinary') { ?>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Appraisals') { ?>
+                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Organization') { ?>
+                    <i class="fa fa-building" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Self Service') { ?>
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php echo $data['menuName']; ?>
+                </a>
+            </span>
+        </li>
+        <?php if(isset($data['childs']) && count($data['childs']) > 0) { ?>
+        <ul class="submenu_list hide_ele nkk" id="submenu_list_<?php echo $data['id']; ?>">
+            <li onclick="show_parent_menu();">
+                <span>
+                    <a href="javascript:void(0);">
+                        Back
+                    </a>
+                </span>
+            </li>
+            <?php if(isset($data['childs']) && count($data['childs']) > 0) { foreach($data['childs'] as $key=>$child_item) {
+                if($child_item['url'] != '/#') {
+            ?>
+            <li id="subnav_<?php echo $child_item['id']; ?>" onclick="window.location='<?php echo BASE_URL.$child_item['url']; ?>';">
+                <span>
+                    <a id="<?php echo $child_item['id']; ?>" href="javascript:void(0);">
+                        <?php echo $child_item['menuName']; ?>
+                    </a>
+                </span>
+            </li>
+            <?php
+                }
+                if(isset($child_item['childs']) && count($child_item['childs'])>0) {
+                    foreach($child_item['childs'] as $key=>$children_item) {
+                        if($children_item['url'] != '/#') {
+            ?>
+            <li id="subchild_<?php echo $children_item['id']; ?>" onclick="window.location='<?php echo BASE_URL.$children_item['url']; ?>';">
+                <span>
+                    <a id="<?php echo $children_item['id']; ?>" href="javascript:void(0);">
+                        <?php echo $children_item['menuName']; ?>
+                    </a>
+                </span>
+            </li>
+            <?php } } } }  } ?>
+        </ul>
+        <?php } ?>
+<?php    
+}
+?>
+        <li id="logs_list" class="parent_menu_class">
+            <span>
+                <a href="javascript:void(0);">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+                    Logs
+                </a>
+            </span>
+        </li>
+        <ul class="submenu_list hide_ele" id="logs_list">
+            <li onclick="show_parent_menu();">
+                <span>
+                    <a href="javascript:void(0);">
+                        Back
+                    </a>
+                </span>
+            </li>
+            <li onclick="window.location='<?php echo BASE_URL.'logmanager'; ?>';">
+                <span>
+                    <a href="javascript:void(0);">
+                        Activity Log
+                    </a>
+                </span> 
+            </li> 
+            <li onclick="window.location='<?php echo BASE_URL.'userloginlog'; ?>';">
+                <span>
+                    <a href="javascript:void(0);">
+                        User Log
+                    </a>
+                </span> 
+            </li> 
+        </ul>
+    </ul>
+</div>
+
+
+<script type="text/javascript">
+$('.parent_menu_class').click(function() {
+    var idVal = $(this).attr('id');
+    var idArr = idVal.split('_');
+    var id = idArr[1];
+    $('#submenu_list_'+id).removeClass('hide_ele');
+    $('#submenu_list_'+id).removeAttr('style');
+    $('.parent_menu_class').addClass('hide_ele');
+});
+</script>
+

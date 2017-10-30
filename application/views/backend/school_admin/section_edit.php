@@ -6,28 +6,28 @@
     <div class="form-horizontal form-material">
         <div class="form-group">
             <div class="col-md-12 m-b-20">
-                <label>Section Name</label><span class="mandatory"> *</span>
+                <label><?php echo get_phrase('section_name') ?></label><span class="mandatory"> *</span>
                 <input type="text" required="required" class="form-control" name="name" value="<?php echo $row['name']; ?>" >
                 <label class="mandatory"> <?php echo form_error('name'); ?></label>
             </div>
             
             <div class="col-md-12 m-b-20">
-                <label>Nick Name</label><span class="mandatory"> *</span>
+                <label><?php echo get_phrase('Description') ?></label><span class="mandatory"> *</span>
                 <input type="text" required="required" class="form-control" name="nick_name" value="<?php echo $row['nick_name']; ?>">
             </div>
             
             <div class="col-md-12 m-b-20">
-                <label>Room No</label><span class="mandatory"> *</span> 
+                <label><?php echo get_phrase('room_no') ?></label><span class="mandatory"> *</span> 
                 <input type="text" required="required" class="form-control" name="room_no" value="<?php echo $row['room_no']; ?>">
             </div>
             
             <div class="col-md-12 m-b-20">
-                <label>Maximum Capacity</label><span class="mandatory"> *</span>
+                <label><?php echo get_phrase('maximum_capacity') ?></label><span class="mandatory"> *</span>
                 <input type="text" required="required" class="form-control" name="max_capacity" value="<?php echo $row['max_capacity']; ?>">
             </div>
                        
             <div class="col-md-12 m-b-20">
-                <label>Select Class</label><span class="mandatory"> *</span>
+                <label><?php echo get_phrase('select_class') ?></label><span class="mandatory"> *</span>
               
                     <select class="selectpicker1" data-style="form-control" data-live-search="true"name ="class_id" disabled="disabled">
                         <option value=""><?php echo get_phrase('select_class'); ?></option>
@@ -41,10 +41,10 @@
             </div>
             
             <div class="col-md-12 m-b-20">
-                <label>Select Teacher</label><span class="mandatory"> *</span>
+                <label><?php echo get_phrase('select_teacher') ?></label><span class="mandatory"> *</span>
                
                     <select class="selectpicker1 form-control outline_none" data-style="form-control"  data-live-search="true"   required="required" name="teacher_id">
-                         <option value=""><?php echo get_phrase('select'); ?></option>
+                         <option value=""><?php echo get_phrase('select_teacher'); ?></option>
                         <?php foreach ($teachers as $row3): ?>
                     <option <?php
                     if ($row['teacher_id'] == $row3['teacher_id']) {
@@ -56,7 +56,7 @@
                     </select>
             </div>            
             <div class="col-md-12 text-right">
-                <button type="submit" class="fcbtn btn btn-danger btn-outline" id="sa-success" name="save_details"><?php echo get_phrase('update');?></button>
+                <button type="submit" class="fcbtn btn btn-danger btn-outline" id="sa-success" name="save_details"><?php echo get_phrase('edit_section');?></button>
             </div>
         </div> 
     <?php echo form_close(); ?>

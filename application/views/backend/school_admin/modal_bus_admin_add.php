@@ -1,10 +1,6 @@
 <div class="row">
-    <div class="col-md-12">
-        <div class="panel panel-primary" data-collapsed="0">            
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel"><?php echo get_phrase('add_bus_admin'); ?></h4>
-            </div>
-            <div class="panel-body" id="tabs">
+    <div class="col-md-12">       
+           <div class="panel-body" id="tabs">
                 <?php echo form_open(base_url() . 'index.php?school_admin/bus_admin/create', array('class' => 'form-horizontal form-material form-groups-bordered validate', 'enctype' => 'multipart/form-data', 'id' => 'addBusAdmin')); ?>
                <div class="form-group">
                     <div class="col-md-12 m-b-20">
@@ -19,15 +15,6 @@
                         <label><?php echo get_phrase('email'); ?><span class="mandatory"> *</span></label>
                         <input data-validate="required" id="bus_admin_email" placeholder="Please Enter Email" type="text" class="form-control" name="email" value=""  data-validate="required" data-message-required ="<?php echo get_phrase('value_required'); ?>" required="required">
                         <span id="error_bus_admin_email" class="mandatory"></span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    
-                    <div class="col-md-12 m-b-20">
-                        <label><?php echo get_phrase('password'); ?><span class="mandatory"> *</span></label>
-                        <input data-validate="required" type="password" placeholder="Please Enter Password" class="form-control" name="password" value="" id="bus_admin_password"  data-validate="required" data-message-required ="<?php echo get_phrase('value_required'); ?>" required="required">
-                        <span id="bus_admin_password" class="mandatory"></span>
                     </div>
                 </div>
 
@@ -56,8 +43,6 @@
             </div>
         </div>
     </div>
-</div>
-
 
 <script type="text/javascript">
 function valid_only_numeric(evt){

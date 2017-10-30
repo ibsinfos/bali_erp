@@ -5,7 +5,7 @@
         <div class="form-horizontal form-material">
             <div class="row">
                 <div class="col-xs-12">
-                    <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                    <label for="running_session"><?php echo get_phrase("current_session"); ?></label>
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                         <input type="text" class="form-control" name="name" value="<?php echo $record->running_year?>" readonly/> 

@@ -92,7 +92,7 @@ class Attendance_model extends CI_Model{
         }
         if(isset($school_id) && $school_id > 0){
             $sql="SELECT count(a.student_id) AS total_student,SUM(IF(a.status=0,1,0)) as absent,
-  SUM(IF(a.status=1,1,0)) as present,a.class_id,c.name FROM `class` AS c  LEFT JOIN `attendance` AS a ON(a.class_id=c.class_id) WHERE a.timestamp='$timeStamp' AND a.school_id = '".$school_id."' GROUP BY class_id";
+  SUM(IF(a.status=1,1,0)) as present,a.class_id,c.name FROM `class` AS c  LEFT JOIN `attendance` AS a ON(a.class_id=c.class_id) WHERE a.date='$timeStamp' AND a.school_id = '".$school_id."' GROUP BY class_id";
         } else {
             $sql="SELECT count(a.student_id) AS total_student,SUM(IF(a.status=0,1,0)) as absent,
   SUM(IF(a.status=1,1,0)) as present,a.class_id,c.name FROM `class` AS c  LEFT JOIN `attendance` AS a ON(a.class_id=c.class_id) WHERE a.timestamp='$timeStamp' GROUP BY class_id";
@@ -507,4 +507,149 @@ class Attendance_model extends CI_Model{
         return $attendance;
     }
 
+
+    //New functions
+    function get_student($whr=array()){
+        _school_cond('S.school_id');
+        _year_cond('E.year');
+        $this->db->select('S.*,E.roll,E.class_id,E.section_id,C.name class_name,SC.name section_name,E.enroll_code,E.date_added,P.father_name,P.father_lname,
+                          P.mother_name,P.mother_lname,P.email parent_email,P.cell_phone parent_phone,P.device_token',FALSE);  
+        $this->db->from('student S');
+        $this->db->join('enroll E','E.student_id=S.student_id','LEFT'); 
+        $this->db->join('class C','C.class_id=E.class_id','LEFT');  
+        $this->db->join('section SC','SC.section_id=E.section_id','LEFT');  
+        $this->db->join('parent P','P.parent_id=S.parent_id','LEFT');
+        $this->db->where($whr);
+        return $this->db->get()->row(); 
+    }
+    
+    function get_student_attendance($whr=array(),$date=false,$order_by='S.name ASC',$having=array()){
+        _school_cond('S.school_id');
+        _year_cond('E.year');
+        $this->db->select('S.*,E.roll,E.year running_year,E.class_id,E.section_id,C.name class_name,SC.name section_name,E.enroll_code,E.date_added,P.father_name,
+                          P.father_lname,P.mother_name,P.mother_lname,P.email parent_email,P.cell_phone parent_phone,P.device_token,
+                          (SELECT attendance_id FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id 
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) attendance_id,
+                          (SELECT timezone FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) timezone,
+                          (SELECT date FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) at_date,
+                          (SELECT DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id 
+                          AND AT.section_id=E.section_id AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) tm_date,
+                          (SELECT has_in FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) has_in,
+                          (SELECT has_out FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) has_out,
+                          (SELECT in_time FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) in_time,
+                          (SELECT out_time FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) out_time,
+                          (SELECT status FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) status,
+                          (SELECT timing_status FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) timing_status,
+                          (SELECT custom_updated FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) custom_updated,
+                          (SELECT closed FROM attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id
+                          AND (AT.date = "'.$date.'" OR DATE_FORMAT(FROM_UNIXTIME(AT.timestamp), "%Y-%m-%d") = "'.$date.'") LIMIT 1) closed',FALSE);   
+        $this->db->from('student S');
+        $this->db->join('enroll E','E.student_id=S.student_id','LEFT'); 
+        $this->db->join('class C','C.class_id=E.class_id','LEFT');  
+        $this->db->join('section SC','SC.section_id=E.section_id','LEFT');  
+        $this->db->join('parent P','P.parent_id=S.parent_id','LEFT');
+        foreach($whr as $wk=>$wv){
+            if($wv)
+                $this->db->where($wk,$wv);
+            else
+                $this->db->where($wk);
+        } 
+        $this->db->order_by($order_by);
+        $this->db->where($having);
+        return $this->db->get()->result(); 
+    }
+
+    function get_student_att($whr=array()){
+        _school_cond('S.school_id');
+        _year_cond('E.year');
+        $this->db->select('S.*,',FALSE);   
+        $this->db->from('student S');
+        $this->db->join('enroll E','E.student_id=S.student_id','LEFT'); 
+        $this->db->join('attendance AT','AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id AND AT.student_id=E.student_id','INNER');
+        foreach($whr as $wk=>$wv){
+            if($wv)
+                $this->db->where($wk,$wv);
+            else
+                $this->db->where($wk);
+        } 
+        return $this->db->get()->result(); 
+    }
+
+    function save_student_attendance($data){
+        if(isset($data['attendance_id']) && $data['attendance_id']){
+            $this->db->update('attendance',$data,array('attendance_id'=>$data['attendance_id']));
+            $flag = $data['attendance_id'];
+        }else{
+            $this->db->insert('attendance',$data);
+            $flag = $this->db->insert_id();
+        }
+        return $flag;
+    }
+
+
+    //subjetwise
+    function get_student_subject_attendance($whr=array(),$subject_id=false,$date=false,$order_by='S.name ASC'){
+        _school_cond('S.school_id');
+        _year_cond('E.year');
+        $this->db->select('S.*,E.roll,E.year running_year,E.class_id,E.section_id,C.name class_name,SC.name section_name,E.enroll_code,E.date_added,P.father_name,
+                          P.father_lname,P.mother_name,P.mother_lname,P.email parent_email,P.cell_phone parent_phone,P.device_token,
+                          (SELECT id FROM subject_attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id AND AT.subject_id="'.$subject_id.'" AND AT.date="'.$date.'" LIMIT 1) attendance_id,
+                          (SELECT subject_id FROM subject_attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id AND AT.subject_id="'.$subject_id.'" AND AT.date="'.$date.'" LIMIT 1) subject_id,
+                          (SELECT status FROM subject_attendance AT WHERE AT.year=E.year AND AT.class_id=E.class_id AND AT.section_id=E.section_id 
+                          AND AT.student_id=E.student_id AND AT.subject_id="'.$subject_id.'" AND AT.date="'.$date.'" LIMIT 1) att_status,',FALSE);  
+        $this->db->from('student S');
+        $this->db->join('enroll E','E.student_id=S.student_id','LEFT'); 
+        $this->db->join('class C','C.class_id=E.class_id','LEFT');  
+        $this->db->join('section SC','SC.section_id=E.section_id','LEFT');  
+        $this->db->join('parent P','P.parent_id=S.parent_id','LEFT');
+        $this->db->where($whr);
+        $this->db->order_by($order_by);
+        return $this->db->get()->result(); 
+    }
+
+    //---Teacher
+    function get_teacher($whr=array()){
+        return $this->db->get_where('teacher',$whr)->row(); 
+    }
+
+    function get_teacher_attendance($whr=array(),$date=false,$order_by='T.name ASC'){
+        _school_cond('T.school_id');
+        $this->db->select('T.*,
+                          (SELECT attendance_id FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) attendance_id,
+                          (SELECT has_in FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) has_in,
+                          (SELECT has_out FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) has_out,
+                          (SELECT in_time FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) in_time,
+                          (SELECT out_time FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) out_time,
+                          (SELECT status FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) status,
+                          (SELECT timing_status FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) timing_status,
+                          (SELECT custom_updated FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) custom_updated,
+                          (SELECT closed FROM attendance_teacher AT WHERE AT.teacher_id=T.teacher_id AND AT.date="'.$date.'" LIMIT 1) closed'); 
+        $this->db->from('teacher T');
+        $this->db->where($whr);
+        $this->db->order_by($order_by);
+        return $this->db->get()->result(); 
+    }
 }

@@ -259,8 +259,6 @@ class Api extends REST_Controller{
 
     function getStudentDetail_post()
     {
-
-        
         $studentId = $this->post("student_id");
         if (empty($studentId)) 
         {

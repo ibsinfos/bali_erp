@@ -53,7 +53,7 @@ $user = $user_type . "-" . $user_id;
                     <div class="col-sm-12">
                         <textarea class="form-control" placeholder="Type your message" name="message" id="sample_wysiwyg"></textarea>
                         <div class="custom-send">
-                            <button class="btn btn-danger btn-rounded" type="submit">Send</button>
+                            <button class="fcbtn btn btn-danger btn-outline btn-1d" type="submit">Send</button>
                         </div>
                     </div>
 <?php echo form_close(); ?>

@@ -249,7 +249,7 @@
         <div style="margin:15px 0 0 0 !important; padding: 0px !important;">
             <table id="items" class="marg-top-fif"  height="50">
             <tr>
-                <th width="65%"><?php echo get_phrase('item'); ?></th>
+                <th width="65%"><?php echo get_phrase('description'); ?></th>
                 <th colspan="2" align="right"><?php echo get_phrase('total'); ?></th>
             </tr>
             <?php foreach ($receipt->payment_trans as $item){
@@ -299,14 +299,14 @@
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </span>
-                                Computer generated <?php echo $print_type?>
+                                Computer generated <?php echo $print_type?> No Signature Required
                                 <span>
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                     <i class="fa fa-star"></i>
                                 </span>
                             </td>
-                            <td class="txt-right csh-line" style="width: 190px;">Cashier  / Manager</td>
+                            <td class="txt-right csh-line" style="width: 190px;"><?php echo get_phrase('cashier').'/'.get_phrase('manager')?></td>
                         </tr>
                     </table>
                 </td>

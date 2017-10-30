@@ -25,7 +25,7 @@
                             <input type="hidden" name="reciever[]" id="reciever" value="">
                 <select class="selectpicker" data-style="form-control" multiple data-actions-box="true" data-live-search="true" onchange="get_value_student()" id="student_reciever" name="student_reciever[]" required="required">
                                 <?php foreach ($students as $value) { ?>
-                                    <option value="student-<?php echo $value['student_id']; ?>"><?php echo $value['name']." ".$value['mname']." ".$value['lname']; ?></option>
+                                    <option value="student-<?php echo $value['student_id']; ?>"><?php echo ucwords($value['name']." ".$value['mname']." ".$value['lname']); ?></option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -35,7 +35,7 @@
 <textarea class="form-control" rows="20" placeholder="Type your message" name="message" placeholder="<?php echo get_phrase('write_your_message'); ?>" id="sample_wysiwyg" required="required"></textarea>
                         </div>    
                         <div class="custom-send m-t-20 text-right">
-                            <button class="btn btn-danger btn-rounded" type="submit"> <?php echo get_phrase('send'); ?></button>
+                            <button class="fcbtn btn btn-danger btn-outline btn-1d" type="submit"> <?php echo get_phrase('send'); ?></button>
                         </div>
                         <?php echo form_close(); ?>
                     </section>
@@ -47,7 +47,7 @@
                             <input type="hidden" name="reciever[]" id="reciever1" value="">
                 <select class="selectpicker" data-style="form-control" multiple data-actions-box="true" data-live-search="true" onchange="get_value_teacher()" id="teacher_reciever" name="teacher_reciever[]" required="required">
                                 <?php foreach ($teachers as $value) { ?>
-                                    <option value="teacher-<?php echo $value['teacher_id']; ?>"><?php echo $value['name']." ".$value['middle_name']." ".$value['last_name']; ?></option>
+                                    <option value="teacher-<?php echo $value['teacher_id']; ?>"><?php echo ucwords($value['name']." ".$value['middle_name']." ".$value['last_name']); ?></option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -55,7 +55,7 @@
 <textarea class="form-control" rows="20" placeholder="Type your message" name="message" placeholder="<?php echo get_phrase('write_your_message'); ?>" id="sample_wysiwyg" required="required"></textarea>
                         </div>
                         <div class="custom-send m-t-20 text-right">
-                            <button class="btn btn-danger btn-rounded" type="submit"> <?php echo get_phrase('send'); ?></button>
+                            <button class="fcbtn btn btn-danger btn-outline btn-1d" type="submit"> <?php echo get_phrase('send'); ?></button>
                         </div>
                         <?php echo form_close(); ?>    
                     </section>
@@ -67,7 +67,7 @@
                             <input type="hidden" name="reciever[]" id="reciever2" value="">
 <select class="selectpicker" data-style="form-control" multiple data-actions-box="true" data-live-search="true" onchange="get_value_parent()" id="parent_reciever" name="parent_reciever[]" required="required">
                                 <?php foreach ($parents as $value) { ?>
-                                    <option value="parent-<?php echo $value['parent_id']; ?>"><?php echo $value['father_name']." ".$value['father_mname']." ".$value['father_lname']; ?></option>
+                                    <option value="parent-<?php echo $value['parent_id']; ?>"><?php echo ucwords($value['father_name']." ".$value['father_mname']." ".$value['father_lname']); ?></option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -76,7 +76,7 @@
 <textarea class="form-control" rows="20" placeholder="Type your message" name="message" placeholder="<?php echo get_phrase('write_your_message'); ?>" id="sample_wysiwyg" required="required"></textarea>
                         </div>
                         <div class="custom-send m-t-20 text-right">
-                            <button class="btn btn-danger btn-rounded" type="submit"> <?php echo get_phrase('send'); ?></button>
+                            <button class="fcbtn btn btn-danger btn-outline btn-1d" type="submit"> <?php echo get_phrase('send'); ?></button>
                         </div>
                         <?php echo form_close(); ?>
                     </section>                    

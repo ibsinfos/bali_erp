@@ -87,11 +87,11 @@ class Default_Model_Servicedeskdepartment extends Zend_Db_Table_Abstract
 	public function getServiceDeskDepartmentDatabyID($id)
 	{
 	    $select = $this->select()
-						->setIntegrityCheck(false)
-						->from(array('sd'=>'main_sd_depts'),array('sd.*'))
-					    ->where('sd.isactive = 1 AND sd.id='.$id.' ');
+                ->setIntegrityCheck(false)
+                ->from(array('sd'=>'main_sd_depts'),array('sd.*'))
+                ->where('sd.isactive = 1 AND sd.id='.$id.' ');
 					   
-		return $this->fetchAll($select)->toArray();
+            return $this->fetchAll($select)->toArray();
 	
 	}
 	

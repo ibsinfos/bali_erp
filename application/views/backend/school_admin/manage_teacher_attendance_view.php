@@ -1,0 +1,165 @@
+<div class="row bg-title">
+    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+        <h4 class="page-title"><?php echo get_phrase('manage_daily_attendance'); ?> </h4></div>
+    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+        <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
+        <a href="javascript: void(0);" onclick="javascript:introJs().start();" id="take-tour" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
+        <ol class="breadcrumb">
+            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li class="active"><?php echo get_phrase('daily_attendance_report'); ?></li>
+        </ol>
+    </div>
+</div>
+
+<div class="col-md-12 white-box">
+    <?php echo form_open(base_url() . 'index.php?school_admin/manage_teacher_attendance/'); ?>
+    <div class="col-sm-4 form-group" data-step="7" data-intro="<?php echo get_phrase('Select date!');?>" data-position='top'>               
+        <label for="field-1"><?php echo get_phrase('select_date'); ?><span class="error mandatory"> *</span></label>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="icon-calender"></i></span>
+            <input type="text" class="form-control" id="mydatepicker_holiday_disable" name="timestamp" value="<?php echo date('m/d/Y', strtotime($date)); ?>">
+            <label class="mandatory"> <?php echo form_error('date'); ?></label>
+        </div>         
+    </div>       
+
+    <input type="hidden" name="year" value="<?php echo sett('running_year'); ?>">
+    <div class="text-right col-xs-12">
+        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="8" data-intro="<?php echo get_phrase('On the click on button, you will get list of attendance!');?>" data-position='top'><?php echo get_phrase('MANAGE ATTENDANCE'); ?></button>
+    </div>
+    <?php echo form_close(); ?>
+</div>
+<div class="col-md-12 white-box" data-step="9" data-intro="<?php echo get_phrase('Shows the student details!!');?>" data-position='top'>
+    <div class="text-center">
+        <h3><?php echo get_phrase('attendance_for_teacher_on').' '.date('d M Y', strtotime($date));?></h3>
+    </div>
+    <div class="row mt10 mb20">
+        <div class="col-md-3 pull-right">            
+            <input type="text" class="form-control rfid-attn" placeholder="RFID">
+        </div>
+    </div>
+    <?php echo form_open(base_url('index.php?school_admin/teacher_attendance_update/'.$date)); ?>
+        <table id="dtable" class="display nowrap" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th><div><?php echo get_phrase('no:');?></div></th>
+                    <th><div><?php echo get_phrase('name');?></div></th>
+                    <th><div><?php echo get_phrase('RFID'); ?></div></th>
+                    <th><div><?php echo get_phrase('phone');?></div></th>
+                    <th><div><?php echo get_phrase('status'); ?></div></th>
+                    <th><div><?php echo get_phrase('time_in'); ?></div></th>
+                    <th><div><?php echo get_phrase('time_out'); ?></div></th>
+                </tr>
+            </thead>
+            <tbody class="att-body">
+                <?php $count = 1;
+                foreach($attendance as $att): 
+                    $time_st = get_timing_st_color($att->timing_status,$att->status,$att->closed,$att->custom_updated,1);?>
+                    <tr style="<?php echo $time_st['style']?>">
+                        <td><?php echo $count++;?>
+                            <?php if($time_st['info']){?> 
+                                <a class="tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo $time_st['info']?>" 
+                                title="<?php echo $time_st['info']?>" style="<?php echo $time_st['style']?>"><i class="fa fa-question-circle"></i></a>
+                            <?php }?>
+                        </td>
+                        <td><?php echo $att->name.' '.$att->last_name;?>
+                            <input type="hidden" class="at-row" data-rfid="<?php echo $att->card_id?>" data-teacher-id="<?php echo $att->teacher_id?>" 
+                            data-date="<?php echo date('Y-m-d',strtotime($date))?>">
+                        </td>  
+                        <td><?php echo $att->card_id;?></td> 
+                        <td><?php echo $att->cell_phone;?></td> 
+                        <td>
+                            <select class="selectpicker pos-static AtdStatus" data-style="form-control" name="atten[<?php echo $att->teacher_id?>]">
+                                <option value="0" <?php echo $att->status == 0?'selected':'';?>><?php echo get_phrase('undefined'); ?></option>
+                                <option value="1" <?php echo $att->status == 1?'selected':'';?>><?php echo get_phrase('present'); ?></option>
+                                <option value="2" <?php echo $att->status == 2?'selected':'';?>><?php echo get_phrase('absent'); ?></option>
+                            </select>
+                            <input type="hidden" name="has_atten[<?php echo $att->teacher_id?>]" value="<?php echo $att->attendance_id;?>">	
+                        </td>
+                        <td><?php echo $att->has_in?date('h:i A',strtotime($att->in_time)):'N/A';?></td> 
+                        <td><?php echo $att->has_out?date('h:i A',strtotime($att->out_time)):'N/A';?></td> 
+                    </tr>
+                <?php endforeach;?>
+            </tbody>
+        </table>
+        <div class="text-right col-xs-12 p-t-20 p-r-0">
+            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" ><?php echo get_phrase('UPDATE ATTENDANCE'); ?></button>
+        </div>
+    <?php echo form_close(); ?>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+    dTable = $('#dtable');
+    dTable.DataTable({
+        dom: 'frtip',
+        //responsive: true,
+        paging: false,
+        columnDefs: [{ orderable: false, targets:-1 }],
+        order: [[ 0, 'asc' ]]
+    });
+
+    $('.rfid-attn').focus();
+    $('.rfid-attn').bind('change', function(e) {
+        var Box = $(this);
+        var RFID = Box.val()!=''?parseInt(Box.val(), 10):false;
+        if(RFID==false || RFID.length>15){
+            swal('Error','<?php echo get_phrase('invalid_rfid_detail!')?>','error');    
+            return false;
+        }  
+
+        AtRec = [];
+        rowIndex = false;
+        dTable.DataTable().rows().eq(0).each( function ( index ) {
+            rowIndex = index;
+            var row = dTable.DataTable().row( index );
+            var data = row.data();
+			rowHtml = $('<div/>');
+            rowHtml.html(data[1]);
+            if(AtRec.length==0){
+                AtRec = rowHtml.find('.at-row[data-rfid='+RFID+']');
+                AtRec.rowIndex = index;
+            }
+        });
+
+        Box.val('');
+        if (RFID !=false && AtRec.data('teacher-id')!=undefined){
+            $('body').loading('start');
+            $.ajax({
+                type:'POST',
+                url:'<?php echo base_url('index.php?ajax_controller/update_teacher_attendance')?>',
+                data:{date:AtRec.data('date'),
+                      teacher_id:AtRec.data('teacher-id')},
+                dataType:'json',
+                success:function(res){
+                    $('body').loading('stop');
+                    if(res.status=='success'){
+                        tr = $(dTable.DataTable().fnGetNodes()[AtRec.rowIndex]);
+                        tr.attr('style',res.time_st.style);
+                        tr.find('select').val(1);
+                        $('.selectpicker').selectpicker('refresh');
+
+                        infoHtml = '<a class="tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="'+res.time_st.info+'"'+ 
+                                    'title="'+res.time_st.info+'" style="'+res.time_st.style+'"><i class="fa fa-question-circle"></i></a>';
+                        td = tr.find('td:eq(0)');
+                        td.html(td.text()+infoHtml);
+                        tr.tooltip({selector:'[data-toggle="tooltip"]'}); 
+                    }
+                    swal(res.status,res.msg,res.status);   
+                }
+            });
+        }else{
+            swal('Error','<?php echo get_phrase('RFID_not_assigned!')?>','error');    
+            return false;
+        }
+    });
+});
+
+function select_section(class_id) {
+    $.ajax({
+        url: '<?php echo base_url('index.php?Ajax_controller/get_sections_by_class');?>/'+class_id,
+        success: function (response) {
+            jQuery('#section_holder').html(response).selectpicker('refresh');
+        }
+    });
+}
+</script>

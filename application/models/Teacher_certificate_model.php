@@ -25,9 +25,9 @@ class Teacher_certificate_model extends CI_Model {
             } 
         }
         if($returnColsStr==""){
-            return $this->db->get_where($this->_table,array($this->_primary=>$id))->result();
+            return $this->db->get_where($this->_table,array('certificate_id'=>$id))->result();
         }else{
-            return $this->db->select($returnColsStr)->from($this->_table)->where($this->_primary,$id)->get()->result();
+            return $this->db->select($returnColsStr)->from($this->_table)->where('certificate_id',$id)->get()->result();
         }
     }
         
@@ -130,15 +130,21 @@ class Teacher_certificate_model extends CI_Model {
     }
    
     
-    function get_certificate_record($teacher_id,$certificate_id,$template_type){
-     $this->db->select('tc.*, teacher.name,teacher.middle_name,teacher.last_name'); // Select field
+    function get_certificate_record($teacher_id,$certificate_id){
+     $this->db->select('tc.*, teacher.name,teacher.middle_name as mname,teacher.last_name as lname'); // Select field
             $this->db->from($this->_table.' as tc'); // from Table1
             $this->db->join('teacher', 'teacher.teacher_id = tc.teacher_id');
             $this->db->where('tc.teacher_id', $teacher_id);
             $this->db->where('tc.certificate_id', $certificate_id);
-            $this->db->where('tc.template_type', $template_type);
             return $this->db->get()->row();
 //            echo $this->db->last_query(); die;
+    }
+    
+     function update_cretificate($dataArray, $condition){
+        $this->db->where($condition);
+        $this->db->update($this->_table, $dataArray);
+//        echo $this->db->last_query(); die;
+        return;
     }
 
 }

@@ -6,41 +6,38 @@
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
-        <a href="javascript: void(0);" onclick="javascript:introJs().start();" id="take-tour" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
+        <a href="javascript: void(0);" onclick="javascript:introJs().start();" id="take-tour" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>        
+
         <ol class="breadcrumb">
-            <li>
-                <a href="<?php echo base_url(); ?>index.php?school_admin/Dashboard">
-                    <?php echo get_phrase('Dashboard'); ?>
-                </a>
-            </li>
-            <li>
-                <a href="<?php echo base_url(); ?>index.php?school_admin/student_information">
-                    <?php echo get_phrase('Student_information'); ?>
-                </a>
+            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li><?php echo get_phrase('student'); ?>
+                <ul>                    
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_information"><?php echo get_phrase('student_information'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_promotion"><?php echo get_phrase('student_promotion'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/map_students_id"><?php echo get_phrase('map_students_id'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_fee_configuration"><?php echo get_phrase('student_fee_setting'); ?></a></li>
+                </ul>
             </li>
             <li class="active">
-                <?php echo get_phrase('student_profile'); ?>
+                <?php echo $page_title; ?>
             </li>
         </ol>
     </div>
     <!-- /.breadcrumb -->
 </div>
-<div class="col-md-12 m-b-20 text-right no-padding">
-        <button value="Print"  onclick="PrintElem('#print_div');" class="fcbtn btn btn-danger btn-outline btn-1d"> Print </button>
+<div class="col-md-12 m-b-20 text-center no-padding">
+        <button value="Print"  onclick="PrintElem('#print_div');" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="6" data-intro="<?php echo get_phrase('print_student_profile_by_clicking_here');?>" data-position='left'> Print </button>
 </div>
 <!--<div class="col-md-12 m-b-20 text-right no-padding">
     <a href="<?php // echo base_url(); ?>index.php?school_admin/student_export/<?php // echo $student_id; ?>"><button value="Excel"  onclick="" class="fcbtn btn btn-danger btn-outline btn-1d"> Excel </button></a>
 </div>-->
 <div id="print_div">
-<?php if (!empty($student_personal_info))
-    {
-        ?>
-
+<?php if (!empty($student_personal_info)){?>
     <div class="row print">
         <div class="col-md-12">
             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 <div class="panel panel-default">
-                    <div class="panel-heading" role="tab" id="headingOne" data-step="5" data-intro="<?php echo get_phrase('Here, You can see basic information of student like photo,class details, section, previous school, course etc. you can collapse this tab and see others to the click on arrow. Like that only you can see class routine, progress report, library information, Transport information, dormitory information, Medical record, Attendance report, Marksheet.');?>" data-position='bottom'>
+                    <div class="panel-heading" role="tab" id="headingOne" data-step="5" data-intro="<?php echo get_phrase('Here,_You_can_see_basic_information_of_student_like_photo,class_details,_section,_previous_school,_course_etc._you_can_collapse_this_tab_and_see_others_to_the_click_on_arrow._Like_that_only_you_can_see_class_routine,_progress_report,_library_information,_Transport_information,_dormitory_information,_Medical_record,_Attendance_report,_Marksheet.');?>" data-position='bottom'>
                         <h4 class="panel-title">
                             <a class="head" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                 <b><?php echo get_phrase('General_information');?></b>
@@ -54,16 +51,16 @@
                                     <div class="el-element-overlay col-lg-2 col-md-4 col-sm-6">
                                         <div class="el-card-item">
                                             <?php
-                                            if($student_personal_info->stud_image !=''){
+                                            if($student_personal_info->stud_image !='' and file_exists('uploads/student_image/'.$student_personal_info->stud_image)){
                                                 $image_url = base_url().'uploads/student_image/'.$student_personal_info->stud_image;
                                             }else{
-                                                $image_url = base_url().'uploads/user.png';
+                                                $image_url = base_url().'uploads/user.png'; 
                                             }
                                             ?>
                                                 <div class="el-overlay-1">
                                                     
                                                     <img src="<?php echo $image_url;?>" />
-                                                    <div class="el-overlay">
+                                                    <div class="el-overlay" style="display:none;">
                                                         <ul class="el-info">
                                                             <li>
                                                                 <a class="btn default btn-outline image-popup-vertical-fit" href="<?php echo $image_url;?>">  <i class="fa fa-search-plus"></i></a>
@@ -99,7 +96,7 @@
                                 <tr>
                                     <th><b><?php echo get_phrase('roll_ : '); ?></b></th>
                                     <td>
-                                        <?php echo $student_personal_info->enroll_code; ?>
+                                        <?php echo $student_personal_info->roll; ?>
                                     </td>
                                 </tr>
 
@@ -114,12 +111,13 @@
                                         $years = floor($diff / (365*60*60*24));
                                         $months = floor(($diff - $years * 365*60*60*24) / (30*60*60*24));
                                         $days = floor(($diff - $years * 365*60*60*24 - $months*30*60*60*24)/ (60*60*24));
-                                        $age = $years." years "." ".$months." months ".$days." days";
+//                                        $age = $years." years "." ".$months." months ".$days." days";
                                        // echo $age = date_diff(strtotime($date,$dob); //(($date)-($dob)/365);
+                                        $age = $years;
                                      }else{
                                          $age = '';
                                      } ?>
-                                    <th><b><?php echo get_phrase('birthday_ : '); ?></b></th>
+                                    <th><b><?php echo get_phrase('date_of_birth_ : '); ?></b></th>
                                     <td>
                                         <?php echo $student_personal_info->birthday; ?>
                                     </td>
@@ -193,7 +191,7 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th><b><?php echo get_phrase('Iqama_/_Saudi_ID_ : '); ?></b></th>
+                                    <th><b><?php echo get_phrase('icard_number_ : '); ?></b></th>
                                     <td>
                                         <?php echo $student_personal_info->icard_no; ?>
                                     </td>
@@ -214,14 +212,13 @@
                                 <tr>
                                     <th><b><?php echo get_phrase('media_consent : '); ?></b></th>
                                     <td>
-                                        <?php echo  $media_consent = $student_personal_info->media_consent; ?>
-                                      
+                                        <?php echo  $media_consent = $student_personal_info->media_consent; ?>                                      
                                     </td>
                                 </tr> 
                                 <tr>
                                     <th><b><?php echo get_phrase('emergency_contact_number_ :');?></b></th>
                                     <td>
-                                        <?php echo $student_personal_info->emergency_contact_number; ?>
+                                        <?php $emergency_contact = $student_personal_info->emergency_contact_number; if($emergency_contact!=''){ echo $emergency_contact ;} else{ echo "No Emergency contact number"; } ?>
                                     </td>
                                 </tr>  
                                  <tr>
@@ -615,7 +612,7 @@
                     </div>
                     <div id="collapseEight" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                         <div class="panel-body">
-                            <h5 class="mandantory"><b>Precautions Before Joining</b></h5>
+                            <h5 class="mandantory"><b><?php echo get_phrase('Precautions_Before_Joining'); ?></b></h5>
                             <table class="table table-bordered margin-no-bottom">                                  
                                     <?php // pre($student_allergy); 
                             if(!empty($student_allergy)){ ?>
@@ -858,8 +855,8 @@ echo $obtained_mark;
 ?>,
                                                 "mark_highest": <?php
 /*$highest_mark = $this->crud_model->get_highest_marks($row2['exam_id'], $class_id, $subject['subject_id']);*/
-$highestMark = $this->crud_model->get_max_marks($row2['exam_id'], $page_data['class_id'], $row3['subject_id']);
-echo $highest_mark;
+$highestMark = $this->crud_model->get_max_marks($row2['exam_id'], $class_id, $row3['subject_id']);
+echo '<pre>'; print_r($highestMark);
 ?>
                                             },
                                             <?php

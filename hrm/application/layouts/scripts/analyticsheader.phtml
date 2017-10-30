@@ -79,6 +79,7 @@ if($actionName == 'viewsettings'){
 <link rel="shortcut icon" href="<?php echo MEDIA_PATH;?>images/sharad_logo.ico?v=2" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/fonts.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/style.css" />
+<link rel="stylesheet" type="text/css"	href="<?php echo MEDIA_PATH; ?>css/erp_custom.css"/>
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/jquery.simplyscroll.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/jquerytour.css" />
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/jquery.jqplot.min.css" />
@@ -343,7 +344,7 @@ function setTheme(themeName)
 </script>
 <script type="text/javascript" charset="utf-8">
 $(function() {
-	setTimeout('hideMessg()',3000);
+	setTimeout('hideMessg()',10000);
 });
 function hideMessg() {
     if($("#messageData").is(":visible"))
@@ -935,9 +936,7 @@ if($loginuserRole == SUPERADMINROLE)
     $notdraggablemenuArr = array('viewsettings','dashboard','welcome','index');
     if(!in_array($controllerName,$notdraggablemenuArr) && $actionName == 'index'){ 
 ?>
-    <div id="pageshortcutdiv">
-        <?php echo sapp_Global::_getPageShortcutFlag($controllerName); ?>
-    </div>
+    
 <?php } ?>
 									
     <div id="maincontentdiv">	

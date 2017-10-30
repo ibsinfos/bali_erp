@@ -133,6 +133,12 @@ class Student_model extends CI_Model {
         $this->db->update('applied_students', $data);
     }
 
+    public function update_enquired_student($stud_id, $data)
+    {
+        $this->db->where('student_id', $stud_id);
+        $this->db->update('enquired_students', $data);
+    }
+
     public function get_students_records($dataArray) {
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
@@ -169,10 +175,9 @@ class Student_model extends CI_Model {
        $n = "";
        $res =  $this->db->get_where($this->_table, array('student_id' => $student_id));
        if($res->num_rows()){
-            $n = $res->row()->name;
-       }
+            $n = $res->row()->name." ".$res->row()->mname. " ".$res->row()->lname;
+            }
        return $n; 
-       
     }
     public function get_parent_id($student_id)
     {
@@ -309,8 +314,6 @@ class Student_model extends CI_Model {
     public function update_enroll($dataArray, $condition) {
         $this->db->where($condition);
         $this->db->update('enroll', $dataArray);
-        //echo $this->db->last_query();
-        //exit;
         return true;
     }
 
@@ -855,13 +858,14 @@ class Student_model extends CI_Model {
                            par.father_school, par.father_department, par.father_income, par.father_designation, par.mother_school, par.mother_department, 
                            par.mother_income, par.mother_designation, par.home_phone, par.work_phone, par.mother_email, par.mother_mobile, par.zip_code, 
                            par.cell_phone, par.father_lname, par.state, std.password as student_pass , sec.name as section_name , sec.section_id ,
-                        cls.name as class_name , cls.class_id , sec.teacher_id , enr.enroll_id , enr.enroll_code , enr.roll, enr.year as academic_year, g.guardian_fname,g.guardian_lname,g.guardian_relation");
+                           cls.name as class_name , cls.class_id , sec.teacher_id , enr.enroll_id , enr.enroll_code , enr.roll, enr.year as academic_year, 
+                           g.guardian_fname,g.guardian_lname,g.guardian_relation");
         $this->db->from("student AS std");
         $this->db->join('enroll AS enr', 'std.student_id = enr.student_id');
-        $this->db->join('guardian AS g', 'g.student_id = enr.student_id','left');
+        $this->db->join('guardian AS g', 'g.student_id = enr.student_id','LEFT');
         $this->db->join('parent AS par', 'std.parent_id = par.parent_id');
-        $this->db->join('class AS cls', 'enr.class_id = cls.class_id');
-        $this->db->join('section AS sec', 'enr.section_id = sec.section_id', 'left');
+        $this->db->join('class AS cls', 'enr.class_id = cls.class_id','LEFT');
+        $this->db->join('section AS sec', 'enr.section_id = sec.section_id', 'LEFT');
         $this->db->where('enr.year', $running_year);
 
         if ($student_id)
@@ -873,8 +877,6 @@ class Student_model extends CI_Model {
         } else {
             $result = $this->db->get()->row();
         }
-//        echo $this->db->last_query(); die;
-        //echo '<pre>';print_r($result);exit;
         return $result;
     }
 
@@ -963,7 +965,7 @@ class Student_model extends CI_Model {
         }
         $instance = $this->get_instance_name();
         $finance_db = strtolower($this->_finance_db);
-        $this->db->insert("$finance_db.crm_accounts", $data);
+        $this->db->insert("crm_accounts", $data);
         $lastid = $this->db->insert_id();
         return $lastid;
     }
@@ -1152,9 +1154,7 @@ class Student_model extends CI_Model {
         $this->db->select('en.roll, stu.student_id, stu.name, stu.lname as lname');
         $this->db->from('enroll as en');
         $this->db->join('student as stu', 'en.student_id  =   stu.student_id');
-        $rs = $this->db->where('en.class_id', $class_id)->where('en.section_id', $section_id)->where('en.year', $running_year)->where('stu.isActive', '1')->where('stu.student_status', '1')->get()->result_array();
-
-        return $rs;
+        return $this->db->where('en.class_id', $class_id)->where('en.section_id', $section_id)->where('en.year', $running_year)->where('stu.isActive', '1')->where('stu.student_status', '1')->get()->result_array();
     }
 
     function parent_login_child_dashboard($parent_id, $running_year) {
@@ -1162,10 +1162,10 @@ class Student_model extends CI_Model {
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
             if($school_id > 0){
-                $sql = "SELECT stud.student_id,stud.name,stud.phone,stud.email,enroll.enroll_code,enroll.class_id,enroll.section_id,class.name as class_name,section.name as section_name from student as stud join enroll as enroll on(stud.student_id=enroll.student_id) join class as class on(enroll.class_id=class.class_id) join section as section on(enroll.section_id=section.section_id) where stud.parent_id='".$parent_id."' and enroll.year='".$running_year."' and stud.school_id = '".$school_id."'";
+                $sql = "SELECT stud.student_id,stud.name,stud.phone,stud.email,enroll.enroll_code,enroll.class_id,enroll.section_id,class.name as class_name,section.name as section_name,stud.stud_image from student as stud join enroll as enroll on(stud.student_id=enroll.student_id) join class as class on(enroll.class_id=class.class_id) join section as section on(enroll.section_id=section.section_id) where stud.parent_id='".$parent_id."' and enroll.year='".$running_year."' and stud.school_id = '".$school_id."'";
             } 
         } else {
-            $sql = "SELECT stud.student_id,stud.name,stud.phone,stud.email,enroll.enroll_code,enroll.class_id,enroll.section_id,class.name as class_name,section.name as section_name from student as stud join enroll as enroll on(stud.student_id=enroll.student_id) join class as class on(enroll.class_id=class.class_id) join section as section on(enroll.section_id=section.section_id) where stud.parent_id='$parent_id' and enroll.year='$running_year'";
+            $sql = "SELECT stud.student_id,stud.name,stud.phone,stud.email,enroll.enroll_code,enroll.class_id,enroll.section_id,class.name as class_name,section.name as section_name, stud.stud_image from student as stud join enroll as enroll on(stud.student_id=enroll.student_id) join class as class on(enroll.class_id=class.class_id) join section as section on(enroll.section_id=section.section_id) where stud.parent_id='$parent_id' and enroll.year='$running_year'";
         }
         $rsStudent = $this->db->query($sql)->result_array();
         return $rsStudent;
@@ -1562,12 +1562,6 @@ class Student_model extends CI_Model {
     
     private function _get_datatables_query_student_information_all_class($class_id,$running_year) {
         $school_id = '';
-        if(($this->session->userdata('school_id'))) {
-            $school_id = $this->session->userdata('school_id');
-            if($school_id > 0){
-                $this->db->where('student.school_id',$school_id);
-            } 
-        }
         $this->db->select('enroll.*,student.*, student.name stdent_fname,parent.*,medical_events.desease_title'); // Select field
         $this->db->from('student'); // from Table1
         $this->db->join('enroll', 'student.student_id = enroll.student_id');
@@ -1576,6 +1570,12 @@ class Student_model extends CI_Model {
         $this->db->where('enroll.class_id', $class_id);
         $this->db->where('enroll.year', $running_year); /// Join table1 with table2 based on the foreign key
         $this->db->where('student.isActive', '1'); // Set Filter
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('student.school_id',$school_id);
+            } 
+        }
         $this->db->group_by('student.student_id');
         //$this->db->where('student.student_status', '1');
 
@@ -1623,12 +1623,7 @@ class Student_model extends CI_Model {
     }
     private function _get_datatables_query_student_information_section($class_id,$section_id,$running_year) {
         $school_id = '';
-        if(($this->session->userdata('school_id'))) {
-            $school_id = $this->session->userdata('school_id');
-            if($school_id > 0){
-                $this->db->where('student.school_id',$school_id);
-            } 
-        }
+        
         
         $this->db->select('enroll.*,student.*, student.name stdent_fname,parent.*,medical_events.desease_title'); // Select field
         $this->db->from('student');
@@ -1639,6 +1634,12 @@ class Student_model extends CI_Model {
         $this->db->where('enroll.section_id', $section_id);
         $this->db->where('enroll.year', $running_year);
         $this->db->where('student.isActive', '1');
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('student.school_id',$school_id);
+            } 
+        }
         $this->db->group_by('student.student_id');
         //$this->db->where('student.student_status', '1');
 
@@ -2046,32 +2047,34 @@ class Student_model extends CI_Model {
     }
 
     
-    function get_student_infoBYparentID($parent_id){
+    function get_student_infoBYparentID($parent_id,$running_year){
         $this->db->select('student.name,student.mname,student.lname,enroll.class_id,class.name as class_name'); // Select field
         $this->db->from('student'); // from Table1
         $this->db->join('enroll', 'student.student_id = enroll.student_id');
         $this->db->join('class', 'class.class_id = enroll.class_id');
         $this->db->where('student.parent_id', $parent_id);
-        //$this->db->where('enroll.year', $running_year); /// Join table1 with table2 based on the foreign key
+        $this->db->where('enroll.year', $running_year); /// Join table1 with table2 based on the foreign key
         $this->db->where('student.isActive', '1'); // Set Filter
-        $this->db->where('student.student_status','1');
-        return $this->db->get()->result_array();
+        $this->db->where('student.student_status','1'); 
+        $this->db->group_by('enroll.student_id');
+        $rs= $this->db->get()->result_array();
+        //echo $this->db->last_query();
+        return $rs;
     }
 
-    function get_student_details_by_id($student_id=array()){
+    function get_student_details_by_id($student_id){
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
         }
 
-        $this->db->select('s.student_id, s.name, s.mname, s.lname, s.phone, s.email, s.device_token, e.class_id');
+        $this->db->select('s.student_id, s.name, s.mname, s.lname, s.phone, s.email, s.device_token');
         $this->db->from('student s');
-        $this->db->join('enroll e', 'e.student_id = s.student_id');
-        $this->db->where_in('s.student_id',$student_id);
+        $this->db->where('s.student_id',$student_id);
         $this->db->where('s.isActive','1');
         $this->db->where('s.student_status','1');
         $this->db->where('s.school_id', $school_id);
-        return $this->db->get()->result_array();
+        return $this->db->get()->row();
     }
 
     function get_active_students($class_id, $section_id, $running_year) {
@@ -2155,4 +2158,39 @@ class Student_model extends CI_Model {
 //        echo $this->db->last_query(); die;
         return $rs; 
      }
+
+     function get_all_students_for_push_msg(){
+        $running_year = $this->get_setting_record(array('type' => 'running_year'), 'description');
+
+        $this->db->select('*, student.name stdent_fname');
+        $this->db->from('student as student');
+        $this->db->join('enroll as enroll', 'student.student_id = enroll.student_id');
+        $this->db->join('parent as parent', 'parent.parent_id = student.parent_id');
+        $this->db->join('section as section', 'section.section_id = enroll.section_id');
+        $this->db->where('enroll.year', $running_year);
+        $this->db->where('student.isActive', '1');
+        $this->db->where('student.student_status', '1');
+        $rs = $this->db->get()->result_array();
+        return $rs;
+     }
+     
+     function get_student_by_class_And_section($class_id,$section_id,$running_year){
+         $this->db->select('enroll.*,student.student_id, student.name student_fname,student.mname,student.lname'); // Select field
+        $this->db->from('student');
+        $this->db->join('enroll', 'student.student_id = enroll.student_id');
+        $this->db->where('enroll.class_id', $class_id);
+        $this->db->where('enroll.section_id', $section_id);
+        $this->db->where('enroll.year', $running_year);
+        $this->db->where('student.isActive', '1');
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('student.school_id',$school_id);
+            } 
+        }
+        $this->db->group_by('student.student_id');
+        return $this->db->get()->result_array();
+//        echo $this->db->last_query(); die;
+     }
+     
 }

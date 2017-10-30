@@ -2,8 +2,7 @@
 
     <!-- .page title -->   
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-        <h4 class="page-title"><?php echo get_phrase('Student Overview
-'); ?> </h4></div>
+        <h4 class="page-title"><?php echo get_phrase('Fee_collection'); ?> </h4></div>
     <!-- /.page title -->
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
@@ -26,7 +25,7 @@
 </div>
 
 <div class="row m-0">
-    <div class="col-sm-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here you can see Enquired students, Enroll students etc.');?>" data-position='top'>
+    <div class="col-sm-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here_you_can_see_Enquired_students,_Enroll_students_etc.');?>" data-position='top'>
         <table class="table display new_table">
             <thead>
                 <tr>							
@@ -39,8 +38,9 @@
                 <tr>
                     <td><b ><?php echo $count_enquire_students; ?></b></td>
                     <td><b ><?php echo(!empty($count_enroll_students)) ? $count_enroll_students : ''; ?></b></td>
-                    <td><b ><?php foreach ($count_amount_collected as $row)
-                                    echo $row['count'];
+                    <td><b ><?php $amt=0;foreach ($count_amount_collected as $row)
+                                    $amt+= $row['count'];
+                    if($amt==0) { echo $amt; }else{echo 'No collection';}
                     ?></b></td>
                 </tr>
             </tbody>
@@ -49,7 +49,7 @@
 </div>
 
 <div class="row m-0">
-    <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('This is the list of enquired students.');?>" data-position='top'> 
+    <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('This_is_the_list_of_enquired_students.');?>" data-position='top'> 
 
         <table class="new_tab table display" id="table">
             <thead>

@@ -17,7 +17,13 @@
         <div class="form-group">
             <label class="col-md-12">Sending_to_service_on</label>
             <div class="col-md-12 m-b-20">
-                <input type="text" class="form-control datepicker" value="<?php echo date('d/m/Y H:i:s'); ?>" disabled="disabled">
+                <?php  
+                if(function_exists('date_default_timezone_set'))
+                {
+                    date_default_timezone_set("Asia/Kolkata");
+                }                
+                ?>
+                <input type="text" class="form-control" name="service_date" value="<?php echo date('d/m/Y H:i:s'); ?>" disabled="disabled">
             </div>                       
         </div>
         <div class="form-group">
@@ -27,7 +33,7 @@
             </div>                       
         </div>        
         <div class="text-right">
-            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" name="save_details"><?php echo get_phrase('Update'); ?></button>
+            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" name="save_details"><?php echo get_phrase('send_for_service'); ?></button>
         </div>
     </from>
     <?php echo form_close(); ?>

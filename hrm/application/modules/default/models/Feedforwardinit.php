@@ -83,7 +83,7 @@ class Default_Model_Feedforwardinit extends Zend_Db_Table_Abstract
 			
 		$objName = 'feedforwardinit';
 		
-		$tableFields = array('action'=>'Action','unitname' => 'Business Unit','deptname' => 'Department','fin_year' => 'Financial Year',
+		$tableFields = array('action'=>'Action','deptname' => 'Department','fin_year' => 'Financial Year',
                     'ff_mode'=>'Mode','app_period' => 'Period','ff_due_date' => 'Due Date','status' => 'Appraisal Status','ff_process_status' => 'Process Status');
 		
 		$tablecontent = $this->getFeedforwardInitData($sort, $by, $pageNo, $perPage,$searchQuery);     

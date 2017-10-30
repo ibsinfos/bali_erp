@@ -39,7 +39,7 @@ class Default_LeaverequestController extends Zend_Controller_Action
 		
     }
 	
-	public function indexAction()
+    public function indexAction()
     {
 	    $auth = Zend_Auth::getInstance();
      	if($auth->hasIdentity()){
@@ -100,7 +100,7 @@ class Default_LeaverequestController extends Zend_Controller_Action
 						$weekendDatailsArr = $leavemanagementmodel->getWeekendDetails($employeeDepartmentId);
                         $employeeemail = $loggedinEmpId[0]['emailaddress'];
 						$userfullname = $loggedinEmpId[0]['userfullname'];
-						$businessunitid = $loggedInEmployeeDetails[0]['businessunit_id'];
+						//$businessunitid = $loggedInEmployeeDetails[0]['businessunit_id'];
                         if(!empty($reportingManagerDetails))
 						{
 							$leaverequestform->rep_mang_id->setValue($reportingManagerDetails[0]['userfullname']); 

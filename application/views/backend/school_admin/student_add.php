@@ -29,14 +29,13 @@
 
 <?php
 $msg = $this->session->flashdata('flash_validation_error');
-if ($msg) {
-    ?>        
+if ($msg){?>        
     <div class="alert alert-danger">
         <?php echo $msg; ?>
     </div>
 <?php } ?>
-<div class="panel panel-danger block6" data-step="5" data-intro="For Information" data-position='bottom'>
-    <div class="panel-heading"> Student Admission Notes
+<div class="panel panel-danger block6" data-step="5" data-intro="<?php echo get_phrase('For_Information'); ?>" data-position='bottom'>
+    <div class="panel-heading"><?php echo get_phrase('Student_Admission_Notes'); ?>
         <div class="pull-right"><a href="#" data-perform="panel-collapse"><i class="ti-minus"></i></a> <a href="#" data-perform="panel-dismiss"><i class="ti-close"></i></a> </div>
     </div>
     <div class="panel-wrapper collapse in" aria-expanded="true">
@@ -47,7 +46,7 @@ if ($msg) {
 </div>
 
 
-<div class="row">
+<div class="row" data-step='6' data-intro='<?php echo get_phrase('fill_the_form_with_student_details_for_admission') ?>' data-position='top'>
 
     <?php echo form_open(base_url() . 'index.php?school_admin/student/create/', array('class' => 'form-groups-bordered validate', 'enctype' => 'multipart/form-data', 'id' => 'addStudentForm')); ?>
         <div class="white-box">
@@ -93,6 +92,7 @@ if ($msg) {
                                         $arrVal = explode("||||", $value);
                                     }        
                                     $group_section  = !(empty($arrVal[3])) ? $arrVal[3] : "";
+                                    
                                     echo "<section id='$group_section'>";
                                    
                                     foreach($arrDbField as $db_key => $db_field)
@@ -118,7 +118,6 @@ if ($msg) {
                                                         $form_validation_type   = (!empty($arrValid[1])) ? $arrValid[1] : "";
                                                     }        
 
-
                                                     $field_val = $arrFieldValue[$key][$db_field];
                                                      if(strstr($field_val, "?"))
                                                      {
@@ -127,49 +126,62 @@ if ($msg) {
                                                          $field_values       =       (!empty($arrField[1])) ? $arrField[1] : "";
                                                      }
                                                     $label = $arrLabel[$key][$db_field];
-                           $ajax_event = '';
-                           if(!empty($arrAjaxEvent[$key][$db_field]))
-                               $ajax_event = $arrAjaxEvent[$key][$db_field];
-                           $pattern = '';
-                           
-                           switch($form_validation_type)
-                           {
-                               case 'alphabetic';
-                                   $pattern = "^[A-Za-z -]+$";
-                               break;
-                               case 'numeric':
-                                   $pattern = "\d*";
-                               break;
-                               case 'tel':
-                                   $pattern = "\d*";
-                               break;
+                                                    $ajax_event = '';
+                                                    if(!empty($arrAjaxEvent[$key][$db_field]))
+                                                        $ajax_event = $arrAjaxEvent[$key][$db_field];
+                                                    $pattern = '';
+                                                    
+                                                    switch($form_validation_type)
+                                                    {
+                                                        case 'alphabetic';
+                                                            $pattern = "^[A-Za-z -]+$";
+                                                        break;
+                                                        case 'numeric':
+                                                            $pattern = "\d*";
+                                                        break;
+                                                        case 'tel':
+                                                            $pattern = "\d*";
+                                                        break;
 
-                              // case 'email':
-                                //   $pattern = "[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,4}";
-                               //break;
-                               default:
-                               $pattern = '';
-                           break;    
-                       }
-                       if(!empty($pattern))
-                           $pattern = "pattern = '$pattern'";
-                       else
-                           $pattern = '';
-                        
-                       $place_holder = '';
-                         $class = 'ti-user';
-                         $place_holder = $arrPlaceHolder[$key][$db_field];
-                         $class = $arrClass[$key][$db_field];
-                         $required = ''; 
+                                                        // case 'email':
+                                                            //   $pattern = "[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,4}";
+                                                        //break;
+                                                        default:
+                                                        $pattern = '';
+                                                        break;    
+                                                    }
+                                                    if(!empty($pattern))
+                                                        $pattern = "pattern = '$pattern'";
+                                                    else
+                                                        $pattern = '';
+                                                    
+                                                    $place_holder = '';
+                                                    $class = 'ti-user';
+                                                    $place_holder = $arrPlaceHolder[$key][$db_field];
+                                                    $class = $arrClass[$key][$db_field];
+                                                    $required = ''; 
+                                                    
+                                                    $maxlength = "";
+                                                    if(!empty($arrMin[$key][$db_field]))
+                                                    {
+                                                        "min = ".$arrMin[$key][$db_field];
+                                                    }
+                                                    if(!empty($arrMax[$key][$db_field]))
+                                                    {
+                                                        $maxlength =  "maxlength = '".$arrMax[$key][$db_field]."'";
+                                                    }
+                                                    if(!empty($arrPost[$db_field]))
+                                                        $value = $arrPost[$db_field];
+                                                    else
+                                                        $value = "";
                                                     switch($field_type)
                                                     { 
-                                                        
                                                         case 'button':
                                                         if($key == 1)
                                                         {    
-                                                        echo "<br><div class='col-sm-12 form-group text-left'>
+                                                        echo "<br><div class='col-sm-12 text-center'>
                                                             <button type='button' id='$db_field' 
-                                                                class='fcbtn btn btn-danger btn-outline btn-1d pull-right'>
+                                                                class='fcbtn btn btn-danger btn-outline btn-1d'>
 
 
                                                                 ".get_phrase('next')." <i class='fa fa-angle-right'></i>
@@ -178,24 +190,24 @@ if ($msg) {
                                                         }
                                                         else {
                                                             
-                                                            echo "<br>
-                                                            <div class='col-sm-12 form-group text-left'>
+                                                            echo "<br> <div class='col-sm-12 form-group text-center'>
+                                                                <button type='button' id='bck_$key' 
+                                                                class='fcbtn btn btn-danger btn-outline btn-1d'>
+
+
+                                                                ".get_phrase('back')." <i class='fa fa-angle-left'></i>
+                                                            </button>
+                                                                &nbsp;
+                                                           
                                                                 <button type='button' id='$db_field' 
-                                                                class='fcbtn btn btn-danger btn-outline btn-1d pull-right'>
+                                                                class='fcbtn btn btn-danger btn-outline btn-1d'>
 
 
                                                                 ".get_phrase('next')." <i class='fa fa-angle-right'></i>
                                                             </button>
-                                                                <button type='button' id='bck_$key' 
-                                                                class='fcbtn btn btn-danger btn-outline btn-1d pull-right'>
-
-
-                                                                ".get_phrase('back')." <i class='fa fa-angle-left'></i>
-                                                            </button>&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            
+                                                                                                                            
                                                             
                                                         </div>";
-                                                            
                                                         }
                                                        break;     
                                                         case 'stopgap':
@@ -208,55 +220,56 @@ if ($msg) {
                                                                        echo "</label>";
                                                             echo "<div class='input-group'>
                                                                     <input type='hidden' id='parent' class='form-control' name='parent' value=''>
-                                                                    <input type='text' id='parent_email' class='form-control' name='parent_email  data-validate='required' data-message-required='Please select parent details from the popup window' disabled>
-
-                                                                    <span class='input-group-btn' data-step='12' data-intro='From Here you can select parent' data-position='right'>
+                                                                    <input type='text' id='parent_email' class='form-control' name='parent_email' data-validate='required' 
+                                                                        data-message-required='Please select parent details from the popup window' disabled>
+                                                                    <span class='input-group-btn'>
                                                                     <a href='#' class='btn fileinput-exists btn-block btn-danger' data-dismiss='fileinput' onclick=\"showAjaxModal('".base_url('index.php?modal/popup/modal_parent/')."')\">Select Parent</a>                                                          
-                                                                </span>
-                                                                </div></div>";
+                                                                    </span>
+                                                                  </div>
+                                                                </div>";
                                                        break;    
                                                         case 'text' :
-                                  echo "<div class='col-sm-4 form-group text-left'>
-                                            <label for='field-1' class='control-label'>".get_phrase($label);
-                                   if(strtolower($form_validation) == "m")
-                                    {    
-                                        echo "<span class='error mandatory'> *</span></label>";
-                                        $required = "required";
-                                    }
-                                    else
-                                         echo "</label>";
-                                     echo   "<div class='input-group'>
-                                                <div class='input-group-addon'>
-                                                    <i class='$class'></i>
-                                                </div>";
-                                        echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
-                                        $pattern placeholder = '$place_holder' 
-                                        data-message-required='Enter Value' $required> 
-                                        </div>";
-                                       echo "</div>";
-                                   break;
-                                   case 'tel' :
-                                     echo "<div class='col-sm-4 form-group text-left'>
-                                               <label for='field-1'>".get_phrase($label);
-                                       if(strtolower($form_validation) == "m")
-                                       {    
-                                               echo "<span class='error mandatory'> *</span></label>";
-                                               $required = "required";
+                                                        echo "<div class='col-sm-4 form-group text-left'>
+                                                                    <label for='field-1' class='control-label'>".get_phrase($label);
+                                                        if(strtolower($form_validation) == "m")
+                                                        {    
+                                                            echo "<span class='error mandatory'> *</span></label>";
+                                                            $required = "required";
+                                                        }
+                                                        else
+                                                        echo "</label>";
+                                                            echo "<div class='input-group'>
+                                                                    <div class='input-group-addon'>
+                                                                        <i class='$class'></i>
+                                                                    </div>";
+                                                            echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
+                                                            $pattern placeholder = '$place_holder'  $maxlength
+                                                            data-message-required='Enter Value' $required  value='$value'> 
+                                                            </div>";
+                                                        echo "</div>";
+                                                    break;
+                                                    case 'tel' :
+                                                    echo "<div class='col-sm-4 form-group text-left'>
+                                                            <label for='field-1'>".get_phrase($label);
+                                                    if(strtolower($form_validation) == "m")
+                                                    {    
+                                                            echo "<span class='error mandatory'> *</span></label>";
+                                                            $required = "required";
 
-                                       }
-                                       else
-                                                  echo "</label>";
-                                     echo   "<div class='input-group'>
-                                                   <div class='input-group-addon'>
-                                                       <i class='ti-user'></i>
-                                                   </div>";
-                                     echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
-                                           data-validate='$form_validation_type' 
-                                           data-message-required='Enter Value' $required> 
-                                           </div>";
-                                       echo "</div>";
-                                   break;
-                                   case 'date':
+                                                    }
+                                                    else
+                                                                echo "</label>";
+                                                    echo   "<div class='input-group'>
+                                                                <div class='input-group-addon'>
+                                                                    <i class='ti-user'></i>
+                                                                </div>";
+                                                    echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field' $maxlength
+                                                        data-validate='$form_validation_type'  value='$value'
+                                                        data-message-required='Enter Value' $required> 
+                                                        </div>";
+                                                    echo "</div>";
+                                                break;
+                                                case 'date':
                                                 echo "
                                            <div class='col-sm-4 form-group text-left'>
                                                <label for='field-1'>".
@@ -273,8 +286,8 @@ if ($msg) {
                                                <div class='input-group-addon'><i class='icon-calender'></i>
                                                </div>";
                                           
-                                           echo "<input type='text' class='form-control datepicker' name='$db_field' "
-                                                   . "id='$db_field' placeholder='' data-validate='$form_validation_type' data-start-view='2' $required>"
+                                           echo "<input type='text' class='form-control gh' name='$db_field' " 
+                                                   . "id='$db_field' placeholder='' $maxlength value='$value' data-validate='$form_validation_type' data-start-view='2' $required>"
 
                                                ."</div>";
                                            
@@ -317,7 +330,7 @@ if ($msg) {
                                            else
                                                echo "</label>";        
 
-                                           echo "<select class='form-control' data-style='form-control' data-container='body'  name='$db_field' id='$db_field' $required "
+                                           echo "<select class='selectpicker' data-style='form-control' data-container='body'  name='$db_field' id='$db_field' $required "
 
 
                                                    .  $ajax_event.">".
@@ -325,7 +338,17 @@ if ($msg) {
 
                                            foreach($arrMain as $select_key => $select_value)
                                            {
-                                               echo "<option value = '$select_key'>$select_value</option>";
+                                               if(in_array($db_field, array_keys($arrPost)))
+                                                {
+                                                    if($select_key == $arrPost[$db_field])
+                                                       $selected =  " selected = 'selected'";
+                                                    else
+                                                        $selected = '';
+                                    
+                                                }
+                                               else
+                                                   $selected = '';
+                                               echo "<option value = '$select_key' $selected>$select_value</option>";
                                            }     
                                          echo "</select>";      
                                          echo "</div>";
@@ -335,24 +358,27 @@ if ($msg) {
                                                    <label for='field-1'>".get_phrase($label);
                                           if(strtolower($form_validation) == "m")
                                            {    
-                                                   echo "<span class='error mandatory'> *</span></label>";
-                                                   $required = "required";
-
+                                                echo "<span class='error mandatory'> *</span></label>";
+                                                $required = "required";
                                            }
                                            else
-                                                 echo "</label>";
-                                               echo   "<div class='input-group'>
+                                                echo "</label>";
+                                                echo   "<div class='input-group'>
                                                              <div class='input-group-addon'>
                                                                  <i class='$class'></i>
                                                              </div>";
-                                               echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
-                                                     data-validate='$form_validation_type'  placeholder = '$place_holder'  $required
+                                                echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
+                                                     data-validate='$form_validation_type' value='$value'  placeholder = '$place_holder'  $required
                                                      data-message-required='Enter Value' $form_validation_type > 
                                                      </div>";
 
                                                echo "</div>";
                                            break;
                                            case 'installment' :
+                                              echo "<div class='col-sm-4 form-group text-left'>
+                                           <label for='control-label'>".
+                                               get_phrase($label);
+                                          if(strtolower($form_validation) == "m")
 
                                                echo "<div class='col-sm-4 form-group text-left'>
                                                <label for='control-label'>".
@@ -364,24 +390,41 @@ if ($msg) {
                                                    $required = "required = 'required'";
                                            }
                                            else
+                                            echo "</label>";        
 
-                                               echo "</label>"; 
-                                                      
-                                               echo "<select class='form-control' data-style='form-control' name='$db_field'"
-                                                       . " id='$db_field' "
-                              . "data-validate='$form_validation_type' $required data-message-required='Select' $ajax_event>
-                                                   <option value=''>Select</option>";
-
-
-                                           echo "<select class='form-control' data-style='form-control' data-container='body'  name='$db_field' id='$db_field' $required "
-
-
-                                                   .  $ajax_event.">".
+                                           echo "<select class='selectpicker' data-style='form-control' data-container='body' name='$db_field' id='$db_field' $required "
+                                                 .$ajax_event.">".
                                                "<option value=''>Select</option>";
-                                                   foreach($arrInstallment[$field_values] as $row)
-                                                   {
-                                                       echo "<option value = '".$row['id']."'>".$row['installment_name']."</option>";
-                                                   }     
+                                                    if(sett('new_fi')){
+                                                        foreach($fee_terms as $rec){
+                                                            if($db_field=='tutionfee_inst_type'){
+                                                                $in_arr_val = $term_config['school_term_setting'];
+                                                            }else if($db_field=='hostfee_inst_type'){
+                                                                $in_arr_val = $term_config['hostel_term_setting'];
+                                                            }else if($db_field=='transpfee_inst_type'){
+                                                                $in_arr_val = $term_config['transport_term_setting'];
+                                                            }         
+
+                                                            if(in_array($rec->id,$in_arr_val)){
+                                                                echo "<option value = '".$rec->id."'>".$rec->name."</option>";
+                                                            }
+                                                        }   
+                                                    }else{
+                                                        foreach($arrInstallment[$field_values] as $row)
+                                                        {
+                                                            if(in_array($db_field, array_keys($arrPost)))
+                                                            {
+                                                                if($row['id'] == $arrPost[$db_field])
+                                                                    $selected =  " selected = 'selected'";
+                                                                else
+                                                                    $selected = '';
+
+                                                            }
+                                                            echo "<option value = '".$row['id']."' $selected>".$row['installment_name']."</option>";
+                                                        }
+                                                    }     
+
+
                                                  echo "</select>";      
                                                  echo "</div>";
 
@@ -475,8 +518,16 @@ echo form_close(); ?>
                 url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_free_hostel_room/' + dormitory_id,
                 success: function (response) {
                     $('#room_id').html(response).selectpicker('refresh');
+					
                 }
             });
+			$.ajax({
+				url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_mess_ajax/',
+                success: function (response) {
+                    $('#mess_management_id').html(response).selectpicker('refresh');
+					
+                }
+			});	
         });
 
         $('#room_id').change(function () {
@@ -510,11 +561,10 @@ echo form_close(); ?>
             });
         });
         
-        $(".datepicker").datepicker({
+        $(".gh").datepicker({
             dateFormat: "dd/mm/yy",
             changeMonth: true,
             changeYear: true,
-            endDate: '+0d',
             autoclose: true
         });
         
@@ -667,7 +717,8 @@ $("#bck_5").click(function(){
 });
 
 $("#btn0").click(function(){
-      // $('#id_btn_block').css('display','none');     
+      // $('#id_btn_block').css('display','none');
+      $( ".content-current" ).removeClass( "content-current" )
         var valid_val = 1;
         var elems = $('#section-flip-1').find('input');
         elems.each(function(index,element) {

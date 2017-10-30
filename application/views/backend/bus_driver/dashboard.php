@@ -13,30 +13,35 @@
     <!-- /.breadcrumb -->
 </div>
 
-<div class="row">
+  <div class="row">
     <div class="col-lg-5 col-sm-12 col-xs-12">
         <div class="panel">
             <div class="p-30">
                 <div class="row">
                     <div class="col-xs-4">
-                        <img src="" alt="profile_image" width="100px" height="100px">
-
+                        <!--<img src="" alt="profile_image" width="100px" height="100px">-->
+                        <?php if ($driver_detail->driver_image != "" && file_exists('uploads/bus_driver_image/' . $driver_detail->driver_image)) {
+                                $driver_image = $driver_detail->parent_image;
+                                } else {
+                                    $driver_image = '';
+                                } ?>
+                                <img src="<?php echo ($driver_image!=""?"uploads/bus_driver_image/".$driver_image:"uploads/user.png");?>" width="100px" height="100px"/>
                     </div>
                 <div class="col-xs-8">
-                    <h2 class="m-b-0">Bus Driver Name</h2>
-                    <h4>Mail Id</h4>
+                    <h2 class="m-b-0"><?php echo ucfirst($driver_detail->name);  ?></h2>
+                    <h4><?php echo $driver_detail->email; ?></h4>
                 </div>
                 </div>
                 <div class="row text-center m-t-30">
                     <div class="col-xs-4 b-r">
                         <h2><?php echo get_phrase('Contact'); ?></h2>
-                        <h4></h4></div>
+                        <h4><?php echo $driver_detail->phone; ?></h4></div>
                     <div class="col-xs-4 b-r">
                         <h2><?php echo get_phrase('Gender'); ?></h2>
-                        <h4></h4></div>
+                        <h4><?php echo ucfirst($driver_detail->sex); ?></h4></div>
                     <div class="col-xs-4">
                         <h2><?php echo get_phrase('Bus'); ?></h2>
-                        <h4></h4></div>
+                        <h4><?php echo get_phrase($driver_detail->bus_name); ?></h4></div>
                 </div>
             </div>
 
@@ -55,3 +60,21 @@
         Google map 
     </div>
 </div>
+
+<script>
+$(function(){
+    if(window.innerWidth<700){
+        sidebar = $('.sidebar');
+        sideMenu = $('#side-menu'); 
+        $('.fix-sidebar').addClass('overflow-toggle');
+        sidebar.addClass('side_menu1');
+        sideMenu.show();
+        act = sideMenu.find('li.active');
+        if(act.length==0){
+            act = sideMenu.find('li:eq(0)');
+            act.addClass('active');  
+        } 
+        scrollInView(act);   
+    }
+});    
+</script>

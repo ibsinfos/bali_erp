@@ -310,7 +310,7 @@ public function saveemployeeappealAction()
         $mpdf->SetDisplayMode('fullpage');
         $mpdf->list_indent_first_level = 0;
         $mpdf->SetDisplayMode('fullpage');
-        $mpdf->pagenumPrefix = 'Generated using Sentrifugo'.str_repeat(" ",72);
+        //$mpdf->pagenumPrefix = 'Generated using Rarome LLC'.str_repeat(" ",72);
         $mpdf->pagenumSuffix = '';
         $mpdf->nbpgPrefix = ' of ';
         $mpdf->nbpgSuffix = '';

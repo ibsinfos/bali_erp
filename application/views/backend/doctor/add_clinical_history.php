@@ -35,8 +35,8 @@
 
                 <div class="col-xs-12 col-md-6 form-group">
                     <label class="control-label"><?php echo get_phrase('select_section'); ?><span class="error mandatory"> *</span></label>
-                    <select id="section_holder" name="section_id" class="selectpicker" data-style="form-control" onchange="onsectionchange(this);" data-step="7" data-intro="<?php echo get_phrase('Here select you section for which you want to progress detail'); ?> " data-position='top' required="">
-                        <option value="">Select Section</option>
+                    <select id="section_holder" name="section_id" class="selectpicker" data-style="form-control" onchange="onsectionchange(this);" data-step="7" data-intro="<?php echo get_phrase('Here select you section for which you want to progress detail'); ?> " data-position='top' required="" data-live-search="true">
+                        <!--<option value="">Select Section</option>-->
                         </select>
                     <span></span>
                 </div>
@@ -44,7 +44,8 @@
                 <div class="col-xs-12 col-md-6 form-group">
                     <label class="control-label"><?php echo get_phrase('student'); ?><span class="error mandatory"> *</span></label>
                     <?php //pre($students); die;?>
-                    <select id="student_holder" name="student_id" class="selectpicker" data-style="form-control" data-step="10" data-intro="<?php echo get_phrase('Here select you student for which you want to progress detail '); ?>" data-position='top' required="">  <option value="">Select Student</option>
+                    <select id="student_holder" name="student_id" class="selectpicker" data-style="form-control" data-step="10" data-intro="<?php echo get_phrase('Here select you student for which you want to progress detail '); ?>" data-position='top' required="" data-live-search="true"> 
+                        <!--<option value="">Select Student</option>-->
                         <?php foreach ($students as $data) { ?>
                             <option value="<?php echo $data['student_id']; ?>" <?php if ($student_id == $data['student_id']) echo "selected"; ?>><?php echo $data['name']; ?></option>
                         <?php } ?>
@@ -97,7 +98,7 @@
             <!--           
             <!----CREATION FORM ENDS-->
             <div class="text-right">
-                <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit'); ?></button>
+                <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('Add_record'); ?></button>
             </div> 
 
             <?php echo form_close(); ?>

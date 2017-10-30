@@ -31,13 +31,13 @@
 </div>
 </div>
 <div class="col-md-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Inventory Category List.');?>" data-position='top'>
-    <table id="example23" class="display nowrap table-responsive" cellspacing="0" width="100%">
+    <table id="ex" class="display nowrap table-responsive" cellspacing="0" width="100%">
         <thead>
             <tr>
-                <th><div>Categories Name</div></th>
-                <th><div>Total Item</div></th>
+                <th><div><?php echo get_phrase('Categories_Name'); ?></div></th>
+                <th><div><?php echo get_phrase('Total_Item'); ?></div></th>
                 <th><div><?php echo get_phrase('Actions'); ?></div></th>
-                <th><div>Options</div></th>     
+                <th><div><?php echo get_phrase('Options'); ?></div></th>     
             </tr>
         </thead>
         <tbody>
@@ -45,7 +45,6 @@
                     <td>
                         <?php echo $row['categories_name']; ?>
                     </td>
-
                     <td> <?php echo $row['count']; ?>
                     </td>
                     <td>
@@ -63,15 +62,21 @@
 
                             </ul>
                         </div>
-
                     </td>
-
                     <td>
                         <a href="<?php echo base_url(); ?>index.php?school_admin/add_inventory_product/<?php echo $row['categories_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo 'Add ' . $row['categories_name']; ?>"><i class="fa fa-plus-square"></i></button></a>                                                       
                         <a href="<?php echo base_url(); ?>index.php?school_admin/category_edit/<?php echo $row['categories_id']; ?>" ><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit Category"><i class="fa fa-pencil-square-o"></i></button></a>
+                        <?php
+                         if(intval($row['transaction'])>0){        
+                           echo '<button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 disabled"  data-placement="top" data-original-title="'.get_phrase('delete_class').'" title="'.get_phrase('delete_class').'"><i class="fa fa-trash-o"></i> </button>';
+                            }
+                            else{
+                                ?>
                         <a href="javascript: void(0);" onclick="confirm_modal('<?php echo base_url(); ?>index.php?school_admin/inventory_category/delete/<?php echo $row['categories_id']; ?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete Category"><i class="fa fa-trash-o"></i></button></a>
                     </td>
-
+                    <?php
+                        }
+                    ?>
                 </tr><?php } ?>
         </tbody>
     </table>

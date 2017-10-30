@@ -1,7 +1,7 @@
   <div class="row bg-title">    
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-        <h4 class="page-title"><?php echo get_phrase('Overview Reports'); ?> </h4></div>
+        <h4 class="page-title"><?php echo get_phrase('Overview_Reports'); ?> </h4></div>
     <!-- /.page title -->
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
@@ -50,9 +50,9 @@
         <section id="collapse1">
             <div class="row">
     <div class="col-md-12">
-        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('You can check mark the required fields and submit to get the custom report.');?>" data-position="top">
+        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('You_can_check_mark_the_required_fields_and_submit_to_get_the_custom_report.');?>" data-position="top">
                 <div class="text-right"> <input type="checkbox" value="all" id="CheckAll" class="js-switch" data-color="#99d683" />
-    <label>All</label>
+    <label><?php echo get_phrase('All'); ?></label>
                 </div>
                  <div class="tab-pane active" id="home">
                 <?php echo form_open(base_url() . 'index.php?admin_report/student_custom_report/', array('class' => 'form-groups-bordered', 'id' => 'StudentCustomReport')); if(count($filter_fields)){?>

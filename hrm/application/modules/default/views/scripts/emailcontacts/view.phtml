@@ -40,7 +40,7 @@ if($this->emailContactsData == '' || empty($this->emailContactsData)) { ?>
 <?php 
 $group_email = $this->form->groupEmail->getValue();
 sapp_Helper::viewHeader();
-sapp_Helper::viewBody('alt','Business Unit',(!empty($this->data['unitname']))?$this->data['unitname']:"...",'Group',(!empty($this->data['group_name']))?$this->data['group_name']:"...");
+sapp_Helper::viewBody('alt','Group',(!empty($this->data['group_name']))?$this->data['group_name']:"...");
 sapp_Helper::viewBody('nor','Group Email ',(!empty($group_email))?$this->form->groupEmail->getValue():"...",'','');
 sapp_Helper::viewFooter();
 ?>

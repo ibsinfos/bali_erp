@@ -103,15 +103,15 @@ else
 				// {
 					echo sapp_Helper::sd_form_helper($this->msgarray, $this->form, 'department_name','', '','',array());
 				// }
-				echo $this->form->businessunit_id;
+				//echo $this->form->businessunit_id;
 				echo $this->form->department_id;
 			}
 			else 
 			{
-				$businessunits = $this->businessunits;            
+				//$businessunits = $this->businessunits;            
 	?>
 				<input type="hidden" name="performance_app_flag" id="performance_app_flag" />
-				<div class="new-form-ui">
+				<?php /*<div class="new-form-ui">
 					<label class="required"><?php echo $this->form->businessunit_id->getLabel();?> <!--	img class="tooltip" title="All the business units which have the appraisal settings configured will be displayed" src="<?php echo DOMAIN;?>public/media/images/help.png"--></label>
 					<div class="division">
 						<select name="businessunit_id" id="businessunit_id">
@@ -147,7 +147,7 @@ else
 						<?php }?>
 
 					</div>
-				</div>
+				</div> */ ?>
 	<?php         
 				echo sapp_Helper::sd_form_helper($this->msgarray, $this->form, 'department_id','', ' department_id_div ','',array());
 			}
@@ -226,6 +226,16 @@ If the appraisal is directly made available for the employees, they will be able
 <div class="clear"></div>
      </div>
 <script type='text/javascript'>
+    $(document).ready(function(){ 
+$.post(base_url+"/appraisalinit/getdepartmentsadmin",{bu:'1'},function(data){
+    $('#s2id_department_id').find('a.select2-choice').find('span').html('Select Department');
+    $('#department_id').find('option').remove();
+    $('#department_id').html(data.options);
+    // $('.department_id_div').show();
+    //$.unblockUI();
+},'json');    
+    });
+    
 function changeduedatetext(value)
 {
 	if(value)
@@ -585,7 +595,7 @@ $("#appraisal_mode").change(function(){
 	{
 		is_edit = 1;
 	}
-	$.post(base_url+"/appraisalinit/getperiod",{from_year:from_val,to_year:to_val,bunit:bunit,mode:amode,dept_id:deptid,flag:flag,is_edit:is_edit,appraisal_id:appraisal_id,existing_period:existing_period},function(data){
+	$.post(base_url+"/appraisalinit/getperiod",{from_year:from_val,to_year:to_val,mode:amode,dept_id:deptid,flag:flag,is_edit:is_edit,appraisal_id:appraisal_id,existing_period:existing_period},function(data){
 		$('#errors-appraisal_mode').remove();
 		if(data.status === 'success')
 		{

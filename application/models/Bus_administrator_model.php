@@ -24,6 +24,31 @@ class Bus_administrator_model extends CI_Model {
         return $progress_id;
     }
     
+    public function get_admin_list($school_id) {
+        $this->db->where('school_id',$school_id);
+        $this->db->select('bus_administrator_id id, name fname, email, phone cell_phone');
+        
+        $this->db->order_by("name", "asc");
+        $data = $this->db->get("bus_administrator")->result_array();
+
+        if(count($data)){
+            foreach($data as $k => $datum){
+                $where = array('original_user_type' => 'BA', 'main_user_id' => $datum['id'], 'school_id'=>$school_id);
+                $this->db->from("user_role_transaction");
+                $this->db->where($where);
+                $query = $this->db->get();
+                $exist = $query->num_rows();
+                if($exist){
+                    $role_id = $query->row()->role_id;
+                    $data[$k]['role_id'] = $role_id;
+                }else{
+                    $data[$k]['role_id'] = '';
+                }
+            }
+        }
+        return $data;
+    }
+    
     function edit($dataArray,$id){
         $this->db->where($this->_primary, $id);
         $this->db->update($this->_table, $dataArray);

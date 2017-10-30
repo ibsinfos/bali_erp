@@ -88,3 +88,37 @@ z-index:1;
 #admin_custom .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn){
     margin-top:-90px;
 }*/
+
+#feedback_header .dropify-wrapper{height: 120px;} 
+
+#feedback_slider{
+    width:500px;
+    top:64px;
+    position:fixed;
+    z-index: 999;
+}
+#feedback_header{ 
+    width:370px;
+    height:445px;
+    position:absolute; 
+    right:0px; 
+    border:1px solid #d8d8d8;
+    padding:5px 15px;
+    border-radius:3px;
+    box-shadow: 0 0 8px gray;
+    background: #fff;
+}
+#feedback_sidebar1{
+    position:absolute;
+    top:180px;
+    left:113px;
+    box-shadow: 0 0 8px gray;
+}
+
+#feedback_title{
+position:absolute;
+top:300px;
+left:650px;
+}
+
+.fa-hand-o-right{position: absolute; right: 15px; bottom: 25px; cursor: pointer;}

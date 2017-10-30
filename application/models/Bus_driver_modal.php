@@ -5,7 +5,7 @@ class Bus_driver_modal extends CI_Model {
     
       var $column_order = array(null, 'b.name', 'bd.email', 'bd.phone', 'bd.sex', 'b.name', 't.route_name'); //set column field database for datatable orderable
     var $column_search = array('b.name', 'bd.email', 'bd.phone', 'bd.sex', 'b.name', 't.route_name'); //set column field database for datatable searchable 
-    var $order = array('bd.bus_driver_id' => 'desc'); // default order 
+    var $order = array('b.bus_id' => 'desc'); // default order 
     
     public function __construct() {
         parent::__construct();
@@ -134,6 +134,30 @@ class Bus_driver_modal extends CI_Model {
         return $this->db->get()->result_array();
     }
     
+    public function get_driver_list($school_id) {
+        $this->db->where('school_id',$school_id);
+        $this->db->select('bus_driver_id id, name, email, phone');
+        $this->db->where(array('bus_driver_status' => '1'));
+        $this->db->order_by("name", "asc");
+        $data = $this->db->get($this->_table)->result_array();
+
+        if(count($data)){
+            foreach($data as $k => $datum){
+                $where = array('original_user_type' => 'BD', 'main_user_id' => $datum['id'], 'school_id'=>$school_id);
+                $this->db->from("user_role_transaction");
+                $this->db->where($where);
+                $query = $this->db->get();
+                $exist = $query->num_rows();
+                if($exist){
+                    $role_id = $query->row()->role_id;
+                    $data[$k]['role_id'] = $role_id;
+                }else{
+                    $data[$k]['role_id'] = '';
+                }
+            }
+        }
+        return $data;
+    }
     public function get_num_of_groups($driver_id) {
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
@@ -229,6 +253,25 @@ class Bus_driver_modal extends CI_Model {
         return $this->db->get_where('bus_driver', array('bus_driver_id' => $id))->row();
     }
     
+    public function get_bus_driver_with_bus($id) {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('bd.school_id',$school_id);
+            } 
+        }
+        
+         $this->db->select('bd.*, b.name as bus_name');
+        $this->db->from('bus_driver bd');
+        $this->db->join('bus b', 'b.bus_id = bd.bus_id', 'left');
+        $this->db->where('bd.bus_driver_id',$id);
+        return $this->db->get()->row();
+        
+        
+//        return $this->db->get_where('bus_driver', array('bus_driver_id' => $id))->row();
+    }
+    
     public function save_bus_driver($data) {
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
@@ -238,11 +281,14 @@ class Bus_driver_modal extends CI_Model {
             } 
         }
         $this->db->insert('bus_driver', $data);
+        
     }
     
     public function update_bus_driver($data, $param2) {
-        $this->db->where('bus_driver_id',$param2);
-        $this->db->update('bus_driver', $data);
+        if(is_array($param2)){
+            $this->db->where($param2);//'bus_driver_id',
+            $this->db->update('bus_driver', $data);
+        }
     }
     
     public function delete_bus_driver($data) {
@@ -560,7 +606,7 @@ class Bus_driver_modal extends CI_Model {
         return $this->db->get()->result_array();  
     }
     
-    public function get_bus_with_route1() {
+    public function get_bus_with_route1($bus_id) {
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
@@ -570,9 +616,23 @@ class Bus_driver_modal extends CI_Model {
         }
         $this->db->select('t.route_name,b.*');
         $this->db->from('bus b'); 
-        $this->db->order_by('b.bus_id','desc'); 
+        $this->db->where('b.bus_id',$bus_id); 
         $this->db->join('transport t', 't.transport_id = b.route_id', 'left');    
         return $this->db->get()->result_array();
+    }
+    
+     public function get_bus_id($bus_driver_id) {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+        $this->db->select('bus_id');
+        $this->db->from('bus_driver'); 
+        $this->db->where('bus_driver_id',$bus_driver_id); 
+        return $this->db->get()->row();
     }
     
     /**
@@ -679,7 +739,48 @@ class Bus_driver_modal extends CI_Model {
         return $rs;
     }
     // GET DATATABLE QUERY
-        private function _get_datatables_query() {
+        private function _get_datatables_query($bus_id = '') {       
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('b.school_id',$school_id);
+            } 
+        }
+        $this->db->select('t.route_name,b.*');
+        $this->db->from('bus b'); 
+        $this->db->where('b.bus_id',$bus_id); 
+        $this->db->join('transport t', 't.transport_id = b.route_id', 'left'); 
+        
+        $i = 0;
+
+        foreach ($this->column_search as $item) { // loop column 
+            if ($_POST['search']['value']) { // if datatable send POST for search
+
+                if ($i === 0) { // first loop
+                    $this->db->group_start(); // open bracket. query Where with OR clause better with bracket. because maybe can combine with other WHERE with AND.
+                    $this->db->like($item, $_POST['search']['value']);
+                } else {
+                    $this->db->or_like($item, $_POST['search']['value']);
+                }
+                
+                if (count($this->column_search) - 1 == $i) //last loop
+                    $this->db->group_end(); //close bracket
+            }
+            $i++;
+        }
+
+        if (isset($_POST['order'])) { // here order processing
+            $this->db->order_by($this->column_order[$_POST['order']['0']['column']], $_POST['order']['0']['dir']);
+        } else if (isset($this->order)) {
+            $order = $this->order;
+            $this->db->order_by(key($order), $order[key($order)]);
+        }
+    }
+    
+    
+    // GET DATATABLE QUERY
+    private function _get_datatables_busdriver_query() {       
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
@@ -716,24 +817,59 @@ class Bus_driver_modal extends CI_Model {
             $order = $this->order;
             $this->db->order_by(key($order), $order[key($order)]);
         }
+
     }
-    
     // GET DATATABLE 
     function get_datatables() {
         $list = $this->_get_datatables_query();
         if ($_POST['length'] != -1)
         $this->db->limit($_POST['length'], $_POST['start']);
         $query = $this->db->get();
-        return $query->result();
+        $result = $query->result_array();
+        $school_id = (!empty($_SESSION['school_id'])) ? $_SESSION['school_id'] : 0; 
+        //pre($result);
+        foreach($result as $key => $value)
+        {
+            $bus_id = $value['bus_id'];
+            $query1 = "SELECT COUNT(*) AS transaction FROM student_bus_allocation WHERE bus_id = '$bus_id' and school_id = '$school_id'";
+            $rs = $this->db->query($query1)->result_array();
+         
+            $result[$key]['transaction'] = $rs[0]['transaction'];
+        }    
+       
+     $object = json_decode(json_encode($result), FALSE);
+     return $object;
     }
     
-     function count_filtered() {
-        $this->_get_datatables_query();
+    function get_datatables_bus_driver(){
+        $list = $this->_get_datatables_busdriver_query();
+        if ($_POST['length'] != -1)
+        $this->db->limit($_POST['length'], $_POST['start']);
+        $query = $this->db->get();
+        $result = $query->result_array();
+        $school_id = (!empty($_SESSION['school_id'])) ? $_SESSION['school_id'] : 0; 
+        //pre($result);
+        foreach($result as $key => $value)
+        {
+            $bus_id = $value['bus_id'];
+            $query1 = "SELECT COUNT(*) AS transaction FROM student_bus_allocation WHERE bus_id = '$bus_id' and school_id = '$school_id'";
+            $rs = $this->db->query($query1)->result_array();
+         
+            $result[$key]['transaction'] = $rs[0]['transaction'];
+        }    
+       
+     $object = json_decode(json_encode($result), FALSE);
+     return $object;
+    }
+    
+     function count_bus_driver_filtered() {       
+        $this->_get_datatables_busdriver_query();
         $query = $this->db->get();
         return $query->num_rows();
     }
     
-     public function count_all() {
+    public function count_bus_driver_all() {
+       
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
@@ -743,7 +879,49 @@ class Bus_driver_modal extends CI_Model {
         }
         $this->db->from('bus_driver');
         return $this->db->count_all_results();
+        }
+        
+    function count_filtered($bus_id = '') {
+        $this->_get_datatables_query($bus_id);
+        $query = $this->db->get();
+        return $query->num_rows();
     }
     
-  
+     public function count_all($bus_id = '') {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('b.school_id',$school_id);
+            } 
+        }
+        $this->db->select('t.route_name,b.*');
+        $this->db->from('bus b'); 
+        $this->db->where('b.bus_id',$bus_id); 
+        $this->db->join('transport t', 't.transport_id = b.route_id', 'left');    
+        return $this->db->get()->result_array();
+    }  
+    
+    function get_student_by_bus_id($bus_id = ''){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('sba.school_id',$school_id);
+            } 
+        }
+        $this->db->select('sba.*,s.name,s.mname,s.lname,b.name bus_name,t.route_name,c.name as class_name,sec.name section_name');
+        $this->db->from('student_bus_allocation sba');
+        $this->db->join('student s','s.student_id = sba.student_id');
+        $this->db->join('enroll e','e.student_id = sba.student_id');
+        $this->db->join('class c','c.class_id = e.class_id');
+        $this->db->join('section sec','sec.section_id = e.section_id');
+        $this->db->join('transport t', 't.transport_id = sba.route_id', 'left'); 
+        $this->db->join('bus b','b.bus_id = sba.bus_id','left');
+        $this->db->where('sba.bus_id',$bus_id);
+        $this->db->where('s.student_status','1');
+       return $this->db->get()->result_array();
+//        $this->db->get()->result_array();
+//        echo $this->db->last_query(); die;
+    }
 }

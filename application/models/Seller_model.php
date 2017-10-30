@@ -12,7 +12,7 @@
         }
 
     public function get_category($categories_name)
-    {
+    { 
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
@@ -20,7 +20,7 @@
                 $this->db->where('school_id',$school_id);
             } 
         }
-        return $this->db->get_where('categories', array('categories_name' => $categories_name))->row()->categories_id;
+         return $this->db->get_where('categories', array('categories_id' => $categories_name))->row()->categories_id;
     }     
     
     public function add($data){
@@ -44,7 +44,7 @@
                 $this->db->where('school_id',$school_id);
             } 
         }
-       return $this->db->get_where('seller_master', array('seller_name' => $seller_name))->row()->seller_id;
+       return $this->db->get_where('seller_master', array('seller_id' => $seller_name))->row()->seller_id;
     }
     
     public function get_By_Id($id){    

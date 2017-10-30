@@ -29,10 +29,16 @@
                     <table class="table table-bordered margin-no-bottom">
                         <div class="col-md-12 m-b-20">
                             <div class="col-xs-4 col-sm-2 col-md-1 p-0">
-                                <?php foreach($parent_image as $value){ ?>
+                                <?php foreach($parent_image as $value){ 
+                                if ($value['parent_image'] != "" && file_exists('uploads/parent_image/' . $value['parent_image'])) {
+                                    $parent_image = $value['parent_image'];
+                                } else {
+                                    $parent_image = '';
+                                }
+                                ?>
                                 <a href="#" class="profile-picture">
-                                            <img src="<?php  echo ($value['parent_image']!=" "?"uploads/parent_image/".$value['parent_image']:"uploads/user.jpg");?>" width="70px" height="70px"/> </a>
-                                <?php }?>
+                                  <img src="<?php echo ($student_image != "" ? 'uploads/parent_image/' . $parent_image : 'uploads/user.png') ?>" width="70px" height="70px"/> </a>
+                                <?php }?>   
                             </div>
  <?php foreach($edit_data as $row): ?>
                             <div class="col-xs-8 col-sm-10 col-md-11">

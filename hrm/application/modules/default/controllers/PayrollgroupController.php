@@ -189,7 +189,7 @@ class Default_PayrollgroupController extends Zend_Controller_Action{
             $dataArr=array();
             if($payroll_group_codes=="" && !is_array($payroll_group_codes)){;
                 $error=TRUE;
-                $err_msg_arr['payroll_group_codes']="Please select any optiionn for 'Payroll Category Code'";
+                $err_msg_arr['payroll_group_codes']="Please select any option for 'Payroll Category Code'";
             }else{
                 $dataArr['payroll_group_codes']=$payroll_group_codes;
             }
@@ -205,7 +205,7 @@ class Default_PayrollgroupController extends Zend_Controller_Action{
                     if($retData==FALSE){
                         $this->_helper->flashMessenger($rs_main_roll_details[0]['rolename'].' already set with category.');
                     }else{
-                        $this->_helper->flashMessenger('Payroll category and rolles created successfully.');
+                        $this->_helper->flashMessenger('Payroll category and roles created successfully.');
                     }
                     $trDb->commit();
                     $this->getResponse()->setRedirect($baseUrl->baseUrl().'/index.php/payrollgroup');
@@ -221,7 +221,7 @@ class Default_PayrollgroupController extends Zend_Controller_Action{
                         $err_msg_arr['header_messsage']=$e->getMessage();
                     }else{
                         $error=TRUE;
-                        $err_msg_arr['header_messsage']="Unknown error arises to save thepayroool group data,Please try again.";
+                        $err_msg_arr['header_messsage']="Unknown error arises to save the payroll group data,Please try again.";
                     }
                     $this->view->error=TRUE;
                 }
@@ -304,7 +304,7 @@ class Default_PayrollgroupController extends Zend_Controller_Action{
                     $trDb->commit();
                     
                     $baseUrl = new Zend_View_Helper_BaseUrl();
-                    $this->_helper->flashMessenger('Payroll category and rolles updated successfully.');
+                    $this->_helper->flashMessenger('Payroll category and roles updated successfully.');
                     $this->getResponse()->setRedirect($baseUrl->baseUrl().'/index.php/payrollgroup');
 
                     //$this->_redirect('payrollgroup');

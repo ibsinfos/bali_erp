@@ -1,0 +1,81 @@
+<div class="">
+    <div id="breadcrumdiv"> 
+        <div class="breadcrumbs"><span class="firstbreadcrumb" onclick="window.location = 'http://localhost/beta/hrm/index.php'">Home</span> <span class="arrows">&rsaquo;</span> <span>HR</span> <span class="arrows">&rsaquo;</span> <a href="http://localhost/beta_merge/hrm/index.php/payslipgroup" >Payroll and Payslip Management </a><span class="arrows">&rsaquo;</span> <span>Payroll Slip Group</span><span class="arrows">&rsaquo;</span> <span>Generate Employee Payslip</span></div>    </div>
+
+
+</div><div id="maincontentdiv">	
+    <div id="dialog-confirm" style="display:none;">
+        <div class="newframe-div">
+            <div class="new-form-ui height32">
+                <div class="division">
+                    <input maxlength="12" id="number_value" name="number_value" type="text">
+                </div>
+                <span class="errors" id="errors-contactnumber"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="empstatus-alert" style="display:none;">
+        <div class="newframe-div"><div id="empstatusmessage"></div></div>
+    </div>
+
+    <div id="empleaves-alert" style="display:none;">
+        <div class="newframe-div"><div id="empleavesmessage"></div></div>
+    </div>									
+    <div>
+
+        <!-- For excel Upload -->
+        <div class="profile-tabs-right-2">
+            <div class="flt_right">
+
+                <div class="actions_div">
+
+                    <span class="uploadbut_exel uploadbutsel flt_left marginfiv   " id="upload_custom_div">Import Employees</span>
+                    <a target="_blank" href="http://localhost/beta_merge/hrm/public/downloads/import_employees.xlsx" class="importformatlink flt_left">Import format</a>
+                    <a target="_blank" href="http://localhost/beta_merge/hrm/public/downloads/importguide.pdf" class="importformatlink flt_left">Help</a>
+                    <div id="loaderimgprofile" style="display:none;"><img src="http://localhost/beta_merge/hrm/public/media/images/loaderwhite_21X21.gif" style="width:21px; height: 21px; float: none; "></div>								
+                </div>                 					
+            </div>
+            <input id="uploadimagepath" name="uploadimagepath" value="" type="hidden">
+            <input name="emp_excel" value="" type="hidden">							    	
+
+        </div>
+    </div>
+    <br>
+    <h2>Generated Payslips - Harsha k</h2>
+    <br>
+     <div class="new-form-ui">
+           <div class="division">
+
+            <select name="prefix_id" id="prefix_id" class="select2-offscreen" tabindex="-1">
+                <option value="January" label="January">January</option>
+                <option value="February" label="February">February</option>
+                <option value="March" label="March">March</option>
+                <option value="april" label="Science">April</option>
+                <option value="may" label="May">May</option>
+                <option value="June" label="June">June</option>
+                <option value="July" label="July">July</option>
+                <option value="August" label="August">August</option>
+                <option value="September" label="September">September</option>
+                <option value="October" label="October">October</option>
+                <option value="November" label="November">November</option>
+                <option value="December" label="December">December</option>
+            </select>             
+</div>
+     </div><br>
+    <table>
+        <tr><th>Name:</th><td>Harsha k ‎(E9)</td></tr>
+        <tr><th>Department:</th><td>English</td></tr>
+        <tr><th>Position:</th><td>Junior Tutor</td></tr>
+        <tr><th>Grade:</th><td>Harsha k ‎(E9)</td></tr>
+        
+    </table>
+     <hr>
+         <br>
+         <h2><b>Payroll Details</b></h2><br>
+    <table>
+        <tr><th>Payroll group:</th><td>Monthly payroll</td></tr>
+        <tr><th>Payment frequency:</th><td>Salaried - Monthly</td></tr>
+            
+    </table>
+    </div>

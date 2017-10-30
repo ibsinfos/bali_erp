@@ -77,5 +77,11 @@
             </section>
         </div>
 
-    <?php } }
+    <?php } } ?>
         
+    
+<script type="text/javascript">
+$('#modal_ajax').on('shown.bs.modal', function (e) {
+    $('#modal_ajax #myModalLabel').html('<?php echo $page_title; ?>');
+})
+</script>

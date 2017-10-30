@@ -8,7 +8,7 @@
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript:void(0);" onclick="javascript:introJs().start();" id="take-tour" target="_blank" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         <ol class="breadcrumb">
-            <li><a href="#" class="active"> Dashboard</a></li>
+            <li><a href="#" class="active"> Dashboard </a></li>
 
         </ol>
     </div>
@@ -39,9 +39,8 @@
         <div class="panel">
             <div class="p-30">
                 <div class="row">
-                    <div class="col-xs-4">
-                        <img src="<?php echo ($edit_data['stud_image'] != " " ? "uploads/student_image/" . $edit_data['stud_image'] : "uploads/user.jpg"); ?>" alt="profile_image" width="100px" height="100px">
-
+                    <div class="col-xs-4">          
+                        <img src="<?php echo ($edit_data['stud_image'] != "" ? "uploads/student_image/" . $edit_data['stud_image'] : "uploads/user.png"); ?>" alt="Profile Image" width="100px" height="100px">
                     </div>
                     <div class="col-xs-8">
                         <h2 class="m-b-0"><?php echo $student_details->name . " " . $student_details->lname; ?></h2>
@@ -79,68 +78,48 @@
 <div class="row">
     <div class="col-md-8 col-sm-8 col-xs-12">
         <div class="white-box">
-            <h3 class="m-b-0">Yearly Attedance</h3>
+            <h3 class="m-b-0">Yearly Attendance</h3>
 
 
             <ul class="dp-table m-t-20">
-                <li>
+
+                <?php 
+//                $count = count($attendance_percentege); 
+//                echo $count ; die;
+                $i = 1; foreach($attendance_percentege as $row): ?>
+                    <li>
                     <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:30%;"> <span class="sr-only">88% Complete</span> </div>
+                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="<?php echo $row; ?>" aria-valuemin="0" aria-valuemax="100" style="height:<?php echo $row; ?>%;"> <span class="sr-only"><?php echo $row; ?></span> </div>
                     </div>
-                    <br/> <b>Jul</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:60%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Aug</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:80%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Sep</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:30%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Oct</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:40%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Nov</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:20%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Dec</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:50%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Jan</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:50%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Feb</b> </li>
-                <li>
-                    <div class="progress progress-md progress-vertical-bottom m-0">
-                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="88" aria-valuemin="0" aria-valuemax="100" style="height:50%;"> <span class="sr-only">88% Complete</span> </div>
-                    </div>
-                    <br/> <b>Mar</b> </li>
+                    <br/> <b><?php echo date("F", mktime(0, 0, 0, $i, 1)); ?></b>
+                    </li>               
+              <?php   $i++;
+                 endforeach;  ?>
             </ul>
         </div>
     </div>
-
-
-    <div class="col-md-4 col-sm-12 col-xs-12">
+<!--    <div class="col-md-4 col-sm-12 col-xs-12">
         <div class="white-box real-time-widgets">
-            <h3 class="m-0">Attendence Percentage</h3>
+            <h3 class="text-white box-title">Class <?php echo $student_details->class_name; ?> Result</h3>
             <div id="container" style="width: 300px; height: 300px; margin: 0 auto">
             </div>
         </div>
-    </div>
+    </div>-->
+    <!-- row -->
 
+    <div class="col-md-4 col-sm-12 col-xs-12">
+        <div class="white-box p-10 m-b-0 bg-danger">
+            <h3 class="text-white box-title">Class <?php echo $student_details->class_name; ?> Result</h3>
+            <div id="sparkline1dash"></div>
+        </div>
+        <div class="white-box">
+            <div class="row">
+                <div class="p-l-20 p-r-20 text-center">
+                    <div data-label="60%" class="css-bar css-bar-60 css-bar-lg m-b-0 css-bar-danger"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- col-md-3 -->
 </div>
 <!-- /.row -->
@@ -156,61 +135,46 @@
                         <h3 class="m-b-0 m-t-0">Holidays List</h3>
                     </div>
                     <div class="col-xs-4">
-                        <select class="selectpicker" data-style="form-control" data-live-search="true">
-                            <option>JAN</option>
-                            <option>FEB</option>
-                            <option>MARCH</option>
-                            <option>APRIL</option>
-                            <option>MAY</option>
-                            <option>JUNE</option>
-                            <option>JULY</option>
-                            <option>AUGUST</option>
-                            <option>SEPTEMBER</option>
-                            <option>OCTOBER</option>
-                            <option>NOVEMNER</option>
-                            <option>DEC</option>
+                        <select class="selectpicker" id = "selected_month" data-style="form-control" onchange="showHolidaysByMonth(this.value);">
+                            <?php $monthStart =
+                                    date('F',
+                                    strtotime('Jan'));
+                            for ($i = 1;$i <=12;$i++) { ?>
+                                <option value="<?php echo date('m',
+                                        strtotime($monthStart)) ?>" <?php if(date('m',
+                                        strtotime($monthStart)) == date('m')) { ?> selected="selected" <?php } ?>><?php echo $monthStart; ?>
+                                </option>
+                                <?php $monthStart = date('F', strtotime($monthStart . '+1 month'));
+                            } ?>
                         </select>
                     </div>
                 </div>
             </div>
-            <div class="panel-footer bg-extralight scrollbar student_dash_scrollbar p-r-20">
-                <ul class="earning-box">
-                    <li>
-                        <div class="er-row">
-                            <div class="er-text">
-                                <h3>Diwali Holiday</h3><span class="text-muted">wednesday</span></div>
-                            <div class="er-count ">11-05-2016</div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="er-row">
-                            <div class="er-text">
-                                <h3>Eid Holiday</h3><span class="text-muted">sunday</span></div>
-                            <div class="er-count ">11-05-2016</div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="er-row">
-                            <div class="er-text">
-                                <h3>Holi Holiday</h3><span class="text-muted">monday</span></div>
-                            <div class="er-count ">11-05-2016</div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="er-row">
-                            <div class="er-text">
-                                <h3>friday</h3><span class="text-muted">saturday</span></div>
-                            <div class="er-count ">11-05-2016</div>
-                        </div>
-                    </li>
-
-                </ul>
+              <div class="panel-footer bg-extralight" id="holiday_div">
+<?php if (count($holidays)) { ?>
+                    <ul class="earning-box">
+    <?php foreach ($holidays as
+            $holiday) { ?>
+                            <li>
+                                <div class="er-row">
+                                    <div class="er-text">
+                                        <h3><?php echo ucfirst($holiday['title']); ?></h3>
+                                        <span class="text-muted"><?php echo date('l', strtotime($holiday['date_start'])); ?></span>
+                                    </div>
+                                    <div class="er-count "><?php echo date('d-m-Y',
+                strtotime($holiday['date_start'])); ?></div>
+                                </div>
+                            </li>
+                    <?php } ?>
+                    </ul>
+<?php } ?>
             </div>
         </div>
     </div>
     <div class="col-lg-4 col-sm-12 col-md-4">
         <div class="white-box">
             <h3 class="m-t-0"><?php echo get_phrase('Campus_Updates'); ?></h3>
+            <!--<div class="panel-footer bg-extralight scrollbar student_dash_scrollbar p-r-20">-->
             <div class="panel-footer bg-extralight scrollbar student_dash_scrollbar p-r-20">
                 <ul class="feeds">
                     <?php if (!empty($notifications)) { ?>
@@ -233,7 +197,7 @@
     <div class="col-lg-4 col-md-4">
         <div class="white-box">
             <h3 class="m-t-0">Course Completion</h3>
-            <div class="panel-footer bg-extralight scrollbar student_dash_scrollbar p-r-20">
+            <div class="panel-footer student_dash_scrollbar p-r-20">
                 <ul class="country-state m-t-20">
                     <li>
                         <h2>Maths</h2> <small>From Mr. trump</small>
@@ -269,30 +233,40 @@
         </div>
     </div>
 </div>
-
-<!-- row -->
-<div class="row">
-    <div class="col-md-3 col-xs-12 col-sm-6">
-        <div class="white-box p-10 m-b-0 bg-danger">
-            <h3 class="text-white box-title">Class <?php echo $student_details->class_name; ?> Result</h3>
-            <div id="sparkline1dash"></div>
-        </div>
-        <div class="white-box">
-            <div class="row">
-                <div class="p-l-20 p-r-20 text-center">
-                    <div data-label="60%" class="css-bar css-bar-60 css-bar-lg m-b-0 css-bar-danger"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
 <!-- /#page-wrapper -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/modules/solid-gauge.js"></script>
+<script type='text/javascript'>
+$(document).ready(function(){
+	showHolidaysByMonth('<?php echo date('m'); ?>');
+});
+function showHolidaysByMonth(monthValue) { 
+//        alert(monthValue); die;
+        $.ajax({
+            url: '<?php echo base_url(); ?>index.php?student/get_holidays_by_month/' + monthValue,
+            success: function (response)
+            { 
+                $('#holiday_div').html(response);
+            }, error: function (xhr, status, error) {
 
+            }
+        });
+    }
+    
+    var select_month = $('#selected_month').val();
+     if(select_month != ''){
+      $.ajax({
+            url: '<?php echo base_url(); ?>index.php?student/get_holidays_by_month/' + select_month,
+            success: function (response)
+            { 
+                $('#holiday_div').html(response);
+            }, error: function (xhr, status, error) {
+
+            }
+        });
+     }
+</script>
 <script>
             if (!Highcharts.theme) {
                 Highcharts.setOptions({
@@ -379,7 +353,7 @@
                                 color: Highcharts.getOptions().colors[0],
                                 radius: '112%',
                                 innerRadius: '88%',
-                                y: <?php echo $percentage; ?>
+                                y: <?php // echo  $percentage; ?>
                             }]
 
                     }]
@@ -426,4 +400,6 @@
                                         .translate(190, 96)
                                         .add(this.series[2].group);
                             });
+                            
+   
 </script>

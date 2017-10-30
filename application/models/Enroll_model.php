@@ -108,13 +108,58 @@ class Enroll_model extends CI_Model {
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
             if($school_id > 0){
+                $where = " AND s.school_id = '".$school_id."'";
+            } 
+        }
+        $sql = 'SELECT s.name,s.student_id, e.enroll_code FROM student s, enroll e 
+        WHERE e.class_id="' . $class_id . '" AND e.section_id="'.$section_id.'" AND e.year="'.$year.'" AND s.student_id=e.student_id '.$where.' 
+        ORDER BY S.name ASC';
+		
+        $rs = $this->db->query($sql)->result();
+		
+        if(count($rs)){
+            $exist = array();
+            foreach($rs as $datum){
+                $where = array('student_id'=>$datum->student_id, 'enroll_code'=>$datum->enroll_code, 'school_id'=>$school_id);
+
+                $exist_student = $this->db->get_where('student_bus_allocation', $where)->result_array();
+
+                if(count($exist_student)){
+                    foreach($exist_student as $exist_datum){
+                        $exist[] = $exist_datum['student_id'];
+                    }
+                }
+            }
+
+            if(count($exist)){
+                foreach($exist as $existing){
+                    foreach($rs as $kk=>$AllStudent){
+                        if($AllStudent->student_id==$existing){
+                            unset($rs[$kk]);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $rs;
+    }
+	
+	 function get_all_student($class_id, $section_id,$year) {
+        $school_id = ''; $where = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
                 $where = " and s.school_id = '".$school_id."'";
             } 
         }
-        $sql = 'select s.name,s.student_id from student s , enroll e where e.class_id="' . $class_id . '" and e.section_id="' . $section_id . '"and e.year="' . $year . '" and s.student_id=e.student_id'.$where;
+        $sql = 'select s.name,s.student_id, e.enroll_code from student s , enroll e where e.class_id="' . $class_id . '" and e.section_id="' . $section_id . '"and e.year="' . $year . '" and s.student_id=e.student_id'.$where;
+		
+		
         $rs = $this->db->query($sql)->result();
-        return $rs;
-    }
+		
+		return $rs;
+	 }
 
     function get_student_list_teacher_api($classId) {
         $school_id = '';

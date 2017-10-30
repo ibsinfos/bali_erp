@@ -262,7 +262,7 @@ class Refund extends CI_Controller {
     public function refund_rule_edit($rule_id){        
         $page_data = $this->get_page_data_var();
         $page_data['page_name'] = 'fees/refund_rule_edit';
-        $page_data['page_title'] = get_phrase('refund_rules_create');
+        $page_data['page_title'] = get_phrase('edit_refund_rule');
         $page_data['rule_id'] = $rule_id;
         
         $this->form_validation->set_rules('running_year', 'Current running year', 'trim|required');
@@ -325,7 +325,7 @@ class Refund extends CI_Controller {
         $page_data = $this->get_page_data_var();
        
         $page_data['page_name'] = 'fees/refund_apply';
-        $page_data['page_title'] = 'refund_apply';
+        $page_data['page_title'] = get_phrase('apply_refund');
         $page_data['account_type'] = $this->session->userdata('login_type');
         $page_data['classes'] = $this->Fees_model->get_classes();
         $this->load->view('backend/index', $page_data); 
@@ -356,7 +356,7 @@ class Refund extends CI_Controller {
             if($terms['school_fee_terms']){
                 $return['html'] .= '<optgroup label="School Fees">';
                 foreach($terms['school_fee_terms'] as $term){
-                    $return['html'] .= '<option data-type="school" value="'.$term->id.'">'.$term->name.' -- '.$term->amount.'</option>';
+                    $return['html'] .= '<option data-type="1" value="'.$term->id.'">'.$term->name.' -- '.$term->amount.'</option>';
                 }
                 $return['html'] .= '</optgroup>';  
             }
@@ -384,15 +384,12 @@ class Refund extends CI_Controller {
         $stu_config = $this->Ajax_model->get_stu_config_rec(array('student_id'=>$student_id));
         $group_rec = $this->Ajax_model->get_fee_group(array('FRGC.class_id'=>$stu_rec->class_id));
         $refund_rule = $this->Refund_model->get_rule_rec(array('fee_group_id'=>$group_rec->id,'setup_term_id'=>$fee_id));
-        //echo '<pre>';print_r($refund_rule);exit;
+        //echo '<pre>';print_r($stu_config);exit;
         
         //Have Paid
-        $whr_cond = array('student_status'=>$stu_status,
-                            'student_id'=>$student_id,
-                            'class_id'=>$class_id,
-                            'fee_type'=>$fee_type,
-                            'fee_id'=>$fee_id);
+        $whr_cond = array('student_status'=>$stu_status,'student_id'=>$student_id,'class_id'=>$class_id,'fee_type'=>$fee_type,'fee_id'=>$fee_id);
         $hv_collrec = $this->Ajax_model->get_fee_collection_record($whr_cond);
+        //echo '<pre>';print_r($hv_collrec);exit;
 
         if(!$hv_collrec || $hv_collrec->is_paid!=1){
             $return['msg']= 'Fee not paid!';
@@ -414,7 +411,7 @@ class Refund extends CI_Controller {
         $return['net_due'] = 0;  
         $trans_paid = 0;
         
-        $return['payment_trans_html'] = '<tr><td colspan="6" class="text-center"><strong>No Payments Yet</strong></td></tr>';
+        $return['payment_trans_html'] = '<tr><td colspan="6" class="text-center"><strong>'.get_phrase('no_payments_yet').'</strong></td></tr>';
         if($hv_collrec){
             foreach($hv_collrec->pay_trans as $ptran){
                 $trans_paid += $ptran->paid_amount;
@@ -426,16 +423,16 @@ class Refund extends CI_Controller {
             $return['net_due'] = $hv_collrec->net_due;  
         }
         $return['total_paid'] = $total_paid; 
-        //echo '<pre>--';print_r($hv_collrec);print_r($paid_items);exit;
+        //echo '<pre>--';print_r($hv_collrec);exit;
 
         $fee_detail_body = '';
-        if($fee_type=='school'){ 
+        if($fee_type==1){ 
             foreach($hv_collrec->item_trans as $i=>$rec){
                 if($rec->item_type==1){
                     $total_fees += $rec->item_amt;
                     $fee_detail_body .= '<tr data-num="'.$i.'">
                                             <td class="slabel">'.($i+1).'</td>
-                                            <td>'.$rec->item_name.($rec->is_custom?' <strong>[Custom]</strong>':'').'</td>
+                                            <td>'.$rec->item_name.($rec->is_custom?' <strong>['.get_phrase('custom').']</strong>':'').'</td>
                                             <td class="text-right amt-ele" data-amt="'.$rec->item_amt.'">
                                                 <span>'.$rec->item_amt.'</span>
                                                 <input type="hidden" name="heads['.$i.'][id]" value="'.$rec->item_id.'"/>
@@ -446,8 +443,7 @@ class Refund extends CI_Controller {
                 }
             }
         
-            $total_fees = sprintf('%0.2f',$total_fees);
-        }else if($fee_type=='hostel' || $fee_type=='transport'){
+        }else if($fee_type==2 || $fee_type==3){
             foreach($hv_collrec->item_trans as $i=>$rec){
                 if($rec->item_type==4){
                     $total_fees += $rec->item_amt;
@@ -465,6 +461,7 @@ class Refund extends CI_Controller {
                 }
             } 
         }
+        $total_fees = sprintf('%0.2f',$total_fees);
 
         //Concession Part
         $concess_div_html = false;
@@ -542,14 +539,15 @@ class Refund extends CI_Controller {
             if($refund_record){
                 $return['ajax_html'] = '<div class="row">
                                             <div class="col-md-12">
-                                                <h3 class="text-center">Refund has been applied on '.date('d/m/Y',strtotime($refund_record->approve_date)).'</h3>
+                                                <h3 class="text-center">
+                                                '.get_phrase('refund_has_been_applied_on').date('d/m/Y',strtotime($refund_record->approve_date)).'</h3>
                                             </div>          
                                         </div>'; 
             }
         }else{
             $return['ajax_html'] = '<div class="row">
                                         <div class="col-md-12">
-                                            <h3 class="text-center">Refund Rule Not Exists!</h3>
+                                            <h3 class="text-center">'.get_phrase('refund_rule_not_exists!').'</h3>
                                         </div>          
                                     </div>  ';    
         }

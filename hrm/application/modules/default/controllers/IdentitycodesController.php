@@ -61,10 +61,10 @@ class Default_IdentitycodesController extends Zend_Controller_Action
 		$IdentityCodesform->removeElement('vendor_code');
 		$IdentityCodesform->removeElement('staffing_code');
 		
-		if(!sapp_Global::_isactivemodule(BGCHECKS))		
-		$IdentityCodesform->removeElement('bg_code');
-		if(!sapp_Global::_isactivemodule(RESOURCEREQUISITION))
-		$IdentityCodesform->removeElement('requisition_code');		
+//		if(!sapp_Global::_isactivemodule(BGCHECKS))		
+//		$IdentityCodesform->removeElement('bg_code');
+//		if(!sapp_Global::_isactivemodule(RESOURCEREQUISITION))
+//		$IdentityCodesform->removeElement('requisition_code');		
 		
 		
         $this->view->form = $IdentityCodesform; 	
@@ -85,6 +85,8 @@ class Default_IdentitycodesController extends Zend_Controller_Action
      */
     public function addpopupAction()
     {
+        error_reporting(E_ALL);
+        ini_set('display_errors',1);
         Zend_Layout::getMvcInstance()->setLayoutPath(APPLICATION_PATH."/layouts/scripts/popup/");
         $auth = Zend_Auth::getInstance();
         if($auth->hasIdentity())
@@ -98,8 +100,8 @@ class Default_IdentitycodesController extends Zend_Controller_Action
         $IdentityCodesModel = new Default_Model_Identitycodes();
         $identity_data = '';
         
-		$IdentityCodesform->removeElement('vendor_code');
-		$IdentityCodesform->removeElement('staffing_code');
+//		$IdentityCodesform->removeElement('vendor_code');
+//		$IdentityCodesform->removeElement('staffing_code');
 		
         try
         {
@@ -117,8 +119,8 @@ class Default_IdentitycodesController extends Zend_Controller_Action
                 {
                     $IdentityCodesform->setDefault("employee_code",$data[0]["employee_code"]);
                     $IdentityCodesform->setDefault("bg_code",$data[0]["backgroundagency_code"]);
-                    $IdentityCodesform->setDefault("users_code",$data[0]["users_code"]);
-                    $IdentityCodesform->setDefault("requisition_code",$data[0]["requisition_code"]);
+//                    $IdentityCodesform->setDefault("users_code",$data[0]["users_code"]);
+//                    $IdentityCodesform->setDefault("requisition_code",$data[0]["requisition_code"]);
                     $IdentityCodesform->setDefault("id",$data[0]["id"]);
                     $IdentityCodesform->submit->setLabel('Update');
                     $this->view->id = $id;
@@ -141,8 +143,8 @@ class Default_IdentitycodesController extends Zend_Controller_Action
         }		
 		if(!sapp_Global::_isactivemodule(BGCHECKS))		
 		$IdentityCodesform->removeElement('bg_code');
-		if(!sapp_Global::_isactivemodule(RESOURCEREQUISITION))
-		$IdentityCodesform->removeElement('requisition_code');
+//		if(!sapp_Global::_isactivemodule(RESOURCEREQUISITION))
+//		$IdentityCodesform->removeElement('requisition_code');
         $this->view->form = $IdentityCodesform;
 		
         if($this->getRequest()->getPost())
@@ -155,7 +157,7 @@ class Default_IdentitycodesController extends Zend_Controller_Action
                 {
                     $identityCodesArr = $IdentityCodesModel->getIdentitycodesRecord();
                     $identityCodesArr = $identityCodesArr[0];
-                    $identity_data .= sapp_Global::selectOptionBuilder($identityCodesArr['users_code'], "Users (".$identityCodesArr['users_code'].")");
+                   // $identity_data .= sapp_Global::selectOptionBuilder($identityCodesArr['users_code'], "Users (".$identityCodesArr['users_code'].")");
 
 					/* Removing the codes which are not included for first phase*/
 					//$identity_data = sapp_Global::selectOptionBuilder($identityCodesArr['staffing_code'], "Staffing (".$identityCodesArr['staffing_code'].")");
@@ -266,28 +268,28 @@ class Default_IdentitycodesController extends Zend_Controller_Action
 
             $employeeCode = $this->_request->getParam('employee_code');
             $bgAgencyCode = $this->_request->getParam('bg_code');
-            $vendorCode = $this->_request->getParam('vendor_code');
-            $staffingCode = $this->_request->getParam('staffing_code');
-            $users_code = $this->_request->getParam('users_code');
-            $requisition_code = $this->_request->getParam('requisition_code');
+//            $vendorCode = $this->_request->getParam('vendor_code');
+//            $staffingCode = $this->_request->getParam('staffing_code');
+//            $users_code = $this->_request->getParam('users_code');
+//            $requisition_code = $this->_request->getParam('requisition_code');
 
             $data = array(  
                         'employee_code'=>$employeeCode,
                         'backgroundagency_code'=>$bgAgencyCode,
-                        'vendor_code'=>$vendorCode,
-                        'staffing_code'=>$staffingCode,
-                        'users_code'=>$users_code,
-                        'requisition_code'=>$requisition_code,
+//                        'vendor_code'=>$vendorCode,
+//                        'staffing_code'=>$staffingCode,
+                        'users_code'=>'USER',
+                        'requisition_code'=>'REQ',
                         'modifiedby'=>$loginUserId,
                         'modifieddate'=>gmdate("Y-m-d H:i:s")
 						
                     );
 			/* Removing the codes which we are not being using for the first phase*/
-			unset($data['vendor_code']);
-			unset($data['staffing_code']);
+//			unset($data['vendor_code']);
+//			unset($data['staffing_code']);
 			
-			if(!sapp_Global::_isactivemodule(RESOURCEREQUISITION))
-				unset($data['requisition_code']);
+//			if(!sapp_Global::_isactivemodule(RESOURCEREQUISITION))
+//				unset($data['requisition_code']);
 			if(!sapp_Global::_isactivemodule(BGCHECKS))
 				unset($data['backgroundagency_code']);
 			
@@ -304,7 +306,7 @@ class Default_IdentitycodesController extends Zend_Controller_Action
                 $where = '';
                 $actionflag = 1;
             }
-                $Id = $IdentityCodesModel->SaveorUpdateIdentitycodesData($data, $where);
+            $Id = $IdentityCodesModel->SaveorUpdateIdentitycodesData($data, $where);
             if($Id == 'update')
             {
                $tableid = $id;

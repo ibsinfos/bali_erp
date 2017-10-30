@@ -44,8 +44,8 @@
                 <input type="text" id = "ptm_date" class="form-control mydatepicker"  name="date_select" value="<?php echo $edit_data[0]['meeting_date'];?>" data-validate="required" data-message-required="Please pick a date">
             </div> 
         </div>
-        <div class="text-right">
-            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" name="save_details"><?php echo get_phrase('submit_changes');?></button>
+        <div class="text-center">
+            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" name="save_details"><?php echo get_phrase('update');?></button>
         </div>
         
     </from>

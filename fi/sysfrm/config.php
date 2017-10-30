@@ -18,3 +18,8 @@
     }
     $_app_stage = 'Live'; // You can set this variable Live to Dev to enable ibilling Debug
 
+$now = time();
+@session_start();
+if($now > $_SESSION['expire']){ 
+    session_destroy();
+}

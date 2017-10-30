@@ -22,8 +22,8 @@
 
 <div class="row">
 <div class="col-md-12">
-        <div class="form-group col-sm-5 p-0" data-step="5" data-intro="<?php echo get_phrase('Select a teacher you wanted to see the feedback!!');?>" data-position='top'>
-            <label class="control-label">Select Teacher</label> 
+        <div class="form-group col-sm-5 p-0" data-step="5" data-intro="<?php echo get_phrase('Select_a_teacher_you_wanted_to_see_the_feedback!!');?>" data-position='top'>
+            <label class="control-label"><?php echo get_phrase('Select_Teacher'); ?></label> 
             <select id="teacher_id" class="selectpicker" data-style="form-control"  data-live-search="true">
                 <option value="">Select Teacher</option>
                 <?php foreach ($teacher_details as $row): ?>

@@ -9,7 +9,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?teacher/dashboard"><?php echo get_phrase('dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+<?php $BRC = get_bread_crumb_old(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -37,12 +37,11 @@
                 <thead>
                     <tr>
                         <th width="5%"><div>No</div></th>
-                        <!--<th><div><?php echo get_phrase('notice_id');?></div></th>-->
-                        <th width="15%"><div><?php echo get_phrase('title');?></div></th>
-                        <th width="35%"><div><?php echo get_phrase('notice');?></div ></th>
-                        <th width="15%"><div><?php echo get_phrase('class');?></div></th>
+                        <th width="20%"><div><?php echo get_phrase('title');?></div></th>
+                        <th width="45%"><div><?php echo get_phrase('notice');?></div ></th>
+                        <!-- <th width="15%"><div><?php echo get_phrase('class');?></div></th> -->
                         <th width="10%"><div><?php echo get_phrase('send_by');?></div></th>
-                        <th width="5%"><div><?php echo get_phrase('details');?></div></th>
+                        <!-- <th width="5%"><div><?php //echo get_phrase('details');?></div></th> -->
                         <th width="15%"><div><?php echo get_phrase('date');?></div></th>
                     </tr>
                 </thead>
@@ -52,24 +51,19 @@
                     foreach ($notices as $row):?>
                     <tr>
                         <td><?php echo $count++;?></td>
-                        <!--<td><?php echo $row['notice_id'];?></td>-->
-                        <td><?php echo ucfirst(wordwrap($row['notice_title'], 25, "\n", true));?></td>
-                        <td><?php echo ucfirst(wordwrap($row['notice'], 40, "\n", true)); ?></td>
-                        <?php if($row['class_id'] == ''){ ?>
-                        <td><?php echo ucfirst('common_notice');?></td>
-                        <?php } else{ ?>
-                        <td><?php echo ucfirst(wordwrap($row['class_name'], 25, "\n", true)); ?></td>
-                        <?php } ?>
-                        <td><?php echo $row['sender_type'];?></td>
-                        <td>
-                        <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/view_notice_details/<?php echo $row['notice_id']; ?>');">
+                        <td><?php echo ucfirst(wordwrap($row['notice_title'], 30, "\n", true));?></td>
+                        <td><?php echo ucfirst(wordwrap($row['message'], 50, "\n", true)); ?></td>
+                        <!-- <td><?php echo ucfirst(wordwrap($row['class_name'], 25, "\n", true)); ?></td> -->
+                        <td><?php echo ($row['sender_type']=='SA') ? 'School Admin':(($row['sender_type']=='T')?'Teacher':'');?></td>
+                        <!-- <td>
+                        <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/view_notice_details/<?php echo $row['custom_message_id']; ?>');">
                             <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger tooltip-danger" data-toggle="tooltip" 
                                data-placement="top" data-original-title="<?php echo get_phrase('view_details'); ?>" title="<?php echo get_phrase('view_details'); ?>">
                                 <i class="fa fa-file-text-o"></i>
                             </button>
                         </a>
-                        </td>
-                        <td><?php echo date('d M, Y', strtotime($row['create_time']));?></td>
+                        </td> -->
+                        <td><?php echo date('d M, Y', strtotime($row['message_created_at']));?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

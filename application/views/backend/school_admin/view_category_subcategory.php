@@ -21,12 +21,12 @@
 
 <div class="row">
     <div class="col-xs-12 m-b-20">
-        <a href="<?php echo base_url(); ?>index.php?blogs/addcategory" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add Category/Subcategory" data-step="5" data-intro="You can add a new category here!!" data-position='bottom'><i class="fa fa-plus"></i>
+        <a href="<?php echo base_url(); ?>index.php?blogs/addcategory" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add Category/Subcategory" data-step="5" data-intro="<?php echo get_phrase('You_can_add_a_new_category_here!!');?>" data-position='bottom'><i class="fa fa-plus"></i>
         </a>
     </div>
 </div>
 
-<div class="col-md-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Views the category & subcategory list');?>" data-position='top'>
+<div class="col-md-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Views_the_category_&_subcategory_list');?>" data-position='top'>
     <section>
         <div class="sttabs tabs-style-flip">
             <nav>
@@ -153,11 +153,27 @@
         });
         
     <?php } ?>
-        $('#cate a').click(function(){
-            $('#section-flip-2').css('display','none');
-            $('#section-flip-1').css('display','block');
-            $('#subcat').removeClass('tab-current');
-            $('#cate').addClass('tab-current');
-        });
+//        $('#cate a').click(function(){
+//            $('#section-flip-2').css('display','none');
+//            $('#section-flip-1').css('display','block');
+//            $('#subcat').removeClass('tab-current');
+//            $('#cate').addClass('tab-current');
+//        });
     </script>
-    
+  
+   <?php /* //$(document).ready(function(){
+//    <?php if(isset($tab) && $tab == 'subcat') { ?>
+//    $('#subcat').addClass('tab-current');
+//    $('#subcat a').click();
+//    $('#section-flip-2').css('display','block');
+//    $('#section-flip-1').css('display','none');
+//    $('#cate').removeClass('tab-current');
+//    <?php } else { ?>
+//        alert('jhjj');
+//    $('#cate').addClass('tab-current');
+//    $('#cate a').click();
+//    $('#section-flip-2').css('display','none');
+//    $('#section-flip-1').css('display','block');
+//    $('#subcat').removeClass('tab-current');
+//    <?php } ?>
+//}); */ ?>

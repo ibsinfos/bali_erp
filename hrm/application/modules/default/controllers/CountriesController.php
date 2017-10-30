@@ -550,7 +550,7 @@ class Default_CountriesController extends Zend_Controller_Action
 				$tableid = $Id; 	
 				$menuID = COUNTRIES;
 				$result = sapp_Global::logManager($menuID,$actionflag,$loginUserId,$tableid);
-				$countryData = $countriesmodel->fetchAll("isactive = '1' AND school_id ='".$school_id."'",'country')->toArray();
+				$countryData = $countriesmodel->fetchAll("isactive = '1'",'country')->toArray();
 				$opt ='';   
 				foreach($countryData as $record)
 				{

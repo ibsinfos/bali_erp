@@ -7,7 +7,7 @@
        <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -21,10 +21,10 @@
 
 
 <div class="col-md-12 white-box">
-<?php echo form_open(base_url() . 'index.php?school_admin/teacher_attendance_report_selector/'); ?>
-<div class="col-sm-4 form-group" data-step="7" data-intro="<?php echo get_phrase('Select a month for which you want to see the attendance report.');?>" data-position='top'>
+<?php echo form_open(base_url() . 'index.php?school_admin/teacher_attendance_report/'); ?>
+<div class="col-sm-4 form-group" data-step="7" data-intro="<?php echo get_phrase('Select_a_month_for_which_you_want_to_see_the_attendance_report.');?>" data-position='top'>
     <label for="field-1" class="control-label" style="margin-bottom: 5px;"><?php echo get_phrase('select_month');?><span class="error" style="color: red;"> *</span></label>
-    <select  class="selectpicker" data-style="form-control" data-live-search="true" name="month" required >
+    <select class="selectpicker" data-style="form-control" data-live-search="true" name="month" required>
         <option value=""><?php echo get_phrase('select_month'); ?></option>
         <option value="1"><?php echo get_phrase('January'); ?></option>
         <option value="2"><?php echo get_phrase('February'); ?></option>
@@ -44,7 +44,7 @@
 
 <input type="hidden" name="year" value="<?php echo $running_year;?>">
 <div class="text-right col-xs-12" >
-    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="8" data-intro="<?php echo get_phrase('Click here to view the report of selected class and month.');?>" data-position='left'><?php echo get_phrase('VIEW REPORT');?></button>
+    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="8" data-intro="<?php echo get_phrase('Click_here_to_view_the_report_of_selected_class_and_month.');?>" data-position='left'><?php echo get_phrase('VIEW_REPORT');?></button>
 </div>
 <?php echo form_close(); ?>
 </div>

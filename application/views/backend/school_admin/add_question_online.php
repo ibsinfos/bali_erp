@@ -1,3 +1,9 @@
+<style>
+#radioBtn .notActive{
+    color: #3276b1 !important;  
+    background-color: #fff !important;
+}
+</style>
 <div class="row bg-title"> 
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
@@ -38,29 +44,29 @@
                 </div>
             </div>
       
-      
-            <div class="col-md-12 head-sub"><b><?php echo get_phrase('questions_type'); ?></b></div>
-            
+      <div class="row ">
+           <br/>
             <div class="col-md-12"> 
                 <div class="add-quest"> 
-                    <div class="col-md-3"  data-step="5" data-intro="You can add objective type of questions from." data-position='top'>  
-                        <label class="form-check-label">
+                <div data-toggle="buttons">
+                    <div class="col-md-4"  data-step="5" data-intro="<?php echo get_phrase('You_can_add_objective_type_of_questions_from.'); ?>" data-position='top'>  
+                        <label onclick="show_tabs_list();" class=" btn btn-primary active">
                             <input class="form-check-input" type="radio" 
                                    name="question_type" value="1" checked="checked" onclick="show_tabs_list();" id="question_type" >
                                    <?php echo get_phrase('objective_questions'); ?>
                         </label> 
                     </div>
-                    <div class="col-md-3"  data-step="6" data-intro="You can add TRUE/FALSE type of questions from." data-position='top'> 
-                        <label class="form-check-label">
-                            <input class="form-check-input" type="radio" 
+                    <div class="col-md-4" onclick="view_true_false();" data-step="6" data-intro="<?php echo get_phrase('You_can_add_TRUE/FALSE_type_of_questions_from..'); ?>" data-position='top'> 
+                        <label class="btn btn-primary">
+                            <input class="" type="radio" 
                                    name="question_type" value="2" onclick="view_true_false();" id="question_type" >
                                    <?php echo get_phrase('true_/_false'); ?>
                         </label> 
 
 
                     </div>
-                    <div class="col-md-3"  data-step="7" data-intro="You can add FILl IN THE BLANK type of questions from." data-position='top'> 
-                        <label class="form-check-label">
+                    <div class="col-md-4"  data-step="7" data-intro="<?php echo get_phrase('You_can_add_FILl_IN_THE_BLANK_type_of_questions_from.'); ?>" data-position='top'> 
+                        <label onclick="fill_inblank();" class="btn btn-primary">
                             <input class="form-check-input" type="radio" 
                                    name="question_type" value="3" onclick="fill_inblank();" id="question_type">
                                    <?php echo get_phrase('fill_in_the_blanks'); ?>
@@ -75,11 +81,11 @@
                                    <?php echo get_phrase('Subjective'); ?>
                         </label> 
                     </div>    -->
-
+                    </div>
                     </div>
 
                 </div> 
-
+    </div>
 
 
             <div class="panel-body" id="tabs" >
@@ -391,11 +397,23 @@
             var order = $(this).val();
             validate_order(order);
         });
+        $('#radioBtn a').on('click', function(){
+    var sel = $(this).data('title');
+    var tog = $(this).data('toggle');
+    $('#'+tog).prop('value', sel);
+    
+    $('a[data-toggle="'+tog+'"]').not('[data-title="'+sel+'"]').removeClass('active').addClass('notActive');
+    $('a[data-toggle="'+tog+'"][data-title="'+sel+'"]').removeClass('notActive').addClass('active');
+});
 
     });
       function validate_order(order) {
         $('#order_error').hide();
+        <?php if($exam_id!=''){ ?>
         var exam_id = <?php echo $exam_id;?>;
+        <?php } else { ?> 
+        var exam_id = 0;
+        <?php } ?>
         mycontent = $.ajax({
             async: false,
             dataType: 'json',
@@ -648,4 +666,3 @@
     }
 
 </style>
-

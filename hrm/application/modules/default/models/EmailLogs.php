@@ -87,11 +87,18 @@ class Default_Model_EmailLogs extends Zend_Db_Table_Abstract
     public function getEmpExpiryData($calc_date)
     {
         $db = Zend_Db_Table::getDefaultAdapter();
+//        $query = "select v.user_id,case when v.passport_expiry_date = '".$calc_date."' 
+//                  then 'passport' when v.visa_expiry_date = '".$calc_date."' then 'visa' when 
+//                  v.ininetyfour_expiry_date = '".$calc_date."' then 'i94'  end etype 
+//                  from main_empvisadetails v  
+//                  where  '".$calc_date."' in (v.passport_expiry_date,v.ininetyfour_expiry_date,
+//                  v.visa_expiry_date) and v.isactive = 1";
+        
         $query = "select v.user_id,case when v.passport_expiry_date = '".$calc_date."' 
                   then 'passport' when v.visa_expiry_date = '".$calc_date."' then 'visa' when 
-                  v.ininetyfour_expiry_date = '".$calc_date."' then 'i94'  end etype 
+                  v.work_permit_expiry_date = '".$calc_date."' then 'workpermit' end etype 
                   from main_empvisadetails v  
-                  where  '".$calc_date."' in (v.passport_expiry_date,v.ininetyfour_expiry_date,
+                  where  '".$calc_date."' in (v.passport_expiry_date,v.work_permit_expiry_date,
                   v.visa_expiry_date) and v.isactive = 1";
         
         $result = $db->query($query);

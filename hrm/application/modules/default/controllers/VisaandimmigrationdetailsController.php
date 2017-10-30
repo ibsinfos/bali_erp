@@ -340,6 +340,7 @@ class Default_VisaandimmigrationdetailsController extends Zend_Controller_Action
 		 		$auth = Zend_Auth::getInstance();
 		 		if($auth->hasIdentity()){
 		 			$loginUserId = $auth->getStorage()->read()->id;
+                                        $school_id = $auth->getStorage()->read()->school_id;
 		 		}
 		 		$passport_num = new Zend_Form_Element_Text('passport_number');
 		 		$flag=true;
@@ -368,18 +369,22 @@ class Default_VisaandimmigrationdetailsController extends Zend_Controller_Action
 		 			$visa_type = $this->_request->getParam('visa_type');
 		 			$visa_issue_date = $this->_request->getParam('visa_issue_date',null);
 		 			$visa_expiry_date = $this->_request->getParam('visa_expiry_date',null);
-		 			$inine_status = $this->_request->getParam('inine_status');
-		 			$inine_review_date = $this->_request->getParam('inine_review_date',null);
+//		 			$inine_status = $this->_request->getParam('inine_status');
+//		 			$inine_review_date = $this->_request->getParam('inine_review_date',null);
 		 			$issuing_authority = $this->_request->getParam('issuing_authority');
-		 			$ininetyfour_status = $this->_request->getParam('ininetyfour_status');
-		 			$ininetyfour_expiry_date = $this->_request->getParam('ininetyfour_expiry_date',null);
+                                        $emirates_id = $this->_request->getParam('emirates_id');
+		 			$emirates_renewal_date = $this->_request->getParam('emirates_renewal_date',null);
+//		 			$ininetyfour_status = $this->_request->getParam('ininetyfour_status');
+//		 			$ininetyfour_expiry_date = $this->_request->getParam('ininetyfour_expiry_date',null);
+                                        $work_permit_expiry_date = $this->_request->getParam('work_permit_expiry_date',null);
 		 	
 		 			$passport_issue = sapp_Global::change_date($passport_issue_date, 'database');
 		 			$passport_expiry = sapp_Global::change_date($passport_expiry_date, 'database');
 		 			$visa_issue = sapp_Global::change_date($visa_issue_date, 'database');
 		 			$visa_expiry = sapp_Global::change_date($visa_expiry_date, 'database');
-		 			$inine_review = sapp_Global::change_date($inine_review_date, 'database');
-		 			$ininetyfour_expiry = sapp_Global::change_date($ininetyfour_expiry_date, 'database');
+		 			$emirates_renew = sapp_Global::change_date($emirates_renewal_date, 'database');
+		 			//$ininetyfour_expiry = sapp_Global::change_date($ininetyfour_expiry_date, 'database');
+                                        $work_permit_expiry = sapp_Global::change_date($work_permit_expiry_date, 'database');
 		 	
 		 			$data = array(  'passport_number'=>$passport_num,
 		 					'passport_issue_date'=>$passport_issue,
@@ -388,14 +393,14 @@ class Default_VisaandimmigrationdetailsController extends Zend_Controller_Action
 		 					'visa_type'=>$visa_type,
 		 					'visa_issue_date'=>$visa_issue,
 		 					'visa_expiry_date'=>$visa_expiry,
-		 					'inine_status'=>$inine_status,
-		 					'inine_review_date'=>$inine_review,
 		 					'issuing_authority'=>$issuing_authority,
-		 					'ininetyfour_status'=>$ininetyfour_status,
-		 					'ininetyfour_expiry_date'=>$ininetyfour_expiry,
+		 					'emirates_id'=>$emirates_id,
+		 					'emirates_renewal_date'=>$emirates_renew,
 		 					'user_id'=>$user_id,
 		 					'modifiedby'=>$loginUserId,
-		 					'modifieddate'=>gmdate("Y-m-d H:i:s")
+		 					'modifieddate'=>gmdate("Y-m-d H:i:s"),
+                                                        'work_permit_expiry_date'=>$work_permit_expiry,
+                                                        'school_id' => $school_id,
 		 			);
 		 			if($id!=''){
 		 				$where = array('id=?'=>$id);
@@ -459,6 +464,22 @@ class Default_VisaandimmigrationdetailsController extends Zend_Controller_Action
 		 		$emptyFlag=0;
 		 		$Visaandimmigrationdetailsform = new Default_Form_Visaandimmigrationdetails();
 		 		$visaandimmigrationdetailsModel = new Default_Model_Visaandimmigrationdetails();
+
+                                $authoritiesmodel = new Default_Model_Authorities();
+                                $authoritiesData = $authoritiesmodel->getAuthoritiesOptions(); 
+                                $Visaandimmigrationdetailsform->issuing_authority->addMultiOption('','Select Issuing Athority');
+                                if(!empty($authoritiesData))
+                                {
+                                    foreach ($authoritiesData as $authorityRes){
+                                            $Visaandimmigrationdetailsform->issuing_authority->addMultiOption($authorityRes['id'],$authorityRes['name']);
+                                    }
+                                }
+                                else
+                                {
+                                        $msgarray['issuing_authority'] = 'Issuing Authorities are not configured yet.';
+                                        $emptyFlag++;
+                                }
+                                
 		 		$msgarray = array();
 		 		$Visaandimmigrationdetailsform->setAttrib('action',BASE_URL.'visaandimmigrationdetails/addpopup/unitId/'.$id);
 		 		$this->view->form = $Visaandimmigrationdetailsform;
@@ -489,13 +510,29 @@ class Default_VisaandimmigrationdetailsController extends Zend_Controller_Action
 		 	
 		 		$Visaandimmigrationdetailsform = new Default_Form_Visaandimmigrationdetails();
 		 		$visaandimmigrationdetailsModel = new Default_Model_Visaandimmigrationdetails();
+                                
+                                $authoritiesmodel = new Default_Model_Authorities();
+                                $authoritiesData = $authoritiesmodel->getAuthoritiesOptions(); 
+                                $Visaandimmigrationdetailsform->issuing_authority->addMultiOption('','Select Issuing Athority');
+                                if(!empty($authoritiesData))
+                                {
+                                    foreach ($authoritiesData as $authorityRes){
+                                            $Visaandimmigrationdetailsform->issuing_authority->addMultiOption($authorityRes['id'],$authorityRes['name']);
+                                    }
+                                }
+                                else
+                                {
+                                        $msgarray['issuing_authority'] = 'Issuing Authorities are not configured yet.';
+                                        $emptyFlag++;
+                                }
 		 		
 		 		if($id)
 		 		{
 		 			$data = $visaandimmigrationdetailsModel->getsinglevisadetailsRecord($id);
 		 			if(!empty($data))
 		 			{
-		 				$Visaandimmigrationdetailsform->populate($data[0]);
+                                            $Visaandimmigrationdetailsform->setDefault('issuing_authority',$data['issuing_authority']);
+                                            $Visaandimmigrationdetailsform->populate($data[0]);
 		 			}
 		 		}
 		 		$Visaandimmigrationdetailsform->setAttrib('action',BASE_URL.'visaandimmigrationdetails/editpopup/unitId/'.$userid);

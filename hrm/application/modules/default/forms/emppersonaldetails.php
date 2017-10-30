@@ -40,17 +40,17 @@ class Default_Form_emppersonaldetails extends Zend_Form
 		$maritalstatusid->addMultiOption('','Select Marital Status');
         $maritalstatusid->setRegisterInArrayValidator(false);
 		
-		$ethniccodeid = new Zend_Form_Element_Select('ethniccodeid');
-		$ethniccodeid->addMultiOption('','Select Ethnic Code');
-		$ethniccodeid->setLabel('Ethnic Code');
-        $ethniccodeid->setRegisterInArrayValidator(false);
-        
-		
-
-        $racecodeid = new Zend_Form_Element_Select('racecodeid');
-		$racecodeid->addMultiOption('','Select Race Code');
-		$racecodeid->setLabel('Race Code');
-        $racecodeid->setRegisterInArrayValidator(false);
+//		$ethniccodeid = new Zend_Form_Element_Select('ethniccodeid');
+//		$ethniccodeid->addMultiOption('','Select Ethnic Code');
+//		$ethniccodeid->setLabel('Ethnic Code');
+//        $ethniccodeid->setRegisterInArrayValidator(false);
+//        
+//		
+//
+//        $racecodeid = new Zend_Form_Element_Select('racecodeid');
+//		$racecodeid->addMultiOption('','Select Race Code');
+//		$racecodeid->setLabel('Race Code');
+//        $racecodeid->setRegisterInArrayValidator(false);
         
 		
         

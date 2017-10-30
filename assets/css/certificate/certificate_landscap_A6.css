@@ -1,0 +1,243 @@
+ body {
+	margin: 0;
+	padding: 0;
+ }
+ 
+ #background 
+{ 
+	 left: 0px; 
+	 top: 0px; 
+	 position: relative; 
+	 margin-left: auto; 
+	 margin-right: auto; 
+	 width: 1748px;
+	 height: 1233px; 
+	 overflow: hidden;
+	 z-index:0;
+	} 
+
+ #BG 
+{ 
+	 left: -5px; 
+	 top: 0px; 
+	 position: absolute; 
+	 width: 1758px;
+	 height: 1233px;
+	 z-index:1;
+} 
+
+ #Shape6 
+{ 
+	 left: 27px; 
+	 top: 19px; 
+	 position: absolute; 
+	 width: 1694px;
+	 height: 1195px;
+	 z-index:2;
+} 
+
+ #Shape7 
+{ 
+	 left: 43px; 
+	 top: 35px; 
+	 position: absolute; 
+	 width: 1662px;
+	 height: 1163px;
+	 z-index:3;
+} 
+
+ #Ribbon 
+{ 
+	 left: 341px; 
+	 top: 126px; 
+	 position: absolute; 
+	 width: 1066px;
+	 height: 211px;
+	 z-index:4;
+} 
+
+ #Shape13 
+{ 
+	 left: 1205px; 
+	 top: 181px; 
+	 position: absolute; 
+	 width: 55px;
+	 height: 53px;
+	 z-index:5;
+} 
+
+ #Shape14 
+{ 
+	 left: 489px; 
+	 top: 181px; 
+	 position: absolute; 
+	 width: 55px;
+	 height: 52px;
+	 z-index:6;
+} 
+
+ #Shape15 
+{ 
+	 left: 647px; 
+	 top: 343px; 
+	 position: absolute; 
+	 width: 452px;
+	 height: 4px;
+	 z-index:7;
+} 
+
+ #THISCERTIFICATEISPRE 
+{ 
+         color: #58595B;
+         font-size: 18px;
+         text-align: center;
+         font-family: Bodoni MT;
+	 left: 625px; 
+	 top: 305px; 
+	 position: absolute; 
+	 width: 496px;
+	 height: 21px;
+	 z-index:8;
+} 
+
+ #CERTIFICATE 
+{ 
+         color:white;
+         font-size: 40px;
+         font-family: Trajan Pro;
+         text-align: center;
+	 left: 575px; 
+	 top: 178px; 
+	 position: absolute; 
+	 width: 595px;
+	 height: 61px;
+	 z-index:9;
+} 
+
+ #Shape18 
+{ 
+	 left: 766px; 
+	 top: 946px; 
+	 position: absolute; 
+	 width: 216px;
+	 height: 197px;
+	 z-index:10;
+} 
+
+ #Shape19 
+{ 
+	 left: 792px; 
+	 top: 970px; 
+	 position: absolute; 
+	 width: 164px;
+	 height: 150px;
+	 z-index:11;
+} 
+
+ #CERTIFIED 
+{ 
+	 left: 808px; 
+	 top: 1034px; 
+	 position: absolute; 
+	 width: 131px;
+	 height: 20px;
+	 z-index:12;
+} 
+
+ #Starsbottom 
+{ 
+	 left: 834px; 
+	 top: 1074px; 
+	 position: absolute; 
+	 width: 80px;
+	 height: 31px;
+	 z-index:13;
+} 
+
+ #Starstop 
+{ 
+	 left: 834px; 
+	 top: 983px; 
+	 position: absolute; 
+	 width: 80px;
+	 height: 31px;
+	 z-index:14;
+} 
+
+ #DATE 
+{ 
+	 left: 365px; 
+	 top: 1100px; 
+	 position: absolute; 
+	 width: 92px;
+	 height: 27px;
+	 z-index:15;
+} 
+
+ #Shape16copy 
+{ 
+	 left: 281px; 
+	 top: 1086px; 
+	 position: absolute; 
+	 width: 259px;
+	 height: 4px;
+	 z-index:16;
+} 
+
+ #SIGNATURE 
+{ 
+	 left: 1232px; 
+	 top: 1101px; 
+	 position: absolute; 
+	 width: 211px;
+	 height: 26px;
+	 z-index:17;
+} 
+
+ #Shape16 
+{ 
+	 left: 1208px; 
+	 top: 1086px; 
+	 position: absolute; 
+	 width: 259px;
+	 height: 4px;
+	 z-index:18;
+} 
+
+ #Loremipsumdolorsitam 
+{ 
+  
+         font-family: Century Schoolbook;
+         font-size: 15px;
+         text-align:center;
+	 left: 279px; 
+	 top: 708px; 
+	 position: absolute; 
+	 width: 1190px;
+	 height: 99px;
+	 z-index:19;
+} 
+
+ #JOHNSMITH 
+{ 
+         font-family: Century;
+         font-size: 80px;
+         text-align:center;
+	 left: 398px; 
+	 top: 508px; 
+	 position: absolute; 
+	 width: 950px;
+	 height: 125px;
+	 z-index:20;
+} 
+
+#date_format
+{
+        font-family: Century Schoolbook;
+        font-size: 15px;
+        left: 352px; 
+        align: center;
+	top: 1070px; 
+	position: absolute; 
+	z-index:15;
+}

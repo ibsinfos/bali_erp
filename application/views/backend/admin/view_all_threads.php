@@ -25,7 +25,7 @@
 <div class="col-md-12 white-box">
 <div class="row">
     <div class="col-md-12 m-b-20">
-         <a href="<?php echo base_url(); ?>index.php?discussion_forum/create_thread/" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Thread" data-step="5" data-intro="Here you can post a new disucssion topic" data-position='left'><i class="fa fa-plus"></i>
+         <a href="<?php echo base_url(); ?>index.php?discussion_forum/create_thread/" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Thread" data-step="5" data-intro="<?php echo get_phrase('Here_you_can_post_a_new_disucssion_topic');?>" data-position='left'><i class="fa fa-plus"></i>
         </a>
     </div>
 </div>

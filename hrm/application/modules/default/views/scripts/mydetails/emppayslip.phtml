@@ -1,8 +1,23 @@
 <link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/payslip_style.css" />
 <style type="text/css">
-    
-    .home_menu .menu-head{
-        height: 42px;
+    @media print 
+    {
+       @page
+       {
+        size: 8.3in 5.8in;
+        size: A5;
+        margin: 0;
+      }
+
+      html, body {
+        width: 8.3in;
+        height: 5.8in;
+      }
+
+      .earning_deduct{
+          display: none !important;
+      }
     }
     </style>
 <?php
@@ -28,7 +43,7 @@
 ?>
  <?php echo $this->headScript()->prependFile(
         $this->baseUrl('\public\scripts\jquery.fileDownload-master\src\Scripts\jquery.fileDownload.js')); ?>
-
+<?php $months = array('1' => 'Jan', '2'=>'Feb', '3'=>'Mar', '4'=>'Apr', '5'=>'May', '6'=>'Jun', '7'=>'Jul', '8'=>'Aug', '9'=>'Sep', '10'=>'Oct', '11'=>'Nov', '12'=>'Dec');?>
 <?php if (empty($this->empdata)) { ?>
     <div class="ml-alert-1-info">
         <div class="style-1-icon info"></div>
@@ -58,32 +73,78 @@
     $empLeaveData=$this->empLeaveData;
 
     if($empLeaveData['emp_leave_limit']>=$empLeaveData['used_leaves']) { 
-            $lop=0;
-        }else{
-            $lop=$empLeaveData['used_leaves']-$empLeaveData['emp_leave_limit'];
-        }
+        $lop=0;
+    }else{
+        $lop=$empLeaveData['used_leaves']-$empLeaveData['emp_leave_limit'];
+    }
 
-        $presentDays=30-$lop;
-        $salaryForPresentDays=$presentDays*$salaryPerDay;
-        $deductedSalary=$salaryPerDay*$lop;
-        $netPay=$this->netPayDetails[0]['net_pay']-$deductedSalary;
+    $presentDays=30-$lop;
+    $salaryForPresentDays=$presentDays*$salaryPerDay;
+    $deductedSalary=$salaryPerDay*$lop;
+    $netPay=$this->netPayDetails[0]['net_pay']-$deductedSalary;
+    
+    $doj = $this->doj;
+//    $dojLastDayOfMonth = date('t',mktime(0, 0, 0, date('m',strtotime($doj)),10));
+//    $joinDate = date('d',strtotime($doj));
+//    
+//    $workingDays = $dojLastDayOfMonth - $joinDate + 1;
+    
+    $payslipGenMonth = $this->empPayslipData[0]['payslip_month'];
+    $last_day_this_month  = date('t',mktime(0, 0, 0, date('m',strtotime($doj)),10));
+    $joinDate = date('d',strtotime($doj));
+    if(date('m',strtotime($doj)) == date('m',strtotime('-1 month'))){
+        $workingDays = $last_day_this_month - $joinDate + 1;
+        $firstDayOfPayslipMonth = date('F j, Y', strtotime($doj));
+    } else if(date('m',strtotime($doj)) == $payslipGenMonth && date('Y',strtotime($doj)) == date('Y')) {
+        $dojLastDayOfMonth = date('t',mktime(0, 0, 0, date('m',strtotime($doj)),10));
+        $workingDays = $dojLastDayOfMonth - $joinDate + 1;
+        $firstDayOfPayslipMonth = date('F j, Y', strtotime($doj));
+    } 
+    else {
+        $workingDays = date('t',mktime(0, 0, 0, date('m',strtotime($doj)),10));
+        $firstDayOfPayslipMonth = date('F 01, Y',mktime(0, 0, 0, $this->empPayslipData[0]['payslip_month'],10));
+    }
 ?>    
 
 <!-- Code by Shuchita -->
+
+
+ <div style="width: 100%; float: left; margin-bottom: 20px;">
+     <select name="year" id="year" onchange="showPayslipByMonth();">
+                <option value="">Select Year</option>
+                <?php for($i=2000;$i<=2017;$i++) { ?>
+                <option value="<?php echo $i;?>"><?php echo $i;?></option>
+                <?php } ?>
+            </select>
+            <select name="month" id="month" onchange="showPayslipByMonth();">
+                <option value="">Select Month</option>
+                <?php foreach ($months AS $k => $v):
+                    if($k==(date('n'))){
+                        break;
+                    }
+                    if($k<10){
+                        $k="0".$k;
+                    }?>
+                <option value="<?php echo $k;?>"><?php echo $v;?></option>
+                <?php endforeach;?>
+            </select>
+            <input type="hidden" name="emp_id" id="emp_id" value="<?php echo $this->id; ?>">
+        </div>
  
-<div class="right-block-data right-over-border"> 
+<div class="right-block-data right-over-border" style="min-height:0;"> 
         <div id="error_message" style="display:none;"></div>
         <!--<div class="ml-alert-1-info m1-info-set">
                 <div class="style-1-icon info"></div>Feature will be available soon.
         </div>-->
+        
         <div id="winPrint">
             
             <div class="slimScrollDiv">
                 <div id="empleavesummary" class="details_data_display_block newtablegrid" style="width:100% !important;">
                    <div class="row">
         <div class="row">
-            <div class="col-md-12">
-                <span class="text-left">
+            <div class="col-md-12 text-center">
+                <span>
                     <?php 
                     $organizationImg = new Zend_Session_Namespace('organizationinfo');
                     $hideshowmainmenu = $organizationImg->hideshowmainmenu;
@@ -99,8 +160,16 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-info">
-                    <div class="panel-heading">Company Name here</div>
-                    <div class="text-center year_info"><b>Payslip For June 2017</b></div>
+                    <div class="text-center year_info">
+                        <b>Payslip For <?php  echo date('F',mktime(0, 0, 0, $this->empPayslipData[0]['payslip_month'],10)); echo ' '; echo date('Y',strtotime($this->empPayslipData[0]['payslip_year'])); ?> <br/>
+                            </b>
+                        <?php
+                            $prev_month = date('m',mktime(0, 0, 0, $this->empPayslipData[0]['payslip_month'],10));
+                            $first_day_this_month = $firstDayOfPayslipMonth;// date('F 01, Y',mktime(0, 0, 0, $this->empPayslipData[0]['payslip_month'],10)); // hard-coded '01' for first day
+                            $last_day_this_month  = date('F t, Y',mktime(0, 0, 0, $this->empPayslipData[0]['payslip_month'],10));
+                            ?>
+                            (<b>Payslip Period: </b><?php echo $first_day_this_month; ?> - <?php echo $last_day_this_month; ?>)
+                    </div>
                     <div class="panel-body">
 
                         <table class="table table-bordered">
@@ -112,35 +181,23 @@
                                     <td colspan="2"><?php echo $this->employeedata['userfullname']; ?></td>
                                 </tr>
                                 <tr>
-                                    <th class="info" colspan="1">Bank</th>
+                                    <th class="info" colspan="1">Bank Name</th>
                                     <td colspan="2"><?php echo $this->salarydetails['bankname']; ?></td>
                                     <th class="info" colspan="1">Bank A/C No.</th>
                                     <td colspan="2"><?php echo $this->salarydetails['accountnumber']; ?></td>
                                 </tr>
                                 <tr>
-                                    <th class="info" colspan="1">DOJ</th>
+                                    <th class="info" colspan="1">Date of Joining</th>
                                     <td colspan="2"><?php echo $this->employeedata['selecteddate'];?></td>
-                                    <th class="info" colspan="1">LOP Days</th>
+                                    <th class="info" colspan="1">Leaves</th>
                                     <td colspan="2"><?=$lop?></td>
                                 </tr>
                                 <tr>
                                     <th class="info" colspan="1">Employee Id</th>
                                     <td colspan="2"><?php echo $this->employeedata['employeeId'];?></td>
-                                    <th class="info" colspan="1">STD Days</th>
-                                    <td colspan="2">30</td>
+                                    <th class="info" colspan="1">Working Days</th>
+                                    <td colspan="2"><?php echo $workingDays; ?></td>
                                 </tr>
-                                <?php /*<tr>
-                                    <th class="info" colspan="1">Location</th>
-                                    <td colspan="2">1234567890</td>
-                                    <th class="info" colspan="1">Worked Days</th>
-                                    <td colspan="2">Deepak Gupta</td>
-                                </tr>
-                                <tr>
-                                    <th class="info" colspan="1">Department</th>
-                                    <td colspan="2">1234567890</td>
-                                    <th class="info" colspan="1">Designation</th>
-                                    <td colspan="2">Deepak Gupta</td>
-                                </tr>*/?>
                             </tbody>
                         </table>
                     </div>
@@ -152,46 +209,77 @@
             <div class="col-md-12 table-responsive">
                 <table class="table table-bordered">
                     <thead>
-                        <tr class="info">
-                            <th class="text-center" width="30%">Earnings</th>
-                            <th class="text-center">Amount NO.</th>
-                            <th class="text-center" width="30%">Deduction</th>
-                            <th class="text-center">Amount in RS.</th>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <th width='25%'>
+                                            Earnings
+                                        </th>
+                                        <th width='25%'>
+                                            Amount
+                                        </th>
+                                        <th width='25%'>
+                                            Deduction
+                                        </th>
+                                        <th width='25%'>
+                                            Amount
+                                        </th>
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="2">
-                                <div class="col-md-12">
-                                    <?php foreach($this->earningColArr as $k => $v):?>
-                                    <div class="col-md-6"><?php echo $v['name'];?></div>
-                                    <div class="col-md-6 text-right"><?php echo number_format($v['value'],2);?></div>
-                                    <?php endforeach;?>
-                                </div>
-                            </td>
-                            <td colspan="2">
-                                <div class="col-md-12">
-                                    <?php foreach($this->deductColArr as $k => $v):?>
-                                    <div class="col-md-6"><?php echo $v['name'];?></div>
-                                    <div class="col-md-6 text-right"><?php echo number_format($v['value'],2);?></div>
-                                    <?php endforeach;?>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="col-md-6">LOP Amount</div>
-                                    <div class="col-md-6 text-right"><?=number_format($deductedSalary,2)?></div>
-                                </div>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td width='50%'>
+                                            <table>
+                                                <tr style="font-weight:bold;">
+                                                    <td width='25%'>Basic Salary</td>
+                                                    <td width='25%'><?php echo number_format($this->salarydetails['salary'],2);?></td>
+                                                </tr>
+                                                <?php $p=1; foreach($this->earningColArr as $k => $v):?>
+                                                <tr>
+                                                    <td width='25%'><?php echo $p==1?'Amount Payable':$v['name'];?></td>
+                                                    <td width='25%'><?php echo number_format($v['value'],2);?></td>
+                                                </tr>
+                                                <?php $p++; endforeach;?>
+                                            </table>  
+                                        </td>
+                                        <td width='50%'>
+                                            <table>
+                                                <?php foreach($this->deductColArr as $k => $v):?>
+                                                <tr>
+                                                    <td width='25%'><?php echo $v['name'];?></td>
+                                                    <td width='25%'><?php echo number_format($v['value'],2);?></td>
+                                                </tr>
+                                                <?php endforeach;?>
+                                                <tr>
+                                                    <td width='25%'>LOP Amount</td>
+                                                    <td width='25%'><?=number_format($deductedSalary,2)?></td>
+                                                </div>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td class="text-right"><b>NET Earning</b></td>
-                            <td class="text-left"><b><?php echo number_format($netPay,2);?></b></td>
-                            <td></td>
+                            <td>
+                                <table>
+                                    <tr>
+                                       <td width='50%'><b>Net Earning</b></td>
+                                       <td width='50%'><b><?php echo number_format($netPay,2); echo ' '; echo $this->currency['currencycode'];?></b></td> 
+                                    </tr>
+                                </table>
+                            </td>
                         </tr>
-
                     </tbody>
                 </table>
-                <span>**This is computer generated Payslip and does not require signature and stamp.</span>
+                <span>**This is computer generated payslip and does not require signature.</span>
             </div>
         </div>
     </div>
@@ -200,20 +288,14 @@
 
             </div>
 
-            <div class="clear"></div>
-            <div style="height:50px !important; width:100% !important;"></div>
-            
-
-            <div class="clear"></div>
-            <div style="height:50px !important; width:100% !important;"></div>
-            
         </div>
         
-        <div align="center">
+        
+    </div>
+    <div class="col-md-12" align="center">
             <input type="button" value="Print" class="print" onclick="printSalarySlip();">
-            <input type="button" value="PDF" class="print" onclick="salarySlipPDF();">
+<!--            <input type="button" value="PDF" class="print" onclick="salarySlipPDF();">-->
         </div>
-    </div>	
     </div>
     <?php
 }
@@ -260,35 +342,65 @@
         });
     
     }
-    function PrintElem(elem)
-{
-    var mywindow = window.open('', 'PRINT', 'height=400,width=600');
+   
+   function PrintElem(elem)
+    {
+        var mywindow = window.open('', 'PRINT', 'height=400,width=600,location=no,titlebar=no,toolbar=0,scrollbars=0,status=0');
 
-    mywindow.document.write('<html><head><title>Sharad Technologies LLC - School ERP</title><style type="text/css">*{-webkit-print-color-adjust: exact !important; }.col-md-6{width:49% !important; float:left !important;}.text-right{text-align:right !important;}.info,.panel-info>.panel-heading{background-color:#d9edf7 !important;-webkit-print-color-adjust: exact !important; padding: 10px 15px; border-bottom: 1px solid transparent; border-top-left-radius: 3px; border-top-right-radius: 3px;}.newtablegrid table {color: #3B3B3B;font-family: "Roboto Regular";font-size: 13px;line-height: 25px; position: relative;width: 100%;border-collapse: collapse;}.table-bordered {border: 1px solid #ddd; }th,td{border: 1px solid #ddd !important; text-align:left !important; padding:8px !important;}.text-center{text-align:center;}.year_info{padding:20px 10px !important;}</style>');
-    mywindow.document.write('</head><body >');
-    
-    mywindow.document.write('<h1>Sharad Technologies LLC - School ERP</h1>');
-    mywindow.document.head.innerHTML+='<link rel="stylesheet" type="text/css" href="http://localhost/beta_merge/hrm/public/media/css/bootstrap.min.css" />';
-    mywindow.document.write(elem);
+        mywindow.document.write('<html moznomarginboxes mozdisallowselectionprint><head><title></title><style type="text/css">*{-webkit-print-color-adjust: exact !important; }.info,.panel-info>.panel-heading{background-color:#d9edf7 !important;-webkit-print-color-adjust: exact !important;} th, td{font-size:12px !important; vertical-align: top;} table{vertical-align:text-top !important; border:none !important;}.table-bordered > thead > tr > td, .table-bordered > thead > tr > th{border-bottom-width:0 !important; border-left-width: 0 !important; border-right-width: 0 !important;}</style>');
+        mywindow.document.write('<link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/bootstrap.min.css" /><link rel="stylesheet" type="text/css" href="<?php echo MEDIA_PATH; ?>css/payslip_style.css" />'); 
+        mywindow.document.write('</head><body >');
 
-    mywindow.document.write('</body></html>');
-    
-    var tables=mywindow.document.getElementsByTagName('table');
-    
-    for(var i=0;i<tables.length;i++) {
-        tables[i].setAttribute('cellpadding','5');
-        tables[i].setAttribute('cellspacing','0');
-        tables[i].setAttribute('border','1');
-        tables[i].setAttribute('width','100%');
-        tables[i].setAttribute('style','margin-top:20px; border-top:0;');
+        //mywindow.document.write('<h1>Rarome LLC</h1>');
+
+        mywindow.document.write(elem);
+
+        mywindow.document.write('</body></html>');
+
+        var tables=mywindow.document.getElementsByTagName('table');
+
+        for(var i=0;i<tables.length;i++) {
+            tables[i].setAttribute('cellpadding','0');
+            tables[i].setAttribute('cellspacing','0');
+            tables[i].setAttribute('border','0');
+            tables[i].setAttribute('width','100%');
+            tables[i].setAttribute('style','margin-top:0; border:none; !important;');
+        }
+        setTimeout(3000);
+        mywindow.document.close(); // necessary for IE >= 10
+        //    mywindow.focus(); // necessary for IE >= 10*/
+        //
+        //    mywindow.print();
+        //    mywindow.close();
+
+        setTimeout(function(){ mywindow.print(); mywindow.close();}, 3000);
+
+        return true;
     }
-
-    mywindow.document.close(); // necessary for IE >= 10
-    mywindow.focus(); // necessary for IE >= 10*/
-
-    mywindow.print();
-    mywindow.close();
-
-    return true;
-}
+   
+function showPayslipByMonth(){
+        var userid = $('#emp_id').val();
+        var month = $('#month').val();
+        var year = $('#year').val();
+        //alert(userid+'||'+year+'||'+month);
+        if(month!='' && year!='') {
+            var ajaxURL='<?php echo BASE_URL;?>emppayslips/getpayslipidbymonth';
+            $.ajax({
+                url:ajaxURL,
+                type :'POST',
+                data:'year='+year+'&month='+month+'&userid='+userid,
+                success:function(msg){ 
+                    if(msg > 0) {
+                        window.location = '<?php echo BASE_URL;?>emppayslips/view/payslipid/'+msg+'/userid/'+userid;
+                    } else {
+                        alert('Payslip does not exist for selected month and year.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    var err = eval("(" + xhr.responseText + ")");
+                    alert(err.Message);
+                  }
+            });
+        }
+    }
 </script>

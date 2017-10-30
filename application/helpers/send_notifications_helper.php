@@ -24,19 +24,21 @@
  * @param $class_id class_id in case of classid
  */
 
-    function send_school_notification_new($activity, $message, $phones = array(), $emails = array(), $user_details = array(), $class_id=''){
+    function send_school_notification_new($activity, $message, $phones = array(), $emails = array(), $user_details = array(), $class_id='', $sms_type=''){
         $CI=&get_instance();
         $notification_settings = get_push_notification_settings($activity );
         $notification = array_shift($notification_settings);
 
-        if(count($notification)){
-            $user_details['sms'] = $notification['sms'];
-            $user_details['push_notify'] = $notification['push_notify'];
-            $user_details['email'] = $notification['email'];
-            $user_details['notification_link'] = $notification['notification_link'];
+        if(isset($user_details['db_store'])){
+            if(count($notification)){
+                $user_details['sms'] = $notification['sms'];
+                $user_details['push_notify'] = $notification['push_notify'];
+                $user_details['email'] = $notification['email'];
+                $user_details['notification_link'] = $notification['notification_link'];
 
-            if(($notification['sms']=='0') && ($notification['push_notify']=='0') && ($notification['email']=='0')){
-                $data['message_schedule_status'] = '0';
+                if(($notification['sms']=='0') && ($notification['push_notify']=='0') && ($notification['email']=='0')){
+                    $user_details['message_schedule_status'] = '0';
+                }
             }
         }
 
@@ -45,17 +47,26 @@
 
         $notification_link  =  $notification['notification_link'];
 
-        if($user_details['later_schedule_time']==''){
-            if($notification['push_notify'] == 1 && !empty($user_details) ) {
-                //send_push_notification($user_details,$message,$class_id,$notification_link);
-            }
+        if(!isset($user_details['later_schedule_time'])){
+            $user_details['later_schedule_time'] = '';
         }
 
-        unset($user_details['device_token']);
+        if($user_details['later_schedule_time']==''){
+            if($notification['push_notify'] == 1 && !empty($user_details) ){
+                send_push_notification($user_details,$message,$class_id,$notification_link);
+            }
+        }
+        
+
+        //if(isset($user_details['device_token'])){
+            unset($user_details['device_token']);
+        //}
 
         $CI = & get_instance();
-
-        $CI->db->insert( 'custom_message_noticeboard' , $user_details);
+        if(isset($user_details['db_store'])){
+            unset($user_details['db_store']);
+            $CI->db->insert( 'custom_message_noticeboard' , $user_details);
+        }
         
         if($user_details['later_schedule_time']==''){
             if($notification['sms'] == 1 && !empty($phones)) {
@@ -69,19 +80,20 @@
                 if(is_array($message)) {
                     if(array_key_exists('sms_message', $message)){
                         $sms_message        =   $message['sms_message'];
-                        //send_sms( $phones , $sms_message );
+                        send_sms( $phones , $sms_message, $sms_type);
                     }else if(array_key_exists('messagge_body', $message)){
                         $sms_message        =   $message['messagge_body'];
-                        //send_sms( $phones , $sms_message );
+                        send_sms( $phones , $sms_message, $sms_type);
                     }    
                 } else {
                     $sms_message        =   $message;
-                    //send_sms( $phones , $sms_message );
+                    send_sms( $phones , $sms_message, $sms_type);
                 }
             }
             
             if($notification['email'] == 1 && !empty($emails)) {
-                $CI->load->helper('email_helper');
+                send_custom_email($emails, $message['subject'] , $message['messagge_body'] , $message['to_name']);
+                /* $CI->load->helper('email_helper');
 
                 $email_config       =   create_email_params( $emails , $activity , $message);
                 //send_common_mail( $email_config['to_address'] , $email_config['subject'] , $email_config['message_body'] , ''); 
@@ -94,7 +106,7 @@
                     } else {
                         //send_common_mail( $email_config['email'] , $email_config['subject'] , $email_config['message_body'] , $email_config['to_name']); 
                     }
-                }
+                }*/
             }
         }
     }
@@ -135,10 +147,10 @@
         
         if($notification['email'] == 1 && !empty($emails)) {
             $CI->load->helper('email_helper');
-
             $email_config       =   create_email_params( $emails , $activity , $message);
-            //send_common_mail( $email_config['to_address'] , $email_config['subject'] , $email_config['message_body'] , ''); 
-
+//            echo $email_config['email']['0']; die;
+            send_common_mail( $email_config['email']['0'] , $email_config['subject'] , $email_config['message_body'] , '');
+            
             if(!empty($email_config)){
                 if(is_array($email_config['email'])) {
                     foreach( $email_config['email'] as $key=>$to_email ) {
@@ -169,7 +181,7 @@
      * @param $phone_number array() array of phone number or comma seperated string
      * @param string $message  Message to be sent
      */
-    function send_sms( $phone_number , $message ,$senderId="sharad") {
+    function send_sms( $phone_number , $message , $sms_type=false, $senderId="sharad") {
         if(is_array($phone_number)) {
             $phone_number               =       implode( "," , $phone_number);
         }
@@ -179,11 +191,18 @@
         }else{
             $senderId= str_pad($senderId,6,'_');
         }
+
+        $CI                     =   &   get_instance();
+
         $post = [
             'location'                  =>      $globalSettingsSMSDataArr[3]->description,
             'cell_phone'                =>      $phone_number,
             'message'                   =>      $message,
-            'sender_id'                  =>      $senderId
+            'sender_id'                 =>      $senderId,
+            'secret_key'                =>      SECRET,
+            'school_db_name'            =>      $CI->db->database,
+            'school_id'                 =>      $CI->session->userdata('school_id')?$CI->session->userdata('school_id'):0,
+            'sms_type'                 =>      $sms_type
         ];
 
         $url = "http://".SMS_IP_ADDR."/School/index.php/?admin/send_common_sms/"; // url for sms configured
@@ -313,7 +332,7 @@
      */
     function send_mobile_pushnotification( $message , $device_details ) {
         $url="http://".SMS_IP_ADDR."/School/index.php/?admin/send_push_notification_api/";
-        if($device_details['device_token'] !='' && $device_details['server_key'] !='' && $device_details['instance'] !=''){
+        if(isset($device_details['device_token']) && $device_details['device_token'] !='' && $device_details['server_key'] !='' && $device_details['instance'] !=''){
             $post=[
                 'token'             =>  $device_details['device_token'] ,
                 'server_key'        =>  $device_details['server_key'],
@@ -326,45 +345,6 @@
             return false;
         }
     }
-    
-
-    function create_passcode($type=''){
-        if(!empty($type)){
-            if($type==='parent'){
-                $passcode = "spa" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='admin'){
-                $passcode = "sad" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='teacher'){
-                $passcode = "sta" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='bus_driver'){
-                $passcode = "dri" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='student'){
-                $passcode = "stu" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='school_admin'){
-                $passcode = "sch" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='accountant'){
-                $passcode = "sac" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='cashier'){
-                $passcode = "sca" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }else if($type==='doctor'){
-                $passcode = "dr" . mt_rand(10000000, 99999999);
-                return $passcode;
-            }
-            else{
-                return 'invalid';
-            }            
-        }else{
-            return 'invalid';
-        }
-    }
 
     function send_custom_email($toEmail='',$subject='',$message='',$toName=""){
 
@@ -373,7 +353,7 @@
         
         $ci                     =   & get_instance();
         /******************loading models and controllers**************************/
-        $ci->load->library('email');
+        /* $ci->load->library('email');
         
         $settingsDataArr=get_data_generic_fun('settings','description',array('condition_type'=>'in','condition_in_col'=>'type','condition_in_data'=>'system_name,system_email'));
 
@@ -413,7 +393,28 @@
              return $rr=$ci->email->print_debugger();
         }else{
             return 1;
-        }
+        }*/
+
+        $settingsDataArr=get_data_generic_fun('settings','description',array('condition_type'=>'in','condition_in_col'=>'type','condition_in_data'=>'system_email'));
+
+        $from_email                   =  $settingsDataArr[0]->description;
+
+        $post = [            
+            'to_email'                =>      $toEmail,
+            'from_email'                =>    $from_email,
+            'subject'                   =>    $subject,
+            'message'                 =>      $message,
+            'to_name'                 =>      $toName,
+            'secret_key'                =>      SECRET,
+            'school_db_name'            =>      $ci->db->database
+        ];
+        
+        $url = "http://".SMS_IP_ADDR."/auto_instance/index.php/welcome/send_custom_email/"; // url for email configured
+        
+        if(fire_api_by_curl($url,$post))
+            return TRUE;
+        else 
+            return FALSE;
     }
 
     function get_country_list(){

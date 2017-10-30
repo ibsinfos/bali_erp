@@ -23,14 +23,37 @@
     <!-- /.breadcrumb -->
 </div>
 
-<?php echo form_open(base_url() . 'index.php?school_admin/marks_selector'); ?>
+<div class="panel panel-danger block6" data-step="5" data-intro="For Information" data-position='bottom' id="error" style="display: none;">
+    <div class="panel-heading"> 
+        You need to add exam routine first.
+        <div class="pull-right"><a href="#" data-perform="panel-collapse">
+            <i class="ti-minus"></i>
+            <a href="#" data-perform="panel-dismiss">
+                <i class="ti-close"></i>
+            </a> 
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-danger block6" data-step="5" data-intro="For Information" data-position='bottom'>
+    <div class="panel-heading"> Manage Exam Marks Note
+        <div class="pull-right"><a href="#" data-perform="panel-collapse"><i class="ti-minus"></i></a> <a href="#" data-perform="panel-dismiss"><i class="ti-close"></i></a> </div>
+    </div>
+    <div class="panel-wrapper collapse in" aria-expanded="true">
+        <div class="panel-body">
+            <p> You can manage marks here. Please set exam routine first before add marks, otherwise marks will not be shown.</p>
+        </div>
+    </div>
+</div>
+
+<?php echo form_open(base_url() . 'index.php?school_admin/marks_selector',array('id'=>'marks_form','name'=>'marks_form')); ?>
 
         <div class="col-md-12 white-box">
             <div class="col-sm-3 form-group">
 		<div class="form-group col-sm-12 p-0" data-step="5" data-intro=" <?php echo get_phrase('Select a exam, for which you want to manage marks.');?>" data-position='right'>
                 <label class="control-label"><?php echo get_phrase('exam'); ?></label>
                 <span class="error" style="color: red;"> *</span>
-                <select name="exam_id" class="selectpicker" data-style="form-control" data-live-search="true" required onchange="return select_classes_for_exam(this.value);">
+                <select name="exam_id" id="exam_id" class="selectpicker" data-style="form-control" data-live-search="true" required onchange="return select_classes_for_exam(this.value);">
                     <option value=" "><?php echo get_phrase('select_exam'); ?></option>
                     <?php if(count($exams)){ foreach ($exams as $row):?>
                     <option value="<?php echo $row['exam_id']; ?>"><?php echo $row['name']; ?></option><?php endforeach; }?>
@@ -68,7 +91,7 @@
 		    </div></div>
             <!--</div>-->
             <div class="text-right col-xs-12" >
-                <button data-step="9" data-intro=" <?php echo get_phrase('Click here to manage marks.');?>" data-position='left' type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('manage_marks');?></button>
+                <button data-step="9" data-intro=" <?php echo get_phrase('Click here to manage marks.');?>" data-position='left' type="button" class="fcbtn btn btn-danger btn-outline btn-1d" onclick="validateMarks();"><?php echo get_phrase('manage_marks');?></button>
             </div>
         </div>
 
@@ -109,4 +132,31 @@
             }
         });
     }
+
+    function validateMarks(){
+        var exam_id,class_id,section_id,subject_id;
+        var flag = 0;
+        exam_id = $('#exam_id').val();
+        class_id = $('#class_id').val();
+        section_id = $('#section_holder').val();
+        subject_id = $('#subject_holder').val();
+        
+        $.ajax({
+            url: '<?php echo base_url(); ?>index.php?Ajax_controller/check_exam_routine_set/' + exam_id+'/'+class_id+'/'+section_id+'/'+subject_id,
+            async: false,
+            success:function (response){ 
+                if(response == 1){
+                    flag = 1;
+                }
+                if(flag == 0) {
+                    message_modal('You need to add exam routine first.');
+                } else {
+                    document.marks_form.submit();
+                }
+            }
+        });
+
+        
+    }
+
 </script>

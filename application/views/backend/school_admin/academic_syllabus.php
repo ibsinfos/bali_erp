@@ -23,8 +23,8 @@
 <div class="row">
 <div class="col-md-12">
     <div class="form-group col-sm-5 no-padding" >
-        <div class="form-group" data-step="5" data-intro="<?php echo get_phrase('Select a class, for which you want to see the academic syllabus.');?>" data-position='right'>
-        <label for="field-1">Select Class</label>
+        <div class="form-group" data-step="5" data-intro="<?php echo get_phrase('Select_a_class, for_which_you_want_to_see_the_academic_syllabus.');?>" data-position='right'>
+        <label for="field-1"><?php echo get_phrase('Select Class'); ?></label>
         <select  class="selectpicker" data-style="form-control" data-live-search="true" onchange="window.location = this.options[this.selectedIndex].value">
               <option value="">Select Class</option>                        
               <?php foreach ($classes as $row): ?>                            
@@ -37,7 +37,7 @@
 
     </div>  
     <div class="m-b-20"  >    
-        <a  href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/academic_syllabus_add/');" data-step="6" data-intro="<?php echo get_phrase('From here you can add the academic syllabus.');?>" data-position='left');" 
+        <a  href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/academic_syllabus_add/');" data-step="6" data-intro="<?php echo get_phrase('From_here_you_can_add_the_academic_syllabus.');?>" data-position='left');" 
            class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger par-add-btn" data-toggle="tooltip" 
            data-placement="left" title="" data-original-title="Add New Syllabus">
            <i class="fa fa-plus"></i>
@@ -67,7 +67,7 @@
                 <!-- <th><div><?php echo get_phrase('uploader'); ?></div></th> -->
                 <th><div><?php echo get_phrase('date'); ?></div></th>
                 <th><div><?php echo get_phrase('file'); ?></div></th>
-                <th><div data-step="7" data-intro="<?php echo get_phrase('Here you can download, edit and delete the records.');?>" data-position='top'><?php echo get_phrase('options'); ?></div></th>                             
+                <th><div data-step="7" data-intro="<?php echo get_phrase('Here_you_can_download, edit_and_delete_the_records.');?>" data-position='top'><?php echo get_phrase('options'); ?></div></th>                             
             </tr>
         </thead>
         <tbody>

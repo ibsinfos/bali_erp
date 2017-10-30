@@ -43,6 +43,7 @@ class Default_MydetailsController extends Zend_Controller_Action
 	}
 	public function indexAction()
 	{	
+           
 		$editPrivilege="";
 		$auth = Zend_Auth::getInstance();
      	if($auth->hasIdentity()){
@@ -70,7 +71,8 @@ class Default_MydetailsController extends Zend_Controller_Action
 				$positionsmodel = new Default_Model_Positions();
 				$prefix_model = new Default_Model_Prefix();
 				$data = $employeeModal->getsingleEmployeeData($id);
-				if($data == 'norows')
+
+                                if($data == 'norows')
 				{
 					$this->view->rowexist = "norows";
 					$this->view->empdata = "";
@@ -177,7 +179,7 @@ class Default_MydetailsController extends Zend_Controller_Action
 					$employeeform->populate($data);
 					$employeeform->setDefault('user_id',$data['user_id']);
 					$employeeform->setDefault('emp_status_id',$data['emp_status_id']);
-					$employeeform->setDefault('businessunit_id',$data['businessunit_id']);
+					//$employeeform->setDefault('businessunit_id',$data['businessunit_id']);
 					$employeeform->setDefault('jobtitle_id',$data['jobtitle_id']);
 					$employeeform->setDefault('department_id',$data['department_id']);
 					$employeeform->setDefault('position_id',$data['position_id']);
@@ -221,19 +223,19 @@ class Default_MydetailsController extends Zend_Controller_Action
 					}
 					
 
-				   if(!empty($data['businessunit_id']))
-				   {
-					
-						$buname = $busineesUnitModel->getSingleUnitData($data['businessunit_id']);
-						
-						if(!empty($buname)){
-							$data['businessunit_id'] = $buname['unitname'];
-						}
-						else
-						{
-							$data['businessunit_id'] = "";
-						}
-					}
+//				   if(!empty($data['businessunit_id']))
+//				   {
+//					
+//						$buname = $busineesUnitModel->getSingleUnitData($data['businessunit_id']);
+//						
+//						if(!empty($buname)){
+//							$data['businessunit_id'] = $buname['unitname'];
+//						}
+//						else
+//						{
+//							$data['businessunit_id'] = "";
+//						}
+//					}
 					if(!empty($data['department_id'])) 
 					{
 						$depname = $deptModel->getSingleDepartmentData($data['department_id']);
@@ -5313,13 +5315,24 @@ class Default_MydetailsController extends Zend_Controller_Action
         
         $userid = $loginUserId;//$this->getRequest()->getParam('userid');
         $employeeModal = new Default_Model_Employee();
+        $payslipModal = new Default_Model_Payrollpayslip();
         $empsalarydetailsModal = new Default_Model_Empsalarydetails();
         $payrollPayslipDetailsModal = new Default_Model_Payrollpayslipdetails();
-        $salarySlipDetails=$payrollPayslipDetailsModal->get_details_by_employee_id($userid);
-        $netPayDetails=$payrollPayslipDetailsModal->get_current_net_pay($userid);
+        $currencyModel = new Default_Model_Currency();
+        $empLastPayslip = $payslipModal->getEmpLastPayslip($userid);
+        
         //sapp_Payrollcal::pre($salarySlipDetails);die;
         $earningColArr=array();
         $deductColArr=array();
+        
+        if(count($empLastPayslip) == 0){
+            $this->_helper->getHelper("FlashMessenger")->addMessage(array("error"=>"Employee Payslip is not generated yet."));                                      $this->view->messages = $this->_helper->flashMessenger->getMessages();	
+            $this->_redirect('mydetails');
+        }
+        
+        $salarySlipDetails=$payrollPayslipDetailsModal->get_details_by_employee_id($userid,$empLastPayslip[0]['id']);
+        $netPayDetails=$payrollPayslipDetailsModal->get_current_net_pay($userid,$empLastPayslip[0]['id']);
+        
         foreach ($salarySlipDetails AS $k =>$v){
             if($v['type']==0){
                 $tempArr=array();
@@ -5340,13 +5353,17 @@ class Default_MydetailsController extends Zend_Controller_Action
             $bas = sapp_Global:: _decrypt($data[0]['salary']);
             $data[0]['salary']=$bas;
         }
-        $isrowexist="norows";
-        //$isrowexist = $employeeModal->getsingleEmployeeData($userid);
+        
+        $currency = $currencyModel->getCurrencyDataByID($data[0]['currencyid']);
+        $this->view->currency=$currency[0];
+        
+        //$isrowexist="norows";
+        $isrowexist = $employeeModal->getsingleEmployeeData($userid);
         if ($isrowexist == 'norows')
             $this->view->rowexist = "norows";
         else
             $this->view->rowexist = "rows";
-
+        $this->view->doj = $isrowexist[0]['date_of_joining'];
         $empdata = $employeeModal->getActiveEmployeeData($userid);
         //sapp_Payrollcal:: pre($empdata);die;
         if (!empty($empdata)) {
@@ -5383,6 +5400,8 @@ class Default_MydetailsController extends Zend_Controller_Action
             $this->view->netPayDetails=$netPayDetails;
             $this->view->netPay = $netPay;
             $this->view->empdata = $empdata;
+            $this->view->empPayslipData=$netPayDetails;
+            //print_r($netPayDetails); die;
         }else{
             $this->view->is_generated="no";
         }

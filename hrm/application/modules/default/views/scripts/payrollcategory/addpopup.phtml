@@ -1,3 +1,5 @@
+<div style='width:80%; float:left;'>
+
 <form name="payrollcategory" id="payrollcategory" action="<?php echo BASE_URL; ?>payrollcategory/addpopup/userid/<?php echo $this->userid; ?>" method="post" onsubmit="return confirmSubmit();">
     <div class="total-form-controller">
         <div class="new-form-ui">
@@ -45,19 +47,24 @@
         <div class="new-form-ui"  id="formula">
             <label class="required">Formula</label>
             <div class="division">
-                <textarea  name="formula" value="" class=""></textarea>  <a href="<?php echo BASE_URL; ?>/payrollcategory/validate">Validate</a>  
+                <textarea  name="formula" value="" class=""></textarea>  
+<!--                <a href="<?php //echo BASE_URL; ?>/payrollcategory/validate">Validate</a>  -->
             </div> 
         </div>
         <div style="clear:both"></div>
-        <center>
-            <div class="new-form-ui" id="conditionwithformula">
-
-                <label class="required">If</label>
-                <div class="division">
+        
+        
+        <div id="conditionwithformula">
+            <div class="new-form-ui">
+                <label class="required" style="float:left;">If</label>
+                <div class="division" style="float:left;">
                     <textarea  name="if" value="" class=""></textarea>  <!--<a href="">Validate</a>-->   
                 </div>
-                <?php $operatorValArr=array('gt'=>'Greater Then','lt'=>'Less Then','ge'=>'Greater then equal to','le'=>'Less then equal to','et'=>'equal to');?>
-                <div class="division">
+            </div>
+            <?php $operatorValArr=array('gt'=>'Greater Then','lt'=>'Less Then','ge'=>'Greater then equal to','le'=>'Less then equal to','et'=>'equal to');?>
+            <div class="new-form-ui">
+                <label class="required" style="float:left;">Operator</label>
+                <div class="division" style="float:left;">
                     <select name="operator" id="operator">
                         <option>Select Operator</option>
                         <?php foreach($operatorValArr AS $k => $v):?>
@@ -65,26 +72,61 @@
                         <?php endforeach;?>
                     </select>
                 </div> 
-
-                <div class="division">
+            </div>
+        
+            <div class="new-form-ui">
+                <label class="required" style="float:left;">Condition</label>
+                <div class="division" style="float:left;">
                     <textarea  name="condition" value="" class=""></textarea>  <!--<a href="">Validate</a>-->   
                 </div>
-
-                <label class="required">Then</label>
-                <div class="division">
+            </div>
+            <div class="new-form-ui">
+                <label class="required" style="float:left;">Then</label>
+                <div class="division" style="float:left;">
                     <textarea  name="then" value="" class=""></textarea>  <!--<a href="">Validate</a>-->   
                 </div>
             </div>
-        </center>
+        </div>
+		
+        
         <div style="clear:both"></div>
-        <div class="new-form-ui-submit" style="margin-left: 200px;">
+        <div class="new-form-ui-submit" style="width:100%; float: left;">
             <input type="hidden" name="category_type" value="<?php echo $this->type; ?>" />
             <input type="submit" name="submit" id="submitbutton" value="Save">
             <button onclick="parent.top.location=parent.top.location;" type="button" >Cancel</button>
 <!--            <button onclick="closeiframepopup('<?php echo $this->controllername;?>','cancel');" type="button" >Cancel</button>-->
         </div>
     </div>
-</form>	
+    
+   
+</form>
+     <div class="company_announc " style="float: left; width: 95%;"><h4 class="dashbord_title">Earnings</h4>
+        <ul>			
+            <?php foreach($this->categories as $k=>$v): if($v['type']==0) { ?>
+            <li style="float:left; margin-right: 5px;">
+                <div class="annou_txt"><?php echo $v['name']. " (".$v['code'].")" ; ?></div>
+            </li>
+            <?php } endforeach;?>
+        </ul>
+    </div>
+    <div class="company_announc " style="float: left; width: 95%;"><h4 class="dashbord_title">Deductions</h4>
+        <ul>			
+            <?php foreach($this->categories as $k=>$v): if($v['type']==1) { ?>
+            <li style="float:left; margin-right: 5px;">
+                <div class="annou_txt"><?php echo $v['name']. " (".$v['code'].")" ; ?></div>
+            </li>
+            <?php } endforeach;?>
+        </ul>
+    </div>
+</div>
+
+<div class="right_dashboard" style="width:50%; margin-top: 20%; float:left; display: block;">
+    <div class="dashboard_birthday">
+        <div id="today_bday_name" class="to_daybirth no_birthday" style="margin-top:-103px; text-align: left; padding: 5px;">
+            To use Formula or Condition in Payroll category. Use short code of existing categories.<br> Example: <br><br>1)10%BAS will be equal to 10 percent of Basic Salary(BAS).<br>2)(IT-1000)*2 will be equal to Income Tax(IT) minus 1000 times 2
+        </div>
+    </div>
+</div>
 
 
 <style>
@@ -175,7 +217,7 @@
         });*/
     });
     function confirmSubmit(){
-        if(confirm('Are sure to submit the data ? Yes/No')){
+        if(confirm('Are you sure to save the details?')){
             $('#payrollcategory').submit();
         }else{
             return false;
@@ -271,6 +313,12 @@
                            });
                            
                            <?php if($this->popup != '') { ?>
+                                    //parent.top.location.reload();
+//                                window.onunload = refreshParent;
+//                                function refreshParent() {
+//                                    window.opener.location.reload();
+//                                    parent.top.location.href = parent.top.location.href;
+//                                }
 					parent.top.location.href = parent.top.location.href;
 	<?php } ?>
 

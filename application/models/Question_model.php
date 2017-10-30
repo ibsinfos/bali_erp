@@ -46,6 +46,7 @@ class Question_model extends CI_Model {
         $this->db->where('questions.class_id',$class_id);
         $this->db->where('questions.subject_id',$subject_id);
         $this->db->where('questions.exam_id',$exam_id);
+		
         return $this->db->get()->result_array();
     }
 

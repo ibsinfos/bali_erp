@@ -73,7 +73,7 @@
                                                     <td><?php echo $row['comment']; ?></td>
                                                     <td>
                                                         <!--Exam Routine link -->
-                                                        <a href="<?php echo base_url(); ?>index.php?school_admin/exam_routine/<?php echo $row['exam_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view_exam_routine'); ?>"><i class="fa fa-eye"></i></button></a>
+                                                        <a href="<?php echo base_url(); ?>index.php?school_admin/exam_routine/<?php echo $row['exam_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('add_exam_routine'); ?>"><i class="fa fa-eye"></i></button></a>
                                                         <!--edit-->
                                                         <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_edit_exam/<?php echo $row['exam_id']; ?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('edit'); ?>" title="<?php echo get_phrase('edit'); ?>" title="<?php echo get_phrase('edit'); ?>"><i class="fa fa-pencil-square-o"></i></button></a>
                                                         <!--delete-->

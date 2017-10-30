@@ -35,7 +35,7 @@
                 <center>
                     <div class="main_div">
                         <span class="m-t-20" id="title-name"><br><b><?php echo $system_name; ?></b></span><br>
-                        <span class="m-t-20" id="sub-title"><?php echo ucfirst($certificate_detail->certificate_title); ?></span>
+                        <span class="m-t-20" id="sub-title" style="font-family:Old English Text MT"><?php echo ucfirst($certificate_detail->certificate_title); ?></span>
                         <br>
                         <span id="title-name">for</span>
                         <br>

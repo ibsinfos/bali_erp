@@ -32,11 +32,13 @@ if (!empty($assignment_Details)){ ?>
 			<label for="field-1"><?php echo get_phrase('comments');?><span class="error mandatory"> *</span></label>
                      <textarea  class="form-control" id="comments" placeholder="Type your comment here " name="comments" required></textarea>
                       </div>
-                        <div class="col-md-6 m-b-20">
+                        <div class="col-md-12 m-b-20" >
                    <label for="field-1"><?php echo get_phrase('file_to_upload');?><span class="error mandatory"> *</span></label>
-                   <input type="file" name="userfile" required="" class="form-control" data-label="<i class='entypo-upload'></i> Browse"/>
-                        <span class="mandatory"><?php echo get_phrase('supported_types_:_.doc_.xls_.pdf_.img');?></span></b>
-                      </div>
+<!--                   <input type="file" name="userfile" required="" class="form-control" data-label="<i class='entypo-upload'></i> Browse"/>
+                        <span class="mandatory"><?php echo get_phrase('supported_types_:_.doc_.xls_.pdf_.img');?></span></b>-->
+                   <input type="file" id="input-file-now" class="dropify" name="userfile">
+                      <span class="mandatory"><?php echo get_phrase('supported_types_:_.doc_.xls_.pdf_.img');?></span>
+                        </div>
                  <div class="col-md-12 m-b-20 text-right">
                         <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" id="insert" name="save_details" value="save_details"><?php echo get_phrase('submit'); ?></button>
                         </div>
@@ -47,3 +49,14 @@ if (!empty($assignment_Details)){ ?>
 <?php } ?>
 </div>
 </div>
+<script type='text/javascript'>
+
+$('.dropify').dropify({
+    messages: {
+        'default': 'Drag and drop a file here or click',
+        'replace': 'Drag and drop or click to replace',
+        'remove':  'Remove',
+        'error':   'Ooops, something wrong happended.'
+    }
+});
+</script>

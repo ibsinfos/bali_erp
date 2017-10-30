@@ -28,7 +28,7 @@
     <div class="col-md-12 white-box">
         <?php echo form_open(base_url().'index.php?school_admin/admission_settings_update'); ?>
         
-            <div class="col-sm-6 form-group" data-step="5" data-intro="<?php echo get_phrase('Choose academic year from here.');?>" data-position='bottom'>
+            <div class="col-sm-6 form-group" data-step="5" data-intro="<?php echo get_phrase('Choose_academic_year_from_here.');?>" data-position='bottom'>
                 <label class="control-label">
                     <?php echo get_phrase('Academic_Year'); ?>
                 </label>
@@ -44,7 +44,7 @@
                         <?php endfor;?>
                 </select>
             </div>
-            <div class="col-sm-6 form-group p-l-30" data-step="6" data-intro="<?php echo get_phrase('You can set on/off from here.');?>" data-position='bottom'>
+            <div class="col-sm-6 form-group p-l-30" data-step="6" data-intro="<?php echo get_phrase('You_can_set_on/off_from_here.');?>" data-position='bottom'>
                 <label class="control-label">
                     <?php echo get_phrase('Admission_off_/_on'); ?>
                 </label>
@@ -54,7 +54,7 @@
                 </div>
         </div>
         <div class="col-md-12 text-right">
-                    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="7" data-intro="<?php echo get_phrase('You can submit from here.');?>" data-position='left'>
+                    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="7" data-intro="<?php echo get_phrase('You_can_submit_from_here.');?>" data-position='left'>
                         <?php echo get_phrase('Submit'); ?>
                     </button>
                 </div>

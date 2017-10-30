@@ -161,8 +161,8 @@ class Assets_AssetsController extends Zend_Controller_Action
 							$this->view->data_array = $data_array;
 
 							$employeemodel = new Default_Model_Employee();
-							if($data_array[0]['location']!='' && $data_array[0]['location'] !='null') {
-							$employeeData = $employeemodel->getEmployeesForServiceDesk($data_array[0]['location']);
+							//if($data_array[0]['location']!='' && $data_array[0]['location'] !='null') {
+							$employeeData = $employeemodel->getEmployeesForServiceDesk('');
 								if(!empty($employeeData)){
 									foreach($employeeData as $empdata)
 									{
@@ -172,7 +172,7 @@ class Assets_AssetsController extends Zend_Controller_Action
 										$assetsForm->setDefault('allocated_to',$data_array[0]['allocated_to']);
 									}
 								}
-							}
+							//}
 
 							$SubCategoriesModel = new Assets_Model_AssetCategories();
 							$SubCategoriesData = $SubCategoriesModel->getAssetSubCategoriesDetailsById($data_array[0]['category']);
@@ -272,11 +272,11 @@ class Assets_AssetsController extends Zend_Controller_Action
 				}
 				$assetsForm->sub_category->addMultiOptions(array(''=>'Select Sub Category')+$asset_sub__array);
 			}
-			if(isset($_POST['location']) && $_POST['location']!='')
-			{
-				
+//			if(isset($_POST['location']) && $_POST['location']!='')
+//			{
+//				
 				$employeemodel = new Default_Model_Employee();
-				$employeeData = $employeemodel->getEmployeesForServiceDesk(intval($_POST['location']));
+				$employeeData = $employeemodel->getEmployeesForServiceDesk('');
 				$allocated_users_array = array();
 				if(count($employeeData) > 0)
 				{
@@ -286,14 +286,14 @@ class Assets_AssetsController extends Zend_Controller_Action
 						
 					}
 				}
-			}
+			//}
 				if($assetsForm->isValid($this->_request->getPost())){
 					$category	= $this->_request->getParam('category');
 					$sub_category	= $this->_request->getParam('sub_category');
 					$id = $this->_request->getParam('id');
 					$company_asset_code = $this->_request->getParam('company_asset_code');
 					$name = $this->_request->getParam('name');
-					$location = $this->_request->getParam('location');
+					//$location = $this->_request->getParam('location');
 					$allocated_to = $this->_request->getParam('allocated_to');
 					
 					/* $responsible_technician = $this->_request->getParam('responsible_technician');
@@ -323,27 +323,27 @@ class Assets_AssetsController extends Zend_Controller_Action
 					}
 				$date = gmdate("Y-m-d H:i:s");		
 				$data = array( 
-								'category' => $category,
-								'sub_category'=> $sub_category,
-								'company_asset_code'=>$company_asset_code,
-								'name'=>$name,
-								'location'=>$location,
-								'allocated_to'=>$allocated_to,
-								/* 'responsible_technician'=>$responsible_technician,
-								'vendor'=>$vendor, */
-								'asset_classification'=>$asset_classification,
-						        'purchase_date'=>(trim($purchase_date)!=''?$purchase_date:NUll),
-								'invoice_number'=>$invoice_number,
-								'manufacturer'=>$manufacturer,
-								'key_number'=>$key_number,
-								'warenty_status' =>$warenty_status,
-								'warenty_end_date'=>(trim($warenty_end_date)!=''?$warenty_end_date:NUll),
-								'is_working'=>$is_working,
-								'notes' => $notes,
-								'image' =>$image,
-								'ImagEncrpName' => $ImagEncrpName
-						     
-							);	
+                                        'category' => $category,
+                                        'sub_category'=> $sub_category,
+                                        'company_asset_code'=>$company_asset_code,
+                                        'name'=>$name,
+                                        //'location'=>$location,
+                                        'allocated_to'=>$allocated_to,
+                                        /* 'responsible_technician'=>$responsible_technician,
+                                        'vendor'=>$vendor, */
+                                        'asset_classification'=>$asset_classification,
+                                        'purchase_date'=>(trim($purchase_date)!=''?$purchase_date:NUll),
+                                        'invoice_number'=>$invoice_number,
+                                        'manufacturer'=>$manufacturer,
+                                        'key_number'=>$key_number,
+                                        'warenty_status' =>$warenty_status,
+                                        'warenty_end_date'=>(trim($warenty_end_date)!=''?$warenty_end_date:NUll),
+                                        'is_working'=>$is_working,
+                                        'notes' => $notes,
+                                        'image' =>$image,
+                                        'ImagEncrpName' => $ImagEncrpName
+
+                                );	
 				//ToCheckThe EncrpName
 			  
 

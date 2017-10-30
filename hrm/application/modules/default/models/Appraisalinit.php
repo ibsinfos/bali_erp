@@ -24,7 +24,7 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
     protected $_name = 'main_pa_initialization';
     protected $_primary = 'id';
 	
-    public function checkappadmin($businessunit_id,$department_id)
+    public function checkappadmin($department_id)
     {                
         $db = Zend_Db_Table::getDefaultAdapter();
         $dept_str = "";
@@ -32,7 +32,7 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
             $dept_str = " and i.department_id = '".$department_id."' ";
         
         $query = "select count(id) cnt from main_pa_initialization i 
-                  where i.isactive = 1 and i.businessunit_id = '".$businessunit_id."'  and i.status = 1 ".$dept_str;
+                  where i.isactive = 1 and i.status = 1 ".$dept_str;
         $result = $db->query($query)->fetch();
         return $result['cnt'];
     }
@@ -68,13 +68,13 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
         return $result;
     }
     
-    public function getdeparmentsadmin($businessunit_id,$enable_step='',$dept_str='')
+    public function getdeparmentsadmin($enable_step='',$dept_str='')
     {
         $db = Zend_Db_Table::getDefaultAdapter();
 		$where_condition = '';
 		if(!empty($dept_str))
 		{
-			$where_condition = " and d.id in ($dept_str) ";
+			$where_condition = " d.id in ($dept_str) and ";
 		}
         // Filter departments by 'Process Status' in 'Manager Status' and 'Employee Status' screens
         if (!empty($enable_step)) {
@@ -85,14 +85,14 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
 			$query = "select d.id,d.deptname 
 					from main_pa_initialization initi 
 					inner join main_departments d on d.id = initi.department_id and d.isactive = 1 
-					where initi.enable_step = $enable_step and initi.isactive = 1 and initi.businessunit_id=$businessunit_id $where_condition group by d.id";
+					where initi.enable_step = $enable_step and initi.isactive = 1 $where_condition group by d.id";
         } else {
         	/*$query = "select distinct d.id,d.deptname from main_pa_implementation pa 
         	inner join main_departments d on d.id = pa.department_id and d.isactive = 1 
         	where pa.isactive = 1 and pa.performance_app_flag = 0 and pa.businessunit_id = '".$businessunit_id."'";*/
 			$query = "select d.id,d.deptname 
 					from main_departments d 
-					where d.unitid=$businessunit_id $where_condition and d.isactive = 1";
+					where $where_condition d.isactive = 1";
         }
         $result = $db->query($query)->fetchAll();
         return $result;
@@ -152,9 +152,9 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
         if($init_id != '')
         {
             $db = Zend_Db_Table::getDefaultAdapter();
-            $query = "select b.unitname,d.deptname,group_concat(distinct te.employemnt_status) eligibility_names,
+            $query = "select d.deptname,group_concat(distinct te.employemnt_status) eligibility_names,
                       group_concat(distinct pac.category_name) category_names,pa.* 
-                      from main_pa_initialization pa inner join main_businessunits b on b.id = pa.businessunit_id 
+                      from main_pa_initialization pa 
                       left join main_departments d on d.id = pa.department_id 
                       inner join tbl_employmentstatus te on find_in_set(te.id,pa.eligibility) 
                       inner join main_pa_category pac on find_in_set(pac.id,pa.category_id) 
@@ -597,7 +597,7 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
                   from main_pa_initialization where isactive = 1 and businessunit_id = '".$bunit."' $where
                   and appraisal_mode = '".$mode."' and from_year = '".$from_year."' and to_year = '".$to_year."' and status=2 ";*/
 		$query = "select ifnull(max(ifnull(appraisal_period,0)),0)+1 app_period 
-                  from main_pa_initialization where isactive = 1 and businessunit_id = '".$bunit."' $where
+                  from main_pa_initialization where isactive = 1 $where
                    and from_year = '".$from_year."' and to_year = '".$to_year."' and status=2 ";
         $result = $db->query($query)->fetch();
         return $result['app_period'];
@@ -700,7 +700,7 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
 			
 		$objName = 'appraisalinit';
 		
-		$tableFields = array('action'=>'Action','unitname' => 'Business Unit','deptname' => 'Department','fin_year' => 'Financial Year',
+		$tableFields = array('action'=>'Action','deptname' => 'Department','fin_year' => 'Financial Year',
                     'appraisal_mode'=>'Appraisal Mode','app_period' => 'Period','status' => 'Appraisal Status','appraisal_process_status' => 'Process Status');
 		
 		$tablecontent = $this->getAppraisalInitData($sort, $by, $pageNo, $perPage,$searchQuery);  
@@ -766,7 +766,7 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
 	 * @param string $manager_flag            = calling flag(always null except from myteamappraisal call)
 	 * @return array Array of appraisal data.
 	 */
-	public function checkAppraisalExists($businessUnitId,$departmentId='',$performance_app_flag='',$manager_flag = '')
+	public function checkAppraisalExists($departmentId='',$performance_app_flag='',$manager_flag = '')
 	{            
 		$dept_str = "";$manager_str = "";
 		if($departmentId != '')
@@ -780,7 +780,7 @@ class Default_Model_Appraisalinit extends Zend_Db_Table_Abstract
 		$select = $this->select()
 				->setIntegrityCheck(false)
 				->from(array('pi'=>'main_pa_initialization'),array('pi.*'))
-				->where('pi.isactive = 1 AND pi.status in (0,1) AND pi.businessunit_id = '.$businessUnitId.$dept_str.$manager_str);    
+				->where('pi.isactive = 1 AND pi.status in (0,1)'.$dept_str.$manager_str);    
 		return $this->fetchAll($select)->toArray();
 	}
 	
@@ -879,9 +879,9 @@ public function getEmployeeList($data,$employeeIds='',$flag)
 		$where = '';
 		if(is_numeric($department_id) && $department_id > 0)
 		{
-			$where = " AND department_id=$department_id ";
+			$where = " department_id=$department_id ";
 		}
-		$sql_str = "SELECT count(id) as initialization_count FROM main_pa_initialization WHERE businessunit_id=$businessunit_id $where AND (from_year=$from_year $condition to_year=$to_year) AND status!=3";
+		$sql_str = "SELECT count(id) as initialization_count FROM main_pa_initialization WHERE $where AND (from_year=$from_year $condition to_year=$to_year) AND status!=3";
 		$db = Zend_Db_Table::getDefaultAdapter();
 		$res = $db->fetchRow($sql_str);
 		return $res['initialization_count'];

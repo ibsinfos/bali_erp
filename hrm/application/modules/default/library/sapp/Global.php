@@ -2374,14 +2374,14 @@ protected function _getAcl()
 						if(in_array($menuID,$settingsmenuArray))
 						{
 							
-                                                        $settingsdiv = '<div id="pageshortcut" class = "sprite remove-shortcut-icon '.$class.'" onclick="createorremoveshortcut('.$menuID.',2)">Unpin from shortcuts';
+                                                        $settingsdiv = '<div id="pageshortcut" class = "sprite remove-shortcut-icon '.$class.'" style="display:none;" onclick="createorremoveshortcut('.$menuID.',2)">Unpin from shortcuts';
 							$settingsdiv .='</div>';
 
 						}
 						else
 						{
 							
-                                                        $settingsdiv = '<div id="pageshortcut" class ="sprite shortcut-icon '.$class.'" onclick="createorremoveshortcut('.$menuID.',1)">Pin to shortcuts';
+                                                        $settingsdiv = '<div id="pageshortcut" class ="sprite shortcut-icon '.$class.'" style="display:none;" onclick="createorremoveshortcut('.$menuID.',1)">Pin to shortcuts';
 							$settingsdiv .='</div>';
 						}
 					}
@@ -2389,7 +2389,7 @@ protected function _getAcl()
 				else
 				{
 					
-                                        $settingsdiv = '<div id="pageshortcut" class ="sprite shortcut-icon '.$class.'" onclick="createorremoveshortcut('.$menuID.',3)">Pin to shortcuts';
+                                        $settingsdiv = '<div id="pageshortcut" class ="sprite shortcut-icon '.$class.'" style="display:none;" onclick="createorremoveshortcut('.$menuID.',3)">Pin to shortcuts';
 					$settingsdiv .='</div>';
 				}
 			}

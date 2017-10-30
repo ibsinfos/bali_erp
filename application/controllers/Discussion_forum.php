@@ -170,30 +170,40 @@ class Discussion_forum extends CI_Controller {
         $this->load->view('backend/index', $page_data);
     }
     
-    public function view_discussion_details($param1= '') {
+    public function view_discussion_details($param1= '') {     error_reporting(0);
         $page_data= $this->get_page_data_var();
         $this->load->model("Crud_model");
         $this->load->model("Teacher_model");
         $this->load->model("Student_model");
         $this->load->model("Parent_model");
-        $this->load->model("Admin_model");
+        $this->load->model("School_Admin_model");
         if($this->session->userdata('school_admin_login') == 1 ) {
-            
-            $adminDataArr=$this->Admin_model->get_data_by_cols('*', array('admin_id' => $this->session->userdata('admin_id'))); //->row()->image;
-            
-            $image          =      $adminDataArr[0]->image;
-            $page_data['image'] = $image; 
+            $adminDataArr=$this->School_Admin_model->get_data_by_cols('*', array('school_admin_id' => $this->session->userdata('school_admin_id')));
+            $image          =      $adminDataArr[0]->profile_pic;
+            if($image!='' && file_exists('uploads/sc_admin_images/'.$image))
+            $page_data['image'] = 'uploads/sc_admin_images/'.$image;
+            else 
+            $page_data['image'] = '';    
             
         }else if($this->session->userdata('teacher_login') == 1){
             $image          =      $this->Teacher_model->get_teacher_record(array('teacher_id' => $this->session->userdata('teacher_id')));
-            $page_data['image'] = $image->teacher_image; 
+            if($image->teacher_image!='' && file_exists('uploads/teacher_image/'.$image->teacher_image))
+            $page_data['image'] = 'uploads/teacher_image/'.$image->teacher_image;
+            else
+                 $page_data['image'] = ''; 
 
         }else if($this->session->userdata('student_login') == 1) {
             $image =  $this->db->get_where('student', array('student_id' => $this->session->userdata('student_id')))->row()->stud_image;
-            $page_data['image'] = $image; 
+            if($image!='' && file_exists('uploads/student_image/'.$image))
+            $page_data['image'] = 'uploads/student_image/'.$image; 
+            else 
+                $page_data['image'] = ''; 
         }else if($this->session->userdata('parent_login') == 1) {
             $image =  $this->db->get_where('parent', array('parent_id' => $this->session->userdata('parent_id')))->row()->parent_image;
-            $page_data['image'] = $image; 
+            if($image!='' && file_exists('uploads/parent_image/'.$image))
+            $page_data['image'] = 'uploads/parent_image/'.$image; 
+            else
+            $page_data['image'] = ''; 
         }
         
         $form_name                                       =   $this->input->post('add_comment');
@@ -226,38 +236,70 @@ class Discussion_forum extends CI_Controller {
                 if($post['user_type'] == 'teacher'){
                     $image =  $this->Teacher_model->get_teacher_record(array('teacher_id' => $post['user_id']));
                     $teacher_image = $image->teacher_image;
-                    $page_data['comments'][$k]['image'] = $teacher_image;
-                }else if($post['user_type'] == 'admin'){
-                    $image =  $this->Admin_model->get_admin_image($post['user_id']);
-                    $page_data['comments'][$k]['image'] = $image;
+                    if($teacher_image!='' && file_exists('uploads/teacher_image/'.$teacher_image))
+                    $page_data['comments'][$k]['image'] = @$teacher_image;
+                    else
+                        $page_data['comments'][$k]['image'] = '';
+                }else if($post['user_type'] == 'school_admin'){
+                    $image =  $this->School_Admin_model->get_school_admin_image($post['user_id']);
+                    $admin_image =  @$image->profile_pic;
+                    if($admin_image!='' && file_exists('uploads/sc_admin_images/'.$admin_image))
+                    $page_data['comments'][$k]['image'] = @$admin_image;
+                    else 
+                        $page_data['comments'][$k]['image'] = '';
                 }else if($post['user_type'] == 'student'){
                     $image =  $this->Student_model->get_student_image($post['user_id']);
+                    if($image!='' && file_exists('uploads/student_image/'.$image))
                     $page_data['comments'][$k]['image'] = $image;
+                    else 
+                        $page_data['comments'][$k]['image'] = '';
                 }else if($post['user_type'] == 'parent'){
                     $image =  $this->Parent_model->get_parent_image($post['user_id']);
+                     if($image!='' && file_exists('uploads/parent_image/'.$image))
                     $page_data['comments'][$k]['image'] = $image;
+                     else
+                         $page_data['comments'][$k]['image'] = '';
+                     
                 }
 
                 $sub_comments =   get_data_generic_fun('discussion_post','*', array('parent_comment_id'=>$post['comment_id']),'result_arr', array('date_add' => 'desc'));
+                $page_data['comments'][$k]['sub_comments'] = $sub_comments;
                 if(!empty($sub_comments)){
-                    if($sub_comments[0]['user_type'] == 'teacher'){
-                        $image =  $this->Teacher_model->get_teacher_record(array('teacher_id' => $sub_comments[0]['user_id']));
-                        $teacher_image = $image->teacher_image;
-
-                        $page_data['comments'][$k]['sub_comments']['image'] = $teacher_image;
-                         $page_data['comments'][$k]['sub_comments']['user_type'] = 'teacher';
-                    }else if($sub_comments[0]['user_type'] == 'admin'){ 
-                        $image =  $this->Admin_model->get_admin_image($sub_comments[0]['user_id']);
-                        $page_data['comments'][$k]['sub_comments']['image'] = $image;
-                        $page_data['comments'][$k]['sub_comments']['user_type'] = 'admin';
-                    }else if($sub_comments[0]['user_type'] == 'student'){
-                        $image =  $this->Student_model->get_student_image($sub_comments[0]['user_id']);
-                        $page_data['comments'][$k]['sub_comments']['image'] = $image;
-                        $page_data['comments'][$k]['sub_comments']['user_type'] = 'student';
-                    }else if($sub_comments[0]['user_type'] == 'parent'){
-                        $image =  $this->Parent_model->get_parent_image($sub_comments[0]['user_id']);
-                        $page_data['comments'][$k]['sub_comments']['image'] = $image;
-                        $page_data['comments'][$k]['sub_comments']['user_type'] = 'parent';
+                    foreach ($sub_comments as $key=>$subcomment) {
+                        if($subcomment['user_type'] == 'teacher'){
+                            $image =  $this->Teacher_model->get_teacher_record(array('teacher_id' => $subcomment['user_id']));
+                            $teacher_image = $image->teacher_image;
+                            if($teacher_image!='' && file_exists('uploads/teacher_image/'.$teacher_image))
+                            $page_data['comments'][$k]['sub_comments'][$key]['image'] = $teacher_image;
+                            else
+                                $page_data['comments'][$k]['sub_comments'][$key]['image'] = '';
+                             $page_data['comments'][$k]['sub_comments'][$key]['user_type'] = 'teacher';
+                        }
+                        else if($subcomment['user_type'] == 'school_admin'){ 
+                            $adminDataArr=$this->School_Admin_model->get_data_by_cols('*', array('school_admin_id' => $this->session->userdata('school_admin_id')));
+                            $image  = $adminDataArr[0]->profile_pic;
+                            if($image!='' && file_exists('uploads/sc_admin_images/'.$image))
+                            $page_data['comments'][$k]['sub_comments'][$key]['image'] = $image;
+                            else
+                             $page_data['comments'][$k]['sub_comments'][$key]['image'] = '';   
+                            $page_data['comments'][$k]['sub_comments'][$key]['user_type'] = 'admin';
+                        }
+                        else if($subcomment['user_type'] == 'student'){
+                            $image =  $this->Student_model->get_student_image($subcomment['user_id']);
+                            if($image!='' && file_exists('uploads/student_image/'.$image))
+                            $page_data['comments'][$k]['sub_comments'][$key]['image'] = $image;
+                            else 
+                                $page_data['comments'][$k]['sub_comments'][$key]['image'] = '';
+                            $page_data['comments'][$k]['sub_comments'][$key]['user_type'] = 'student';
+                        }
+                        else if($subcomment['user_type'] == 'parent'){
+                            $image =  $this->Parent_model->get_parent_image($subcomment['user_id']);
+                            if($image!='' && file_exists('uploads/parent_image/'.$image))
+                            $page_data['comments'][$k]['sub_comments'][$key]['image'] = $image;
+                            else 
+                                $page_data['comments'][$k]['sub_comments'][$key]['image'] = '';
+                            $page_data['comments'][$k]['sub_comments'][$key]['user_type'] = 'parent';
+                        }
                     }
                 }
             }
@@ -273,27 +315,42 @@ class Discussion_forum extends CI_Controller {
         $details=$page_data['details'];
         if($details[0]['discussion_usertype'] == 'teacher'){
 
-            $page_data['image'] =  $this->Teacher_model->get_teacher_record(array('teacher_id' => $details[0]['discussion_userid']));
+           // $page_data['image'] =  $this->Teacher_model->get_teacher_record(array('teacher_id' => $details[0]['discussion_userid']));
 
-            $page_data['teacher_image']  = get_user_img_url('teacher', $details[0]['discussion_userid']);
-        }elseif($details[0]['discussion_usertype'] == 'admin'){
-
-            $page_data['image'] =  $this->Admin_model->get_admin_image($details[0]['discussion_userid']);
+             $teacher_image1 = get_user_img_url('teacher', $details[0]['discussion_userid']);
+            if($teacher_image1!='' && file_exists('uploads/teacher_image/'.$teacher_image1))
+                    $page_data['discussion_user_image'] =  'uploads/teacher_image/'.$teacher_image1;
+            else 
+                $page_data['discussion_user_image'] =  '';
+        }elseif($details[0]['discussion_usertype'] == 'school_admin'){
+            $user_id = $details[0]['discussion_userid'];
+            $image =  $this->School_Admin_model->get_school_admin_image($user_id);
+            if($image->profile_pic!='' && file_exists('uploads/sc_admin_images/'.$image->profile_pic))
+            $page_data['discussion_user_image'] = 'uploads/sc_admin_images/'.$image->profile_pic;
+            else
+                 $page_data['discussion_user_image'] = '';
+            //$page_data['image'] =  $this->Admin_model->get_admin_image($details[0]['discussion_userid']);
 
             //$page_data['image']  = get_user_img_url('admin', $details[0]['discussion_userid']);
         }elseif($details[0]['discussion_usertype'] == 'parent'){
 
-            $page_data['image'] =  $this->Parent_model->get_parent_image($details[0]['discussion_userid']);
-
+             $parent_image1 =  $this->Parent_model->get_parent_image($details[0]['discussion_userid']);
+            if($parent_image1!='' && file_exists('uploads/parent_image/'.$parent_image1))
+                    $page_data['discussion_user_image'] = 'uploads/parent_image/'.$parent_image1;
+            else 
+                $page_data['discussion_user_image'] = '';
             //$page_data['image']  = get_user_img_url('parent', $details[0]['discussion_userid']);
         }elseif($details[0]['discussion_usertype'] == 'student'){
-
-            $page_data['image'] =  $this->Student_model->get_student_image($details[0]['discussion_userid']);
-
+            
+            $student_image1 =  $this->Student_model->get_student_image($details[0]['discussion_userid']);
+            if($student_image1!='' && file_exists('uploads/student_image/'.$student_image1))
+                    $page_data['discussion_user_image'] = 'uploads/student_image/'.$student_image1;
+            else
+                 $page_data['discussion_user_image'] = '';
             //$page_data['image']  = get_user_img_url('student', $details[0]['discussion_userid']);
         }
-
-        $page_data['admin_image'] =  $this->Admin_model->get_admin_image($this->session->userdata('admin_id'));
+        $image =  $this->School_Admin_model->get_school_admin_image($this->session->userdata('school_admin_id'));
+        $page_data['admin_image'] =  @$image->profile_pic;
 
         $page_data['count']                             =   $count[0]['count'];
         $page_data['page_title']                        =   get_phrase('view_in_detail');

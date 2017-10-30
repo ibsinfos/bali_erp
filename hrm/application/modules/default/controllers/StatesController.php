@@ -670,7 +670,7 @@ class Default_StatesController extends Zend_Controller_Action
 			   
 				if(isset($selectedcountryid))
 				{
-					$stateData = $statesmodel->fetchAll("isactive = '1' AND school_id ='".$school_id."' AND countryid = '".$selectedcountryid."'",'state')->toArray();
+					$stateData = $statesmodel->fetchAll("isactive = '1' AND countryid = '".$selectedcountryid."'",'state')->toArray();
 				}
 				else $stateData = array();				
 				

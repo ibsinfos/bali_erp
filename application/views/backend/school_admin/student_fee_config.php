@@ -151,11 +151,11 @@
                 <?php } endforeach; ?>
         </tbody>
     </table>
-
-    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-t-20">
+    <div class="row text-center">
+    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d">
         <?php echo get_phrase('update_selected_students'); ?>
     </button>
-
+    </div>
 </div>
 
 

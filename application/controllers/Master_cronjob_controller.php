@@ -206,7 +206,8 @@ class Master_cronjob_controller extends CI_Controller {
     function create_back_up_google_drive_per_school() {
         $this->load->dbutil();
         $allDbs = $dbs = $this->dbutil->list_databases();
-        $hostIPAddress = $_SERVER['SERVER_ADDR']; //$this->config->item('HOST_IP_ADDR');
+        //$hostIPAddress = $_SERVER['SERVER_ADDR']; //$this->config->item('HOST_IP_ADDR');
+        $hostIPAddress = $_SERVER['HTTP_HOST'];
         foreach ($allDbs AS $dbName) {
             //pre($dbName);
             if ($this->is_go_ahead($dbName, 'create_back_up_google_drive_per_school') == TRUE) {

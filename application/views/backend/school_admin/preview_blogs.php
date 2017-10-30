@@ -48,7 +48,7 @@
                                     <?php echo ($row['blog_available']=='1'?"Info : Published":"Publish");?>
                                 </label>
 
-                                <?php if($row['blog_available']=='2' || $row['blog_available']=='3') {?>
+                                <?php if(($row['blog_available']=='2' || $row['blog_available']=='3') && $row['blog_user_type']!='school_admin') {?>
                                     <a href="#" class="badge-stu-name badge text-left col-xs-8 col-sm-2 <?php if($row['blog_available']=='1') { echo " disabledlink "; }?>" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_blog_resend/<?php echo $row['blog_id'];?>');">
                                         <i class="entypo-plus-circled"></i>
                                         <?php echo ($row['blog_available']=='1'?"Published":"Resend");?>

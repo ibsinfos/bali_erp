@@ -33,7 +33,7 @@
                     </li>
                     <li id="create">
                         <a href="#add" class="sticon fa fa-plus">
-                            <span class="hidden-xs"><?php echo get_phrase('add'); ?></span>
+                            <span class="hidden-xs"><?php echo get_phrase('add_donation'); ?></span>
                         </a>
                     </li>
                 </ul>
@@ -68,39 +68,35 @@
                 <!--TABLE LISTING ENDS-->
                 <section id="add"> 
         <?php echo form_open(base_url().'index.php?fees/donation/add'); if($this->session->flashdata('flash_message_error')) {?><div class="alert alert-danger"><?php echo $this->session->flashdata('flash_message_error'); ?></div><?php }?>
-<div class="col-md-12">                       
-                    <div class="col-md-4">
+                    <div class="col-md-6 col-md-offset-3">
                         <label for="donator_name"><?php echo get_phrase("donator_name"); ?><span class="error" style="color: red;">*</span></label>
                         <div class="input-group">
                             <div class="input-group-addon"><i class="fa fa-user"></i></div><input type="text" class="form-control" placeholder="<?php echo get_phrase("enter_donator_name");?>" required="required" name="donator_name" type="text" value="<?php echo set_value('donator_name'); ?>" >
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-6 col-md-offset-3">
                         <label for="date"><?php echo get_phrase("date"); ?><span class="error" style="color: red;">*</span></label>
                         <div class="input-group">
                             <div class="input-group-addon"><i class="fa fa-calendar"></i></div><input type="text" class="form-control mydatepicker" placeholder="<?php echo get_phrase("select_date");?>" required="required" name="donation_date" type="text" value="<?php echo set_value('donation_date'); ?>" >
                         </div>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-6 col-md-offset-3">
                         <label for="amount"><?php echo get_phrase("amount"); ?><span class="error" style="color: red;">*</span></label>
                         <div class="input-group">
                             <div class="input-group-addon"><i class="fa fa-money"></i></div><input type="text" class="form-control" placeholder="<?php echo get_phrase("enter_amount");?>" required="required" name="amount" type="text" value="<?php echo set_value('amount'); ?>" >
                         </div>
                     </div>
+
+                    <div class="col-md-6 col-md-offset-3">
+                        <label for="description"><?php echo get_phrase('description');?><span class="error" style="color: red;">*</span></label>
+                        <textarea class="form-control" rows="8" name="description"></textarea>
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="col-md-9 col-md-offset-1"><br>
-                            <label for="description"><?php echo get_phrase('description');?><span class="error" style="color: red;">*</span></label>
-                            <textarea class="form-control" rows="8" name="description"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-10 form-group text-right"><br>
-                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("submit");?></button> 
+                    <div class="row text-center">
+                        <div class="col-sm-12 form-group text-center"><br>
+                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("add_donation");?></button> 
                         </div>
                     </div>
                 <?php echo form_close();?>                            

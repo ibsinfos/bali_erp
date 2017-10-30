@@ -92,7 +92,7 @@ $data = $this->data;
 			 if($this->data['is_orghead'] == 0)
 				{ 
 					
-				sapp_Helper::viewBody('alt','Business Unit', (!sapp_Helper::SappEmpty( $this->data['businessunit_id']))? $this->data['businessunit_id']:"..."	,'Department',(!sapp_Helper::SappEmpty( $this->data['department_id']))? $this->data['department_id']:"...");
+				//sapp_Helper::viewBody('alt','Business Unit', (!sapp_Helper::SappEmpty( $this->data['businessunit_id']))? $this->data['businessunit_id']:"..."	,'Department',(!sapp_Helper::SappEmpty( $this->data['department_id']))? $this->data['department_id']:"...");
 				sapp_Helper::viewBody('nor','Reporting Manager',(!sapp_Helper::SappEmpty( $this->data['reporting_manager']))? $this->data['reporting_manager']:"..."	,'','');
 				}
 				

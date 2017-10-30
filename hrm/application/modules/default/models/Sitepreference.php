@@ -111,7 +111,7 @@ class Default_Model_Sitepreference extends Zend_Db_Table_Abstract
                             ->joinLeft(array('d'=>'main_dateformat'), 'd.id=s.dateformatid AND d.isactive=1',array('date_description'=>'d.description','date_example'=> 'd.example','date_format'=>'d.dateformat','mysql_dateformat'=>'d.mysql_dateformat','js_dateformat'=>'d.js_dateformat')) 
                             ->joinLeft(array('tm'=>'main_timeformat'), 'tm.id=s.timeformatid AND tm.isactive=1',array('time_description'=>'tm.description','time_example'=> 'tm.example','time_format'=>'tm.timeformat'))
                             ->joinLeft(array('c'=>'main_currency'), 'c.id=s.currencyid AND c.isactive=1',array('currency'=>'concat(c.currencyname,"(",c.currencycode,")")'))							
-                            ->joinLeft(array('z'=>'main_timezone'), 'z.id=s.timezoneid AND z.isactive=1',array('tz_value' => 'z.timezone','timezone'=>'concat(z.timezone," [",z.timezone_abbr,"]")'))
+                            ->joinLeft(array('z'=>'tbl_timezones'), 'z.id=s.timezoneid AND z.isactive=1',array('tz_value' => 'z.timezone','timezone'=>'concat(z.timezone," [",z.timezone_abbr,"]")'))
                             ->joinLeft(array('pw'=>'tbl_password'), 'pw.id=s.passwordid AND pw.isactive=1',array('pw.passwordtype','pwddescription'=>'pw.description')) 						   
                             ->where('s.isactive = 1');
     	  

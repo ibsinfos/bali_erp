@@ -119,15 +119,15 @@ class Incident_model extends CI_Model {
 
     public function get_details() {
         $school_id = '';
-
+        
         if (($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
             if ($school_id > 0) {
-                $sql = "select incident.*,violation_type.*,teacher.name as raised_by,"
+                $sql = "select incident.*,violation_type.*,"
                         . "class.name as class_name,section.name as section_name,"
                         . "student.name as student_name,teacher1.name as reporting_teacher from incident as incident "
                         . "LEFT JOIN violation_type as violation_type on(incident.violation_type_id=violation_type.violation_type_id)"
-                        . " LEFT JOIN teacher as teacher on(incident.raised_by_teacher_id = teacher.teacher_id)"
+//                        . " LEFT JOIN teacher as teacher on(incident.raised_by_teacher_id = teacher.teacher_id)"
                         . "LEFT JOIN teacher as teacher1 on (incident.reporting_teacher_id=teacher1.teacher_id) "
                         . "LEFT JOIN class as class on(incident.class_id=class.class_id)"
                         . " LEFT JOIN section as section on(incident.section_id=section.section_id) "
@@ -135,11 +135,11 @@ class Incident_model extends CI_Model {
                         . "WHERE incident.status='Active' and incident.school_id = '" . $school_id . "'";
             }
         } else {
-            $sql = "select incident.*,violation_type.*,teacher.name as raised_by,"
+            $sql = "select incident.*,violation_type.*,"
                     . "class.name as class_name,section.name as section_name,"
                     . "student.name as student_name,teacher1.name as reporting_teacher from incident as incident "
                     . "LEFT JOIN violation_type as violation_type on(incident.violation_type_id=violation_type.violation_type_id)"
-                    . " LEFT JOIN teacher as teacher on(incident.raised_by_teacher_id = teacher.teacher_id)"
+//                    . " LEFT JOIN teacher as teacher on(incident.raised_by_teacher_id = teacher.teacher_id)"
                     . "LEFT JOIN teacher as teacher1 on (incident.reporting_teacher_id=teacher1.teacher_id) "
                     . "LEFT JOIN class as class on(incident.class_id=class.class_id)"
                     . " LEFT JOIN section as section on(incident.section_id=section.section_id) "
@@ -148,6 +148,7 @@ class Incident_model extends CI_Model {
         }
 
         $rs = $this->db->query($sql)->result_array();
+        //echo $this->db->last_query(); die;
         return $rs;
     }
     public function get_details_by_id($id) {
@@ -249,5 +250,4 @@ class Incident_model extends CI_Model {
         $rs = $this->db->query($sql)->result_array();
         return $rs;
     }
-
 }

@@ -22,14 +22,14 @@
 <?php } ?>
 <?php // pre($student_data); die;?>
 <div class="row m-0">
-    <div class="col-sm-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here you can edit the student information.');?>" data-position='top'>   
+    <div class="col-sm-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here_you_can_edit_the_student_information.');?>" data-position='top'>   
         <?php echo form_open(base_url() . 'index.php?school_admin/view_admission_form/' . $inquery_student_id, array('class' => 'form-group validate', 'id' => 'studentEnquiryForm', 'enctype' => "multipart/form-data")); ?>
 
         <div class="panel panel-success" data-collapsed="0" >
             <div class="panel panel-default view-panel view-top">
 
                 <fieldset class="scheduler-border">
-                    <legend class="scheduler-border"><h2>Student Information</h2></legend>
+                    <legend class="scheduler-border"><h2><?php echo get_phrase('Student_Information'); ?></h2></legend>
                     <div class="panel-body panel-padd-off">
                         <div class="row">
                             <div class="col-xs-12 col-sm-6 col-md-4 form-group">
@@ -125,11 +125,11 @@
 
 
 <div class="row m-0">
-    <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Here you can edit general information.');?>" data-position="top">  
+    <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Here_you_can_edit_general_information.');?>" data-position="top">  
 
         <div class="panel panel-default view-panel">
             <fieldset class="scheduler-border">
-                <legend class="scheduler-border"><h2>General Information</h2></legend>
+                <legend class="scheduler-border"><h2><?php echo get_phrase('General_Information'); ?></h2></legend>
                 <div class="panel-body panel-padd-off">
                     <div class="row">
                         <div class="col-xs-12 col-sm-6 col-md-4 form-group">
@@ -417,7 +417,7 @@
                 </div></fieldset></div></div></div>
 
 <div class="row m-0">
-    <div class="col-sm-12 white-box" data-step="7" data-intro="<?php echo get_phrase('Here you can enter the details of siblings!');?>" data-position="top">  
+    <div class="col-sm-12 white-box" data-step="7" data-intro="<?php echo get_phrase('Here_you_can_enter_the_details_of_siblings!');?>" data-position="top">  
 
         <input class="form-control" type="hidden"  name="address" value="<?php echo $student_data->address; ?>"/>
 
@@ -428,11 +428,11 @@
                     <thead>
                         <tr>
                             <th class="text-center">#</th>
-                            <th class="text-center">Name</th>
-                            <th class="text-center">Age</th>
-                            <th class="text-center">Name of the School</th>
-                            <th class="text-center">Class</th>
-                            <th class="text-center">Relationship</th>
+                            <th class="text-center"><?php echo get_phrase('Name'); ?></th>
+                            <th class="text-center"><?php echo get_phrase('Age'); ?></th>
+                            <th class="text-center"><?php echo get_phrase('Name_of_the_School'); ?></th>
+                            <th class="text-center"><?php echo get_phrase('Class'); ?></th>
+                            <th class="text-center"><?php echo get_phrase('Relationship'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -564,9 +564,9 @@
         </div>
 
         <div class="row">
-            <div class="text-right col-md-12">
+            <div class="text-center col-md-12">
                 <div class="form-group">
-                    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" id="admission" name="admit_student" value= "admit_student1" data-step="8" data-intro="<?php echo get_phrase('On the click of this button you can edit.');?>" data-position='left'><?php echo get_phrase("update"); ?></button>
+                    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" id="admission" name="admit_student" value= "admit_student1" data-step="8" data-intro="<?php echo get_phrase('On_the_click_of_this_button_you_can_edit.');?>" data-position='left'><?php echo get_phrase("update"); ?></button>
                 </div>
             </div> 
         </div>

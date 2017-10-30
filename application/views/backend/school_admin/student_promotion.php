@@ -146,7 +146,7 @@
             url: '<?php echo base_url(); ?>index.php?school_admin/get_students_to_promote/' + from_class_id + '/' + from_section_id + '/' + to_class_id + '/' + to_section_id + '/' + running_year + '/' + promotion_year,
             success: function(response) {
                 backendLoginFinance();
-                jQuery('#students_for_promotion_holder').html(response).selectpicker('refresh');
+                jQuery('#students_for_promotion_holder').html(response);
             }
         });
         return false;

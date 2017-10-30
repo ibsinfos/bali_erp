@@ -31,28 +31,28 @@ class Default_Form_servicedeskconf extends Zend_Form
 
         $id = new Zend_Form_Element_Hidden('id');
 		$postid = Zend_Controller_Front::getInstance()->getRequest()->getParam('id');
-		$businessunit_id = new Zend_Form_Element_Select('businessunit_id');
-		$businessunit_id->setLabel("Business Unit");
-        $businessunit_id->setAttrib('class', 'selectoption');
-		if($postid == '')
-		{                    
-			$businessunit_id->setAttrib('onchange', 'displayemployees(this)');
-			$bunitModel = new Default_Model_Businessunits();
-			$bunitdata = $bunitModel->fetchAll('isactive=1','unitname');
-	    	$businessunit_id->addMultiOptions(array(''=>'Select Business unit',
-                                            '0'=>'No Business Unit'));
-                
-	    	foreach ($bunitdata->toArray() as $data){
-				$businessunit_id->addMultiOption($data['id'],$data['unitname']);
-	    	}
-		}else
-		{
-			$businessunit_id->addMultiOptions(array(''=>'Select Business unit'));
-		}	
-        $businessunit_id->setRegisterInArrayValidator(false);
-        $businessunit_id->setRequired(true);
-		$businessunit_id->addValidator('NotEmpty', false, array('messages' => 'Please select business unit.'));
-		
+//		$businessunit_id = new Zend_Form_Element_Select('businessunit_id');
+//		$businessunit_id->setLabel("Business Unit");
+//        $businessunit_id->setAttrib('class', 'selectoption');
+//		if($postid == '')
+//		{                    
+//			$businessunit_id->setAttrib('onchange', 'displayemployees(this)');
+//			$bunitModel = new Default_Model_Businessunits();
+//			$bunitdata = $bunitModel->fetchAll('isactive=1','unitname');
+//	    	$businessunit_id->addMultiOptions(array(''=>'Select Business unit',
+//                                            '0'=>'No Business Unit'));
+//                
+//	    	foreach ($bunitdata->toArray() as $data){
+//				$businessunit_id->addMultiOption($data['id'],$data['unitname']);
+//	    	}
+//		}else
+//		{
+//			$businessunit_id->addMultiOptions(array(''=>'Select Business unit'));
+//		}	
+//        $businessunit_id->setRegisterInArrayValidator(false);
+//        $businessunit_id->setRequired(true);
+//		$businessunit_id->addValidator('NotEmpty', false, array('messages' => 'Please select business unit.'));
+//		
 		
 		$department_id = new Zend_Form_Element_Select('department_id');
 		$department_id->setLabel("Department");
@@ -66,11 +66,11 @@ class Default_Form_servicedeskconf extends Zend_Form
 		$service_desk_flag->setLabel("Applicability");
         $service_desk_flag->setAttrib('onclick', 'changeimplementation(this)');
         $service_desk_flag->addMultiOptions(array(
-										        '1' => 'Business unit wise',
+										        //'1' => 'Business unit wise',
 										        '0' => 'Department wise',
     									   ));
 		$service_desk_flag->setSeparator('');
-		$service_desk_flag->setValue(1);    									   
+		$service_desk_flag->setValue(0);    									   
 		$service_desk_flag->setRegisterInArrayValidator(false);
 		$service_desk_flag->setRequired(true);
 		$service_desk_flag->addValidator('NotEmpty', false, array('messages' => 'Please select applicability.'));
@@ -83,7 +83,7 @@ class Default_Form_servicedeskconf extends Zend_Form
 		$request_for->setAttrib('onchange', 'displayemployees(this)');
 		$request_for->addMultiOptions(array(
 				'1' => 'Service',
-				'2' => 'Asset',
+				//'2' => 'Asset',
 				
 		));
 		
@@ -163,7 +163,7 @@ class Default_Form_servicedeskconf extends Zend_Form
 		$submit->setAttrib('id', 'submitbutton');
 		$submit->setLabel('Save');
 
-		 $this->addElements(array($id,$businessunit_id,$department_id,$description,$service_desk_flag,$service_desk_id,$request_recievers,$approvingauthority,$approver_1,$approver_2,$approver_3,$cc_mail_recievers,$attachment,$request_for,$submit));
+		 $this->addElements(array($id,$department_id,$description,$service_desk_flag,$service_desk_id,$request_recievers,$approvingauthority,$approver_1,$approver_2,$approver_3,$cc_mail_recievers,$attachment,$request_for,$submit));
          $this->setElementDecorators(array('ViewHelper')); 
 		
 	}

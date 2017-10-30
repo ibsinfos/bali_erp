@@ -21,7 +21,7 @@
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-road"></i></div>
                         <select class="selectpicker" data-style="form-control" data-live-search="true" name="class_id">
-                            <option value="0"><?php echo get_phrase('for_all')?></option>
+                            <option value="0"><?php echo get_phrase('common')?></option>
                             <?php foreach($classes as $cls){?>
                                 <option value="<?php echo $cls->class_id?>"><?php echo $cls->name?></option>
                             <?php }?>

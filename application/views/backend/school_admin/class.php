@@ -12,7 +12,7 @@
          <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -109,16 +109,16 @@
                 <?php echo form_close(); ?> 
             </section>             
 
-<!--            <section id="section-flip-3">
+            <!--<section id="section-flip-3">
                 <ul id="sortable2" class="connectedSortable text-center">
-                    <?php $count = 1; foreach ($classes_record as $row): ?>
+                    <?php /* $count = 1; foreach ($classes_record as $row): ?>
                         <li id="<?php echo $row['class_id'];?>" class="badge badge-danger">
                            <?php echo $row['name'];?>
                         </li>
-                    <?php endforeach; ?>
+                    <?php endforeach; */?>
                 </ul>
             </section>-->
-               <section id="section-flip-3">
+            <section id="section-flip-3">
                 <ul id="sortable2" class="connectedSortable">
                     <?php $count = 1; foreach ($classes_record as $row): ?>
                         <li id="<?php echo $row['class_id'];?>" class="ui-state-highlight">
@@ -144,9 +144,7 @@ $(document).ready(function(){
 </script>
 <script type="text/javascript">
 $(document).ready(function() {
-
     //var SearchName = $('#PublicSearch').val();
-
     //datatables
     table = $('#table').DataTable({ 
         "dom": 'Bfrtip',
@@ -180,7 +178,7 @@ $(document).ready(function() {
        
 
     });
-//        table.$('tr').tooltip( {selector: '[data-toggle="tooltip"]'});
+    //table.$('tr').tooltip( {selector: '[data-toggle="tooltip"]'});
 
     /*if(SearchName!=''){            
         table.search(SearchName).draw();

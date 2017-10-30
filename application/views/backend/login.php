@@ -100,13 +100,14 @@
             #reload_img{width: 35px; height: 35px; cursor: pointer;}
             #form_login > h3 > a{color:blue !important;}
             .bootbox-body{color: red;}
+            .succed{color: green !important;}
         </style>
 
         <section id="wrapper" class="login-register">
 
             <div class="login-box login-sidebar">
                 <div class="white-box">
-                    <a href="javascript:void(0)" class="text-center db m-b-20"><img src="<?php echo base_url(); ?>assets/images/logo_ag.png" alt="Home" width="70px"/></a>  
+                    <a href="javascript:void(0)" class="text-center db m-b-20"><img src="<?php echo base_url(); ?>assets/images/logo_ag.png" alt="Home" style="width: 170px; height: 35px;"/></a>  
 
                     <form method="post" id="form_login" novalidate="novalidate" class="form-horizontal form-material loginform1">
 
@@ -391,6 +392,9 @@ $(document).ready(function () {
                 data: {email: email},
                 success: function (response) {
                     var data = JSON.parse(response);
+                    $('.success').removeClass('mandatory');
+                    $('.success').addClass('succed');
+                    $('.success').empty();
                     $('.success').html(data.message);
                 }
             });

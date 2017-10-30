@@ -35,11 +35,11 @@ class Default_Form_emailcontacts extends Zend_Form
         $group_id->setRequired(true);
         $group_id->addValidator('NotEmpty', false, array('messages' => 'Please select group.')); 
         
-        $business_unit_id = new Zend_Form_Element_Select("business_unit_id");
-        $business_unit_id->setRegisterInArrayValidator(false);
-        $business_unit_id->setRequired(true);
-        $business_unit_id->addValidator('NotEmpty', false, array('messages' => 'Please select business unit.')); 
-        $business_unit_id->setAttrib('onchange', "bunit_emailcontacts('business_unit_id');");
+//        $business_unit_id = new Zend_Form_Element_Select("business_unit_id");
+//        $business_unit_id->setRegisterInArrayValidator(false);
+//        $business_unit_id->setRequired(true);
+//        $business_unit_id->addValidator('NotEmpty', false, array('messages' => 'Please select business unit.')); 
+//        $business_unit_id->setAttrib('onchange', "bunit_emailcontacts('business_unit_id');");
          
           //Group Email....
          $grpEmail = new Zend_Form_Element_Text('groupEmail');
@@ -70,7 +70,7 @@ class Default_Form_emailcontacts extends Zend_Form
          $submit->setAttrib('id', 'submitbutton');
         $submit->setLabel('Save');
 
-         $this->addElements(array($id,$group_id,$grpEmail,$submit,$business_unit_id));
+         $this->addElements(array($id,$group_id,$grpEmail,$submit));
         $this->setElementDecorators(array('ViewHelper')); 
 		
         }

@@ -1,10 +1,13 @@
-<script src="<?php echo base_url();?>assets/js/jquery-3.2.1.min.js"></script>
+<!-- <script src="<?php //echo base_url();?>assets/js/jquery-3.2.1.min.js"></script> -->
 <?php
 ?>
 <div class="navbar-default sidebar custom-sidebar-width" role="navigation">
     <div class="sidebar-nav slimscrollsidebar">
         <div class="sidebar-head custom-sidebar-color">
-            <h3 data-step="1" data-intro="You will get Navigation from here!" data-position='right'><span class="fa-fw open-close"><i class="ti-menu hidden-xs"></i><i class="ti-close visible-xs"></i></span> <span class="hide-menu">Navigation</span></h3> </div>
+            <h3 data-step="1" data-intro="You will get Navigation from here!" data-position='right'>
+                <span class="fa-fw open-close"><i class="ti-menu hidden-xs"></i><i class="ti-close visible-xs"></i></span>
+            </h3> 
+        </div>
 
         <ul class=" nav p-r-0" id="side-menu">
             <li class="p-0 menu-item-tile">

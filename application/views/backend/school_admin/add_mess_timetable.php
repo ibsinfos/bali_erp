@@ -41,7 +41,7 @@
     <div class="col-md-6 form-group">
         <label class="control-label"><?php echo get_phrase('mess_name'); ?><span class="error mandatory"> *</span></label>
 
-        <select name="mess_id" class="form-control" data-style="form-control" data-live-search="true"  required="required">
+        <select name="mess_id" class="selectpicker" data-style="form-control" data-live-search="true"  required="required">
             <option value=""><?php echo get_phrase('select_mess_name'); ?> </option>
             <?php
             foreach ($mess_name as $row):

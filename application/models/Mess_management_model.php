@@ -165,4 +165,16 @@ class Mess_management_model extends CI_Model {
             return $this->db->get($this->_table)->first_row()->mess_management_id;
         }
     }
+	
+	public function get_mess_array() {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+               $this->db->where('school_id',$school_id);
+            } 
+        }
+        $mess_array = $this->db->get('mess_management')->result_array();
+        return $mess_array;
+    }
 }

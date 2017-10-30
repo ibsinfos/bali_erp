@@ -13,9 +13,8 @@ echo form_open_multipart(base_url().'index.php?school_admin/'.$method);?>
         </div>
     </div>
     <!--end here-->    
-    <div class="text-right">
-        <input type="submit" value="upload" class="fcbtn btn btn-danger btn-outline btn-1d"/>
-        
+    <div class="text-center">
+        <input type="submit" value="Upload" class="fcbtn btn btn-danger btn-outline btn-1d"/>
     </div>
 </form>
 

@@ -1,7 +1,7 @@
 <div class="row bg-title">
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-        <h4 class="page-title"><?php echo get_phrase('view_all_blogs'); ?> </h4></div>
+        <h4 class="page-title"><?php echo get_phrase('view_published_blogs'); ?> </h4></div>
     <!-- /.page title -->
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">

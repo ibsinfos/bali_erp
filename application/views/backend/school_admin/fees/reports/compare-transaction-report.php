@@ -17,7 +17,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?<?php echo $this->session->userdata('login_type');?>/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -34,33 +34,35 @@
     <div class="col-md-12 white-box">
         <form method="post" action="">
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label>Start Date</label>
                     <input type="text" class="form-control dtp" name="from_date" placeholder="YYYY-MM-DD" value="<?php echo $from_date?>" required/>
                 </div> 
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label>End Date</label>
                     <input type="text" class="form-control dtp" name="to_date" placeholder="YYYY-MM-DD" value="<?php echo $to_date?>" required/>
                 </div> 
             </div>
 
-            <h2>AND</h2>
+            <div class="row text-center">
+                <h2>AND</h2>
+            </div>
 
             <div class="row mt10">
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label>Start Date</label>
                     <input type="text" class="form-control dtp" name="from_date2" placeholder="YYYY-MM-DD" value="<?php echo $from_date2?>" required/>
                 </div> 
                 
                 
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label>End Date</label>
                     <input type="text" class="form-control dtp" name="to_date2" placeholder="YYYY-MM-DD" value="<?php echo $to_date2?>" required/>
                 </div> 
 
-                <div class="col-md-3">
+                <div class="col-md-12 text-center">
                     <label>&nbsp;</label><br/>
-                    <button type="submit" class="btn btn-danger btn-outline btn-1d">Submit</button>
+                    <button type="submit" class="btn btn-danger btn-outline btn-1d">View</button>
                 </div> 
             </div>
         </form>
@@ -70,7 +72,7 @@
 <?php if($report_generated){?>
 <div class="row m-0">
     <div class="col-md-12 white-box">
-        <h3>Trnsaction Reort</h3>
+        <h3><?php echo get_phrase('transaction_report')?></h3>
         <table class="table table-striped table-bordered" width="100%" id="dt_table">
             <thead>
                 <tr>
@@ -88,13 +90,13 @@
                 </tr>
                 <tr>
                     <td>1</td>
-                    <td>Donations</td>
+                    <td><?php echo get_phrase('donations')?></td>
                     <td><?php echo $donations;?></td>
                     <td><?php echo $donations2;?></td>
                 </tr>
                 <tr>
                     <td>2</td>
-                    <td>School Fee</td>
+                    <td><?php echo get_phrase('school_fee')?></td>
                     <td><?php echo $school_fee;?></td>
                     <td><?php echo $school_fee2;?></td>
                 </tr>
@@ -105,7 +107,7 @@
                 </tr>
                 <tr>
                     <td>1</td>
-                    <td>Employee Salary</td>
+                    <td><?php echo get_phrase('employee_salary')?></td>
                     <td><?php echo $salary;?></td>
                     <td><?php echo $salary2;?></td>
                 </tr>
@@ -121,6 +123,5 @@ $(function(){
        autoclose: true,
        format:'yyyy-mm-dd'
     });
-
 });
 </script>

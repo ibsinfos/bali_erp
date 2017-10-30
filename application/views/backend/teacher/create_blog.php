@@ -79,7 +79,7 @@
                         <div class="col-xs-12 text-right btn-center-in-sm">
                             <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"  name="save_details" value="save_blog">
 
-                                <?php echo get_phrase('submit');?>
+                                <?php echo get_phrase('create_blog');?>
                             </button>
                         </div>
                     </div>

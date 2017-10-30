@@ -36,7 +36,7 @@ if($this->ermsg !='')
 	<?php } ?> 
 <?php } else {?>
 
-			<div class="new-form-ui">
+			<?php /*<div class="new-form-ui">
 				<label >Business Unit</label>
 				<div class="division">
 					<select id="bunit_id" name="bunit_id" onchange="checkimp('1',this.value)">
@@ -52,13 +52,16 @@ if($this->ermsg !='')
 					</select>
 					<span class="errors" id="errors-bunit_id"></span>
 				</div>	
-			</div>
+			</div> */ ?>
 			
 			<div class="new-form-ui" id="deptdiv">
             <label >Department <img class="tooltip" title="Select business unit to populate departments" src="<?php echo $this->baseUrl().'/public/media/';?>images/help.png"></label>
             <div class="division">
 					<select id="dept_id" name="dept_id" onchange="checkimp('2',this.value)">
 					<option  value="">Select Department</option>
+                                        <?php foreach($this->deptdataarr as $key=>$dept) { ?>
+                                        <option  value="<?php echo $dept['id']; ?>"><?php echo $dept['deptname']; ?></option>
+                                        <?php } ?>
 					</select>
 					<span class="errors" id="errors-dept_id"></span>
 			</div>
@@ -82,7 +85,7 @@ if($this->ermsg !='')
 <script type="text/javascript">
 function displmanagerappstatus(flag,value)
 {
-	var bunitid = $("#bunit_id").val();
+	//var bunitid = $("#bunit_id").val();
 	var deptid = $("#dept_id").val();
 	var perf_app_flag = $("#perf_app_flag").val();
 	$("#errors-bunit_id").html('');
@@ -144,7 +147,7 @@ function displaymanagerstatus(flag)
 {
 	var appraisalid = $("#appraisalid").val();
 	var completedmgrids = $("#completedmgrids").val();
-	var bunitid = $("#bunit_id").val();
+	//var bunitid = $("#bunit_id").val();
 	var deptid = $("#dept_id").val();
 	var perf_app_flag = $("#perf_app_flag").val();
 	var app_status_val = $("#app_status_val").val();
@@ -152,7 +155,7 @@ function displaymanagerstatus(flag)
 	if(flag == 1)
 		DATA = 'appraisalid='+appraisalid+'&completedmgrids='+completedmgrids+'&flag='+flag+'&app_status='+app_status_val;
 	else
-		DATA = 'bunitid='+bunitid+'&deptid='+deptid+'&flag='+flag+'&perf_app_flag='+perf_app_flag+'&app_status='+app_status_val;
+		DATA = 'deptid='+deptid+'&flag='+flag+'&perf_app_flag='+perf_app_flag+'&app_status='+app_status_val;
 		        	$.ajax({
 			         	url: base_url+"/appraisalstatus/managerstatus/format/html",
 			         	type : 'POST',	

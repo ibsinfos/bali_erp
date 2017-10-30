@@ -1,0 +1,417 @@
+<style type="text/css">
+.child_menus, .child_menus ul, .child_menus ul li, .child_menus ul li span, .child_menus ul li span a{
+    -webkit-box-sizing: initial !important;
+    -moz-box-sizing:  initial !important;
+    box-sizing:  initial !important;
+}
+</style>
+
+<?php
+$request = Zend_Controller_Front::getInstance();
+$controllerName = $request->getRequest()->getControllerName();
+$actionName = $request->getRequest()->getActionName();
+
+$auth = Zend_Auth::getInstance();
+
+$loginUserName = ""; 
+$loginUserId = '';
+$tourflag = 0;
+$loginProfileImgSrc = MEDIA_PATH.'images/default-profile-pic.jpg';
+$loginuserRole = '';
+$userfullname = '';
+$loginuserGroup = '';
+
+if($auth->hasIdentity())
+{
+    $loginUserId = $auth->getStorage()->read()->id;
+    
+    $userProfileImage = $auth->getStorage()->read()->profileimg;
+    if (!empty($userProfileImage) && file_exists("public/uploads/profile/".$userProfileImage)) {
+    	$loginProfileImgSrc = DOMAIN."public/uploads/profile/".$userProfileImage;
+    }
+    $loginUserName =$auth->getStorage()->read()->employeeId;	    
+    $loginuserRole = $auth->getStorage()->read()->emprole;	
+    $loginuserGroup = $auth->getStorage()->read()->group_id;
+    $tourflag = $auth->getStorage()->read()->tourflag;
+    $userfullname = $auth->getStorage()->read()->userfullname;
+}
+
+$menu_model = new Default_Model_Menu();
+if($actionName == 'viewsettings'){
+    $marr = $menu_model->getgroup_formenu($loginuserGroup, $loginuserRole, '');
+}else{
+    $marr = $menu_model->getgroup_formenu($loginuserGroup, $loginuserRole, '');
+}
+
+
+$menuarr = $marr['tmpArr'];
+
+$active_menus = $menu_model->getisactivemenus();
+//print_r($active_menus);
+$act_menus = array();
+if(!empty($active_menus))
+{
+    foreach($active_menus as $act)
+    {
+        $act_menus[$act['id']] = $act;
+        if($act['id'] == 130) {
+            $act['url'] = "/timemanagement";
+            $menuarr[] = $act;
+        }
+    }
+}
+
+
+//$marr = array_merge($marr,$act_menus);
+
+//echo '<pre>'; print_r($menuarr); die;
+?>
+<div class="child_menus hide_ele" id="navigation_menus">
+    <ul>
+        <li onclick="show_parent_menu();" id="back_btn" class="hide_ele">
+            <span>
+                <a href="javascript:void(0);">
+                    <i class="fa fa-mail-reply" aria-hidden="true"></i>
+                </a>
+            </span>
+        </li>
+        <li id="<?php echo DASHBOARD_MENU; ?>" class="parent_menu_class" onclick="window.location= '<?php echo BASE_URL.'welcome'; ?>';">
+            <span>
+                <a href="<?php echo BASE_URL.'welcome'; ?>">
+                    <i class="fa fa-dashboard" aria-hidden="true"></i>
+                    Dashboard
+                </a>
+            </span>
+        </li>
+<?php 
+foreach($menuarr as $menuid => $data)
+{
+?>
+        <li id="nav_<?php echo $data['id']; ?>" class="parent_menu_class <?php if(isset($data['childs']) && count($data['childs']) > 0) { ?> has_sub_menu <?php } ?>" <?php if(isset($data['childs']) && count($data['childs']) == 0) { ?> onclick="window.open('<?php echo BASE_URL.$data['url']; ?>','_blank');" <?php } ?>>
+            <?php if(isset($data['childs']) && count($data['childs']) > 0) { ?>
+                <i class="fa fa-bars more"></i>
+                <?php } ?>
+            <span>
+                <a id="<?php echo $data['id']; ?>" href="<?php if(isset($data['childs']) && count($data['childs']) > 0) { ?>javascript:void(0);<?php } else { ?><?php echo BASE_URL.$data['url']; ?><?php } ?>">
+                    <?php /*<?php if($data['menuName'] == 'Analytics') { ?>
+                    <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'HR') { ?>
+                    <i class="fa fa-handshake-o" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Site Config') { ?>
+                    <i class="fa fa-cogs" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Modules') { ?>
+                    <i class="fa fa-life-ring" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Disciplinary') { ?>
+                    <i class="fa fa-gavel" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Appraisals') { ?>
+                    <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Organization') { ?>
+                    <i class="fa fa-building" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php if($data['menuName'] == 'Self Service') { ?>
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    <?php } else { ?> */ ?>
+                    <?php if($data['menuName']=='Time') { ?>
+                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                    <?php } else { ?>
+                    <i class="fa <?php echo $data['iconPath']; ?>" aria-hidden="true"></i>
+                    <?php } ?>
+                    <?php //} ?>
+                    <?php echo $data['menuName']; ?>
+                </a>
+            </span>
+        </li>
+        <?php if(isset($data['childs']) && count($data['childs']) > 0) { ?>
+        <ul class="submenu_list hide_ele" id="submenu_list_<?php echo $data['id']; ?>">
+            
+            <?php if(isset($data['childs']) && count($data['childs']) > 0) { 
+            ?>
+<!--            <li onclick="show_previous_menu('<?php echo $child_item['id']; ?>');">
+                <span>
+                    <a href="javascript:void(0);">
+                        Back
+                    </a>
+                </span>
+            </li>-->
+            <?php
+                foreach($data['childs'] as $key=>$child_item) {
+                    if($menuid == SERVICEDESK  && $key == SD_TRANS)
+                    {     
+                        $storage = new Zend_Auth_Storage_Session();
+                        $sess_data = $storage->read();
+                        
+                        $pending_url = BASE_URL."servicerequests/index/t/".sapp_Global::_encrypt("1")."/v/".sapp_Global::_encrypt("17");
+                        $closed_url = BASE_URL."servicerequests/index/t/".sapp_Global::_encrypt("1")."/v/".sapp_Global::_encrypt("2");
+                        $cancel_url = BASE_URL."servicerequests/index/t/".sapp_Global::_encrypt("1")."/v/".sapp_Global::_encrypt("3");
+                        $reject_url = BASE_URL."servicerequests/index/t/".sapp_Global::_encrypt("1")."/v/".sapp_Global::_encrypt("16");
+                        $all_url = BASE_URL."servicerequests/index/t/".sapp_Global::_encrypt("1");
+                        $sd_req_model = new Default_Model_Servicerequests();
+                        $counts = $sd_req_model->getRequestsCnt($loginUserId,'request');        
+                        $call = 'menu';
+                        $pending_cnt = $closed_cnt = $cancel_cnt = $rejected_cnt = 0; 
+                        if(count($counts) > 0)
+                        {
+                            foreach($counts as $cnt)
+                            {
+                                if($cnt['status'] != 'Closed' && $cnt['status'] != 'Cancelled' && $cnt['status'] != 'Rejected') $pending_cnt += $cnt['cnt'];
+                                if($cnt['status'] == 'Closed') $closed_cnt += $cnt['cnt'];
+                                if($cnt['status'] == 'Cancelled') $cancel_cnt += $cnt['cnt'];
+                                if($cnt['status'] == 'Rejected') $rejected_cnt += $cnt['cnt'];
+                            }
+                        }
+            ?>
+            <li class="child_navs" id="subnav_<?php echo $child_item['id']; ?>" onclick="showSubNav('<?php echo $child_item['id']; ?>');">
+                <?php //if(isset($child_item['childs']) && count($child_item['childs']) > 0) { ?>
+                <i class="fa fa-bars more_subnav"></i>
+                <?php //} ?>
+                <span>
+                    <a id="<?php echo $child_item['id']; ?>" href="javascript:void(0);">
+                        <i class="fa <?php echo $child_item['iconPath']; ?>" aria-hidden="true"></i>
+                        My request summary
+                    </a>
+                </span>
+            </li>
+            <li class="subchild_list subchild_<?php echo $child_item['id']; ?> hide_ele">
+                <span>
+                    <a href="<?php echo $all_url; ?>">
+                        <i class="fa fa-list" aria-hidden="true"></i>
+                        All (<?php echo $pending_cnt+$cancel_cnt+$closed_cnt+$rejected_cnt; ?>)
+                    </a>
+                </span>
+            </li>
+            <li class="subchild_list subchild_<?php echo $child_item['id']; ?> hide_ele" onclick="window.open('<?php echo $pending_url; ?>','_blank');">
+                <span>
+                    <a href="javascript:void(0);">
+                        <i class="fa fa-list" aria-hidden="true"></i>
+                        Open (<?php echo $pending_cnt; ?>)
+                    </a>
+                </span>
+            </li>
+            <li class="subchild_list subchild_<?php echo $child_item['id']; ?> hide_ele" onclick="window.open('<?php echo $closed_url; ?>','_blank');">
+                <span>
+                    <a href="javascript:void(0);">
+                        <i class="fa fa-list" aria-hidden="true"></i>
+                        Closed (<?php echo $closed_cnt; ?>)
+                    </a>
+                </span>
+            </li>
+            <li class="subchild_list subchild_<?php echo $child_item['id']; ?> hide_ele" onclick="window.open('<?php echo $reject_url; ?>','_blank');">
+                <span>
+                    <a href="javascript:void(0);">
+                        <i class="fa fa-list" aria-hidden="true"></i>
+                        Rejected (<?php echo $rejected_cnt; ?>)
+                    </a>
+                </span>
+            </li>
+            <li class="subchild_list subchild_<?php echo $child_item['id']; ?> hide_ele" onclick="window.open('<?php echo $cancel_url; ?>','_blank');">
+                <span>
+                    <a href="javascript:void(0);">
+                        <i class="fa fa-list" aria-hidden="true"></i>
+                        Cancelled (<?php echo $cancel_cnt; ?>)
+                    </a>
+                </span>
+            </li>
+            <?php
+                        $check_receiver = $sd_req_model->check_receiver($loginUserId, $sess_data->businessunit_id);
+                        $check_reporting = $sd_req_model->check_reporting($loginUserId);
+                        $check_approver = $sd_req_model->check_approver($loginUserId);
+                        $html = '';
+                        if($check_receiver == 'yes' && $check_reporting == 'yes')
+                        {            
+                            $html .= sapp_Helper::sd_req_summary_new($loginUserId,'rec_rept',$call,$child_item['id']);            
+                        }
+                        else if($check_approver == 'yes' && $check_reporting == 'yes')
+                        {            
+                            $html .= sapp_Helper::sd_req_summary_new($loginUserId,'rept_app',$call,$child_item['id']);
+                        }
+                        else if($check_receiver == 'yes')
+                        {            
+                            $html .= sapp_Helper::sd_req_summary_new($loginUserId,'receiver',$call,$child_item['id']);            
+                        }
+                        else if($check_reporting == 'yes')
+                        {            
+                            $html .= sapp_Helper::sd_req_summary_new($loginUserId,'reporting',$call,$child_item['id']);
+                        }
+                        else if($check_approver == 'yes')
+                        {            
+                            $html .= sapp_Helper::sd_req_summary_new($loginUserId,'approver',$call,$child_item['id']);
+                        }
+                        if($data->is_orghead == 1)
+                        {
+                            $html .= sapp_Helper::sd_all_summary_new($loginUserId,'org_head',$call,$child_item['id']);
+                        }
+                        echo $html;
+                    } 
+                    if($child_item['url'] != '/#' || (isset($child_item['childs']) && count($child_item['childs']) > 0)) {
+                        
+            ?>
+            <li class="child_navs" id="subnav_<?php echo $child_item['id']; ?>" <?php if($child_item['url'] != '/#' && !isset($child_item['childs']) && count($child_item['childs']) == 0) { ?> onclick="window.open('<?php echo BASE_URL.$child_item['url']; ?>','_blank');" <?php } else { ?> onclick="showSubNav('<?php echo $child_item['id']; ?>');" <?php } ?>>
+                <?php if(isset($child_item['childs']) && count($child_item['childs']) > 0) { ?>
+                    <i class="fa fa-bars more_subnav"></i>
+                    <?php } ?>
+                <span>
+                    
+                    <a id="<?php echo $child_item['id']; ?>" href="javascript:void(0);">
+                        <i class="fa <?php echo $child_item['iconPath']; ?>" aria-hidden="true"></i>
+                        <?php echo $child_item['menuName']; ?>
+                    </a>
+                </span>
+            </li>
+            
+            <?php
+                if(isset($child_item['childs']) && count($child_item['childs'])>0) {
+                    foreach($child_item['childs'] as $key=>$children_item) {
+                        if($children_item['url'] != '/#') {
+            ?>
+            
+            <li class="subchild_list subchild_<?php echo $child_item['id']; ?> hide_ele" id="subchild_<?php echo $children_item['id']; ?>">
+                <span <?php if($children_item['id']==208) { ?> style="display:block !important;" <?php } ?>>
+                    <a id="<?php echo $children_item['id']; ?>" href="<?php echo BASE_URL.$children_item['url']; ?>">
+                        <i class="fa <?php echo $children_item['iconPath']; ?>" aria-hidden="true"></i>
+                        <?php echo $children_item['menuName']; ?>
+                    </a>
+                </span>
+            </li>
+                <?php } } } } }  } ?>
+        </ul>
+        <?php } ?>
+<?php    
+}
+?>
+        <?php if($loginuserRole == SUPERADMIN || $loginuserGroup == MANAGEMENT_GROUP) { ?>
+        <li id="logs_list" class="parent_menu_class has_sub_menu">
+            <span>
+                <a href="javascript:void(0);">
+                    <i class="fa fa-sign-in" aria-hidden="true"></i>
+                    Logs
+                </a>
+            </span>
+        </li>
+        <ul class="submenu_list hide_ele" id="submenu_list_logs_list">
+<!--            <li onclick="show_parent_menu();">
+                <span>
+                    <a href="javascript:void(0);">
+                        Back
+                    </a>
+                </span>
+            </li>-->
+            <li class="child_navs">
+                <span>
+                    <a href="<?php echo BASE_URL.'logmanager'; ?>">
+                        <i class="fa fa-arrows" aria-hidden="true"></i>
+                        Activity Log
+                    </a>
+                </span> 
+            </li> 
+            <li class="child_navs">
+                <span>
+                    <a href="<?php echo BASE_URL.'userloginlog'; ?>">
+                        <i class="fa fa-user" aria-hidden="true"></i>
+                        User Log
+                    </a>
+                </span> 
+            </li> 
+        </ul>
+        <?php } ?>
+    </ul>
+    <input type="hidden" id="current_menu" value="" />
+</div>
+
+
+<script type="text/javascript">
+function hide_show_all_menus(){
+    //e.preventDefault();
+    if($('#navigation_menus').hasClass('hide_ele')) {
+        $('#navigation_menus').removeClass('hide_ele');
+    }
+    else {
+        $('#navigation_menus').addClass('hide_ele');
+    }
+
+}
+
+function show_parent_menu(){ 
+    var idVal = $('#current_menu').val();
+    //$('.subchild_list').addClass('hide_ele');
+    if($('#current_menu').val()!='' && $('.submenu_list').hasClass('hide_ele')) { 
+        //alert('if');
+        $('.parent_menu_class').addClass('hide_ele');
+        $('.child_navs').removeClass('hide_ele');
+        $('.subchild_list').addClass('hide_ele');
+        $('#current_menu').val('');
+        //$('#subnav_'+idVal).removeClass('hide_ele');
+    } else {
+        //alert('else');
+        $('#back_btn').addClass('hide_ele');
+        $('.parent_menu_class').removeClass('hide_ele');
+        $('.child_navs').addClass('hide_ele');
+        $('.submenu_list').addClass('hide_ele');
+    }
+    
+    
+//    if($('.subchild_list').hasClass('hide_ele')) {
+//        $('.parent_menu_class').removeClass('hide_ele');
+//        $('.submenu_list').addClass('hide_ele');
+//    } else {
+////        if($('#current_menu').val()!='') {
+////        }
+//        $('.subchild_list').addClass('hide_ele');
+//        $('.parent_menu_class').addClass('hide_ele');
+//        $('.child_navs').removeClass('hide_ele');
+//    }
+//    
+    
+}
+
+
+$('body').click(function(e){
+    // check click was iside navigation or outside
+    // if outside navigation then hide navigation
+    // else do nothing
+    if ($('#navigation_menus').has(e.target).length === 0 && $('.collapse_btn').has(e.target).length === 0) {
+        $("#navigation_menus").addClass('hide_ele');
+    } else {
+        $("#navigation_menus").removeClass('hide_ele');
+    }
+});    
+    
+$('.parent_menu_class').click(function() {
+    if($(this).hasClass('has_sub_menu')) {
+        $('#back_btn').removeClass('hide_ele');
+        
+        var idVal = $(this).attr('id');
+        var idArr = idVal.split('_');
+        var id = idArr[1];
+
+        if(idVal == 'logs_list') {
+            id = idVal;
+        }
+
+        $('#submenu_list_'+id).removeClass('hide_ele');
+        $('#submenu_list_'+id).removeAttr('style');
+        $('.parent_menu_class').addClass('hide_ele');
+        $('.child_navs').removeClass('hide_ele');
+    }
+});
+
+function showSubNav(idVal){
+    $('#current_menu').val(idVal);
+    $('.subchild_'+idVal).removeClass('hide_ele');
+    $('.parent_menu_class').addClass('hide_ele');
+    $('.child_navs').addClass('hide_ele');
+}
+
+//function show_previous_menu(idVal){
+//    $('.subchild_'+idVal).addClass('hide_ele');
+//    $('.parent_menu_class').addClass('hide_ele');
+//    $('.child_navs').removeClass('hide_ele');
+//}
+
+</script>
+

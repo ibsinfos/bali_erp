@@ -25,7 +25,7 @@
 
 
 <div class="row">    
-<div class="col-md-12 no-padding select_container">
+    <div class="col-md-12 no-padding select_container">
     <div class="col-md-10">
     <div class="form-group col-md-5 no-padding" data-step="5" data-intro="<?php echo get_phrase('Select a class, for which you want to see class routine.');?>" data-position='right'>
     <label class="control-label">Select Class</label>
@@ -57,79 +57,89 @@
     <?php echo $this->session->flashdata('flash_message_error'); ?>
     </div>
     <?php } ?>
+<div class="row">    
+    <div class="col-md-12" data-collapsed="0" data-step="7" data-intro="<?php echo get_phrase('From here you can see the class timetable of selected class and take print also.');?>" data-position='top'>
+	<div class="col-md-12 white-box">
+        <?php
+        foreach ($routines as $array_name => $array1) {
+            foreach ($array1 as $key1 => $array) {
+                ?>
+                        <div class="panel panel-default">
 
-<div class="col-md-12 white-box" data-collapsed="0" data-step="7" data-intro="<?php echo get_phrase('From here you can see the class timetable of selected class and take print also.');?>" data-position='top'>
-<?php
-foreach ($routines as $array_name => $array1) {
-    foreach ($array1 as $key1 => $array) {
-        ?>
-                <div class="panel panel-default">
-                  
-                  <div><span><b>
-                            <?php echo get_phrase('class'); ?>&nbsp;
-                            <?php echo $class_name; ?> : 
-        <?php echo get_phrase('section'); ?> - <?php echo $array_name; ?></b></span>
-                            <a href="<?php echo base_url(); ?>index.php?school_admin/class_routine_print_view/<?php echo $class_id; ?>/<?php echo $key1; ?>" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-b-20" target="_blank">
-                                <i class="fa fa-print"></i> <?php echo get_phrase('print'); ?>
-                            </a>
-                 </div>
-                 
-                    <div class="panel-body">
-                        <table cellpadding="0" cellspacing="0" border="0"  class="table table-bordered">
-                            <tbody>
-                                <?php
-                                foreach ($array as $key => $value) {
-                                    ?>
-                                    <tr class="gradeA">
-                                        <td width="100"><?php echo strtoupper($key); ?></td>
-                                        <td>
-                                            <?php
-                                            foreach ($value as $keys => $row2) {
-                                                ?>
-                                                <div class="btn-group btn-bottom">
-                                                    <!--<button class="btn btn-default dropdown-toggle btn_whitespace" data-toggle="dropdown">-->
-                                                    <button class="btn btn-default btn_whitespace">
-                                                <?php echo $row2['subject_name'];?>
-                                                <?php echo '('.$row2['teacher_name'].')';?>
-                                                        <?php
-                                                        if ($row2['time_start_min'] == 0 && $row2['time_end_min'] == 0)
-                                                            echo '(' . $row2['time_start'] . '-' . $row2['time_end'] . ')';
-                                                        if ($row2['time_start_min'] != 0 || $row2['time_end_min'] != 0)
-                                                            echo '(' . $row2['time_start'] . ':' . $row2['time_start_min'] . '-' . $row2['time_end'] . ':' . $row2['time_end_min'] . ')';
+                            
+                            
+                         <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-6 text-left"><b>
+                                    <?php echo get_phrase('class'); ?>&nbsp;
+                                    <?php echo $class_name; ?> : 
+                                    <?php echo get_phrase('section'); ?> - <?php echo $array_name; ?></b>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <a href="<?php echo base_url(); ?>index.php?school_admin/class_routine_print_view/<?php echo $class_id; ?>/<?php echo $key1; ?>" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-b-20" target="_blank">
+                                        <i class="fa fa-print"></i> <?php echo get_phrase('print'); ?>
+                                    </a>
+                                </div>
+                            </div>
+                                <table cellpadding="0" cellspacing="0" border="0"  class="table table-bordered">
+                                    <tbody>
+                                        <?php
+                                        foreach ($array as $key => $value) {
+                                            ?>
+                                            <tr class="gradeA">
+                                                <td width="100"><?php echo strtoupper($key); ?></td>
+                                                <td>
+                                                    <?php
+                                                    foreach ($value as $keys => $row2) {
                                                         ?>
-                                                        <!--<span class="caret"></span>-->
-                                                    </button>
-                                                    <?php /*<ul class="dropdown-menu">
-                                                        <li>
-                                                            <a href="#" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_edit_class_routine/<?php echo $row2['class_routine_id']; ?>');">
-                                                                <i class="entypo-pencil"></i>
-                <?php echo get_phrase('edit'); ?>
-                                                            </a>
-                                                        </li>
+                                                        <div class="btn-group btn-bottom">
+                                                            <button class="btn btn-default dropdown-toggle btn_whitespace m-b-5 m-r-5" data-toggle="dropdown">
+                                                            <!--<button class="btn btn-default btn_whitespace m-b-5 m-r-5"> -->    
+                                                        <?php echo $row2['subject_name'];?>
+                                                        <?php echo '('.$row2['teacher_name'].')';?>
+                                                                <?php
+                                                                if ($row2['time_start_min'] == 0 && $row2['time_end_min'] == 0)
+                                                                    echo '(' . $row2['time_start'] . '-' . $row2['time_end'] . ')';
+                                                                if ($row2['time_start_min'] != 0 || $row2['time_end_min'] != 0)
+                                                                    echo '(' . $row2['time_start'] . ':' . $row2['time_start_min'] . '-' . $row2['time_end'] . ':' . $row2['time_end_min'] . ')';
+                                                                ?>
+                                                                <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                <li>
+                                                                    <a href="#" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_edit_class_routine/<?php echo $row2['class_routine_id']; ?>');">
+                                                                        <i class="entypo-pencil"></i>
+                        <?php echo get_phrase('edit'); ?>
+                                                                    </a>
+                                                                </li>
 
-                                                        <li>
-                                                            <a href="#" onclick="confirm_modal('<?php echo base_url(); ?>index.php?school_admin/class_routine/delete/<?php echo $row2['class_routine_id']; ?>');">
-                                                                <i class="entypo-trash"></i>
-                <?php echo get_phrase('delete'); ?>
-                                                            </a>
-                                                        </li>
-                                                    </ul>*/?>
-                                                </div>
-            <?php } ?>
+                                                                <li>
+                                                                    <a href="#" onclick="confirm_modal('<?php echo base_url(); ?>index.php?school_admin/class_routine/delete/<?php echo $row2['class_routine_id']; ?>');">
+                                                                        <i class="entypo-trash"></i>
+                        <?php echo get_phrase('delete'); ?>
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                    <?php } ?>
 
-                                        </td>
-                                    </tr>
-        <?php } ?>
+                                                </td>
+                                            </tr>
+                <?php } ?>
 
-                            </tbody>
-                        </table>
+                                    </tbody>
+                                </table>
 
-                    </div>
-                </div>
+                            </div>
 
-    <?php }
-}
-?>
+                     
+                        </div>
+
+            <?php }
+        }
+        ?>  
+		</div>
+    </div>
 <?php
 // endif;?>
 </div>

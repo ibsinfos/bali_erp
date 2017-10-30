@@ -64,6 +64,11 @@ class Setting_model extends CI_Model {
         return $return;
     }
 
+    function get_setting_count($type=false){
+        _school_cond();
+        return $this->db->get_where('settings',array('type'=>$type))->num_rows();
+    }
+
     function get_year()
     {
         $school_id = '';

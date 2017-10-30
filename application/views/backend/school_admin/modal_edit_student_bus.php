@@ -56,7 +56,7 @@
                             <?php } ?>
                         </select>
             </div>  
-            <div class="col-md-12 m-b-20">
+            <!-- <div class="col-md-12 m-b-20">
                 <label><?php echo get_phrase('start_date'); ?></label><span class="mandatory"> *</span>
                 <input id= "start_date" type="text" class="form-control mydatepicker" required="required" value="<?php echo $row['start_date']?>"  name="start_date" placeholder="Pick a date" data-validate="required" data-message-required ="Please pick a date">
                 <label class="mandatory"> <?php echo form_error('name'); ?></label>
@@ -66,7 +66,7 @@
             <div class="col-md-12 m-b-20">
                 <label><?php echo get_phrase('end_date'); ?></label><span class="mandatory"> *</span>
                 <input id= "end_date" type="text" class="form-control mydatepicker" value="<?php echo $row['end_date']?>" required="required" name="end_date" placeholder="Pick a date" data-validate="required" data-message-required ="Please pick a date">
-            </div>
+            </div> -->
             <div class="col-md-12 text-right">
                 <button type="submit" class="fcbtn btn btn-danger btn-outline" id="sa-success" name="save_details"><?php echo get_phrase('update');?></button>
             </div>

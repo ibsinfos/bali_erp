@@ -35,7 +35,7 @@
     </div>
 </div>
   
-<div class="panel panel-danger block6" data-step="5" data-intro="<?php echo get_phrase('For Information');?>" data-position='bottom'>
+<div class="panel panel-danger block6" data-step="5" data-intro="<?php echo get_phrase('For_Information');?>" data-position='bottom'>
     <div class="panel-heading"> Instructions to be followed:
         <div class="pull-right"><a href="#" data-perform="panel-collapse"><i class="ti-minus"></i></a> <a href="#" data-perform="panel-dismiss"><i class="ti-close"></i></a> </div>
     </div>
@@ -59,15 +59,15 @@
 	</div>
 <?php } ?>
 
-<div class="white-box" data-step="6" data-intro="<?php echo get_phrase('Fill the required fields and then click on Admit Student for admission.');?>" data-position='top'>
+<div class="white-box" data-step="6" data-intro="<?php echo get_phrase('Fill_the_required_fields_and_then_click_on_Admit_Student_for_admission.');?>" data-position='top'>
 <?php
     create_dynamic_form($arrDynamic,$arrGroups, $arrLabel, $arrAjaxEvent, $arrValidation, $arrFieldValue, $arrFieldQuery,
-            $arrDbField, $arrClass, $arrPlaceHolder, $arrMin,$arrMax);
+            $arrDbField, $arrClass, $arrPlaceHolder, $arrMin,$arrMax, $arrPost);
  
                             
 
 
-                           echo "<div class='text-right'>
+                           echo "<div class='col-md-12 text-center'>
                             <button type='submit' class='fcbtn btn btn-danger btn-outline btn-1d'>Submit</button>
                         </div>";
 

@@ -10,8 +10,8 @@ class Ajax_model extends CI_Model {
         _school_cond('S.school_id');
         _year_cond('E.year');
         $this->db->select('S.*,C.name class_name,SC.name section_name,E.enroll_code,E.class_id,E.section_id,P.email parent_email,P.cell_phone parent_mobile,
-        CONCAT(P.father_name,P.father_lname) father_full_name,
-        (SELECT count(*) FROM fee_stu_config WHERE student_id=S.student_id AND school_id=E.school_id AND running_year=E.year) has_config',false);  
+        CONCAT(P.father_name," ",P.father_lname) father_full_name,
+        (SELECT count(*) FROM fee_stu_config WHERE student_id=S.student_id AND school_id=E.school_id AND running_year=E.year) has_config',FALSE);  
         $this->db->from('student S');
         $this->db->join('enroll E','E.student_id=S.student_id','LEFT');
         $this->db->join('class C','C.class_id=E.class_id','LEFT');  
@@ -154,7 +154,7 @@ class Ajax_model extends CI_Model {
         return $this->db->get()->result();
     }
 
-    function get_setudent_fee_config($student_id){
+    function get_student_fee_config($student_id){
         $return = array('school_fee_terms'=>array(),'hostel_fee_terms'=>array(),'transport_fee_terms'=>array());
         $stu_rec = $this->get_student(array('S.student_id'=>$student_id));
         _school_cond();
@@ -193,7 +193,14 @@ class Ajax_model extends CI_Model {
         $return['school_fee_terms'] = array();
         if($school_fee_setup){
             $arr = array();
-            $setup_terms = $this->db->get_where('fee_setup_terms',array('charge_setup_id'=>$school_fee_setup->id))->result();
+            $this->db->select('FST.*,
+                (SELECT FCR.is_paid FROM fee_pay_collection_records FCR WHERE FCR.student_id="'.$student_id.'" AND FCR.class_id="'.$stu_rec->class_id.'" 
+                AND FCR.fee_type=1 AND FCR.fee_id=FST.id AND FCR.running_year="'._getYear().'" AND FCR.school_id="'._getSchoolid().'") is_paid,
+                (SELECT FCR.net_due FROM fee_pay_collection_records FCR WHERE FCR.student_id="'.$student_id.'" AND FCR.class_id="'.$stu_rec->class_id.'" 
+                AND FCR.fee_type=1 AND FCR.fee_id=FST.id AND FCR.running_year="'._getYear().'" AND FCR.school_id="'._getSchoolid().'") net_due',FALSE);
+            $this->db->from('fee_setup_terms FST');
+            $this->db->where(array('FST.charge_setup_id'=>$school_fee_setup->id));
+            $setup_terms = $this->db->get()->result();
             foreach($setup_terms as $st){
                 $this->db->select('FSTH.*,FH.name');
                 $this->db->from('fee_heads FH');
@@ -209,15 +216,31 @@ class Ajax_model extends CI_Model {
         $return['hostel_room'] = $this->db->get_where('hostel_room',array('hostel_room_id'=>$stu_config->room_id))->row();
         $return['hostel_fee_terms'] = array();
         if($hostel_fee_setup){
-            $return['hostel_fee_terms'] = $this->db->get_where('fee_hotel_setup_terms',array('setup_id'=>$hostel_fee_setup->id))->result();
+            $this->db->select('FST.*,
+                (SELECT FCR.is_paid FROM fee_pay_collection_records FCR WHERE FCR.student_id="'.$student_id.'" AND FCR.class_id="'.$stu_rec->class_id.'" 
+                AND FCR.fee_type=2 AND FCR.fee_id=FST.id AND FCR.running_year="'._getYear().'" AND FCR.school_id="'._getSchoolid().'") is_paid,
+                (SELECT FCR.net_due FROM fee_pay_collection_records FCR WHERE FCR.student_id="'.$student_id.'" AND FCR.class_id="'.$stu_rec->class_id.'" 
+                AND FCR.fee_type=2 AND FCR.fee_id=FST.id AND FCR.running_year="'._getYear().'" AND FCR.school_id="'._getSchoolid().'") net_due',FALSE);
+            $this->db->from('fee_hotel_setup_terms FST');
+            $this->db->where(array('FST.setup_id'=>$hostel_fee_setup->id));
+            $return['hostel_fee_terms'] = $this->db->get()->result();
+            //$return['hostel_fee_terms'] = $this->db->get_where('fee_hotel_setup_terms',array('setup_id'=>$hostel_fee_setup->id))->result();
         }
         
         _school_cond();
         $return['route_stop'] = $this->db->get_where('route_bus_stop',array('route_bus_stop_id'=>$stu_config->route_stop_id))->row();
         $return['transport_fee_terms'] = array();
-        if($transport_fee_setup)
-            $return['transport_fee_terms'] = $this->db->get_where('fee_transport_setup_terms',array('setup_id'=>$transport_fee_setup->id))->result();  
-        
+        if($transport_fee_setup){
+            $this->db->select('FST.*,
+                (SELECT FCR.is_paid FROM fee_pay_collection_records FCR WHERE FCR.student_id="'.$student_id.'" AND FCR.class_id="'.$stu_rec->class_id.'" 
+                AND FCR.fee_type=3 AND FCR.fee_id=FST.id AND FCR.running_year="'._getYear().'" AND FCR.school_id="'._getSchoolid().'") is_paid,
+                (SELECT FCR.net_due FROM fee_pay_collection_records FCR WHERE FCR.student_id="'.$student_id.'" AND FCR.class_id="'.$stu_rec->class_id.'" 
+                AND FCR.fee_type=3 AND FCR.fee_id=FST.id AND FCR.running_year="'._getYear().'" AND FCR.school_id="'._getSchoolid().'") net_due',FALSE);
+            $this->db->from('fee_transport_setup_terms FST');
+            $this->db->where(array('FST.setup_id'=>$transport_fee_setup->id));
+            $return['transport_fee_terms'] = $this->db->get()->result();
+            //$return['transport_fee_terms'] = $this->db->get_where('fee_transport_setup_terms',array('setup_id'=>$transport_fee_setup->id))->result();  
+        }
         return $return;
     }
 

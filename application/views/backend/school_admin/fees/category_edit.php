@@ -32,11 +32,11 @@
                     <?php echo form_open(base_url('index.php?fees/fees/category_edit'), array('class' => 'form-horizontal form-groups-bordered validate', 'target' => '_top')); ?>
                     <div class="row">
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                            <label for="running_session"><?php echo get_phrase("current_session"); ?></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                                 <select name="running_year" class="selectpicker" data-style="form-control" data-live-search="true">
-                                      <option value=""><?php echo get_phrase('select_running_session');?></option>
+                                      <option value=""><?php echo get_phrase('current_session');?></option>
                                       <?php for($i = 0; $i < 10; $i++):?>
                                             <option value="<?php echo (2016+$i);?>-<?php echo (2016+$i+1);?>"
                                                 <?php if($running_year == (2016+$i).'-'.(2016+$i+1)) echo 'selected';?>>
@@ -72,7 +72,7 @@
 
                     <br>
                     <div class="form-group">
-                        <div class="text-right">
+                        <div class="col-xs-12 text-center">
                             <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit'); ?></button>
                         </div>
                     </div>

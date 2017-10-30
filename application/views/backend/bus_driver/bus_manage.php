@@ -13,7 +13,7 @@
 
                
 <div class="col-sm-12 white-box">            
-<table id="table" class="table display">
+<table class = "custom_table table display" cellspacing="0" width="100%" id="example23">
     <thead>
         <tr>
             <th><div><?php echo get_phrase('s._no.'); ?></div></th>
@@ -22,11 +22,22 @@
             <th><div><?php echo get_phrase('description'); ?></div></th>
             <th><div><?php echo get_phrase('route'); ?></div></th>
             <th><div><?php echo get_phrase('avaiable_seats'); ?></div></th>
-            <!--<th><div><?php echo get_phrase('options'); ?></div></th>-->
+            <!--<th><div><?php // echo get_phrase('options'); ?></div></th>-->
         </tr>
     </thead>
     <tbody>
-       
+        <?php $count = 1; 
+        foreach($buses as $row): ?>
+            <tr>
+                <td><?php echo $count++; ?></td>
+                <td><?php echo $row['name']; ?></td>
+                <td><?php echo $row['bus_unique_key']; ?></td>
+                <td><?php echo $row['description']; ?></td>
+                <td><?php echo $row['route_name']; ?></td>
+                <td><?php echo $row['number_of_seat']; ?></td>
+            </tr>
+       <?php  endforeach; ?>
+        
     </tbody>
 </table>
 </div>  

@@ -3,8 +3,8 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 
    function create_dynamic_form($arrDynamic, $arrGroups, $arrLabel, $arrAjaxEvent, $arrValidation, $arrFieldValue, $arrFieldQuery,
-            $arrDbField, $arrClass, $arrPlaceHolder, $arrMin, $arrMax){ 
-
+            $arrDbField, $arrClass, $arrPlaceHolder, $arrMin, $arrMax, $arrPost){ 
+       
         $arrVal     = array();
         $arrValid   = array();
         $arrField   = array();
@@ -42,6 +42,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                       if(in_array($db_field, array_keys($arrValidation[$key])))
                       {        
                         $valid = $arrValidation[$key][$db_field];
+                         $field_val = $arrFieldValue[$key][$db_field];
 
                          if(strstr($valid, "?"))
                          {
@@ -49,7 +50,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                              $form_validation        = (!empty($arrValid[0])) ? $arrValid[0] : "";
                              $form_validation_type   = (!empty($arrValid[1])) ? $arrValid[1] : "";
                         }        
-                           $field_val = $arrFieldValue[$key][$db_field];
+             
                             if(strstr($field_val, "?"))
                             {
                                 $arrField           =        explode("?", $field_val);
@@ -73,10 +74,12 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                                case 'tel':
                                    $pattern = "\d*";
                                break;
-
-                              // case 'email':
-                                //   $pattern = "[a-zA-Z0-9._\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,4}";
-                               //break;
+                               case 'alphanumeric':     
+                                    $pattern = "/[^[:alnum:]\-_]/";
+                               break;    
+                               case 'email':
+                                   $pattern = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$";
+                               break;
                                default:
                                $pattern = '';
                            break;    
@@ -99,9 +102,14 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                          {
                             $maxlength =  "maxlength = '".$arrMax[$key][$db_field]."'";
                          }
-                            switch($field_type)
+                         if(!empty($arrPost[$db_field]))
+                              $value = $arrPost[$db_field];
+                         else
+                             $value = "";
+                         switch($field_type)
                             {
                                 case 'text' :
+                                  
                                   echo "<div class='col-sm-4 form-group text-left'>
                                             <label for='field-1' class='control-label'>".get_phrase($label);
                                    if(strtolower($form_validation) == "m")
@@ -116,7 +124,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                                                     <i class='$class'></i>
                                                 </div>";
                                         echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
-                                        $pattern placeholder = '$place_holder' $maxlength 
+                                        $pattern placeholder = '$place_holder' $maxlength value='$value'
                                         data-message-required='Enter Value' $required> 
                                         </div>";
                                        echo "</div>";
@@ -137,7 +145,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                                                        <i class='ti-user'></i>
                                                    </div>";
                                      echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
-                                           data-validate='$form_validation_type' $maxlength 
+                                           data-validate='$form_validation_type' $maxlength value='$value' 
                                            data-message-required='Enter Value' $required> 
                                            </div>";
                                        echo "</div>";
@@ -159,10 +167,9 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                                                <div class='input-group-addon'><i class='icon-calender'></i>
                                                </div>";
                                            echo "<input type='text' class='form-control datepicker' name='$db_field' "
-                                                   . "id='$db_field' placeholder='' data-validate='$form_validation_type' data-start-view='2' $required>"
+                                                   . "id='$db_field' placeholder='' value='$value' data-validate='$form_validation_type' data-start-view='2' $required>"
                                                ."</div>";
-                                           if(strtolower($form_validation) == "m")
-                                               echo "<span class='error mandatory'> *</span></label>";
+                                          
                                            echo "</div>";
                                        break;        
                                        case 'drop' :
@@ -201,13 +208,23 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                                            }
                                            else
                                                echo "</label>";        
-                                           echo "<select class='selectpicker' data-style='form-control' data-container='body'  name='$db_field' id='$db_field' $required "
+                                           echo "<select class='selectpicker' data-style='form-control' data-live-search='true' data-container='body'  name='$db_field' id='$db_field' $required "
                                                    .  $ajax_event.">".
                                                "<option value=''>Select</option>";
 
                                            foreach($arrMain as $select_key => $select_value)
                                            {
-                                               echo "<option value = '$select_key'>$select_value</option>";
+                                               if(in_array($db_field, array_keys($arrPost)))
+                                                        {
+                                                            if($select_key == $arrPost[$db_field])
+                                                               $selected =  " selected = 'selected'";
+                                                            else
+                                                                $selected = '';
+
+                                                        }
+                                                else
+                                                    $selected = '';
+                                               echo "<option value = '$select_key' $selected>$select_value</option>";
                                            }     
                                          echo "</select>";      
                                          echo "</div>";
@@ -228,7 +245,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                                                                  <i class='$class'></i>
                                                              </div>";
                                                echo "<input type='$field_type' class='form-control' id='$db_field' name='$db_field'
-                                                     data-validate='$form_validation_type'  placeholder = '$place_holder'  $required
+                                                     data-validate='$form_validation_type'  value='$value' placeholder = '$place_holder'  $required
                                                      data-message-required='Enter Value' $form_validation_type > 
                                                      </div>";
 
@@ -239,7 +256,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
                                                <label for='control-label'>".
                                                    get_phrase($label);
                                                echo "</label>";        
-                                               echo "<select class='selectpicker' data-style='form-control' data-container='body' name='$db_field' id='$db_field' "
+                                               echo "<select class='selectpicker' data-style='form-control' data-live-search='true' data-container='body' name='$db_field' id='$db_field' "
                                                        . "data-validate='$form_validation_type' data-message-required='Select' $ajax_event>
                                                    <option value='0'>Select</option>";
 
@@ -252,7 +269,7 @@ if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
                                            break;
                                            case 'hidden' :
-                                               echo "<input type='hidden' name='$db_field' id='$db_field' ";
+                                               echo "<input type='hidden' name='$db_field' id='$db_field' value = '$field_values'";
                                            break;
                                            case 'image' :
                                                echo "<div class='white-box'>

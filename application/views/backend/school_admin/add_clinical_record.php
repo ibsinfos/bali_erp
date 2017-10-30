@@ -11,12 +11,12 @@
 <body>
 
 <div class="container-fluid">
-  <h3>Enter Patient's Details</h3>
+  <h3><?php echo get_phrase("enter_patient's_Details"); ?></h3>
   
       <?php echo form_open(base_url().'index.php?school_admin/add_clinical_record', array('class' =>'form-horizontal','id'=>'studentClinicalForm'));?>
      
     <div class="form-group">
-      <label class="control-label col-sm-2" for="first_name">First Name:<span class="error" style="color: red;"> *</span></label>
+      <label class="control-label col-sm-2" for="first_name"><?php echo get_phrase('first_name'); ?>:<span class="error" style="color: red;"> *</span></label>
       <div class="col-sm-5">
         <input type="text" class="form-control" id="first_name" name = "first_name" placeholder="Enter First Name" required >
       </div>
@@ -25,23 +25,23 @@
       
       
     <div class="form-group">
-      <label class="control-label col-sm-2" for="last_name">Last Name:<span class="error" style="color: red;"> *</span></label>
+      <label class="control-label col-sm-2" for="last_name"><?php echo get_phrase('last_name'); ?>:<span class="error" style="color: red;"> *</span></label>
       <div class="col-sm-5">          
         <input type="text" class="form-control" id="last_name" name= "last_name_done" placeholder="Enter Last Name"  required>
       </div>
     </div>
   
     <div class="form-group">
-      <label class="control-label col-sm-2" for="gender">Gender:<span class="error" style="color: red;"> *</span></label>
+      <label class="control-label col-sm-2" for="gender"><?php echo get_phrase('gender'); ?>:<span class="error" style="color: red;"> *</span></label>
       <div class="col-sm-5">
         <select  class="selectpicker" data-style="form-control" data-live-search="true" name="gender" id="gender" required>
-	<option value="Male" >Male</option>
-	<option value="Female" >Female</option>	
+	<option value="Male" ><?php echo get_phrase('male'); ?></option>
+	<option value="Female" ><?php echo get_phrase('File_upload'); ?></option>	
         </select>
       </div>
     </div>
     <div class="form-group">
-      <label class="control-label col-sm-2" for="birthday">Birthday:<span class="error" style="color: red;"> *</span></label>
+      <label class="control-label col-sm-2" for="birthday"><?php echo get_phrase('birthday'); ?>:<span class="error" style="color: red;"> *</span></label>
       <div class="col-sm-5">
         <input type="text" class="form-control date-picker" id="datepicker" placeholder="" name="birthday" required>
       </div>
@@ -49,18 +49,18 @@
       
       
        <div class="form-group">
-           <label class="control-label col-sm-2" for="age">Age:</label>
+           <label class="control-label col-sm-2" for="age"><?php echo get_phrase('age'); ?>:</label>
       <div class="col-sm-2">
         <input type="tel" class="form-control" id="age" name = "age" placeholder="Present Age">
       </div>
-      <label class="control-label col-sm-1" for="mobile">Mobile:</label>
+      <label class="control-label col-sm-1" for="mobile"><?php echo get_phrase('mobile'); ?>:</label>
       <div class="col-sm-2">
         <input type="tel" class="form-control" id="mobile" placeholder="Enter Mobile" name="mobile" required>
       </div>
     </div>
 
  <div class="form-group">
-      <label class="control-label col-sm-2" for="history">History:</label>
+      <label class="control-label col-sm-2" for="history"><?php echo get_phrase('history'); ?>:</label>
       <div class="col-sm-5">
         <select  class="selectpicker" data-style="form-control" data-live-search="true" name="history" id="history">
 	<option value="Unkown" >Unkown</option>
@@ -75,21 +75,21 @@
       
              
     <div class="form-group">        
-      <label class="control-label col-sm-2" for="surgical_history">Surgical History:</label>
+      <label class="control-label col-sm-2" for="surgical_history"><?php echo get_phrase('surgical_history'); ?>:</label>
         <div class="col-sm-5">          
         <textarea class="form-control" rows="5" id="surgical_history" name="surgical_history"></textarea>
         </div>
     </div>
       
     <div class="form-group">        
-      <label class="control-label col-sm-2" for="obstetric_history">Obstetric History:</label>
+      <label class="control-label col-sm-2" for="obstetric_history"><?php echo get_phrase('obstetric_history'); ?>:</label>
         <div class="col-sm-5">          
         <textarea class="form-control" rows="5" id="obstetric_history"  name="obstetric_history"></textarea>
         </div>
     </div>
       
     <div class="form-group">        
-      <label class="control-label col-sm-2" for="genetic_diseases">Genetic diseases:</label>
+      <label class="control-label col-sm-2" for="genetic_diseases"><?php echo get_phrase('genetic_diseases'); ?>:</label>
         <div class="col-sm-5">          
         <textarea class="form-control" rows="5" id="genetic_diseases" name="genetic_diseases"></textarea>
         </div>
@@ -97,7 +97,7 @@
       
       
     <div class="form-group">        
-      <label class="control-label col-sm-2" for="other_details">Other details:</label>
+      <label class="control-label col-sm-2" for="other_details"><?php echo get_phrase('other_details'); ?>:</label>
         <div class="col-sm-5">          
         <textarea class="form-control" rows="5" id="other_details" name="other_details"></textarea>
         </div>

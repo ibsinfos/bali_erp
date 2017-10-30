@@ -1,20 +1,53 @@
- <footer class="footer text-center"> 2017 &copy; Avant Garde. Brought to you by <a href="http://sharadtechnologies.com/" class="a_col">Sharad Technologies LLC</a> </footer>
+<style type="text/css">
+    #BottomRightBtn{
+        z-index: 2147483000!important;
+        position: fixed!important;
+        bottom: 20px;
+        right: 20px;
+        width: 60px!important;
+        height: 60px!important;
+        border-radius: 50%!important;
+        padding: 3px;
+        cursor: pointer;
+    }
+    .intercom-launcher-frame{bottom: 160px !important;}
+
+    #feedback_sidebar{
+        z-index: 2147483000!important;
+        position: fixed!important;
+        bottom: 85px;
+        right: 20px;
+        width: 60px!important;
+        height: 60px!important;
+        border-radius: 50%!important;
+        padding: 3px;
+        cursor: pointer;
+        display: none;
+    }
+</style>
+
+<div id="feedback_sidebar" class="circle bg-info" onclick="open_panel()"></div>
+
+<div id="BottomRightBtn" class="circle bg-info"><i class="fa fa-smile-o fa-4x" aria-hidden="true"></i></div>
+
+<script type="text/javascript">
+    $("#BottomRightBtn").hover(function(){
+        $(".intercom-launcher-frame").show();
+        $("#feedback_sidebar").show();
+    },function(){
+        $(".intercom-launcher-frame").fadeOut('slow');
+        $("#feedback_sidebar").fadeOut('slow');
+    });
+
+</script>
+
+ <footer class="footer text-center"> 2017 &copy; Avant Garde. </footer>
  
  <script type="text/javascript">
      myJsMain = window.myJsMain || {};
      var siteBaseUrl="<?php echo base_url();?>";
 	$(document).ready(function(){
-		<?php if($this->session->flashdata('flash_message')){ ?>
-			var msg = '<?php echo $this->session->flashdata("flash_message"); ?>';
-            <?php if(isset($_SESSION['flash_message'])){
-                unset($_SESSION['flash_message']);
-            }?>
-            //Created By Beant Kaur
-			var message_type_str="success";
-			EliminaTipo2(msg,message_type_str);
-            
-                        
-		<?php }?>
+		
 
 	    /*$('#PublicSearch').on('keyup click', function(){
 	        var search = $(this).val();

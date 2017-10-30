@@ -937,6 +937,7 @@ Best Regards,";
      * add transport fee
      */
     function add_transport_fee( $student_id , $fee_id , $academic_year ) {
+        $db=$this->connect_db();
         $fee_det                =   array();
         $transpfee_det          =   $db->get_where('sys_items',array('id'=>$fee_id,'school_id'=>$this->school_id))->result_array();
         $fee_det                =   array_merge($fee_det, $transpfee_det);

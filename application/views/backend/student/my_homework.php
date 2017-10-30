@@ -23,21 +23,27 @@
 <div class="row">
        <div class="col-md-12" data-step="5" data-intro="<?php echo get_phrase('Here you can see the list of previous homework.');?>" data-position='top'>
         <div class="panel panel-primary panel-shadow" data-collapsed="0">
-            <div class="panel-heading">
+<!--            <div class="panel-heading">
                 <div class="panel-title">Previous Homework</div>
-            </div>
+            </div>-->
+
+    <div class="panel-danger">
+        <div class="panel-heading"> Previous Homework
+            <div class="pull-right"></div>
+        </div>
+    </div>
             <div class="panel-body">
                <div class="col-md-12">
                    <table class="table table-bordered">
                        <thead>
                         <tr>
-                            <td style="text-align: center;"><?php echo get_phrase('homework');?></td>
-                            <td style="text-align: center;"><?php echo get_phrase('section_name');?></td>
+                            <td><?php echo get_phrase('homework');?></td>
+                            <td><?php echo get_phrase('section_name');?></td>
 <!--                            <td style="text-align: center;"><?php echo get_phrase('subject_name');?></td>-->
      
-                            <td style="text-align: center;" colspan="2"><?php echo get_phrase('start_date');?></td>
-                            <td style="text-align: center;" colspan="2"><?php echo get_phrase('end_date');?></td>
-                            <td style="text-align: center;" colspan="2"><?php echo get_phrase('action');?></td>
+                            <td><?php echo get_phrase('start_date');?></td>
+                            <td><?php echo get_phrase('end_date');?></td>
+                            <td colspan="2"><?php echo get_phrase('action');?></td>
                             
                         </tr>
                     </thead>
@@ -54,8 +60,8 @@
                                 if($row3['start_date'])
                         ?>
                             <tr>
-                                <td style="text-align: center;"><?php echo $row3['hw_name'];?></td>
-                                <td style="text-align: center;">
+                                <td><?php echo $row3['hw_name'];?></td>
+                                <td>
                                     <?php
                                        echo "Section ".$row3['section_name'];
                                        ?></td>
@@ -63,10 +69,10 @@
                                      <?php  echo $row3['subject_name']; ?>                           
                                 </td>-->
                                 
-                                <td style="text-align: center;"><?php echo $row3['start_date']?></td>
-                                <td style="text-align: center;"><?php echo $row3['end_date']?></td>
+                                <td><?php echo $row3['start_date']?></td>
+                                <td><?php echo $row3['end_date']?></td>
                                     
-                                <td style="text-align: center;">
+                                <td>
                                 <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_view_homework/<?php echo $row3['home_work_id']; ?>');">
                                     <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view_details');?>">
                                     <i class="fa fa-eye"></i></button></a>
@@ -88,20 +94,22 @@
     </div>
     <div class="col-md-12" data-step="6" data-intro="<?php echo get_phrase('Here you can see homework list of today.');?>" data-position='top'>
         <div class="panel panel-primary panel-shadow" data-collapsed="0">
-            <div class="panel-heading">
-                <div class="panel-title">Today homework</div>
+            <div class="panel-danger">
+                <div class="panel-heading"> Today Homework
+                    <div class="pull-right"></div>
+                </div>
             </div>
             <div class="panel-body">
                <div class="col-md-12">
                    <table class="table table-bordered">
                        <thead>
                         <tr>
-                            <td style="text-align: center;"><?php echo get_phrase('home_work');?></td>
-                            <td style="text-align: center;"><?php echo get_phrase('section_name');?></td>
+                            <td><?php echo get_phrase('home_work');?></td>
+                            <td><?php echo get_phrase('section_name');?></td>
 <!--                            <td style="text-align: center;"><?php echo get_phrase('subject_name');?></td>-->
-                            <td style="text-align: center;"><?php echo get_phrase('start_date');?></td> 
-                            <td style="text-align: center;"><?php echo get_phrase('end_date');?></td>
-                            <td style="text-align: center;" colspan="3"><?php echo get_phrase('action');?></td>
+                            <td><?php echo get_phrase('start_date');?></td> 
+                            <td><?php echo get_phrase('end_date');?></td>
+                            <td><?php echo get_phrase('action');?></td>
                             
                         </tr>
                     </thead>
@@ -118,32 +126,30 @@
                                 if($row3['start_date'])
                         ?>
                             <tr>
-                                <td style="text-align: center;"><?php echo $row3['hw_name'];?></td>
-                                <td style="text-align: center;">
+                                <td><?php echo $row3['hw_name'];?></td>
+                                <td>
                                     <?php
                                        echo "Section ".$row3['section_name'];
                                        ?></td>
 <!--                                <td style="text-align: center;">
                                      <?php  echo $row3['subject_name']; ?> !-->
-                                <td style="text-align: center;"><?php echo $row3['start_date']?></td>
-                                <td style="text-align: center;"><?php echo $row3['end_date']?></td>
+                                <td><?php echo $row3['start_date']?></td>
+                                <td><?php echo $row3['end_date']?></td>
                                 </td>
-                                <td style="text-align: center;">
+                                <td>
                                     <?php //echo $row3['passing_percent']?></td>
                                     
-                                <td style="text-align: center;">
+                                <td>
                                 <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_view_homework/<?php echo $row3['home_work_id']; ?>');">
                                     <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view_details');?>">
                                     <i class="fa fa-eye"></i></button></a>
-                                </td>
                                 <?php if($row3['status']    ==  "can attempt"){?>
-                                <td style="text-align: center;">
                                     <a href="<?php echo base_url(); ?>index.php?student/homework_submit/<?php echo $row3['home_work_id']; ?>">
                                     <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('attempt_now'); ?>">
                                     <i class="fa fa-sign-in"></i></button></a>
                                 </td>
                                 <?php } else{ ?>
-                                <td style="text-align: center;">
+                                <td>
                                     <?php echo get_phrase("done"); ?>
                                 </td>
                                 <?php } ?>

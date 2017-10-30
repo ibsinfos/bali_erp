@@ -13,8 +13,10 @@
         </ol>
     </div>
 </div>
+<div class="row">
 <div class="badge badge-danger badge-stu-name pull-right m-b-20">
-            <i class="fa fa-user"></i> <?php echo $student_name; ?>
+   <i class="fa fa-user"></i> <?php echo $student_name; ?>
+</div>
 </div>
 <div class="row">
 <div class="white-box">        
@@ -129,7 +131,7 @@
                         </div>
                     </div>
                     <div class="text-right">
-                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit'); ?></button>
+                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('add_record'); ?></button>
                     </div>
 <?php echo form_close(); ?> 
                 </section>             

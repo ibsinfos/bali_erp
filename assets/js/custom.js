@@ -218,9 +218,16 @@ $(document).ready(function () {
     $(".navbar-toggle").on("click", function () {
         $(".navbar-toggle i").toggleClass("ti-menu").addClass("ti-close");
     });
+
+    $(document).on('change keyup','.no-neg',function(){
+        var val = parseFloat(this.value,10);
+        if(val<0){
+            this.value = 0;
+        }
+    });
 });
 
-//Prad Work
+//PRADA Work
 function confirm_act(link,dataobj,noajax,obj,cobj,callback){
     dataobj = dataobj?dataobj:{};
     noajax = noajax?noajax:false;
@@ -238,20 +245,18 @@ function confirm_act(link,dataobj,noajax,obj,cobj,callback){
             $modal_obj.modal('hide');
         }else{
             $('body').loading('start');
+            $modal_obj.modal('hide');
             $.ajax({
                 type: 'POST',
                 url: link,
                 data: dataobj,
                 dataType:'json',
-                success: function (data){
+                success: function (data,textStatus){
+                    //console.log(textStatus);
                     $('body').loading('stop');
                     if(data.status!=undefined){
+                        swal(data.status,data.msg?data.msg:'',data.status);
                         if(data.status=='success'){
-                            $modal_obj.modal('hide');
-                            if(data.msg!=undefined){
-                                swal('',data.msg,'success');
-                            }  
-
                             if($obj && cobj)    
                                 $obj.closest(cobj).remove();
 
@@ -263,11 +268,17 @@ function confirm_act(link,dataobj,noajax,obj,cobj,callback){
                                 window.location.reload();
                             }
                         }else{
-                            if(data.msg!=undefined)
-                                swal('',data.msg,'error');
-                            $modal_obj.modal('hide');
+                            $modal_obj.modal('show');
                         }
+                    }else{
+                        swal('Success','','success');
                     }
+                },
+                error: function(xhr, textStatus, errorThrown){
+                    //console.log(textStatus, errorThrown);
+                    $('body').loading('stop');
+                    swal('Error',errorThrown,'error');
+                    $modal_obj.modal('show');
                 }
             });
         }  
@@ -279,7 +290,7 @@ function confirm_act(link,dataobj,noajax,obj,cobj,callback){
     });    
 }
 
-//Prad Work
+//PRADA Work
 if(window.location.hash!=''){
     var hash = window.location.hash.substr(1);
     
@@ -289,11 +300,15 @@ if(window.location.hash!=''){
     $('.sttabs').find('.content-current').removeClass('content-current');
     $('.sttabs').find('section[id='+hash+']').addClass('content-current');
 
-    $(document).on('click','.sttabs li > a',function(){
+    $(document).on('click','.sttabs > nav li > a',function(){
+        if($(this).attr('href')==undefined)
+            return false;
+
         $('.sttabs').find('li').removeClass('tab-current');
         $('.sttabs').find('.content-current').removeClass('content-current');
         
         //$(this).closest('li').addClass('tab-current'); 
+
         var hash = $(this).attr('href').substr(1);
         $('.sttabs').find('li > a[href=#'+hash+']').closest('li').addClass('tab-current');
         $('.sttabs').find('section[id='+hash+']').addClass('content-current');

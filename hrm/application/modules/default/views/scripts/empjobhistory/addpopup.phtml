@@ -89,7 +89,7 @@ sapp_Global::generateClientValidations($this->form);
 				<?php }?>
 			</div>
 
-			<div class="new-form-ui ">
+			<?php /* <div class="new-form-ui ">
 			    <label class="required"><?php echo $this->form->client->getLabel(); ?> <img class="tooltip" title="<?php echo 'Clients which have been configured in time management.';?>" src="<?php echo MEDIA_PATH;?>images/help.png"></label>
 				<div class="division"><?php echo $this->form->client; ?></div>
 				 <?php if(isset($this->msgarray['client'])){?>
@@ -123,7 +123,7 @@ sapp_Global::generateClientValidations($this->form);
 				   <span class="errors" id="errors-<?php echo $this->form->paid_amount->getId(); ?>"><?php echo $this->msgarray['paid_amount'];?></span>
 				<?php }?>
 			</div>
-			
+			*/ ?>
 						
 			<div class="new-form-ui-submit" id="formSubmit">
 			<?php echo $this->form->submit; ?>

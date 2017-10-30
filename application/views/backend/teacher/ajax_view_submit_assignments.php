@@ -26,19 +26,28 @@
                 <td><?php echo $row['comments'];?></td> 
                 <td><?php if($row['isSubmitted'] == "1"){ echo "Attempted";}else{ echo "Not Attempted";}?></td>
                 <td>
-                    <?php  if($row['isSubmitted'] == "1"){ ?>
-                        <a href="#" onclick="showDocumentPreview('<?php echo base_url();?>index.php?modal/popup/assignment_preview/<?php echo $row['file_desc'];?>/teacher');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Assignment"><i class="fa fa-eye"></i></button> 
-                    <?php }else{ ?>
-                            <a href="#" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_submit_assignment_view/<?php echo $row['answer_id'];?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Available" disabled=""><i class="fa fa-eye"></i></button> 
-                   </a>
-                    <?php } ?>       
-                     <?php if (!empty($row['file_desc'])){?>
-                    <a href="uploads/assignments_answers/<?php echo $row['file_desc']; ?>" target="blank"><button type="button" class="btn btn-defoult btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Download Assignment">
+                    <?php  if($row['isSubmitted'] == "1"){
+                        if (!empty($row['file_desc']) && file_exists(FCPATH.'uploads/assignments_answers/'.$row['file_desc'])){
+                        ?>
+                    <a href="#" onclick="showDocumentPreview('<?php echo base_url();?>index.php?modal/popup/assignment_preview/<?php echo $row['file_desc'];?>/teacher');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Assignment"><i class="fa fa-eye"></i></button></a>
+                     <a href="uploads/assignments_answers/<?php echo $row['file_desc']; ?>" target="blank"><button type="button" class="btn btn-defoult btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Download Assignment">
                         <i class="fa fa-download"></i>
                     </button></a>
-                     <?php  } else{  ?>  <a><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="" disabled="">
+                    <?php }
+                    else{ ?>
+                            <a href="#" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_submit_assignment_view/<?php echo $row['answer_id'];?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Available" disabled=""><i class="fa fa-eye"></i></button> 
+                   </a>
+                    <a><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Attachment" disabled="">
                     <i class="fa fa-download"></i>
-                </button></a> <?php  }?>
+                </button></a>
+                    <?php }
+                    }else{ ?>
+                            <a href="#" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_submit_assignment_view/<?php echo $row['answer_id'];?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Available" disabled=""><i class="fa fa-eye"></i></button> 
+                   </a>
+                    <a><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Attachment" disabled="">
+                    <i class="fa fa-download"></i>
+                </button></a>
+                    <?php } ?>  
                 <?php 
                    if($row['is_Verified']==1){ ?>
                        <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Already Verify" disabled=""><i class="fa fa-share"></i></button>

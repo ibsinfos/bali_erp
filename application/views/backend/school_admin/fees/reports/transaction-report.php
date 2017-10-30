@@ -1,6 +1,6 @@
-<style>
-#dt_table thead{    background: #707cd2;}
-#dt_table thead tr th{font-weight:bold;color:#fff}
+<style type="text/css">
+/*#dt_table thead{    background: #707cd2;}*/
+#dt_table thead tr th{font-weight:bold;}
 .show-detail-box{}
 </style>
 <div class="row bg-title">
@@ -34,20 +34,20 @@
     <div class="col-md-12 white-box">
         <div class="row">
             <form method="post" action="">
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label>Start Date</label>
                     <input type="text" class="form-control dtp" name="from_date" placeholder="YYYY-MM-DD" value="<?php echo $from_date?>" required/>
                 </div> 
                 
                 
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label>End Date</label>
                     <input type="text" class="form-control dtp" name="to_date" placeholder="YYYY-MM-DD" value="<?php echo $to_date?>" required/>
                 </div> 
 
-                <div class="col-md-3">
+                <div class="col-md-12 text-center">
                    <label>&nbsp;</label><br/>
-                   <button type="submit" class="btn btn-danger btn-outline btn-1d">Submit</button>
+                   <button type="submit" class="btn btn-danger btn-outline btn-1d">View</button>
                 </div> 
             </form>
         </div>
@@ -57,8 +57,8 @@
 <?php if($report_generated){?>
 <div class="row m-0">
     <div class="col-md-12 white-box">
-        <h3><?php echo get_phrase('transaction_reort');?></h3>
-        <table class="table table-striped table-bordered" width="100%" id="dt_table">
+        <h3><?php echo get_phrase('transaction_report');?></h3>
+        <table class="table table-bordered" width="100%" id="dt_table">
             <thead>
                 <tr>
                     <th><div><?php echo get_phrase('S.No.');?></div></th>

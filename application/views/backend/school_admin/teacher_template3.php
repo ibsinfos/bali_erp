@@ -22,7 +22,7 @@
         </ol>
     </div>
     <!-- /.breadcrumb -->
-</div>
+</div><?php pre($certificate_detail); die; ?>
   <?php if(!empty($certificate_detail)){ ?>
 <div class="col-md-12 m-b-20 text-right no-padding">   
             <button value="Print" id="print_button" onclick="PrintElem('#print_div');" class="fcbtn btn btn-danger btn-outline btn-1d"> Print </button>
@@ -34,7 +34,7 @@
                 <div class="main_div">
                     <span class="m-t-20" id="title-name"><br><br><b><?php echo $system_name; ?></b></span>
     <br/><br/>
-      <span class="m-t-20" id="sub-title"><?php echo ucfirst($certificate_detail->certificate_title); ?></span>
+      <span class="m-t-20" id="sub-title" style="font-family:Old English Text MT"><?php echo ucfirst($certificate_detail->certificate_title); ?></span>
                     <br>
                     <span id="title-name">for</span>
                     <br>

@@ -132,11 +132,11 @@ class Default_Model_Disciplinaryincident extends Zend_Db_Table_Abstract
                     $tablecontent = $this->getDisciplinaryIncidents($sort, $by, $pageNo, $perPage,$searchQuery,$flag);
                 }
         if($flag=='myincident') {
-            $tableFields = array('action'=>'Action','unitname' => 'Business Unit','deptname' => 'Department',
+            $tableFields = array('action'=>'Action','deptname' => 'Department',
                                 'violationname' => 'Violation Name','date_of_occurrence'=>'Date Of Occurence',
                                 'employee_appeal'=>'Appealed','cao_verdict' => 'Verdict');
         }else{        
-            $tableFields = array('action'=>'Action','employeename'=>'Employee Name','unitname' => 'Business Unit',
+            $tableFields = array('action'=>'Action','employeename'=>'Employee Name',
                             'deptname' => 'Department','violationname' => 'Violation Name','date_of_occurrence'=>'Date Of Occurence',
                             'employee_appeal'=>'Appealed','cao_verdict' => 'Verdict');
         }   
@@ -182,12 +182,13 @@ class Default_Model_Disciplinaryincident extends Zend_Db_Table_Abstract
         if($auth->hasIdentity())
         {
             $loginUserId = $auth->getStorage()->read()->id;
+            $school_id = $auth->getStorage()->read()->school_id;
         }
-        $where_condition = " where user_id!=$loginUserId";
-        if(is_numeric($businessunit_id))
-        {
-            $where_condition .= " and businessunit_id = $businessunit_id ";    
-        }
+        $where_condition = " where user_id!=$loginUserId AND school_id = '".$school_id."'";
+//        if(is_numeric($businessunit_id))
+//        {
+//            $where_condition .= " and businessunit_id = $businessunit_id ";    
+//        }
         if(is_numeric($department_id) && $department_id != 0)
         {
             $where_condition .= " and department_id = $department_id ";   
@@ -195,7 +196,7 @@ class Default_Model_Disciplinaryincident extends Zend_Db_Table_Abstract
         
         $db = Zend_Db_Table::getDefaultAdapter();
         //$query ="select * from main_employees_summary $where_condition";
-        $query ="select user_id,userfullname,profileimg,jobtitle_id,jobtitle_name,employeeId,reporting_manager,reporting_manager_name from main_employees_summary $where_condition";
+         $query ="select user_id,userfullname,profileimg,jobtitle_id,jobtitle_name,employeeId,reporting_manager,reporting_manager_name from main_employees_summary $where_condition";
         $employee_data = $result = $db->query($query)->fetchAll();
         return $employee_data;
     }

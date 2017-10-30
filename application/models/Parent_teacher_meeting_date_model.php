@@ -48,7 +48,7 @@ class Parent_teacher_meeting_date_model extends CI_Model {
                 $this->db->where('school_id',$school_id);
             } 
         }
-        $this->db->order_by('meeting_date', 'DESC');
+        $this->db->order_by('parrent_teacher_meeting_date_id', 'DESC');
         $this->db->where($condition);
         $settings_records = $this->db->get('parrent_teacher_meeting_date')->result_array();
         return $settings_records;

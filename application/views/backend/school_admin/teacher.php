@@ -25,7 +25,7 @@
 </div>
 
 
-<div class="col-sm-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here you can view the list of teachers.');?>" data-position='top'>
+<div class="col-sm-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here_you_can_view_the_list_of_teachers.');?>" data-position='top'>
 
     <?php if ($this->session->flashdata('flash_message_error')) { ?>        
 
@@ -43,7 +43,7 @@
                     <th><div><?php echo get_phrase('email'); ?></div></th>
                     <th><div><?php echo get_phrase('phone'); ?></div></th>
                     <th><div><?php echo get_phrase('options'); ?></div></th>
-                    <th  data-step="6" data-intro="<?php echo get_phrase('Here you can view the profile and update passcode of a teacher.');?>" data-position='left' ><div><?php echo get_phrase('action'); ?></div></th>
+                    <th  data-step="6" data-intro="<?php echo get_phrase('Here_you_can_view_the_profile_and_update_passcode_of_a_teacher.');?>" data-position='left' ><div><?php echo get_phrase('action'); ?></div></th>
                 </tr>
             </thead>
 

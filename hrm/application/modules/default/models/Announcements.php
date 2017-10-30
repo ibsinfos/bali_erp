@@ -145,10 +145,19 @@ class Default_Model_Announcements extends Zend_Db_Table_Abstract
 	
 	public function getAllAnnouncementsData()
 	{
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                    $loginuserGroup = $auth->getStorage()->read()->group_id;
+                    $loginuserRole = $auth->getStorage()->read()->emprole;
+                    $businessunit_id = $auth->getStorage()->read()->businessunit_id;
+                    $department_id = $auth->getStorage()->read()->department_id;
+                    $school_id = $auth->getStorage()->read()->school_id;
+            }
+                
 	    $select = $this->select()
 						->setIntegrityCheck(false)
 						->from(array('a'=>'main_announcements'),array('a.*'))
-					    ->where('a.isactive = 1');
+					    ->where('a.isactive = 1 AND a.school_id = "'.$school_id.'"');
 		return $this->fetchAll($select)->toArray();
 	}
 	
@@ -202,12 +211,13 @@ class Default_Model_Announcements extends Zend_Db_Table_Abstract
 	{
 		$where = '';
 		$auth = Zend_Auth::getInstance();
-     	if($auth->hasIdentity()){
-			$loginuserGroup = $auth->getStorage()->read()->group_id;
-			$loginuserRole = $auth->getStorage()->read()->emprole;
-			$businessunit_id = $auth->getStorage()->read()->businessunit_id;
-			$department_id = $auth->getStorage()->read()->department_id;
-		}
+            if($auth->hasIdentity()){
+                    $loginuserGroup = $auth->getStorage()->read()->group_id;
+                    $loginuserRole = $auth->getStorage()->read()->emprole;
+                    $businessunit_id = $auth->getStorage()->read()->businessunit_id;
+                    $department_id = $auth->getStorage()->read()->department_id;
+                    $school_id = $auth->getStorage()->read()->school_id;
+            }
 		
 		$where = "a.isactive = 1";
 		if($loginuserGroup == HR_GROUP || $loginuserGroup == MANAGEMENT_GROUP || $loginuserRole == 1)
@@ -223,6 +233,8 @@ class Default_Model_Announcements extends Zend_Db_Table_Abstract
 			if($department_id)
 			$where .= ' AND FIND_IN_SET('.$department_id.',a.department_id)';
 		}
+                
+                $where.=" AND a.school_id = '".$school_id."'";
 		
 		$db = Zend_Db_Table::getDefaultAdapter();		
 		

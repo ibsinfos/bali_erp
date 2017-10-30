@@ -71,14 +71,14 @@ class Default_PolicydocumentsController extends Zend_Controller_Action
 		try
 		{
 			/** capture category id **/
-			$id = $this->getRequest()->getParam('id');
-			$id = (int)$id;
-
-			if(!empty($id) && $id != 0)
-			{
-				$categoryObj = $this->documentsModel->getCategoryById($id);
-				if(!empty($categoryObj))
-				{
+//			$id = $this->getRequest()->getParam('id');
+//			$id = (int)$id;
+//
+//			if(!empty($id) && $id != 0)
+//			{
+//				$categoryObj = $this->documentsModel->getCategoryById($id);
+//				if(!empty($categoryObj))
+//				{
 					/** check for ajax call **/
 					$call = $this->_getParam('call');
 					if($call == 'ajaxcall')
@@ -158,16 +158,16 @@ class Default_PolicydocumentsController extends Zend_Controller_Action
 					
 					/** send flash messages to view **/
 					$this->view->messages = $this->_helper->flashMessenger->getMessages();
-				}
-				else
-				{
-					$this->view->ermsg = 'nocategory';
-				}
-			}
-			else
-			{
-				$this->view->ermsg = 'nodata';
-			}
+//				}
+//				else
+//				{
+//					$this->view->ermsg = 'nocategory';
+//				}
+//			}
+//			else
+//			{
+//				$this->view->ermsg = 'nodata';
+//			}
 		}
 		catch(Exception $e)
 		{
@@ -837,16 +837,16 @@ class Default_PolicydocumentsController extends Zend_Controller_Action
 				}
 				
 				/** capture category id **/
-				$category_id = $this->getRequest()->getParam('id');
-				$category_id = (int)$category_id;
-
-				/**
-				** if category id is available
-				** load the form
-				** else redirect to invalid url page
-				**/
-				if($category_id)
-				{
+//				$category_id = $this->getRequest()->getParam('id');
+//				$category_id = (int)$category_id;
+//
+//				/**
+//				** if category id is available
+//				** load the form
+//				** else redirect to invalid url page
+//				**/
+//				if($category_id)
+//				{
 					/**
 					** Initiating category form
 					** and assigning action
@@ -860,10 +860,13 @@ class Default_PolicydocumentsController extends Zend_Controller_Action
 					** populate category in select control
 					**/
 					$categoriesModel = new Default_Model_Categories();
-					$categoriesObj = $categoriesModel->getCategoryById($category_id);
-					if(!empty($categoriesObj))
+					$categoriesObj = $categoriesModel->getAllCategories(); //getCategoryById($category_id);
+
+                                        if(!empty($categoriesObj))
 					{
-						$multipleDocsForm->category_id->addMultiOption($categoriesObj['id'],utf8_encode($categoriesObj['category']));
+                                            foreach($categoriesObj as $key=>$cats){
+						$multipleDocsForm->category_id->addMultiOption($cats['id'],utf8_encode($cats['category']));
+                                            }
 					}
 					$multipleDocsForm->setDefault('category_id',$category_id);
 					$this->view->category_id = $category_id;
@@ -872,12 +875,12 @@ class Default_PolicydocumentsController extends Zend_Controller_Action
 					{
 						$this->saveMultipleDoc($multipleDocsForm,$category_id,$redirectUrl);
 					}
-				}
-				else
-				{
-					$this->view->ermsg = 'invalidUrl';
-					return;
-				}
+//				}
+//				else
+//				{
+//					$this->view->ermsg = 'invalidUrl';
+//					return;
+//				}
 			}
 			else
 			{

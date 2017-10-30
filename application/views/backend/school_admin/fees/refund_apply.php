@@ -18,8 +18,8 @@
                 <div class="col-md-8 col-md-offset-2">
                     <div class="pay-box">
                         <div class="row mt10">
-                            <div class="col-md-3 class-select-box">
-                                <label><?php echo get_phrase('class')?></label>        
+                            <div class="col-md-4 class-select-box">
+                                <label><strong><?php echo get_phrase('class')?></strong></label>        
                                 <select name="class_id" class="selectpicker" data-style="form-control input-sm" data-live-search="true" 
                                         data-title="<?php echo get_phrase('select_class')?>">
                                     <?php foreach($classes as $cls){?>        
@@ -28,14 +28,14 @@
                                 </select>
                             </div> 
 
-                            <div class="col-md-3">
-                                <label><?php echo get_phrase('student')?></label>        
+                            <div class="col-md-4">
+                                <label><strong><?php echo get_phrase('student')?></strong></label>        
                                 <select name="student_id" class="selectpicker" data-style="form-control input-sm" data-live-search="true" 
                                         data-title="<?php echo get_phrase('select_student')?>"> 
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label><?php echo get_phrase('Fees')?></label>        
+                                <label><strong><?php echo get_phrase('Fees')?></strong></label>        
                                 <select name="fee" class="selectpicker" data-style="form-control input-sm" data-live-search="true" 
                                         data-title="<?php echo get_phrase('select_fee')?>"> 
                                 </select>
@@ -54,7 +54,6 @@
                                             <th class="text-right"><?php echo get_phrase('date_of_joining');?></th>
                                         </tr>
                                     </thead>
-
                                     <tbody>
                                     </tbody>
                                 </table>

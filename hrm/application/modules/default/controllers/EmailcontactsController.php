@@ -93,20 +93,20 @@ class Default_EmailcontactsController extends Zend_Controller_Action
         }
         $emailgroup_model = new Default_Model_Emailgroups();
         $emailcontacts_model = new Default_Model_Emailcontacts();
-        $business_unit_model = new Default_Model_Businessunits();
-        $bunits_options = $business_unit_model->getBusinessUnitsList();
+//        $business_unit_model = new Default_Model_Businessunits();
+//        $bunits_options = $business_unit_model->getBusinessUnitsList();
         $emailContactsform = new Default_Form_emailcontacts();
         $emailContactsform->setAttrib('action',BASE_URL.'emailcontacts/add');
         $group_options = array();
-        if(isset($_POST['business_unit_id']) && $_POST['business_unit_id'] != '')
-        {
-            $bunit_val = $_POST['business_unit_id'];
-        }
-        else 
-        {
-            $bunit_val = 0;
-        }
-        $group_data = $emailcontacts_model->getgroupoptions($bunit_val);
+//        if(isset($_POST['business_unit_id']) && $_POST['business_unit_id'] != '')
+//        {
+//            $bunit_val = $_POST['business_unit_id'];
+//        }
+//        else 
+//        {
+//            $bunit_val = 0;
+//        }
+        $group_data = $emailcontacts_model->getgroupoptions();
         if(count($group_data) > 0)
         {
             foreach($group_data as $group)
@@ -130,10 +130,10 @@ class Default_EmailcontactsController extends Zend_Controller_Action
             $msgarray['group_id'] = "No more groups are available for this business unit.";
         }
         $emailContactsform->group_id->addMultiOptions(array(''=>'Select Group')+$group_options);
-        $emailContactsform->business_unit_id->addMultiOptions(array('0'=>'No Business Unit')+$bunits_options);
+        //$emailContactsform->business_unit_id->addMultiOptions(array('0'=>'No Business Unit')+$bunits_options);
         $this->view->form = $emailContactsform; 	
         $this->view->msgarray = $msgarray;
-        $this->view->bunits_options = $bunits_options;
+        //$this->view->bunits_options = $bunits_options;
         if($this->getRequest()->getPost())
         {
             $result = $this->save($emailContactsform);	

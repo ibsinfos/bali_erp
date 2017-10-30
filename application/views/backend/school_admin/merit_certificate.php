@@ -8,8 +8,18 @@
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         <ol class="breadcrumb">
-            <li><a href="<?php echo base_url(); ?>index.php?school_admin/Dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
-            <li class="active"><?php echo get_phrase($page_title); ?></li>
+            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li><?php echo get_phrase('student'); ?>
+                <ul>                    
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_information"><?php echo get_phrase('student_information'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_promotion"><?php echo get_phrase('student_promotion'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/map_students_id"><?php echo get_phrase('map_students_id'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_fee_configuration"><?php echo get_phrase('student_fee_setting'); ?></a></li>
+                </ul>
+            </li>
+            <li class="active">
+                <?php echo $page_title; ?>
+            </li>
         </ol>
     </div>
     <!-- /.breadcrumb -->
@@ -30,14 +40,14 @@ if (!empty($certificate_detail)) {
 ?>
 
 <?php if ($is_approve == '1') { ?>
-    <div class="col-md-12 m-b-20 text-right">
-        <input type="button" value="Approved" id="tc_confm" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="5" data-intro="Click on confirm button , then you will get a print button for print certificate." data-position='right' disabled="">
-        <button value="Print"  onclick="PrintElem('#print_div');" class="fcbtn btn btn-danger btn-outline btn-1d"> Print </button>
+    <div class="col-md-12 m-b-20 text-center">
+        <input type="button" value="Approved" id="tc_confm" class="fcbtn btn btn-danger btn-outline btn-1d" disabled="">
+        <button value="Print"  onclick="PrintElem('#print_div');" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="5" data-intro="<?php echo get_phrase('you_can_print_merit_certificate_by_clicking_this_button'); ?>" data-position='top' > Print </button>
     </div>
 <?php } else { ?>
 <form method="post" action="<?php echo base_url(); ?>index.php?school_admin/print_merit_certificate/create/<?php echo $student->student_id; ?>/<?php echo $student->parent_id; ?>">
 <div class="col-md-12 m-b-20 text-right">
-       <button value="submit" class="fcbtn btn btn-danger btn-outline btn-1d"> Approve </button>
+       <button value="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="5" data-intro="<?php echo get_phrase('you_can_approve_merit_certificate_by_clicking_this_button.') ?>" data-position='top'> Approve </button>
     <?php } ?>
 </div>
 <input type="hidden" name="action" id="action" value="<?php echo $print; ?>">
@@ -54,7 +64,7 @@ if (!empty($certificate_detail)) {
                     <span id="title-name">for</span>
                     <br>
                     <input type="hidden" name="for_merit" value="<?php echo $merit_certificate_for; ?>">
-                    <input type="text" class="input_style" id="for_merit" maxlength="100" onchange="show_value();" data-step="5" data-intro="Please feel in this value after click on print." data-position='right' value="<?php echo "Class ".$merit_certificate_for; ?>" readonly="" />
+                    <input type="text" class="input_style" id="for_merit" maxlength="100" onchange="show_value();" value="<?php echo "Class ".$merit_certificate_for; ?>" readonly="" />
                     <div id="for_merit_val" class="print_text" style="display:none;"><?php echo "Class ".$merit_certificate_for; ?>&nbsp;</div>
                     <br>
                     <img src="<?php echo base_url(); ?>assets/images/horizntal_image.png" />

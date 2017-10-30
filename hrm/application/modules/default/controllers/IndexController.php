@@ -69,7 +69,7 @@ class Default_IndexController extends Zend_Controller_Action
 	{ 
             $auth= Zend_Auth::getInstance();
             if($auth->hasIdentity()){ 
-                $this->_redirect('index.php/index/welcome');
+                $this->_redirect('index/welcome');
             } else { 
                 if(isset($_COOKIE['username']) && isset($_COOKIE['password']))
                 $this->loginpopupsaveAction();
@@ -338,14 +338,13 @@ class Default_IndexController extends Zend_Controller_Action
 		Zend_Session::namespaceUnset('tm_role');
 		$auth = Zend_Auth::getInstance();
 		$auth->clearIdentity();
-		        if (isset($_SERVER['SERVER_NAME'])) {
-            $server = sprintf("%s://%s%s", isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', $_SERVER['SERVER_NAME'], '/');
-        } else {
-            $server = sprintf("%s://%s%s", isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', $_SERVER['SERVER_ADDR'], '/');
-        }
-        $url_arr=explode('/', $_SERVER['PHP_SELF']);
-        $url=$server.$url_arr[1]."/index.php?school_admin/dashboard";
-        $this->_redirect($url);
+                if($_SERVER['HTTP_HOST']=='52.14.91.109' || $_SERVER['HTTP_HOST']=='localhost'){
+                    $url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST'].'/'.SH_CURRENT_INSTANCE."/index.php?login/logout";
+                } else {
+                    $url = CURRENT_HTTP_PROTOCOL.$_SERVER['HTTP_HOST']."/index.php?login/logout";
+                }
+
+                $this->_redirect($url);
 	}
 
 	public function clearsessionarrayAction()

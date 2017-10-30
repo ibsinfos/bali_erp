@@ -24,12 +24,12 @@
             </li>
 
             <ul class="nav p-r-0 list-inline">
-<!--                <li class=" p-0 menu-item-tile <?php if ($page_name == 'assign_role') echo 'active'; ?> ">
+               <li class=" p-0 menu-item-tile <?php if ($page_name == 'assign_role') echo 'active'; ?> ">
                     <a href="<?php echo base_url(); ?>index.php?super_admin/role" class="waves-effect active menu-items text-center">
                         <i class="icon-size fa fa-user"></i>
                         <span class="menu-text"><?php echo get_phrase('manage_role'); ?></span>
                     </a>
-                </li>-->
+                </li>
 
                 <li class=" p-0 menu-item-tile <?php if ($page_name == 'add_role') echo 'active'; ?> ">
                     <a href="<?php echo base_url(); ?>index.php?super_admin/assign_role" class="waves-effect active menu-items text-center">

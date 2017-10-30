@@ -38,9 +38,14 @@
                         <input type="hidden" name="reciever[]" id="reciever2" value="">
             <select class="selectpicker" multiple data-style="form-control" id="parent_reciever" onchange="get_value_parent()" name="parent_reciever[]" data-live-search="true" data-actions-box="true">
 <?php if(count($parents)){ foreach ($parents as $parent) { ?>
-                            <option value="<?php echo $parent['parent_id']; ?>"><?php echo $parent['parent_fullname']; ?></option>
+                            <option value="<?php echo $parent['parent_id'].'_'.$parent['class_id']; ?>"><?php echo $parent['parent_fullname']; ?></option>
 <?php } } ?>
                         </select>
+                    </div>
+
+                    <div class="clearfix"></div><div class="col-md-6"><br>
+                        <label for="Title"><?php echo get_phrase('Title');?><span class="error" style="color: red;">*</span></label>
+                        <input type="text" required="required" class="form-control" name="parent_notice_title" data-validate="required" >
                     </div>
 
                     <div class="col-md-12"><br>
@@ -67,9 +72,15 @@
                         <input type="hidden" name="reciever[]" id="reciever" value="">
             <select class="selectpicker" multiple data-style="form-control" id="student_reciever" onchange="get_value_student()" name="student_reciever[]" data-live-search="true" data-actions-box="true">
 <?php if(count($students)){ foreach ($students as $student){ ?>
-                            <option value="<?php echo $student['student_id']; ?>"><?php echo $student['student_fullname']; ?></option><?php } } ?>
+                            <option value="<?php echo $student['student_id'].'_'.$student['class_id']; ?>"><?php echo $student['student_fullname']; ?></option><?php } } ?>
                         </select>
                     </div>
+
+                    <div class="clearfix"></div><div class="col-md-6"><br>
+                        <label for="Title"><?php echo get_phrase('Title');?><span class="error" style="color: red;">*</span></label>
+                        <input type="text" required="required" class="form-control" name="student_notice_title" data-validate="required" >
+                    </div>
+
                     <div class="col-md-12"><br>
                         <label for="description"><?php echo get_phrase('message');?><span class="error" style="color: red;">*</span></label>
                         <textarea class="form-control" id="student_message" rows="8" name="student_message" placeholder="<?php echo get_phrase('write_your_message'); ?>"></textarea>
@@ -93,8 +104,13 @@
                         <input type="hidden" name="reciever[]" id="reciever1" value="">
             <select class="selectpicker" multiple data-style="form-control" id="teacher_reciever" onchange="get_value_teacher()" name="teacher_reciever[]" data-live-search="true" data-actions-box="true">
 <?php if(count($teachers)){ foreach ($teachers as $teacher){ ?>
-                            <option value="<?php echo $teacher['teacher_id']; ?>"><?php echo $teacher['teacher_fullname']; ?></option><?php } } ?>
+                            <option value="<?php echo $teacher['teacher_id'].'_'.$teacher['class_id'];; ?>"><?php echo $teacher['teacher_fullname']; ?></option><?php } } ?>
                         </select>
+                    </div>
+
+                    <div class="clearfix"></div><div class="col-md-6"><br>
+                        <label for="Title"><?php echo get_phrase('Title');?><span class="error" style="color: red;">*</span></label>
+                        <input type="text" required="required" class="form-control" name="teacher_notice_title" data-validate="required" >
                     </div>
 
                     <div class="col-md-12"><br>
@@ -258,7 +274,13 @@ debugger;
 
             success: function (data) {
                 debugger;
-                if(data){  
+
+                if(data.trim()=='no_sms_pack'){
+                    $('#loader2').hide();
+                    $('.loader2').empty();
+                    $('.loader2').html('<p class="required">Sms pack expired, please renew it</p>');
+                    return false;
+                }else{  
                 debugger;                  
                     $('#loader2').hide();
                     $('.loader2').html('Message sent succesfully');

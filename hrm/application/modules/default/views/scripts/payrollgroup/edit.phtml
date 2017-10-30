@@ -46,10 +46,10 @@ foreach($this->group_category_details AS $k => $v){
 </div>*/?>
     <div style="position: relative">
     <div style="clear: both;"></div>    
-<div class="new-form-ui" id="PayrollGroupMinWidth">
-    <label class="required">
-        Payroll Category Group Code</label>
-    <div class="division">
+    <div class="new-form-ui" id="PayrollGroupMinWidth" style="width: 100%; float:left; height: auto;">
+        <label class="required">
+            Payroll Category Group</label>
+            <div class="division">
         <div>
         <?php /* <select name="payroll_group_code" id="payroll_group_code" class="select2-offscreen" tabindex="-1">
             <option value="">Select</option>
@@ -64,9 +64,9 @@ foreach($this->group_category_details AS $k => $v){
         <span id="all_payroll_category"></span>
         <input type="hidden" value="" name="add_payroll_group_code_hidden" id="add_payroll_group_code_hidden">*/?>
                
-        <?php foreach ($this->groupcode AS $k => $v):?>
+        <?php foreach ($this->groupcode AS $k => $v): ?>
             <label>
-                <input type="checkbox" name="add_payroll_group_code_hidden[]" value="<?php echo $v['payroll_category_id'];?>" <?php if(in_array($v['payroll_category_id'], $group_category_details_arr)){?>checked<?php }?>>
+                <input type="checkbox" name="add_payroll_group_code_hidden[]" value="<?php echo $v['payroll_category_id'];?>" <?php if(in_array($v['payroll_category_id'], $group_category_details_arr) || $v['code']=='BAS'){?>checked<?php }?> <?php if($v['code']=='BAS') { ?>  onclick="return false;" <?php } ?>>
                 <?php echo $v['name'].' - ';if($v['type']==0){ echo 'Earning';}else{ echo 'Deduction';}?>
             </label><br>
         <?php endforeach;?>    
@@ -76,17 +76,17 @@ foreach($this->group_category_details AS $k => $v){
     </div>
     
         
-</div>
-    <div style="clear: both !important;"></div>    
-    <div class="new-form-ui-submit" style="position:relative !important;margin-left: 230px;">
-        <input name="submit"  value="Update payroll roll category" type="submit">
+    </div>
+    <div style="clear: both !important; width: 100%; float: left;">&nbsp;</div>    
+    <div class="new-form-ui-submit" align='center' style="position:relative !important; width:100%;float: left; margin-top: 20px; text-align: center">
+        <input name="submit"  value="Assign Payroll category" type="submit">
         <button onclick="window.location.href = '<?php echo BASE_URL;?>payrollgroup';" type="button" id="Cancel" name="Cancel">Cancel</button>
     </div>
     </div>
     </form>
 <script type="text/javascript">
     function confirmSubmit(frm){
-        if(confirm('Are sure to submit the data ? Yes/No')){
+        if(confirm('Are you sure to save changes?')){
             frm.submit();
         }else{
             return false;

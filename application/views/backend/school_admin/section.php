@@ -50,7 +50,7 @@
     
     
     <div class="m-b-20 hidden-xs">      
-       <a  href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/section_add/');"  class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-step="6" data-intro="<?php echo get_phrase('By clicking here, you will get a form for add section.');?>" data-position='left' data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Section"> 
+       <a  href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/section_add/');"  class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-step="6" data-intro="<?php echo get_phrase('By_clicking_here,_you_will_get_a_form_for_add_section.');?>" data-position='left' data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Section"> 
 	   <i class="fa fa-plus"></i>
        </a>        
    </div>
@@ -59,12 +59,12 @@
 
 <div class="row">
 <div class="col-md-4">
-<div class="badge badge-danger p-10 m-b-20 badge-stu-name " data-step="7" data-intro="<?php echo get_phrase('Here you can see the information of maximum seats and students allotted.');?>" data-position='top'>
+<div class="badge badge-danger p-10 m-b-20 badge-stu-name " data-step="7" data-intro="<?php echo get_phrase('Here_you_can_see_the_information_of_maximum_seats_and_students_allotted.');?>" data-position='top'>
 
         <?php if(!empty($capacity)){?>
         <?php echo get_phrase('maximum_seats:_'). '<span class="p-r-20">' . $capacity .'</span>'  ; ?>
         <?php } else { ?>
-        <?php echo get_phrase(' Maximum seats not mentioned '). '</br>'; ?>
+        <?php echo get_phrase('Maximum_seats_not_mentioned '). '</br>'; ?>
     
         <?php } ?> 
         <?php if(!empty($student_alloted)){?>
@@ -78,7 +78,7 @@
 </div>
 </div>
    <div class="col-md-12 white-box" > 
-        <div class="text-center m-b-20" data-step="8" data-intro="<?php echo get_phrase('Here you can see the list of section.');?>" data-position='top'>
+        <div class="text-center m-b-20" data-step="8" data-intro="<?php echo get_phrase('Here_you_can_see_the_list_of_section.');?>" data-position='top'>
              <h3><?php echo get_phrase('section_details_of_class_'.$class_name);?></h3>
         </div>
 <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
@@ -91,7 +91,7 @@
             <th><div><?php echo get_phrase('room_no'); ?></div></th>
             <th><div><?php echo get_phrase('maximum_capacity'); ?></div></th>
             <th><div><?php echo get_phrase('no._students_alloted'); ?></div></th>
-            <th data-step="9" data-intro="<?php echo get_phrase('Here you can see the options like edit and delete.');?>" data-position='left'><div><?php echo get_phrase('options'); ?></div></th>                                
+            <th data-step="9" data-intro="<?php echo get_phrase('Here_you_can_see_the_options_like_edit_and_delete.');?>" data-position='left'><div><?php echo get_phrase('action'); ?></div></th>                                
         </tr>
     </thead>
     <tbody>

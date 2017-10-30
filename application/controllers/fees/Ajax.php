@@ -44,7 +44,8 @@ class Ajax extends CI_Controller {
         $this->running_year = $this->session->userdata('running_year');
         $this->school_id = $this->session->userdata('school_id');
         
-        if ($this->session->userdata('school_admin_login') != 1 && $this->session->userdata('accountant_login') != 1 && $this->session->userdata('parent_login') != 1){
+        if ($this->session->userdata('school_admin_login') != 1 && $this->session->userdata('accountant_login') != 1 
+            && $this->session->userdata('parent_login') != 1 && $this->session->userdata('cashier_login') != 1){
            echo json_encode(array('status'=>'error','msg'=>'Invalid!'));exit;
         }   
     }
@@ -91,7 +92,6 @@ class Ajax extends CI_Controller {
             $stu_status = $this->input->post('student_status');    
             $student_id = $this->input->post('student_id');
             if($stu_status==1){
-                $whr = array();
                 $this->_get_regular_student_fees($student_id);
             }else{
                 $this->_get_non_enroll_fees($student_id);
@@ -101,8 +101,16 @@ class Ajax extends CI_Controller {
         }
     }
     
+    private function _get_fee_status_color($paid=null,$due=null){
+        $html = '';
+        $html .= ($due!=0?'<span class=\'color-warning ml5\'>['.get_phrase('partial').']</span>':'');
+        $html .= ($paid?'<span class=\'color-success ml5\'>['.get_phrase('paid').']</span>':'');
+        $html .= ($due==null?'<span class=\'color-danger ml5\'>['.get_phrase('unpaid').']</span>':'');
+        return $html;
+    }
+
     private function _get_regular_student_fees($student_id){
-        $return = array('status'=>'error','msg'=>'Error try again!');
+        $return = array('status'=>'error','msg'=>get_phrase('error_try_again!'));
         $student_rec = $this->Ajax_model->get_student(array('S.student_id'=>$student_id));
         $return['stu_detail_html'] = '<tr>
                                         <td>'.$student_rec->enroll_code.'</td>
@@ -111,14 +119,23 @@ class Ajax extends CI_Controller {
                                         <td class="text-right">'.date('d/m/Y',$student_rec->date_added).'</td>
                                       </tr>';
         
-        $terms = $this->Ajax_model->get_setudent_fee_config($student_id);
+        $terms = $this->Ajax_model->get_student_fee_config($student_id);
+        //echo '<pre>';print_r($terms);exit;
+        if(!$terms['fee_config']){
+            $return['msg'] = get_phrase('fee_not_configured');
+            echo json_encode($return);exit;
+        }
+
         $return['html'] = '<option value="">'.get_phrase('select_fee').'</option>';
         if($terms){
             $return['status'] = 'success';
             if($terms['school_fee_terms']){
                 $return['html'] .= '<optgroup label="School Fees">';
                 foreach($terms['school_fee_terms'] as $term){
-                    $return['html'] .= '<option data-type="1" value="'.$term->id.'">'.$term->name.' -- '.$term->amount.'</option>';
+                    $return['html'] .= '<option data-type="1" value="'.$term->id.'" 
+                                            data-content="'.$term->name.' -- '.$term->amount.$this->_get_fee_status_color($term->is_paid,$term->net_due).'">
+                                            '.$term->name.' -- '.$term->amount.
+                                       '</option>';
                 }
                 $return['html'] .= '</optgroup>';  
             }
@@ -126,7 +143,10 @@ class Ajax extends CI_Controller {
             if($terms['hostel_fee_terms']){
                 $return['html'] .= '<optgroup label="Hostel Fees">';
                 foreach($terms['hostel_fee_terms'] as $term){
-                    $return['html'] .= '<option data-type="2" value="'.$term->id.'">'.$term->name.'</option>';
+                    $return['html'] .= '<option data-type="2" value="'.$term->id.'"
+                                         data-content="'.$term->name.$this->_get_fee_status_color($term->is_paid,$term->net_due).'">
+                                         '.$term->name.'
+                                        </option>';
                 }
                 $return['html'] .= '</optgroup>';  
             }
@@ -134,7 +154,10 @@ class Ajax extends CI_Controller {
             if($terms['transport_fee_terms']){
                 $return['html'] .= '<optgroup label="Transport Fees">';
                 foreach($terms['transport_fee_terms'] as $term){
-                    $return['html'] .= '<option data-type="3" value="'.$term->id.'">'.$term->name.'</option>';
+                    $return['html'] .= '<option data-type="3" value="'.$term->id.'"
+                                        data-content="'.$term->name.$this->_get_fee_status_color($term->is_paid,$term->net_due).'">
+                                            '.$term->name.'
+                                        </option>';
                 }
                 $return['html'] .= '</optgroup>';  
             }
@@ -580,10 +603,10 @@ class Ajax extends CI_Controller {
 
         //Have Paid
         $whr_cond = array('student_status'=>$stu_status,
-                            'student_id'=>$student_id,
-                            'class_id'=>$class_id,
-                            'fee_type'=>$fee_type,
-                            'fee_id'=>$fee_id);
+                          'student_id'=>$student_id,
+                          'class_id'=>$class_id,
+                          'fee_type'=>$fee_type,
+                          'fee_id'=>$fee_id);
         $hv_collrec = $this->Ajax_model->get_fee_collection_record($whr_cond);
         //echo '<pre>--';print_r($hv_collrec);exit;    
 
@@ -593,7 +616,6 @@ class Ajax extends CI_Controller {
         $trans_paid = 0;
         $paid_items = array('heads'=>array(),'head_ids'=>array());
         
-        $return['payment_trans_html'] = '<tr><td colspan="6" class="text-center"><strong>No Payments Yet</strong></td></tr>';
         if($hv_collrec){
             $return['payment_trans_html'] = '';
             foreach($hv_collrec->item_trans as $itmtrn){
@@ -701,7 +723,7 @@ class Ajax extends CI_Controller {
                                 <thead>
                                     <tr>
                                         <th style="width:100px"></th>
-                                        <th>'.get_phrase('Concession').'</th>
+                                        <th>'.get_phrase('concession').'</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -715,7 +737,7 @@ class Ajax extends CI_Controller {
                             <div class="row mt5 dis-none">
                                 <div class="col-md-12">
                                     <button type="button" class="btn btn-primary btn-xs pull-right add-cust-dis"
-                                    data-toggle="modal" data-target="#concess-modal">Add Concession</button>
+                                    data-toggle="modal" data-target="#concess-modal">'.get_phrase('add_oncession').'</button>
                                 </div>
                             </div>
                             
@@ -857,25 +879,9 @@ class Ajax extends CI_Controller {
                               'fee_type'=>$this->input->post('fee_type'),
                               'fee_id'=>$this->input->post('fee'));
             $hv_collrec = $this->Ajax_model->get_fee_collection_record($whr_cond);
-            
+            //echo '<pre>';print_r($hv_collrec);exit;
             $trans_paid = 0;
             if($hv_collrec){
-                /* foreach($hv_collrec->item_trans as $itmtrn){
-                    if($itmtrn->item_type==1){
-                        $paid_items['heads'][] = $itmtrn; 
-                        $paid_items['head_ids'][] = $itmtrn->item_id;   
-                    }else if($itmtrn->item_type==2){
-                        $paid_items['concess'][] = $itmtrn; 
-                        $paid_items['concess_ids'][] = $itmtrn->item_id; 
-                    }else if($itmtrn->item_type==3){
-                        $paid_items['fines'][] = $itmtrn; 
-                        $paid_items['fine_ids'][] = $itmtrn->item_id; 
-                    }else if($itmtrn->item_type==4){
-                        $paid_items['terms'][] = $itmtrn; 
-                        $paid_items['term_ids'][] = $itmtrn->item_id; 
-                    }
-                } */
-    
                 foreach($hv_collrec->pay_trans as $ptran){
                     $trans_paid += $ptran->paid_amount;
                 }
@@ -889,7 +895,7 @@ class Ajax extends CI_Controller {
             $pay_amount = $this->input->post('pay_amount');
             $save_array = array('student_status'=>$this->input->post('student_status'),
                                 'student_id'=>$this->input->post('student_id'),
-                                'class_id'=>$this->input->post('class_id'),
+                                'class_id'=>($this->input->post('student_status')==1?$this->input->post('class_id'):0),
                                 'fee_type'=>$this->input->post('fee_type'),
                                 'fee_id'=>$this->input->post('fee'),
                                 'school_fee_total'=> $school_fee_total,
@@ -1080,7 +1086,7 @@ class Ajax extends CI_Controller {
             //echo '<pre>';print_r($has_config_students);exit;
             $html  = '';
             foreach($students as $i=>$stu){
-                $terms = $this->Ajax_model->get_setudent_fee_config($stu->student_id);
+                $terms = $this->Ajax_model->get_student_fee_config($stu->student_id);
                 $fee_detail_html = '<table class="table table-bordered" width="100%" style="margin:0">';
                 $total_amt = 0;
                 $total_paid = 0;
@@ -1183,7 +1189,7 @@ class Ajax extends CI_Controller {
             //echo '<pre>';print_r($has_config_students);exit;
             $html  = '';
             foreach($students as $i=>$stu){
-                $terms = $this->Ajax_model->get_setudent_fee_config($stu->student_id);
+                $terms = $this->Ajax_model->get_student_fee_config($stu->student_id);
                 $fee_detail_html = '<table class="table table-bordered" width="100%" style="margin:0">';
                 $total_amt = 0;
                 $total_paid = 0;
@@ -1249,7 +1255,7 @@ class Ajax extends CI_Controller {
             $total_amt = 0;
             $total_paid = 0;
 
-            $terms = $this->Ajax_model->get_setudent_fee_config($stu->student_id);
+            $terms = $this->Ajax_model->get_student_fee_config($stu->student_id);
             $html = '<tr>
                         <td colspan="4" class="text-left"><strong>School Fees</strong></td>
                      </tr>';
@@ -1325,6 +1331,383 @@ class Ajax extends CI_Controller {
 
             echo json_encode($return);exit;
         }    
+    }
+
+    function adjust_wallet_amount($wallet_id=false){
+        $return = array('status'=>'error','msg'=>get_phrase('invalid_access'));
+        $wallet = $this->Fees_model->get_wallet(array('W.id'=>$wallet_id));
+        if($wallet && $wallet->user_type=='P'){
+            if($wallet->amount<=0){
+                $return['msg'] = get_phrase('no_amount_wallet!');
+                echo json_encode($return);exit;
+            }
+            $wallet_amt = $wallet->amount;
+
+
+            //school_fee_terms //hostel_fee_terms //transport_fee_terms
+            //fee_config //hostel_room //route_stop
+            $cur_date = date('Y-m-d');
+            $students_recs = array();
+            $students = $this->Ajax_model->get_students(array('S.parent_id'=>$wallet->user_id));
+            foreach($students as $stu){
+                $stu->term_config = $this->Ajax_model->get_student_fee_config($stu->student_id);
+                $students_recs[] = $stu;
+            }    
+
+            //From Wallet
+            $total_fee_paid = 0;
+            $has_enough_amt = false;
+            foreach($students_recs as $sti=>$sturec){
+                $group_rec = $this->Ajax_model->get_fee_group(array('FRGC.class_id'=>$sturec->class_id));
+
+                //Getting Concessions Record
+                $concessions_records = array();
+                $group_concessions = $group_rec?$this->Ajax_model->get_rel_concession(array('FC.type'=>1,'FRCT.rel_id'=>$group_rec->id)):array();
+                $class_concessions = $this->Ajax_model->get_rel_concession(array('FC.type'=>2,'FRCT.rel_id'=>$sturec->class_id));
+                $stu_concessions = $this->Ajax_model->get_rel_concession(array('FC.type'=>3,'FRCT.rel_id'=>$sturec->student_id));
+                foreach($group_concessions as $crec){
+                    $crec->type = 'group';
+                    $concessions_records[] = $crec;
+                }
+                foreach($class_concessions as $crec){
+                    $crec->type = 'class';
+                    $concessions_records[] = $crec;
+                }
+                foreach($stu_concessions as $crec){
+                    $crec->type = 'student';
+                    $concessions_records[] = $crec;
+                }
+                //END Concession Part
+
+                //School Fee Terms
+                foreach($sturec->term_config['school_fee_terms'] as $it=>$term){ 
+                    $students_recs[$sti]->term_config['school_fee_terms'][$it]->school_fee_total = $term->amount;  
+                    $students_recs[$sti]->term_config['school_fee_terms'][$it]->concession_total = 0; 
+                    $students_recs[$sti]->term_config['school_fee_terms'][$it]->fine_total = 0;   
+                    $students_recs[$sti]->term_config['school_fee_terms'][$it]->net_due = 0;
+                    $students_recs[$sti]->term_config['school_fee_terms'][$it]->is_paid = 0;
+                    
+                    //Collection_record
+                    $whr_cond = array('student_status'=>1,
+                                      'student_id'=>$sturec->student_id,
+                                      'class_id'=>$sturec->class_id,
+                                      'fee_type'=>1,
+                                      'fee_id'=>$term->id);
+                    $hv_collrec = $this->Ajax_model->get_fee_collection_record($whr_cond);
+                    //echo '<pre>--';print_r($hv_collrec);
+                    $students_recs[$sti]->term_config['school_fee_terms'][$it]->collrec = $hv_collrec;
+                    if($hv_collrec){ 
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->net_amount = $hv_collrec->net_amount; 
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->net_due = $hv_collrec->net_due;
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->is_paid = $hv_collrec->is_paid;  
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->to_pay = $hv_collrec->net_due;    
+                        //$students_recs[$sti]->term_config['tuition'][$it]['to_pay'] = $hv_collrec->net_due;    
+                    }else{
+                        //Fine
+                        $fine_amt = 0;
+                        if($term->fine_id){
+                            $fine_rec = $this->db->get_where('fee_fines',array('id'=>$term->fine_id))->row(); 
+                            $last_date = date('Y-m-d', strtotime($term->start_date. ' + '.$fine_rec->grace_period.' days'));
+                            if($cur_date > $last_date){
+                                $fine_amt = $fine_rec->value_type==1?$fine_rec->value:round(($term->amount*$fine_rec->value)/100,2);
+                                $fine_rec->amt = $fine_amt;
+                            }  
+                        }
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->fine_recs[0] = $fine_rec; 
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->fine_total = $fine_amt;   
+                        
+                        //Concessions/Discount
+                        $total_concess = 0; 
+                        foreach($concessions_records as $ck=>$conrec){
+                            $con_amt = $conrec->amt_type==1?$conrec->amount:round(($term->amount*$conrec->amount)/100,2);
+                            $concessions_records[$ck]->amt = $con_amt; 
+                            $total_concess += $con_amt;
+                        }
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->concessions = $concessions_records;  
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->concession_total = $total_concess;   
+
+                        $term_fee = $term->amount + $fine_amt;
+                        $to_pay = $term_fee > $total_concess?$term_fee-$total_concess:0;
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->net_amount = $to_pay;
+                        $students_recs[$sti]->term_config['school_fee_terms'][$it]->to_pay = $to_pay; 
+                        //$students_recs[$sti]->term_config['tuition'][$it]['to_pay'] = $to_pay; 
+                    }
+                }
+                //Hostel Terms
+                foreach($sturec->term_config['hostel_fee_terms'] as $it=>$term){ 
+                    $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->school_fee_total = $term->amount;  
+                    $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->concession_total = 0; 
+                    $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->fine_total = 0; 
+                    $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->net_due = 0;
+                    $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->is_paid = 0;
+                    //Collection_record
+                    $whr_cond = array('student_status'=>1,
+                                      'student_id'=>$sturec->student_id,
+                                      'class_id'=>$sturec->class_id,
+                                      'fee_type'=>2,
+                                      'fee_id'=>$term->id);
+                    $hv_collrec = $this->Ajax_model->get_fee_collection_record($whr_cond);
+                    $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->collrec = $hv_collrec;
+                    if($hv_collrec){
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->net_amount = $hv_collrec->net_amount;
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->net_due = $hv_collrec->net_due;
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->to_pay = $hv_collrec->net_due;
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->is_paid = $hv_collrec->is_paid;  
+                        //$students_recs[$sti]->term_config['hostel'][$it]['to_pay'] = $hv_collrec->net_due;     
+                    }else{
+                        $hostel_room = $sturec->term_config['hostel_room'];
+                        $term_amt = $hostel_room?($term->amt_type==1?$term->amount:round(($hostel_room->room_fare*$term->amount)/100)):0;
+
+                        //Fine
+                        $fine_amt = 0;
+                        if($term->fine_id && $term_amt>0){
+                            $fine_rec = $this->db->get_where('fee_fines',array('id'=>$term->fine_id))->row(); 
+                            $last_date = date('Y-m-d', strtotime($term->start_date. ' + '.$fine_rec->grace_period.' days'));
+                            if($cur_date > $last_date){
+                                $fine_amt = $fine_rec->value_type==1?$fine_rec->value:round(($term_amt*$fine_rec->value)/100,2);
+                                $fine_rec->amt = $fine_amt;
+                            }  
+                        }
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->fine_recs[0] = $fine_rec; 
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->fine_total = $fine_amt; 
+
+                        //Concessions/Discount
+                        $total_concess = 0; 
+                        if($term_amt>0){
+                            foreach($concessions_records as $ck=>$conrec){
+                                $con_amt = $conrec->amt_type==1?$conrec->amount:round(($term_amt*$conrec->amount)/100,2);
+                                $concessions_records[$ck]->amt = $con_amt; 
+                                $total_concess += $con_amt;
+                            }
+                        }
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->concessions = $concessions_records;  
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->concession_total = $total_concess;   
+
+                        $term_fee = $term_amt + $fine_amt;
+                        $to_pay = $term_fee > $total_concess?$term_fee-$total_concess:0;
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->net_amount = $to_pay;
+                        $students_recs[$sti]->term_config['hostel_fee_terms'][$it]->to_pay = $to_pay; 
+                        //$students_recs[$sti]->term_config['hostel'][$it]['to_pay'] = $to_pay;  
+                    }
+                }
+                //Transport Terms
+                foreach($sturec->term_config['transport_fee_terms'] as $it=>$term){ 
+                    $students_recs[$sti]->term_config['transport_fee_terms'][$it]->school_fee_total = $term->amount;  
+                    $students_recs[$sti]->term_config['transport_fee_terms'][$it]->concession_total = 0; 
+                    $students_recs[$sti]->term_config['transport_fee_terms'][$it]->fine_total = 0; 
+                    $students_recs[$sti]->term_config['transport_fee_terms'][$it]->net_due = 0;
+                    $students_recs[$sti]->term_config['transport_fee_terms'][$it]->is_paid = 0;
+                    //Collection_record
+                    $whr_cond = array('student_status'=>1,
+                                      'student_id'=>$sturec->student_id,
+                                      'class_id'=>$sturec->class_id,
+                                      'fee_type'=>3,
+                                      'fee_id'=>$term->id);
+                    $hv_collrec = $this->Ajax_model->get_fee_collection_record($whr_cond);
+                    $students_recs[$sti]->term_config['transport_fee_terms'][$it]->collrec = $hv_collrec;
+                    if($hv_collrec){
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->net_amount = $hv_collrec->net_amount;
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->net_due = $hv_collrec->net_due;
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->to_pay = $hv_collrec->net_due; 
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->is_paid = $hv_collrec->is_paid; 
+                        //$students_recs[$sti]->term_config['transport'][$it]['to_pay'] = $hv_collrec->net_due;    
+                    }else{
+                        $route_stop = $sturec->term_config['route_stop'];
+                        $term_amt = $route_stop?($term->amt_type==1?$term->amount:round(($route_stop->route_fare*$term->amount)/100)):0;
+
+                        //Fine
+                        $fine_amt = 0;
+                        if($term->fine_id && $term_amt>0){
+                            $fine_rec = $this->db->get_where('fee_fines',array('id'=>$term->fine_id))->row(); 
+                            $last_date = date('Y-m-d', strtotime($term->start_date. ' + '.$fine_rec->grace_period.' days'));
+                            if($cur_date > $last_date){
+                                $fine_amt = $fine_rec->value_type==1?$fine_rec->value:round(($term_amt*$fine_rec->value)/100,2);
+                                $fine_rec->amt = $fine_amt;
+                            }  
+                        }
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->fine_recs[0] = $fine_rec; 
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->fine_total = $fine_amt; 
+                        
+                        //Concessions/Discount
+                        $total_concess = 0; 
+                        if($term_amt>0){
+                            foreach($concessions_records as $ck=>$conrec){
+                                $con_amt = $conrec->amt_type==1?$conrec->amount:round(($term_amt*$conrec->amount)/100,2);
+                                $concessions_records[$ck]->amt = $con_amt; 
+                                $total_concess += $con_amt;
+                            }
+                        }
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->concessions = $concessions_records;  
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->concession_total = $total_concess;  
+
+                        $term_fee = $term_amt + $fine_amt;
+                        $to_pay = $term_fee > $total_concess?$term_fee-$total_concess:0;
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->net_amount = $to_pay;
+                        $students_recs[$sti]->term_config['transport_fee_terms'][$it]->to_pay = $to_pay; 
+                        //$students_recs[$sti]->term_config['transport'][$it]['to_pay'] = $to_pay; 
+                    }
+                } 
+
+                $pay_priority = array(1=>sett('fees_priority_1'),
+                                      2=>sett('fees_priority_2'),
+                                      3=>sett('fees_priority_3'));
+                foreach($pay_priority as $pri=>$priItem){
+                    if($priItem=='tuition'){
+                        $pay_priority[$pri] = 'school_fee_terms';    
+                    }else if($priItem=='hostel'){
+                        $pay_priority[$pri] = 'hostel_fee_terms';    
+                    }else if($priItem=='transport'){
+                        $pay_priority[$pri] = 'transport_fee_terms';    
+                    }
+                }   
+                //echo '<pre>--';print_r($pay_priority);print_r($students_recs);exit; 
+
+
+                foreach($pay_priority as $prio_item){
+                    $prio_fee_arr = isset($sturec->term_config[$prio_item]) && is_array($sturec->term_config[$prio_item])?$sturec->term_config[$prio_item]:array();
+                    
+                    //echo '<pre>--';print_r($prio_fee_arr);exit; 
+                    foreach($prio_fee_arr as $fee_term){
+                        //echo '<pre>--';print_r($fee_term);exit; 
+                        if($wallet_amt>=$fee_term->to_pay && $fee_term->to_pay>0){
+                            $save_wallet_trans = array('wallet_id'=>$wallet->id,
+                                                       'amount'=>$fee_term->to_pay,
+                                                       'type'=>2,
+                                                       'ref'=>($sturec->name.' fees '.$fee_term->name),
+                                                       'time'=>date('Y-m-d H:i:S'));
+                            $this->Fees_model->save_wallet_transaction($save_wallet_trans);
+
+                            $has_enough_amt = $has_enough_amt==false?true:$has_enough_amt;
+                            $wallet_amt -= $fee_term->to_pay;
+                            $total_fee_paid += $fee_term->to_pay;
+
+                            if($prio_item=='school_fee_terms'){
+                                $fee_type = 1;
+                            }else if($prio_item=='hostel_fee_terms'){
+                                $fee_type = 2;
+                            }else if($prio_item=='transport_fee_terms'){
+                                $fee_type = 3;
+                            }
+
+                            //Save Collection
+                            $save_collrec = array('student_status'=>1,
+                                                  'student_id'=>$sturec->student_id,
+                                                  'class_id'=>$sturec->class_id,
+                                                  'fee_type'=>$fee_type,
+                                                  'fee_id'=>$fee_term->id,
+                                                  'school_fee_total'=> $fee_term->school_fee_total,
+                                                  'concession_total'=>$fee_term->concesion_total,
+                                                  'fine_total'=>$fee_term->fine_total,
+                                                  'net_amount'=>$fee_term->net_amount);
+                            if(!$fee_term->collrec){
+                                $save_array['net_due'] = ($fee_term->net_amount-$fee_term->to_pay);
+                                $save_array['is_paid'] = $save_array['net_due']==0?1:0;
+                                $save_array['running_year'] = _getYear();
+                                $save_array['school_id'] = _getSchoolid(); 
+                                $save_array['created'] = date('Y-m-d H:i:S');
+                                $save_array['updated'] = date('Y-m-d H:i:S');
+                                $collrec_id = $this->Ajax_model->save_fee_collection_record($save_array);   
+                            }else{
+                                $save_array['id'] = $fee_term->collrec->id;
+                                $save_array['net_due'] =  ($fee_term->net_due-$fee_term->to_pay);
+                                $save_array['is_paid'] = $save_array['net_due']==0?1:0;
+                                $save_array['updated'] = date('Y-m-d H:i:S');
+                                $flag = $this->Ajax_model->save_fee_collection_record($save_array);  
+                                $collrec_id = $fee_term->collrec->id;
+                            } 
+
+                            $nxt_recp_no = $this->Ajax_model->get_next_pay_trans_receipt_no();
+                            $previous_pay = $this->db->order_by('id','DESC')->get_where('fee_pay_transactions',
+                                                    array('pay_collection_record_id'=>$collrec_id))->row();
+                            $save_pay_trans = array('pay_collection_record_id'=>$collrec_id,
+                                                    'receipt_no'=>$nxt_recp_no,
+                                                    'pay_method'=>'wallet',
+                                                    'paid_amount'=>$fee_term->to_pay,
+                                                    'pay_date'=>date('Y-m-d'),
+                                                    'previous_amount'=>($previous_pay?$previous_pay->paid_amount:0),
+                                                    'due_amount'=>$save_array['net_due'],
+                                                    'note'=> 'Paid using wallet',
+                                                    'user_type'=>$this->session->userdata('u_type'),
+                                                    'user_id'=>$this->session->userdata('login_user_id'),
+                                                    'running_year'=>_getYear(),
+                                                    'school_id'=>_getSchoolid(),
+                                                    'created'=>date('Y-m-d H:i:s'));
+                            $pay_trans_id = $this->Ajax_model->save_pay_trans($save_pay_trans);  
+                            
+                            $this->db->delete('fee_pay_item_transactions',array('pay_collection_record_id'=>$collrec_id));  
+                            if($prio_item=='school_fee_terms'){
+                                foreach($fee_term->heads as $trns){
+                                    $save_pay_item_trans = array('pay_collection_record_id'=>$collrec_id,
+                                                                 'pay_trans_id'=>$pay_trans_id,
+                                                                 'item_type'=>1,
+                                                                 'is_custom'=>0,
+                                                                 'item_id'=>$trns->id,
+                                                                 'item_name'=>$trns->name,
+                                                                 'item_amt'=>$trns->amount,
+                                                                 'added'=>date('Y-m-d H:i:s'));
+                                    $this->Ajax_model->save_pay_item_trans($save_pay_item_trans);   
+                                    $this->Ajax_model->save_payment_item_trans($save_pay_item_trans);
+                                }  
+                            }
+                            foreach($fee_term->concessions as $trns){
+                                $save_pay_item_trans = array('pay_collection_record_id'=>$collrec_id,
+                                                             'pay_trans_id'=>$pay_trans_id,
+                                                             'item_type'=>2,
+                                                             'is_custom'=>0,
+                                                             'item_id'=>$trns->id,
+                                                             'item_name'=>$trns->name,
+                                                             'item_amt'=>$trns->amt,
+                                                             'added'=>date('Y-m-d H:i:s'));
+                                $this->Ajax_model->save_pay_item_trans($save_pay_item_trans); 
+                                $this->Ajax_model->save_payment_item_trans($save_pay_item_trans);  
+                            }
+                            foreach($fee_term->fine_recs as $trns){
+                                $save_pay_item_trans = array('pay_collection_record_id'=>$collrec_id,
+                                                             'pay_trans_id'=>$pay_trans_id,
+                                                             'item_type'=>3,
+                                                             'is_custom'=>0,
+                                                             'item_id'=>$trns->id,
+                                                             'item_name'=>$trns->name,
+                                                             'item_amt'=>$trns->amt,
+                                                             'added'=>date('Y-m-d H:i:s'));
+                                $this->Ajax_model->save_pay_item_trans($save_pay_item_trans);   
+                                $this->Ajax_model->save_payment_item_trans($save_pay_item_trans);
+                            }
+                            if($prio_item=='hostel_fee_terms' || $prio_item=='transport_fee_terms'){
+                                $save_pay_item_trans = array('pay_collection_record_id'=>$collrec_id,
+                                                             'pay_trans_id'=>$pay_trans_id,
+                                                             'item_type'=>4,
+                                                             'is_custom'=>0,
+                                                             'item_id'=>$fee_term->id,
+                                                             'item_name'=>$fee_term->name,
+                                                             'item_amt'=>$fee_term->school_fee_total,
+                                                             'added'=>date('Y-m-d H:i:s'));
+                                $this->Ajax_model->save_pay_item_trans($save_pay_item_trans); 
+                                $this->Ajax_model->save_payment_item_trans($save_pay_item_trans); 
+                            }
+                        }else{
+                            if($total_fee_paid>0){
+                                $save_wallet['id'] = $wallet->id;
+                                $save_wallet['amount'] = $wallet->amount-$total_fee_paid;
+                                $save_wallet['updated'] = date('Y-m-d H:i:s');
+                                $this->Fees_model->save_wallet($save_wallet);
+
+                                $return['msg'] = get_phrase('total_amount_adjusted_'.$total_fee_paid);   
+                            }else{
+                                if(!$has_enough_amt){
+                                    $return['msg'] = get_phrase('not_enough_amount_to_pay');    
+                                } 
+                            }    
+                            echo json_encode($return);exit;
+                        }
+                    }
+                }
+
+            }
+        
+            //echo $total_fee_paid.'<pre>';print_r($students_recs);exit;
+        }
+        //Students Loop ends here
     }
 }
 

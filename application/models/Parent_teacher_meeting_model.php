@@ -154,5 +154,19 @@ class Parent_teacher_meeting_model extends CI_Model {
 
         return $rs;
     }
+    
+    function get_current_month_ptm(){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $where = " AND ptm.school_id='".$school_id."'";
+            } 
+        }
+        $month = date('m');
+        $query = "select CONCAT(t.name,' ',t.last_name) as teacher_name,ptm.parrent_teacher_meeting_date as ptm_date,ptm.time,c.name as class_name from parrent_teacher_meeting ptm LEFT JOIN class c ON c.class_id=ptm.class_id LEFT JOIN teacher t ON ptm.teacher_id=t.teacher_id WHERE MONTH(ptm.parrent_teacher_meeting_date)='".$month."'".$where." LIMIT 0,3";
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
 
 }

@@ -2,7 +2,7 @@
     
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">  
-        <h4 class="page-title"><?php echo get_phrase('View Admission Form'); ?> </h4></div>i
+        <h4 class="page-title"><?php echo get_phrase('View_Admission_Form'); ?> </h4></div>i
     <!-- /.page title -->
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
@@ -10,7 +10,7 @@
         <a href="javascript: void(0);" target="_blank" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/Dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
-            <li class="active"><?php echo get_phrase('View Admission Form'); ?></li>
+            <li class="active"><?php echo get_phrase('View_Admission_Form'); ?></li>
         </ol>
     </div>
     <!-- /.breadcrumb -->
@@ -27,7 +27,7 @@
                 </div> 
                 
                 <div class="container">
-                    <h2>Student Information</h2>
+                    <h2><?php echo get_phrase('student_information'); ?></h2>
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <div class="row">
@@ -89,7 +89,7 @@
                             </div> 
                         </div>
                     </div>
-                    <h2>Student Information</h2>
+                    <h2><?php echo get_phrase('student_information'); ?></h2>
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <div class="row">

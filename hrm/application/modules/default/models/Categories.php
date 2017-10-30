@@ -38,6 +38,14 @@ class Default_Model_Categories extends Zend_Db_Table_Abstract
 		}
 	}
 
+        public function getAllCategories()
+	{
+            $res = $this->select()
+                ->setIntegrityCheck(false)
+                ->from(array('c' => $this->_name));
+            return $this->fetchAll($res)->toArray();
+        }
+        
 	/**
 	** function to retrieve categories
 	** @con = 'add' gets active category names 

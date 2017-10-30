@@ -42,7 +42,7 @@ sapp_Global::generateClientValidations($this->form);?>
 		<?php echo $this->form->user_id; ?>
 		<?php 
 sapp_Helper::viewHeader();
-sapp_Helper::viewBody('nor','Business Unit',$this->empdetails['businessunit_name'],'Department',$this->empdetails['department_name']);
+sapp_Helper::viewBody('nor','Department',$this->empdetails['department_name']);
 sapp_Helper::viewBody('alt','Employee',$this->empdetails['userfullname'],$this->form->leave_limit->getLabel(),$this->form->leave_limit->getValue());
 sapp_Helper::viewBody('nor',$this->form->alloted_year->getLabel(),$this->form->alloted_year->getValue(),'','');
 sapp_Helper::viewFooter();

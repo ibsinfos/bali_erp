@@ -13,30 +13,33 @@
 
 
 <div class="col-sm-12 white-box"> 
-<table id="example23" class="display nowrap">
+<table class = "custom_table table display" cellspacing="0" width="100%" id="ex">
     <thead>
         <tr>
-            <th><div><?php echo get_phrase('No.'); ?></div></th>
+            <th><div><?php echo get_phrase('s._No.'); ?></div></th>
             <th><div><?php echo get_phrase('enroll_code'); ?></div></th>
             <th><div><?php echo get_phrase('student_name'); ?></div></th>
+            <th><div><?php echo get_phrase('class_name'); ?></div></th>
+            <th><div><?php echo get_phrase('section_name'); ?></div></th>
             <th><div><?php echo get_phrase('route'); ?></div></th>
             <th><div><?php echo get_phrase('bus'); ?></div></th>
-            <th><div><?php echo get_phrase('start_date'); ?></div></th>
-            <th><div><?php echo get_phrase('end_date'); ?></div></th>
+            
+            
         </tr>
     </thead>
     <tbody>
-        <?php $count = 1;
+        <?php $count = 1; 
         foreach ($student_details as $value){
             ?>
             <tr>
                 <td><?php echo $count++; ?></td>
                 <td><?php echo $value['enroll_code']; ?></td>
-                <td><?php echo $value['student_name']; ?></td>
+                <td><?php echo $value['name']." ".$value['mname']." ".$value['lname']; ?></td>
+                <td><?php echo $value['class_name']; ?></td>
+                <td><?php echo $value['section_name'] ?></td>
                 <td><?php echo $value['route_name']; ?></td>
                 <td><?php echo $value['bus_name']; ?></td>
-                <td><?php echo date('d/m/Y', strtotime($value['start_date'])); ?></td>
-                <td><?php echo date('d/m/Y', strtotime($value['end_date'])); ?></td>
+                
                 
             </tr>
         <?php } ?>

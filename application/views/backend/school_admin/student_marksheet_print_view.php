@@ -8,14 +8,14 @@
 	</style>
 
 	<center>
-		<img src="uploads/logo.png" style="max-height : 60px;"><br>
+		<img src="uploads/<?php echo $system_logo;  ?>" style="max-height : 60px;"><br>
 		<h3 style="font-weight: 100;"><?php echo $system_name;?></h3>
 		<?php echo get_phrase('student_marksheet');?><br>
 		<?php echo $student_name;?><br>
 		<?php echo get_phrase('class') . ' ' . $class_name[0]->name;?><br>
+                <?php echo get_phrase('section') . ' ' . $section_name;?><br>                
 		<?php echo $exam_name;?>
 	</center>
-
 	<table style="width:100%; border-collapse:collapse;border: 1px solid #ccc; margin-top: 10px;" border="1">
        <thead>
         <tr>
@@ -25,7 +25,7 @@
             <td style="text-align: center;">Grade</td>
             <td style="text-align: center;">Comment</td>
         </tr>
-    </thead>
+       </thead>
     <tbody>
         <?php 
             $total_marks = 0;

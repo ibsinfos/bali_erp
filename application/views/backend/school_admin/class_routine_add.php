@@ -133,7 +133,7 @@
 
     <div class="text-right col-xs-12">
         <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d m-t-10" data-step="7" data-intro="<?php echo get_phrase('On the click of this button, timetable for particular class will be added.');?>" data-position='left'>
-            <?php echo get_phrase('add_class_routine'); ?></button>
+            <?php echo get_phrase('add_class_timetable'); ?></button>
     </div>
 
     <?php echo form_close(); ?>

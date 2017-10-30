@@ -1,7 +1,7 @@
 <div class="row bg-title">
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-        <h4 class="page-title"><?php echo get_phrase('refund_types'); ?> </h4></div>
+        <h4 class="page-title"><?php echo get_phrase($page_title); ?> </h4></div>
     <!-- /.page title -->
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
@@ -9,15 +9,24 @@
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         
         <ol class="breadcrumb">
-            <li><a href="<?php echo base_url(); ?>index.php?<?php echo $this->session->userdata('login_type');?>/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
-
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
-            <li>
-                <?php echo get_phrase(@$ExpBrd[0]); ?>
-                <?php echo @$ExpBrd[1]; ?>
-            </li> <?php }else{ $ExpBrd[2] = $BRC;}?>
+            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li><?php echo get_phrase('fee_setup'); ?>
+                <ul>                    
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/heads"><?php echo get_phrase('fee_heads'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/groups"><?php echo get_phrase('fee_groups'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/terms"><?php echo get_phrase('fee_terms'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/term_setting"><?php echo get_phrase('fee_term_setting'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/charge_setup"><?php echo get_phrase('fee_charge_setup'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/transport_fee_setup"><?php echo get_phrase('transport_fee_setup'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/hostel_fee_setup"><?php echo get_phrase('hostel_fee_setup'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/concessions"><?php echo get_phrase('fee_concessions'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/fines"><?php echo get_phrase('fee_fines'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/main/fee_scholarships"><?php echo get_phrase('fee_scholarships'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?fees/refund/refund_rules"><?php echo get_phrase('refund_rules'); ?></a></li>                                       
+                </ul>
+            </li>
             <li class="active">
-                <?php echo get_phrase(@$ExpBrd[2]); ?>
+                <?php echo $page_title; ?>
             </li>
         </ol>
     </div>
@@ -31,7 +40,7 @@
                 <?php echo form_open(base_url('index.php?fees/refund/refund_rule_edit/'.$rule_id), array('class' => 'form-horizontal form-groups-bordered validate', 'target' => '_top')); ?>
                 <div class="row">
                     <div class="col-xs-12 col-md-offset-3 col-md-6">
-                        <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                        <label for="running_session"><?php echo get_phrase("current_session"); ?></label>
                         <div class="input-group">
                             <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                             <input name="running_year" class="form-control" value="<?php echo set_value('running_year',$refund_rule_data['running_year'])?>" 
@@ -146,11 +155,13 @@
                         </div> 
                     </div>
                 </div>
-
-                <div class="row">          
-                    <div class="col-xs-12 col-md-offset-3 col-md-6">
-                        <button type="submit" class="fcbtn btn btn-danger btn-outline pull-right btn-1d"><?php echo get_phrase('submit'); ?></button>
-                    </div>                
+			
+                <div class="row">   
+					<div class="col-md-12">&nbsp;</div>
+                    <div class="col-xs-12 col-md-12 text-center">
+                        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('update'); ?></button>
+                    </div>         
+                                        <div class="col-md-12">&nbsp;</div>
                 </div>     
                                     
                 <?php echo form_close()?>            

@@ -19,19 +19,24 @@ class Role_model extends CI_Model {
 
     function get_role_array($dataArray = "") {
         $return = array();
-        $this->db->select("*");
-        $this->db->from($this->_table);
-        $this->db->order_by("name", "asc");
+        $this->db->select("*,sc.name as school_name,r.name as role_name");
+        $this->db->from($this->_table.' r');
+		$this->db->join( 'schools as sc' , "sc.school_id = r.school_id", 'left' );
+        $this->db->order_by("r.name", "asc");
 
-        if (!empty($dataArray)) {
+        if (!empty($dataArray)) 
+            {
             $this->db->where($dataArray);
         }
         
-        return $this->db->get()->result_array();
+        $result = $this->db->get()->result_array();
+        
+        //echo $this->db->last_query();die;
+        return $result;
     }
 
     function get_role_name($id, $school_id){
-       return  $this->db->get_where($this->_table, array('id' => $id, 'school_id'=>$school_id))->row()->name;
+       return  $this->db->get_where($this->_table, array('id' => $id))->row()->name;
     }
 
     function assign_role($dataArr){
@@ -48,6 +53,9 @@ class Role_model extends CI_Model {
             //$this->db->where("(link_modules.is_paid_addon = 0 or (link_modules.is_paid_addon = 1 and link_modules.is_paid = 1))");
             foreach($module_data as $k => $datum){
                 $link_data = $this->db->get_where($this->_table_link_modules, array('parent_id' => $datum['id']))->result_array();
+                foreach($link_data as $j => $third_level){
+                    $link_data[$j]['link_data'] = $this->db->get_where($this->_table_link_modules, array('parent_id' => $third_level['id']))->result_array();
+                }
 
                 $module_data[$k]['link_data'] = $link_data;
             }

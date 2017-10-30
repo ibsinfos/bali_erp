@@ -54,8 +54,8 @@
                 <option value=""><?php echo get_phrase('select_section_first'); ?></option>
             </select>
         </div>
-        <div class="text-right col-xs-12 p-t-20">
-            <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d input_allot" value="Allot"/>
+        <div class="text-center col-xs-12 p-t-20">
+            <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d input_allot" value="Allot Product"/>
             <a href="<?php echo base_url(); ?>index.php?school_admin/manage_product/">
                </a>
         </div>  

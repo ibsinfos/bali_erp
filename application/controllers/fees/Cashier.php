@@ -112,6 +112,4 @@ class Cashier extends CI_Controller {
         $page_data['system_logo'] = $this->Setting_model->get_setting_record(array('type' => 'system_logo'),'description');
         return $page_data;
     }
-
-    
   }

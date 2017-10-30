@@ -878,4 +878,21 @@ class Parent_model extends CI_Model {
         return $res;
     }
 
+    function get_parent_details_by_id($parent_id='') {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('p.school_id',$school_id);
+            } 
+        }
+        $this->db->select('p.*'); 
+        $this->db->from($this->_table.' p');        
+        $this->db->where('p.parent_id', $parent_id);
+        $this->db->where('p.isActive', '1');
+        $this->db->where('p.parent_status', '1');
+        $res = $this->db->get()->row();
+        return $res;
+    }
+
 }

@@ -10,7 +10,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?teacher/dashboard"><?php echo get_phrase('dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+<?php $BRC = get_bread_crumb_old(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -29,10 +29,11 @@
 <table id="table" class="table display" cellspacing="0" width="100%">
                 	<thead>
                 		<tr>
-                                <th><div><?php echo get_phrase('s_no.');?></div></th>
+                            <th><div><?php echo get_phrase('s_no.');?></div></th>
                     		<th><div><?php echo get_phrase('route_name');?></div></th>
                     		<th><div><?php echo get_phrase('no_of_buses');?></div></th>
-                    		<th><div><?php echo get_phrase('description');?></div></th>
+                            <th><div><?php echo get_phrase('bus_stop_from');?></div></th>
+                            <th><div><?php echo get_phrase('bus_stop_to');?></div></th>
                     		<th><div><?php echo get_phrase('route_fare');?></div></th>
                                 </tr>
 			</thead>
@@ -74,7 +75,7 @@
 
             //Set column definition initialisation properties.
             "columnDefs": [
-                { "targets": [0], "orderable": false },                 
+                { "targets": [0,3], "orderable": false },                 
             ],
 
         });

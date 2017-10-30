@@ -92,18 +92,18 @@ class Assets_Form_Assets extends Zend_Form
 		
 	
 		
-        $location = new Zend_Form_Element_Select('location');
-        $location->setLabel('Business Unit');
-        $location->setAttrib('onchange', 'displayempnames(this.value);');
-        $locationModel = new Assets_Model_Assets();
-		$locData = $locationModel->getLocation();
-		$location->addMultiOption('','Select Business Unit');
-		foreach ($locData as $data){
-			$location->addMultiOption($data['id'],utf8_encode($data['unitname']));
-			//$location->addMultiOption($data['id'],utf8_encode($data['address1']));
-        }
-		$location->setRequired(true);
-		$location->addValidator('NotEmpty', false, array('messages' => 'Please select Business unit.'));
+//        $location = new Zend_Form_Element_Select('location');
+//        $location->setLabel('Business Unit');
+//        $location->setAttrib('onchange', 'displayempnames(this.value);');
+//        $locationModel = new Assets_Model_Assets();
+//		$locData = $locationModel->getLocation();
+//		$location->addMultiOption('','Select Business Unit');
+//		foreach ($locData as $data){
+//			$location->addMultiOption($data['id'],utf8_encode($data['unitname']));
+//			//$location->addMultiOption($data['id'],utf8_encode($data['address1']));
+//        }
+//		$location->setRequired(true);
+//		$location->addValidator('NotEmpty', false, array('messages' => 'Please select Business unit.'));
 		
 		
 		
@@ -150,7 +150,7 @@ class Assets_Form_Assets extends Zend_Form
         $asset_classification->setLabel('Asset Classification ')	
 				->addMultiOptions(array(''=>'Select Classification ',
 														'Department' => 'Department',
-													    'Business Unit' => 'Business Unit',
+													    //'Business Unit' => 'Business Unit',
 													    'Employee' => 'Employee',
 														 ));
 	   $asset_classification->addValidator('NotEmpty', true, array('messages' => 'Please select Asset classification.'));
@@ -259,7 +259,7 @@ class Assets_Form_Assets extends Zend_Form
 						array
 								(
 								$id,$category, $sub_category,$company_asset_code,
-								$name,$location,$allocated_to,$responsible_technician,
+								$name,$allocated_to,$responsible_technician,
 								$asset_classification,$purchase_date,$invoice_number,
 								$manufacturer,$key_number,$warenty_status,$warenty_end_date,
 								$is_working,$notes,$image,$submit

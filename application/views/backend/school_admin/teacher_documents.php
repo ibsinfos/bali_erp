@@ -20,13 +20,13 @@
 
 <div class="row m-0">
     <div class="col-md-12  white-box">
-        <div class="col-md-3 form-group" data-step="8" data-intro="<?php echo get_phrase('Upload Documents from here.');?>" data-position='left'>
+        <div class="col-md-3 form-group" data-step="8" data-intro="<?php echo get_phrase('Upload_Documents_from_here.');?>" data-position='left'>
             <button type="button" class="fcbtn btn btn-danger btn-outline btn-1d" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_upload_file/teacher/<?php echo $teacher_id; ?>');"><i class="ti-plus m-r-5"></i><?php echo get_phrase('upload_files'); ?></button>
         </div>
     </div>
 </div>
 <div class="row m-0">   
-    <div class="col-md-12 white-box" data-step="9" data-intro="<?php echo get_phrase('Download or Delete Documents');?>" data-position='top'>
+    <div class="col-md-12 white-box" data-step="9" data-intro="<?php echo get_phrase('Download_or_Delete_Documents');?>" data-position='top'>
 
         <table id="example23" class="table-responsive display nowrap" cellspacing="0" width="100%">
                         <thead>

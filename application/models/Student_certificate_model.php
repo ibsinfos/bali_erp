@@ -6,8 +6,8 @@ if (!defined('BASEPATH'))
 class Student_certificate_model extends CI_Model {
 
     private $_table = "student_certificates";
-
-    function __construct() {
+    private $_table_certificate_type = "certificate_types";
+                function __construct() {
         parent::__construct();
     }
     
@@ -40,9 +40,9 @@ class Student_certificate_model extends CI_Model {
             } 
         }
         if($returnColsStr==""){
-            return $this->db->get_where($this->_table,array($this->_primary=>$id))->result();
+            return $this->db->get_where($this->_table,array('certificate_id'=>$id))->result();
         }else{
-            return $this->db->select($returnColsStr)->from($this->_table)->where($this->_primary,$id)->get()->result();
+            return $this->db->select($returnColsStr)->from($this->_table)->where('certificate_id',$id)->get()->result();
         }
     }
         
@@ -144,14 +144,100 @@ class Student_certificate_model extends CI_Model {
         return $this->db->insert_id();
     }
     
-    function get_certificate_record($student_id,$certificate_id,$template_type){
-     $this->db->select('st.*, student.name,student.name,student.mname,student.lname'); // Select field
+    function get_certificate_record($student_id,$certificate_id){
+     $this->db->select('st.*, student.name,student.name,student.mname,student.lname,certificate_types.certificate_type'); // Select field
             $this->db->from($this->_table.' as st'); // from Table1
             $this->db->join('student', 'student.student_id = st.student_id');
+            $this->db->join('certificate_types', 'certificate_types.certificate_type_id = st.certificate_type','left');
             $this->db->where('st.student_id', $student_id);
             $this->db->where('st.certificate_id', $certificate_id);
-            $this->db->where('st.template_type', $template_type);
             return $this->db->get()->row();
     }
 
+    function add_certificate_type($dataArr){
+//            pre($dataArr); die;
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+               $dataArr['school_id'] = $school_id;
+            } 
+        }
+        $this->db->insert($this->_table_certificate_type, $dataArr);
+        return $this->db->insert_id();
+    }
+    
+    function get_certificate_type_list($dataArray = ""){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+//       return $this->db->select('*')->from($this->_table_certificate_type)->order_by('certificate_type_id','desc')->get()->result_array();
+    $return = array();
+        $this->db->select("*");
+        $this->db->from($this->_table_certificate_type);
+        $this->db->order_by("certificate_type_id", "desc");
+        
+        if (!empty($dataArray)) {
+            $this->db->where($dataArray);
+        }       
+        return $this->db->get()->result_array();
+       
+     }
+    
+    function get_data_by_id_certificate_type($id){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+            return $this->db->select('*')->from($this->_table_certificate_type)->where('certificate_type_id',$id)->get()->row();
+        
+    }
+    
+    function update_cretificate_type($dataArray, $condition){
+        $this->db->where($condition);
+        $this->db->update($this->_table_certificate_type, $dataArray);
+//        echo $this->db->last_query(); die;
+        return;
+    }
+    
+    function update_cretificate($dataArray, $condition){
+        $this->db->where($condition);
+        $this->db->update($this->_table, $dataArray);
+//        echo $this->db->last_query(); die;
+        return;
+    }
+    
+    function delete_certificate_type($where){
+            $this->db->where('certificate_type_id',$where);
+            $this->db->delete($this->_table_certificate_type);
+    }  
+    
+    function get_template_size(){
+         $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+//       return $this->db->select('*')->from($this->_table_certificate_type)->order_by('certificate_type_id','desc')->get()->result_array();
+        $return = array();
+        $this->db->select("*");
+        $this->db->from('template_size');
+        
+        if (!empty($dataArray)) {
+            $this->db->where($dataArray);
+        }       
+        return $this->db->get()->result_array();
+
+    }
+    
+    
 }

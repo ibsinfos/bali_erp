@@ -159,14 +159,14 @@ class Default_Model_Emailcontacts extends Zend_Db_Table_Abstract
         $cnt = $row['cnt'];
         return $cnt;
     }
-    public function getgroupoptions($bunit)
+    public function getgroupoptions()
     {
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select id,group_name,group_code 
                   from main_emailgroups 
                   where id not in (select distinct group_id 
                   from main_emailcontacts 
-                  where isactive = 1 and business_unit_id = ".$bunit.")";
+                  where isactive = 1)";
         $result = $db->query($query);
         $options = $result->fetchAll();
         return $options;

@@ -4,17 +4,17 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title text-center">Do you want to remove this information ?</h4>
+                <h4 class="modal-title text-center"><?php echo get_phrase('do_you_want_to_perform_this_action?')?></h4>
             </div>
 
             <div class="modal-footer text-center-imp">
-                <button type="button" class="btn btn-danger confirm-act">Delete</button>
-                <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger confirm-act"><?php echo get_phrase('confirm')?></button>
+                <button type="button" class="btn btn-info" data-dismiss="modal"><?php echo get_phrase('cancel')?></button>
             </div>
         </div>
     </div>
 </div>
-<script src="<?php echo base_url();?>assets/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- <script src="<?php //echo base_url();?>assets/bower_components/jquery/dist/jquery.min.js"></script> -->
 <!--jquery-UI js only for calender-->
 <script src="<?php echo base_url();?>assets/bower_components/calendar/jquery-ui.min.js"></script>
 <!-- Bootstrap Core JavaScript -->
@@ -36,18 +36,19 @@
 <script src="<?php echo base_url();?>assets/sweetalert/sweetalert.min.js"></script>
 <link rel="stylesheet" type="text/css" href="<?php echo base_url();?>assets/sweetalert/sweetalert.css">
 <script type="text/javascript">
-    (function() {
-        [].slice.call(document.querySelectorAll('.sttabs')).forEach(function(el) {
-            new CBPFWTabs(el);
-        });
-    })();
+function callTabs(){
+    [].slice.call(document.querySelectorAll('.sttabs')).forEach(function(el) {
+        new CBPFWTabs(el);
+    });
+}
+callTabs();
 </script>
 
 <!--For file uplaod-->
 <script src="<?php echo base_url();?>assets/bower_components/dropify/dist/js/dropify.min.js"></script>
 <?php if ($this->session->flashdata('flash_message') != ""):?>
 <script type="text/javascript">
-var msg = '<?php echo json_encode($this->session->flashdata("flash_message"));?>';
+var msg = <?php echo json_encode($this->session->flashdata("flash_message"));?>;
 EliminaTipo1(msg);
 function EliminaTipo1(){
     //swal(msg);
@@ -58,16 +59,10 @@ function EliminaTipo1(){
 
 <?php if($this->session->flashdata('flash_message_error') != ""):?>
 <script type="text/javascript">
-var msg = '<?php echo json_encode($this->session->flashdata("flash_message_error"));?>';
+var msg = <?php echo json_encode($this->session->flashdata("flash_message_error"));?>;
 EliminaTipo5(msg);
 function EliminaTipo5(){
-//	swal(msg);
-// alert(":shdgfjsgfhj");
-    swal(
-      msg,''
-      ,
-      'error'
-    )
+    swal(msg,'','error')
 }
 </script>
 <?php endif;?>
@@ -94,9 +89,51 @@ function EliminaTipo5(){
         buttons: [
             "pageLength",
             'copy', 'excel', 'pdf', 'print'
+        ],
+        "columnDefs": [
+            { "targets": [0,3,4,5], "orderable": false },                 
         ]
     });
     example23_getrow.$('tr').tooltip( {selector: '[data-toggle="tooltip"]'});
+
+    var BusAdmin = $('#BusAdmin').DataTable({
+        dom: 'Bfrtip',
+        responsive: true,
+        buttons: [
+            "pageLength",
+            'copy', 'excel', 'pdf', 'print'
+        ],
+        "columnDefs": [
+            { "targets": [0,4,5], "orderable": false },                 
+        ]
+    });
+    BusAdmin.$('tr').tooltip( {selector: '[data-toggle="tooltip"]'});
+
+    var manage_student_bus = $('#manage_student_bus').DataTable({
+        dom: 'Bfrtip',
+        responsive: true,
+        buttons: [
+            "pageLength",
+            'copy', 'excel', 'pdf', 'print'
+        ],
+        "columnDefs": [
+            { "targets": [0,7], "orderable": false },                 
+        ]
+    });
+    manage_student_bus.$('tr').tooltip( {selector: '[data-toggle="tooltip"]'});
+
+    var manage_vehicle_details = $('#manage_vehicle_details').DataTable({
+        dom: 'Bfrtip',
+        responsive: true,
+        buttons: [
+            "pageLength",
+            'copy', 'excel', 'pdf', 'print'
+        ],
+        "columnDefs": [
+            { "targets": [0,9,13], "orderable": false },                 
+        ]
+    });
+    manage_vehicle_details.$('tr').tooltip( {selector: '[data-toggle="tooltip"]'});
 
     var MoreTable = $('#MoreTable').DataTable({
         dom: 'Bfrtip',
@@ -125,19 +162,21 @@ function EliminaTipo5(){
             "pageLength",
             'copy', 'excel', 'pdf', 'print'
         ],
-        "info":     false,
-
+        "info":     false
     });
     //
-    $('#ex').DataTable({
-        dom: 'Bfrtip',
-        responsive: true,
-        buttons: [
-            "pageLength",
-            'copy', 'excel', 'pdf', 'print'
-        ],
-        "info":     false,
-        
+    exTable = $('#ex').DataTable({
+                    dom: 'Bfrtip',
+                    responsive: true,
+                    buttons: [
+                        "pageLength",
+                        'copy', 'excel', 'pdf', 'print'
+                    ],
+                    "info":     false, 
+                });
+     
+                exTable.on( 'draw.dt', function () {
+        $('.selectpicker').selectpicker('refresh');
     });
 
     $('#att').DataTable({
@@ -147,10 +186,13 @@ function EliminaTipo5(){
             "pageLength"
         ],
         "info":     false,
-        
     });
-    
-    //
+
+    $('#att').on( 'draw.dt', function () {
+        $('.selectpicker').selectpicker('refresh');
+    });
+
+
     var classexample_getrow =  $('.example').DataTable({
         dom: 'Bfrtip',
         responsive: true,
@@ -317,26 +359,28 @@ $("a[data-toggle=\"tab\"]").on("shown.bs.tab", function (e) {
 <!-- Date Picker Plugin JavaScript -->
 <script src="<?php echo base_url();?>assets/bower_components/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
 <script>
-    jQuery('.mydatepicker, #datepicker').datepicker();
-    jQuery('#birthday').datepicker({
+$(function(){
+    $('.mydatepicker, #datepicker').datepicker();
+    $('#birthday').datepicker({
        endDate:'-2y',
        autoclose: true,
     });
-    jQuery('#datepicker-autoclose').datepicker({
+    $('#datepicker-autoclose').datepicker({
         autoclose: true,
         todayHighlight: true
     });
 
     var holi = '';
     <?php if(isset($hstring) && $hstring!='') { ?>
-        holi = '<?php echo $hstring; ?>';
+        var holi = '<?php echo $hstring; ?>';
     <?php } ?>
-    jQuery('#mydatepicker_holiday_disable').datepicker({ 
-            startDate: new Date(),
-            endDate: new Date(),
-            todayHighlight: true,
-            datesDisabled: [holi],
+    $('#mydatepicker_holiday_disable').datepicker({ 
+        //startDate: new Date(),
+        endDate: new Date(),
+        todayHighlight: true,
+        datesDisabled: [holi],
     });
+});    
 </script>
 
 <!-- moment Plugin JavaScript -->
@@ -487,14 +531,19 @@ function readURL(input) {
 <script src="<?php echo base_url();?>assets/bower_components/switchery/dist/switchery.min.js"></script>
 <script>
  // Switchery
-var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-$('.js-switch').each(function() {//data-color="#707cd2"
-    objData = $(this).data();
-    if(!objData.color){
-        objData.color = "#707cd2";
-    }
-    new Switchery($(this)[0], objData);
-});
+function enableSwitchery(){
+    $('.switchery').remove();
+    var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+    $('.js-switch').each(function() {//data-color="#707cd2"
+        objData = $(this).data();
+        //console.log(objData);
+        if(!objData.color){
+            objData.color = "#707cd2";
+        }
+        new Switchery(this, objData);
+    });
+}
+enableSwitchery();
 </script>
 
 <!--For summernote editor-->
@@ -521,9 +570,11 @@ $('.js-switch').each(function() {//data-color="#707cd2"
 <script>
 $(document).ready(function() {
   $('.button-on').click(function() {
+    $('body').toggleClass('overflow');
     $('.serch-click-overlay').show(300);
     $('.button-on').hide();
     $('.sidebar-head').hide();
+    
   });
 
   $('.serach-cross').click(function() {
@@ -578,16 +629,38 @@ Typeahead Autocompleter header search-->
 <!--Own new_Custom js file-->
 <script src="<?php echo base_url();?>assets/js/new_custom_js.js"></script>
 
-<script>
+<script type="text/javascript">
+    if($('form')) {
+		if($('a').parent().hasClass('text-right')){
+			$( "a" ).parent().removeClass('text-right');
+            $( "a" ).parent().addClass('text-center');
+		}
+        if($( "form button" ).parent().hasClass('text-right')) { 
+            //$( "form button" ).parent().prepend('<div class="clearfix">&nbsp;</div>');
+            $( "form button" ).parent().removeClass('text-right');
+            $( "form button" ).parent().addClass('text-center');
+        }
+        $( "form button" ).parent().addClass('text-center');
+    } 
+    
+    
   window.intercomSettings = {
     app_id: "qujjof9e",
     name: '<?php echo sett('system_title')?>', 
   };
   
-  Intercom('onShow', function() {
-      $('#intercom-container .intercom-conversations-header-body').attr('style','background-image:<?php echo base_url();?>assets/images/logo_ag.png');
-      $('#intercom-container .intercom-conversations-header-body').attr('style','background-repeat:no-repeat');
-    });
+//  Intercom('onShow', function() {
+//      $('#intercom-container .intercom-conversations-header-body').attr('style','background-image:<?php echo base_url();?>assets/images/logo_ag.png');
+//      $('#intercom-container .intercom-conversations-header-body').attr('style','background-repeat:no-repeat');
+//    });
 </script>
-<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/qujjof9e';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>
+<script>(function(){var w=window;var ic=w.Intercom;if(typeof ic==="function"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/qujjof9e';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()
+
+
+setTimeout(function() {
+  $('.intercom-launcher-frame').fadeOut('fast');
+}, 1000);
+
+
+</script>
 

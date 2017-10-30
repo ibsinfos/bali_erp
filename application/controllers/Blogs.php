@@ -67,7 +67,7 @@ class Blogs extends CI_Controller {
             }else{                
                 $create_blog['blog_available']                  =   '2';
                 if($this->Blog_model->save_blog($create_blog)){                
-                    $this->session->set_flashdata('flash_message', get_phrase('blog_is_created')); 
+                    $this->session->set_flashdata('flash_message', get_phrase('blog_is_created_successfully.')); 
                     redirect(base_url() . 'index.php?blogs/view_my_blogs', 'refresh');
                 }else{
                     $this->session->set_flashdata('flash_message', get_phrase('blog_not_created'));
@@ -137,7 +137,7 @@ class Blogs extends CI_Controller {
            $admin_comments                                          =   $this->input->post('comments');
            $blog_comment['blog_resend_comment']                     =   $admin_comments;           
            if($this->Blog_model->resend_blogs($param2, $blog_comment['blog_resend_comment'])){
-               $this->session->set_flashdata('flash_message', get_phrase('blog_has_been_resend_to_author')); 
+               $this->session->set_flashdata('flash_message', get_phrase('blog_has_been_resent_to_author.')); 
                redirect(base_url() . 'index.php?blogs/view_blogs', 'refresh');
            }else{
                $this->session->set_flashdata('flash_message_error', get_phrase('blog_not_resend')); 
@@ -192,7 +192,7 @@ class Blogs extends CI_Controller {
             $save_blog_comment['date_created']                =    date('Y-m-d H:i:s');
             
             if($this->Blog_model->save_blogs_comments($save_blog_comment)){
-                $this->session->set_flashdata('flash_message', get_phrase('blog_comments_posted!!'));
+                $this->session->set_flashdata('flash_message', get_phrase('blog_comments_posted_successfully!!'));
                
                 redirect(base_url() . 'index.php?blogs/view_blogs_details/'.$param1); 
             }else{
@@ -225,7 +225,8 @@ class Blogs extends CI_Controller {
         if($param1 == '1') { $page_data['tab'] = 'subcat'; }
         if($param1 == 'delete'){
             if($this->Blog_model->delete_category($param2)){
-                $this->session->set_flashdata('flash_message', get_phrase('category_deleted'));
+                $this->session->set_flashdata('flash_message', get_phrase('category_deleted_successfully.'));
+                redirect(base_url() . 'index.php?blogs/view_category_subcategory', 'refresh');
             }
         }
         if($param1 == 'edit'){
@@ -233,13 +234,13 @@ class Blogs extends CI_Controller {
             $condition                          =   array('blog_category_id'=>$param2);
             $dataArray                          =   array('blog_category_name'=>$update['blog_category_name']);
             if($this->Blog_model->update_category($condition, $dataArray)){
-                $this->session->set_flashdata('flash_message', get_phrase('category_updated'));
+                $this->session->set_flashdata('flash_message', get_phrase('category_updated_successfully.'));
             }
             redirect(base_url() . 'index.php?blogs/view_category_subcategory', 'refresh');            
         }
         if($param1 == 'delete_sub'){
             if($this->Blog_model->delete_category($param2)){
-                $this->session->set_flashdata('flash_message', get_phrase('subcategory_deleted'));
+                $this->session->set_flashdata('flash_message', get_phrase('subcategory_deleted_successfully.'));
                 redirect(base_url() . 'index.php?blogs/view_category_subcategory/1', 'refresh'); 
             }            
         }
@@ -249,7 +250,7 @@ class Blogs extends CI_Controller {
             $condition                          =   array('blog_category_id'=>$param2);
             $dataArray                          =   array('blog_category_name'=>$update['blog_category_name'], 'blog_category_parent_id' => $update['blog_category_parent_id']);
             if($this->Blog_model->update_category($condition, $dataArray)){
-                $this->session->set_flashdata('flash_message', get_phrase('subcategory_updated'));
+                $this->session->set_flashdata('flash_message', get_phrase('subcategory_updated_successfully.'));
             }
             redirect(base_url() . 'index.php?blogs/view_category_subcategory/1', 'refresh');            
         }
@@ -266,9 +267,9 @@ class Blogs extends CI_Controller {
         if($param1 == 'delete'){
             $delete_blog = $this->Blog_model->blogdelete($blog_id);
             if($delete_blog){
-                $this->session->set_flashdata('flash_message', get_phrase('blog_deleted'));
+                $this->session->set_flashdata('flash_message', get_phrase('blog_deleted_successfully.'));
             }else{
-                $this->session->set_flashdata('flash_message', get_phrase('not_deleted'));
+                $this->session->set_flashdata('flash_message', get_phrase('not_deleted_successfully.'));
             }
             redirect(base_url() . 'index.php?blogs/view_my_blogs', 'refresh');
         }
@@ -303,7 +304,7 @@ class Blogs extends CI_Controller {
                     $create_blog['blog_sub_category_id']            =   $this->input->post('subcategory');
                 }
                 if($this->Blog_model->update_blog($param2, $create_blog)){                
-                    $this->session->set_flashdata('flash_message', get_phrase('blog_sent_to_publish')); 
+                    $this->session->set_flashdata('flash_message', get_phrase('blog_sent_to_publish_successfully.')); 
                     redirect(base_url() . 'index.php?blogs/view_my_blogs', 'refresh');
                 }else{
                     $this->session->set_flashdata('flash_message', get_phrase('blog_not_updated'));
@@ -329,31 +330,45 @@ class Blogs extends CI_Controller {
             redirect(base_url(), 'refresh');
         } 
         $page_data= $this->get_page_data_var();
+        
         if($param1 == 'create'){            
-            $create_blog_category['blog_category_name']             =   $this->input->post('category_name'); 
-            $create_blog_category['blog_category_parent_id']        =   '0';
-            $num_rows = $this->Blog_model->get_count($create_blog_category);            
-            if (($num_rows) < 1) {             
-                $this->Blog_model->add_blog_category($create_blog_category);                
-                $this->session->set_flashdata('flash_message', get_phrase('category_added'));
-                redirect(base_url() . 'index.php?blogs/view_category_subcategory', 'refresh');  
-            }else{
-                $this->session->set_flashdata('flash_message_error', get_phrase('Category_already_exists!!'));
-                redirect(base_url() . 'index.php?blogs/addcategory', 'refresh');                
-            }                      
-        }  
-        if($param1 == 'subcreate'){
-            $create_blog_category['blog_category_name']             =   $this->input->post('subcategory_name'); 
-            $create_blog_category['blog_category_parent_id']        =   $this->input->post('blog_category_parent_id');
-            $num_rows = $this->Blog_model->get_count_of_subcategory($create_blog_category);            
-            if (($num_rows) < 1) {             
-                $this->Blog_model->add_blog_category($create_blog_category);                
-                $this->session->set_flashdata('flash_message', get_phrase('category_added'));                     
-            }else{
-                $this->session->set_flashdata('flash_message_error', get_phrase('subcategory_already_exists!!'));  
+            $this->form_validation->set_rules('category_name', 'Category Name', 'required');
+            if ($this->form_validation->run() == TRUE) {
+                $create_blog_category['blog_category_name']             =   $this->input->post('category_name'); 
+                $create_blog_category['blog_category_parent_id']        =   '0';
+                $num_rows = $this->Blog_model->get_count($create_blog_category);            
+                if (($num_rows) < 1) {             
+                    $this->Blog_model->add_blog_category($create_blog_category);                
+                    $this->session->set_flashdata('flash_message', get_phrase('category_added_successfully.'));
+                    redirect(base_url() . 'index.php?blogs/view_category_subcategory', 'refresh');  
+                }else{
+                    $this->session->set_flashdata('flash_message_error', get_phrase('Category_already_exists!!'));
+                    redirect(base_url() . 'index.php?blogs/addcategory', 'refresh');                
+                }    
+            }
+            else {
+                $this->session->set_flashdata('flash_message_error', get_phrase('Please fill category name!!'));  
                 redirect(base_url() . 'index.php?blogs/addcategory', 'refresh');
             }
-            redirect(base_url() . 'index.php?blogs/view_category_subcategory', 'refresh');            
+        }  
+        if($param1 == 'subcreate'){
+            $this->form_validation->set_rules('subcategory_name', 'Sub Category', 'required');
+            if ($this->form_validation->run() == TRUE) {
+                $create_blog_category['blog_category_name']             =   $this->input->post('subcategory_name'); 
+                $create_blog_category['blog_category_parent_id']        =   $this->input->post('blog_category_parent_id');
+                $num_rows = $this->Blog_model->get_count_of_subcategory($create_blog_category);            
+                if (($num_rows) < 1) {             
+                    $this->Blog_model->add_blog_category($create_blog_category);                
+                    $this->session->set_flashdata('flash_message', get_phrase('subcategory_added_successfully.'));                     
+                }else{
+                    $this->session->set_flashdata('flash_message_error', get_phrase('subcategory_already_exists!!'));  
+                    redirect(base_url() . 'index.php?blogs/addcategory', 'refresh');
+                }
+                redirect(base_url() . 'index.php?blogs/view_category_subcategory', 'refresh');    
+            } else {
+                $this->session->set_flashdata('flash_message_error', get_phrase('Please fill subcategory name!!'));  
+                redirect(base_url() . 'index.php?blogs/addcategory', 'refresh');
+            }
         }
         $page_data['blog_categories']                           =   $this->Blog_category_model->get_data_by_cols('*',array('blog_category_parent_id'=>'0','blog_category_isActive'=>'1'), 'result_arr', array('blog_category_name' => 'ASC'));
         $page_data['page_title']                                    =   get_phrase('manage_category_&_subcategory');

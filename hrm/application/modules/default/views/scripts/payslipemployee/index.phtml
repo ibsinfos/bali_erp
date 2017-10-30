@@ -1,3 +1,4 @@
+<?php $months = array('1' => 'Jan', '2'=>'Feb', '3'=>'Mar', '4'=>'Apr', '5'=>'May', '6'=>'Jun', '7'=>'Jul', '8'=>'Aug', '9'=>'Sep', '10'=>'Oct', '11'=>'Nov', '12'=>'Dec');?>
 <?php 
 /********************************************************************************* 
  *  This file is part of Sentrifugo.
@@ -29,7 +30,12 @@ if (count($this->messages)) {?><style>#messageData{color:green;}</style>
 				$flag = array("1");				
 				//$flag = array_keys($message);
 				echo "<div id='messageData' class='ml-alert-1-$flag[0]'><div style='display:block;'><span class='style-1-icon $flag[0]'></span>";
-				echo $message;
+                                if(is_array($message)){
+                                    echo '<pre>';
+                                    print_r($message);
+                                } else {
+                                    echo $message;
+                                }
 				echo "</div></div>";
 			} 
 		?>
@@ -44,17 +50,25 @@ if (count($this->messages)) {?><style>#messageData{color:green;}</style>
 			Employees grid will not work as Roles are not added yet.
 	</div>
  <?php	} else	{*/	?>
+
+
+
+
 <?php
 if($this->call == 'ajaxcall'){
 	$div = ''; $endDiv = ''; 
 } else { 
 	$div = '<div id="grid_'.$this->dataArray[0]['objectname'].'" class="all-grid-control">'; $endDiv = '</div>';
 }
+?>
+
+<?php
 	echo $div.'<div id="msg" style="display:none;font-style: oblique; font-weight: bold; color: green;""></div>'.$this->grid($this->dataArray[0]).$endDiv;
        
 //} ?>
-<form method="post" name="frm_selected_emp_ids" id="frm_selected_emp_ids" action="<?php echo BASE_URL.'/payslipemployee/generatebulk/';?>">
-    <input type="hidden" name="selected_emp_ids" id="selected_emp_ids" value=""> 
+<form method="post" name="frm_selected_emp_ids" id="frm_selected_emp_ids" action="<?php echo BASE_URL.'/payslipemployee/generatebulkpayslip/';?>">
+    <input type="hidden" name="emp_ids" id="emp_ids" value="">
+    <input type="hidden" name="month" id="month" value="" />
 </form>
 <script type='text/javascript'>
 $(document).ready(function(){
@@ -63,7 +77,7 @@ $(document).ready(function(){
 <?php if (count($this->messages)) {?>
       setTimeout(function(){
 			$('#dispmsgemp').fadeOut('slow');
-		},3000);
+		},10000);
 
 <?php } ?>
 
@@ -95,7 +109,7 @@ function bulkGenerate(){
         jAlert("Please select any employee to generate the payslip.");
         return false;
     }
-    jConfirm("Are sure to do this action? Y/N","Generate Payslip Individual Employee",function(r){
+    jConfirm("Are you sure to generate payslip?","Generate Payslip for Individual Employee",function(r){
         if(r==true){
             $("#frm_selected_emp_ids").submit();
         }else{
@@ -109,19 +123,19 @@ $(document).ready(function(){
             $('.checkbox').each(function(){
                 this.checked = true;
                 //console.log(this.value);
-                var selelctedIds=$("#selected_emp_ids").val();
+                var selelctedIds=$("#emp_ids").val();
                 if(selelctedIds==""){
-                    $("#selected_emp_ids").val(this.value);
+                    $("#emp_ids").val(this.value);
                 }else{
                     selelctedIds=selelctedIds+","+this.value;
-                    $("#selected_emp_ids").val(selelctedIds);
+                    $("#emp_ids").val(selelctedIds);
                 }
             });
         }else{
              $('.checkbox').each(function(){
                 this.checked = false;
             });
-            $("#selected_emp_ids").val("");
+            $("#emp_ids").val("");
         }
         //var selelctedIds=$("#selected_emp_ids").val();
         //console.log(selelctedIds);
@@ -133,15 +147,15 @@ $(document).ready(function(){
         }else{
             $('#select_all').prop('checked',false);
         }
-        $("#selected_emp_ids").val("");
+        $("#emp_ids").val("");
         $('.checkbox').each(function(){
             if(this.checked){
-                var selelctedIds=$("#selected_emp_ids").val();
+                var selelctedIds=$("#emp_ids").val();
                 if(selelctedIds==""){
-                    $("#selected_emp_ids").val(this.value);
+                    $("#emp_ids").val(this.value);
                 }else{
                     selelctedIds=selelctedIds+","+this.value;
-                    $("#selected_emp_ids").val(selelctedIds);
+                    $("#emp_ids").val(selelctedIds);
                 }
             }
         });
@@ -157,4 +171,26 @@ function is_generated_selectetd(){
     });
     return item_checked;
 }
+
+var months = '<?php echo '<div style="width:100%; float:left; margin-top:20px;"><div class="new-form-ui" style="float:left; height:auto;"><label>Select Month :</label><div class="division"><select name="month_val" id="month_val" class="select2" style=" width:100%;" onChange="generatePayslipForMonth(this.value);">';
+                                 foreach ($months AS $k => $v):
+                                    if($k==(date('n'))){
+                                        break;
+                                    }
+                                    if($k<10){
+                                        $k="0".$k;
+                                    }
+                               echo '<option value="'.$k.'">'.$v.'</option>';
+                                endforeach;
+                           echo '</select></div></div>'; ?>';
+
+$(document).ready(function(){
+    $('.table-header').append(months+'<div class="new-form-ui-submit" style="margin-bottom:10px;float:left; clear:none;margin-top:15px; width:auto;"><button type="button" id="generate" onclick="bulkGenerate();">Generate</button></div></div>');
+});
+
+
+ function generatePayslipForMonth(value){
+        var month = $('#month_val').val();
+        $('#month').val(month);
+    }
 </script>

@@ -77,7 +77,9 @@ class Default_EmppayslipsController extends Zend_Controller_Action {
         }
     }
 
-    public function viewAction() {
+    public function viewoldAction() {
+//        error_reporting(E_ALL);
+//        ini_set('display_errors', '1');
         if (defined('EMPTABCONFIGS')) {
             $empOrganizationTabs = explode(",", EMPTABCONFIGS);
 
@@ -92,8 +94,8 @@ class Default_EmppayslipsController extends Zend_Controller_Action {
                 $employeeModal = new Default_Model_Employee();
                 $empsalarydetailsModal = new Default_Model_Empsalarydetails();
                 $payrollPayslipDetailsModal = new Default_Model_Payrollpayslipdetails();
-                $salarySlipDetails=$payrollPayslipDetailsModal->get_details_by_employee_id($userid);
-                $netPayDetails=$payrollPayslipDetailsModal->get_current_net_pay($userid);
+                $salarySlipDetails=$payrollPayslipDetailsModal->get_details_by_employee_id($userid,$payslip_id);
+                $netPayDetails=$payrollPayslipDetailsModal->get_current_net_pay($userid,$payslip_id);
                 $payrollCal = new sapp_Payrollcal();
                 //sapp_Payrollcal::pre($salarySlipDetails);die;
                 $earningColArr=array();
@@ -117,7 +119,7 @@ class Default_EmppayslipsController extends Zend_Controller_Action {
                     $bas = sapp_Global:: _decrypt($data[0]['salary']);
                     $data[0]['salary']=$bas;
                 }
-
+                
                 // {$payrollcategoryModel = new Default_Model_Payrollcategory();
                 /*$payrollCal = new sapp_Payrollcal();
                 //$payrollCal->suppress_errors = true;
@@ -644,6 +646,336 @@ class Default_EmppayslipsController extends Zend_Controller_Action {
 		 	{
 		 		$this->view->rowexist = "norows";
 		 	}
+    }
+    
+    public function viewAction() {
+//        error_reporting(E_ALL);
+//        ini_set('display_errors',1);
+        if (defined('EMPTABCONFIGS')) {
+            $empOrganizationTabs = explode(",", EMPTABCONFIGS);
+
+            if (in_array('emp_payslips', $empOrganizationTabs)) {
+                $auth = Zend_Auth::getInstance();
+                if ($auth->hasIdentity()) {
+                    $loginUserId = $auth->getStorage()->read()->id;
+                }
+                $userid = $this->getRequest()->getParam('userid');
+                $this->view->userid = $userid;
+                
+                $payslip_id = $this->getRequest()->getParam('payslipid');
+                
+                $employeeModal = new Default_Model_Employee();
+                $empsalarydetailsModal = new Default_Model_Empsalarydetails();
+                $payrollPayslipDetailsModal = new Default_Model_Payrollpayslipdetails();
+                $payrollPayslip = new Default_Model_Payrollpayslip();
+                if(!isset($payslip_id)) {
+                    $empLastPayslip = $payrollPayslip->getEmpLastPayslip($userid);
+                    
+                    if(count($empLastPayslip) == 0){
+                        $this->_helper->getHelper("FlashMessenger")->addMessage(array("error"=>"Employee Payslip is not generated yet."));                                       $this->view->messages = $this->_helper->flashMessenger->getMessages();	
+                        $this->_redirect('employee/edit/id/'.$userid);
+                    } 
+                    else {
+                        $payslip_id = $empLastPayslip[0]['id'];
+                    }
+                }
+                $this->view->payslip_id = $payslip_id;
+                $salarySlipDetails=$payrollPayslipDetailsModal->get_details_by_employee_id($userid,$payslip_id);
+                $netPayDetails=$payrollPayslipDetailsModal->get_current_net_pay($userid,$payslip_id);
+                $currencyModel = new Default_Model_Currency();
+                                
+                $payrollCal = new sapp_Payrollcal();
+
+                $earningColArr=array();
+                $deductColArr=array();
+                foreach ($salarySlipDetails AS $k =>$v){
+                    if($v['type']==0){
+                        $tempArr=array();
+                        $tempArr['name']=$v['name'];
+                        $tempArr['value']=$v['value'];
+                        $earningColArr[]=$tempArr;
+                    }else{
+                        $tempArr=array();
+                        $tempArr['name']=$v['name'];
+                        $tempArr['value']=$v['value'];
+                        $deductColArr[]=$tempArr;
+                    }
+                }
+
+                $data = $empsalarydetailsModal->getsingleEmpSalaryDetailsData($userid);
+                if (!empty($data)) {
+                    $bas = sapp_Global:: _decrypt($data[0]['salary']);
+                    $data[0]['salary']=$bas;
+                }
+                
+                $currency = $currencyModel->getCurrencyDataByID($data[0]['currencyid']);
+                $this->view->currency=$currency[0];
+                
+                $isrowexist = $employeeModal->getsingleEmployeeData($userid);
+                if ($isrowexist == 'norows')
+                    $this->view->rowexist = "norows";
+                else
+                    $this->view->rowexist = "rows";
+                
+                $this->view->doj = $isrowexist[0]['date_of_joining'];
+                
+                $empdata = $employeeModal->getActiveEmployeeData($userid);
+                if (!empty($empdata)) {
+                    $emppayslipsModel = new Default_Model_Emppayslips();
+                    if ($userid) {
+                        //To display Employee Profile information......
+                        $usersModel = new Default_Model_Users();
+                        $employeeData = $usersModel->getUserDetailsByIDandFlag($userid);
+                    }
+                    $this->view->id = $userid;
+                    $this->view->employeedata = $employeeData[0];
+                    
+                    // Code by Shuchita
+                    if ($userid) {
+                        //To display Employee Profile information......
+                        $empLeavesModel = new Default_Model_Employeeleaves();
+                        $employeeLeavesData = $empLeavesModel->getsingleEmployeeleaveData($userid);
+                        $empLeaveData=$employeeLeavesData[0];
+                        $this->view->empLeaveData=$empLeaveData;
+                        //echo '<pre>'; print_r($employeeLeavesData); die;
+                    }
+                    
+                    // Calculation for payroll category
+                    //$payslipid;
+                    
+                    $empsalarydetailsModal = new Default_Model_Empsalarydetails();
+                    
+                    $payrollcategoryModel = new Default_Model_Payrollcategory();
+                    $payrollGroup = new Default_Model_Payrollgroup();
+                    $payrollPayslipDetailsModel = new Default_Model_Payrollpayslipdetails();
+                    $data1 = $empsalarydetailsModal->getsingleEmpSalaryDetailsData($userid);
+                    
+                    $empPayslipData = $payrollPayslip->get_data($payslip_id);
+                    $this->view->empPayslipData=$empPayslipData;
+                    
+                    $doj = $isrowexist[0]['date_of_joining'];
+                
+                    $last_day_this_month  = date('t',mktime(0, 0, 0, date('m',strtotime($doj)),10));
+                    $joinDate = date('d',strtotime($doj));
+//                    if(date('m',strtotime($doj)) == date('m',strtotime('-1 month'))){
+//                        $workingDays = $last_day_this_month - $joinDate + 1;
+//                    } else 
+                    if(date('m',strtotime($doj)) == $empPayslipData[0]['payslip_month'] && date('Y',strtotime($doj)) == $empPayslipData[0]['payslip_year']) {
+                        $dojLastDayOfMonth = date('t',mktime(0, 0, 0, date('m',strtotime($doj)),10));
+                        $workingDays = $dojLastDayOfMonth - $joinDate + 1;
+                    } 
+                    else {
+                        $dojLastDayOfMonth = $workingDays = date('t',mktime(0, 0, 0, $empPayslipData[0]['payslip_month'],10));
+                    }
+                    //echo $workingDays;
+            //echo '<pre>'; print_r($empPayslipData);
+                    if(!empty($data)){
+                        $bas=sapp_Global:: _decrypt( $data1[0]['salary']);
+                    }else{
+                        //continue;
+                    }
+                    //echo $dojLastDayOfMonth;
+                    
+                    $basic = $bas;
+                    
+                    $salaryPerDay = $bas / $dojLastDayOfMonth;//echo '=====';
+                    $salaryForWorkingDays = $salaryPerDay * $workingDays;//echo '=====';
+
+                    $salaryCategory=array();
+                    $salaryCategory['BAS']=$salaryForWorkingDays;
+                    //die;
+                    $allEarningDeduction=$payrollcategoryModel->get_emp_earning_deduction($userid,$payslip_id);
+//echo $empPayslipData[0]['net_pay'];
+                    $totalSal=0;
+                    $totalSal=$empPayslipData[0]['net_pay'];
+                    if(count($allEarningDeduction)>0) {
+                     foreach ($allEarningDeduction AS $key=>$value){
+                            $allEarningDeduction[$key]['payroll_category_id'] = $value['payroll_category_id'];
+                            $allEarningDeduction[$key]['type'] = $value['type'];
+                            if ($value['code'] == "BAS") {
+                                $salaryCategory['BAS']=$basic;
+                                $allEarningDeduction[$key]['value'] = $salaryForWorkingDays;
+                                $totalSal+=$salaryForWorkingDays;
+                                continue;
+                            }else{
+                            if ($value['value_type_id'] == 1) {
+                            $formula = $value['value_formula'];
+                            $string = str_replace("%", "/100", $formula);
+
+                            $salaryCategoryKeyArr= array_keys($salaryCategory);
+                            $salaryCategoryValArr= array_values ($salaryCategory);
+                            $salaryCategoryKeyStr= implode(',', $salaryCategoryKeyArr);
+                            $salaryCategoryValStr= implode(',', $salaryCategoryValArr);
+
+                            $str = 'y(' . strtolower($salaryCategoryKeyStr) . ') = ' . strtolower($string);
+                            $payrollCal->evaluate($str);
+                            $calculatedValue = $payrollCal->e("y($salaryCategoryValStr)");
+
+                            $allEarningDeduction[$key]['value']=$calculatedValue;
+                            $tempSalaryCategoryalue=$allEarningDeduction[$key]['value'];
+                            $salaryCategory[$value['code']]=$tempSalaryCategoryalue;
+                        }
+                            else if($value['value_type_id'] == 2){
+                            $conditionAmount = ''; $tempSalaryCategoryalue = 0;
+                            $conditionValueDetails= sapp_Showpayrollcondition::get_payroll_condition_value_arr_in_edit($value['value_formula']);
+                     
+                            switch ($conditionValueDetails['operator']){
+                                case "gt":
+                                    if($salaryCategory[$conditionValueDetails['if']]>$conditionValueDetails['condition']){
+                                        $conditionAmount=$conditionValueDetails['then'];
+                                    }
+                                    break;
+                                case "lt":
+                                    //$opertator ="<";
+                                    if($salaryCategory[$conditionValueDetails['if']]<$conditionValueDetails['condition']){
+                                        $conditionAmount=$conditionValueDetails['then'];
+                                    }
+                                    break;
+                                case "ge":
+                                    //$opertator =">=";
+                                    if($salaryCategory[$conditionValueDetails['if']]>=$conditionValueDetails['condition']){
+                                        $conditionAmount=$conditionValueDetails['then'];
+                                    }
+                                    break;
+                                case "le":
+                                    //$opertator ="<=";
+                                    if($salaryCategory[$conditionValueDetails['if']]<=$conditionValueDetails['condition']){
+                                        $conditionAmount=$conditionValueDetails['then'];
+                                    }
+                                    break;
+                                case "et":
+                                    //$opertator ="==";
+                                    if($salaryCategory[$conditionValueDetails['if']]==$conditionValueDetails['condition']){
+                                        $conditionAmount=$conditionValueDetails['then'];
+                                    }
+                                    break;
+                                default:
+                                    //$opertator ="==";
+                                    if($salaryCategory[$conditionValueDetails['if']]==$conditionValueDetails['condition']){
+                                        $conditionAmount=$conditionValueDetails['then'];
+                                    }
+                                    break;
+                            }
+                            
+                            if($conditionAmount!='') {
+                                $c_formula = $conditionAmount;
+
+                                $c_string = str_replace("%", "/100", $c_formula);
+
+                                $salaryCategoryKeyArr= array_keys($salaryCategory);
+                                $salaryCategoryValArr= array_values ($salaryCategory);
+
+                                $salaryCategoryKeyStr= implode(',', $salaryCategoryKeyArr);
+                                $salaryCategoryValStr= implode(',', $salaryCategoryValArr);
+
+                                $c_str = 'y(' . strtolower($salaryCategoryKeyStr) . ') = ' . strtolower($c_string);
+                                $payrollCal->evaluate($c_str);
+                                $calculatedValue = $payrollCal->e("y($salaryCategoryValStr)");
+
+                                if($calculatedValue > 0) {
+                                    $allEarningDeduction[$key]['value']=$calculatedValue;
+                                    $tempSalaryCategoryalue=$allEarningDeduction[$key]['value'];
+                                    $salaryCategory[$value['code']]=$tempSalaryCategoryalue;
+                                }
+                            }
+                        }
+                            else{
+                            ///fix
+                                $tempSalaryCategoryalue=$value['value_formula'];
+                                $salaryCategory[$value['code']]=$tempSalaryCategoryalue;
+                                $allEarningDeduction[$key]['value'] = $tempSalaryCategoryalue;
+                            }
+                            
+                            //echo $totalSal;echo '<pre>';print_r($value); echo $tempSalaryCategoryalue;
+                            if($value['type']==0){
+//                                $tempArr=array();
+//                                $tempArr['name']=$value['name'];
+//                                $tempArr['value']=$tempSalaryCategoryalue;
+//                                $earningColArr[]=$tempArr;
+                               // $totalSal+=$tempSalaryCategoryalue;
+                            }else{
+//                                $tempArr=array();
+//                                $tempArr['name']=$value['name'];
+//                                $tempArr['value']=$tempSalaryCategoryalue;
+//                                $deductColArr[]=$tempArr;
+                                //$totalSal-=$tempSalaryCategoryalue;
+                            } 
+                            }
+                    }
+
+                    foreach ($allEarningDeduction AS $k=>$v){ 
+                    $checkExist = $payrollPayslipDetailsModel->get_data_by_category_id($v['payroll_category_id'],$payslip_id);
+
+                    if(count($checkExist) == 0) {
+                        if($v['type']==0) {
+                            $totalSal+=$v['value'];
+                        } else {
+                            $totalSal-=$v['value'];
+                        }
+                        if($v['payroll_category_id']!="" && $v['value']!="" && $payslip_id!=""){
+                            $payrollPayslipCateggoryDataArray=array('payroll_category_id'=>$v['payroll_category_id'],'formula'=>$v['value_formula'],'value'=>$v['value'],'payroll_payslip_id'=>$payslip_id);
+                            $payrollPayslipDetailsModel->add($payrollPayslipCateggoryDataArray);
+                        }
+                    } else {
+                        $payrollCateData = $payrollcategoryModel->get_category_data($checkExist[0]['payroll_category_id']);
+                        if($payrollCateData[0]['type']==0) {
+                            $totalSal-=$checkExist[0]['value'];
+                            $totalSal+=$v['value'];
+                        } else {
+                            $totalSal+=$checkExist[0]['value'];
+                            $totalSal-=$v['value'];
+                        }
+                        $payrollPayslipCateggoryDataArray=array('formula'=>$v['value_formula'],'value'=>$v['value']);
+                        $payrollPayslipDetailsModel->editpayslipdata($payrollPayslipCateggoryDataArray,$checkExist[0]['id']);
+                    }
+                }
+                    }//
+                //echo $totalSal; die;
+//echo $totalSal;
+//echo $totalSal; 
+                //$payrollPayslip->edit(array("net_pay"=>$totalSal),$payslip_id,'id');
+                $paySlipDataArr = array("net_pay"=>$totalSal);
+                $payrollPayslipData=$payrollPayslip->update_payslip($paySlipDataArr,$payslip_id);
+                if($empPayslipData[0]['net_pay']>0){
+                }else{
+                    $payrollPayslip->delete($payslip_id);
+                }
+                 
+                    // Code by Shuchita
+                    if ($this->getRequest()->getPost()) {
+                        
+                    }
+                }
+                //print_r($earningColArr);
+                $this->view->salarydetails=$data[0];
+                $this->view->earningColArr=$earningColArr;
+                $this->view->deductColArr=$deductColArr;
+                $this->view->netPayDetails=$netPayDetails;
+                $this->view->netPay = $netPay;
+                $this->view->empdata = $empdata;
+            } else {
+                $this->_redirect('error');
+            }
+        } else {
+            $this->_redirect('error');
+        }
+    }
+    
+    public function getpayslipidbymonthAction() {
+        $userid = $_POST['userid'];
+        $this->view->userid = $userid;
+        
+        $month = $_POST['month'];
+        $this->view->month = $month;
+        
+        $year = $_POST['year'];
+        $this->view->year = $year;
+        
+        $payrollPayslip = new Default_Model_Payrollpayslip();
+        $payslipData = $payrollPayslip->getPayslipByMonthAndUserid($userid,$month,$year);
+
+        echo $payslipData[0]['id'];
+        exit();
     }
 }
 

@@ -38,24 +38,28 @@
                     <div class="pay-box">
                         <div class="row">
                             <div class="col-md-3 pull-right">
-                                <label for="field-1"><?php echo get_phrase('date'); ?></label>
+                                <label for="field-1"><strong><?php echo get_phrase('date');?></strong></label>
                                 <input class="form-control input-sm" type="text" name="date" value="<?php echo date('Y/m/d') ?>" readonly/>
                             </div>    
                             <div class="col-md-3 pull-right">
-                                <label for="field-1"><?php echo get_phrase('academic_year'); ?></label>
+                                <label for="field-1"><strong><?php echo get_phrase('academic_year');?></strong></label>
                                 <input class="form-control input-sm" type="text" name="runnin_year" value="<?php echo fetch_parl_key_rec(false,'running_year')?>"
                                 readonly/>
                             </div>    
                         </div>
                         <div class="row mt10">
                             <div class="col-md-2">
-                                <label for="field-1"><?php echo get_phrase("student_status");?></label><br/>
-                                <label><input type="radio" name="student_status" value="1" checked="checked"/> Enroll</label>
-                                <label><input type="radio" name="student_status" value="2"/> Enquired</label>           
+                                <label for="field-1"><strong><?php echo get_phrase('student_status');?></strong></label><br/>
+                                <label>
+                                    <input type="radio" name="student_status" value="1" checked="checked"/> <?php echo get_phrase('enroll')?>
+                                </label>
+                                <label>
+                                    <input type="radio" name="student_status" value="2"/> <?php echo get_phrase('enquired')?>
+                                </label>           
                             </div>  
 
                             <div class="col-md-3 class-select-box">
-                                <label><?php echo get_phrase('class')?></label>        
+                                <label><strong><?php echo get_phrase('class')?></strong></label>        
                                 <select name="class_id" class="selectpicker" data-style="form-control input-sm" data-live-search="true" data-title="<?php echo get_phrase('select_class')?>">
                                     <?php foreach($classes as $cls){?>        
                                         <option value="<?php echo $cls->class_id?>"><?php echo $cls->name?></option>
@@ -64,27 +68,29 @@
                             </div> 
 
                             <div class="col-md-3">
-                                <label><?php echo get_phrase('student')?></label>        
-                                <select name="student_id" class="selectpicker" data-style="form-control input-sm" data-live-search="true" data-title="<?php echo get_phrase('select_student')?>"> 
+                                <label><strong><?php echo get_phrase('student')?></strong></label>        
+                                <select name="student_id" class="selectpicker" data-style="form-control input-sm" data-live-search="true" 
+                                    data-title="<?php echo get_phrase('select_student')?>"> 
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label><?php echo get_phrase('Fees')?></label>        
-                                <select name="fee" class="selectpicker" data-style="form-control input-sm" data-live-search="true" data-title="<?php echo get_phrase('select_fee')?>"> 
+                                <label><strong><?php echo get_phrase('Fees')?></strong></label>        
+                                <select name="fee" class="selectpicker" data-style="form-control input-sm" data-live-search="true" 
+                                data-title="<?php echo get_phrase('select_fee')?>" data-showContent="true"> 
                                 </select>
                             </div>      
                         </div>                
 
                         <div class="row mt10 dis-none show-detail-box">
                             <div class="col-md-12">
-                                <h3 class="bg-primary text-center"><?php echo get_phrase('Student Detail')?></h3>       
+                                <h3 class="bg-primary text-center"><?php echo get_phrase('student_detail')?></h3>       
                                 <table class="table no-padding stu-detail">
                                     <thead>
                                         <tr>
                                             <th><?php echo get_phrase('enroll_code'); ?></th>
                                             <th><?php echo get_phrase('student_name'); ?></th>
                                             <th><?php echo get_phrase('class'); ?></th>
-                                            <th class="text-right"><?php echo get_phrase('date_of_joining'); ?></th>
+                                            <th class="text-right"><?php echo get_phrase('date_of_admission'); ?></th>
                                         </tr>
                                     </thead>
 
@@ -94,7 +100,7 @@
                                 
                                 <div class="row fee-detail-box dis-none">
                                     <div class="col-md-12">
-                                        <h3 class="bg-primary text-center"><?php echo get_phrase('Fee Detail')?></h3>  
+                                        <h3 class="bg-primary text-center"><?php echo get_phrase('fee_detail')?></h3>  
                                         <div class="fee-detail">
                                         </div>
                                     </div>
@@ -109,15 +115,15 @@
                         <div id="payment-trans" class="dis-none">
                             <div class="row mt5">
                                 <div class="col-md-12">
-                                    <h3>Payment Transactions</h3>
+                                    <h3><?php echo get_phrase('payment_ransactions')?></h3>
                                     <table class="table table-striped table-bordered">
                                         <thead>
-                                            <th>Receipt No.</th>  
-                                            <th>Payment Date</th> 
-                                            <th>Payment Mode</th>
-                                            <th>Payment Notes</th>
-                                            <th>Cashier</th>    
-                                            <th>Amount</th>               
+                                            <th><?php echo get_phrase('receipt_no.')?></th>  
+                                            <th><?php echo get_phrase('payment_date')?></th> 
+                                            <th><?php echo get_phrase('payment_mode')?></th>
+                                            <th><?php echo get_phrase('payment_notes')?></th>
+                                            <th><?php echo get_phrase('amount')?></th>    
+                                            <th><?php echo get_phrase('print')?></th>               
                                         </thead>
                                         <tbody>             
                                         </tbody>

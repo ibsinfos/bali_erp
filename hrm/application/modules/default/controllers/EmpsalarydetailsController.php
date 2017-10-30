@@ -98,9 +98,9 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 		 					$usersModel = new Default_Model_Users();
 
 		 					$currencymodel = new Default_Model_Currency();
-		 					$accountclasstypemodel = new Default_Model_Accountclasstype();
+		 					//$accountclasstypemodel = new Default_Model_Accountclasstype();
 		 					$bankaccounttypemodel = new Default_Model_Bankaccounttype();
-		 					$payfrequencyModal = new Default_Model_Payfrequency();
+		 					//$payfrequencyModal = new Default_Model_Payfrequency();
 		 					$msgarray = array();
 
 		 					$basecurrencymodeldata = $currencymodel->getCurrencyList();
@@ -117,20 +117,20 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 		 						$emptyFlag++;
 		 					}
 		 					
-		 				$payfreqData = $payfrequencyModal->getActivePayFreqData();
-		 				$empsalarydetailsform->salarytype->addMultiOption('','Select Pay Frequency');
-						if(sizeof($payfreqData) > 0)
-						{
-							foreach ($payfreqData as $payfreqres){
-								$empsalarydetailsform->salarytype->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
-							}
-				
-						}else
-						{
-							$msgarray['salarytype'] = 'Pay frequency is not configured yet.';
-							$emptyFlag++;
-				
-						}
+//		 				$payfreqData = $payfrequencyModal->getActivePayFreqData();
+//		 				$empsalarydetailsform->salarytype->addMultiOption('','Select Pay Frequency');
+//						if(sizeof($payfreqData) > 0)
+//						{
+//							foreach ($payfreqData as $payfreqres){
+//								$empsalarydetailsform->salarytype->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
+//							}
+//				
+//						}else
+//						{
+//							$msgarray['salarytype'] = 'Pay frequency is not configured yet.';
+//							$emptyFlag++;
+//				
+//						}
 
 		 					$bankaccounttypeArr = $bankaccounttypemodel->getBankAccountList();
                                                         $empsalarydetailsform->bankaccountid->addMultiOption('','Select Account Type');
@@ -147,7 +147,7 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 		 						$emptyFlag++;
 		 					}
 
-		 					$accountclasstypeArr = $accountclasstypemodel->getAccountClassTypeList();
+		 					/* $accountclasstypeArr = $accountclasstypemodel->getAccountClassTypeList();
                                                         $empsalarydetailsform->accountclasstypeid->addMultiOption('','Select Account Class Type');
 		 					if(!empty($accountclasstypeArr))
 		 					{
@@ -160,7 +160,7 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 		 					{
 		 						$msgarray['accountclasstypeid'] = 'Account class types are not configured yet.';
 		 						$emptyFlag++;
-		 					}
+		 					} */
 
 		 						
 
@@ -277,7 +277,7 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 		 					$currencymodel = new Default_Model_Currency();
 		 					$accountclasstypemodel = new Default_Model_Accountclasstype();
 		 					$bankaccounttypemodel = new Default_Model_Bankaccounttype();
-		 					$payfrequencyModal = new Default_Model_Payfrequency();
+		 					//$payfrequencyModal = new Default_Model_Payfrequency();
 		 					$data = $empsalarydetailsModal->getsingleEmpSalaryDetailsData($id);
 		 						
 		 					if(!empty($data))
@@ -326,16 +326,16 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 									}
 		 						}
 		 						
-		 						if(isset($data[0]['salarytype']) && $data[0]['salarytype'] !='')
-		 						{
-				 					$payfreqData = $payfrequencyModal->getActivePayFreqData($data[0]['salarytype']);
-									if(sizeof($payfreqData) > 0)
-									{
-										foreach ($payfreqData as $payfreqres){
-											$empsalarydetailsform->salarytype->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
-										}
-									}
-		 						}
+//		 						if(isset($data[0]['salarytype']) && $data[0]['salarytype'] !='')
+//		 						{
+//				 					$payfreqData = $payfrequencyModal->getActivePayFreqData($data[0]['salarytype']);
+//									if(sizeof($payfreqData) > 0)
+//									{
+//										foreach ($payfreqData as $payfreqres){
+//											$empsalarydetailsform->salarytype->addMultiOption($payfreqres['id'],$payfreqres['freqtype']);
+//										}
+//									}
+//		 						}
 
 		 						$empsalarydetailsform->populate($data[0]);
 
@@ -344,14 +344,14 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 		 							$accountholding = sapp_Global::change_date($data[0]["accountholding"], 'view');
 		 							$empsalarydetailsform->accountholding->setValue($accountholding);
 		 						}
-			 					 if(!empty($data[0]['salarytype']))
-								 {
-							           $salarytype = $payfrequencyModal->getsinglePayfrequencyData($data[0]['salarytype']);
-							            if(!empty($salarytype) && $salarytype !='norows')
-							            {
-								          $data[0]['salarytype'] = $salarytype[0]['freqtype'];
-							            }
-						         }
+//			 					 if(!empty($data[0]['salarytype']))
+//								 {
+//							           $salarytype = $payfrequencyModal->getsinglePayfrequencyData($data[0]['salarytype']);
+//							            if(!empty($salarytype) && $salarytype !='norows')
+//							            {
+//								          $data[0]['salarytype'] = $salarytype[0]['freqtype'];
+//							            }
+//						         }
 						         if(!empty($data[0]['salary'])){
 									 if($data[0]['salary'] !='')
 									{
@@ -413,11 +413,11 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 				$id = $this->_request->getParam('id');
 				$user_id = $userid;
 				$currencyid = $this->_request->getParam('currencyid');
-				$salarytype = $this->_request->getParam('salarytype');
+				//$salarytype = $this->_request->getParam('salarytype');
 				$salary = $this->_request->getParam('salary');
 				$bankname = trim($this->_request->getParam('bankname'));
 				$accountholder_name = trim($this->_request->getParam('accountholder_name'));
-				$accountclasstypeid = $this->_request->getParam('accountclasstypeid');
+				//$accountclasstypeid = $this->_request->getParam('accountclasstypeid');
 				$bankaccountid = $this->_request->getParam('bankaccountid');
 				$accountnumber = trim($this->_request->getParam('accountnumber'));
 	
@@ -430,11 +430,11 @@ class Default_EmpsalarydetailsController extends Zend_Controller_Action
 	            $salary=sapp_Global::_encrypt($salary);
 				$data = array('user_id'=>$user_id,
 					                 'currencyid'=>$currencyid,
-									 'salarytype'=>$salarytype,
+									 //'salarytype'=>$salarytype,
 									 'salary'=>($salary!=''?$salary:NULL), 	
 	                                 'bankname'=>($bankname!=''?$bankname:NULL),
 	                                 'accountholder_name'=>($accountholder_name!=''?$accountholder_name:NULL),
-	                                 'accountclasstypeid'=>($accountclasstypeid!=''?$accountclasstypeid:NULL),
+	                                 //'accountclasstypeid'=>($accountclasstypeid!=''?$accountclasstypeid:NULL),
 	                                 'bankaccountid'=>($bankaccountid!=''?$bankaccountid:NULL),    								 
 					      			 'accountnumber'=>($accountnumber!=''?$accountnumber:NULL),
 									 'accountholding'=>($accountholding!=''?$accountholding:NULL),

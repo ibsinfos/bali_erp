@@ -1699,7 +1699,7 @@ abstract class CI_DB_driver {
 			//generate_log($message,'db_errors_'.date('Y-m-d').'.log');
 		}else{
 			generate_log(date('Y-m-d H:i:s').'-'.json_encode($message),'db_errors_'.date('Y-m-d').'.log');
-			redirect('?school_admin/db_error');
+			redirect(base_url('index.php?other/db_error'));
 		}
 
 		$error =& load_class('Exceptions', 'core');

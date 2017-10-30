@@ -19,7 +19,6 @@
     </div>
 </div>
 
-
 <div class="row">
     <div class="col-md-12 text-right form-group" >
         <a href="<?php echo base_url(); ?>index.php?blogs/create_blog" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Create a new blog">
@@ -27,7 +26,6 @@
         </a>
     </div>
 </div>
-
 
 <div class="col-md-12 white-box" data-step="6" data-intro="<?php echo get_phrase('List the blogs you have published');?>" data-position='top'>        
     <table class="custom_table table display " id="example23">

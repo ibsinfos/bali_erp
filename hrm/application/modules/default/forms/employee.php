@@ -24,8 +24,9 @@ class Default_Form_employee extends Zend_Form
 	public function init()
 	{
             $auth = Zend_Auth::getInstance();
-
+            $school_id = '';
             if($auth->hasIdentity()){
+
                 $school_id = $auth->getStorage()->read()->school_id;
             }
 		$this->setMethod('post');
@@ -35,7 +36,7 @@ class Default_Form_employee extends Zend_Form
 		$controller_name = Zend_Controller_Front::getInstance()->getRequest()->getControllerName();
 		$id = new Zend_Form_Element_Hidden('id');
 		$id_val = Zend_Controller_Front::getInstance()->getRequest()->getParam('id',null);
-        $userid = new Zend_Form_Element_Hidden('user_id');
+                $userid = new Zend_Form_Element_Hidden('user_id');
 		$final_emp_id = new Zend_Form_Element_Hidden('final_emp_id');
 		
 		$reportingmanager = new Zend_Form_Element_Select('reporting_manager');
@@ -49,7 +50,7 @@ class Default_Form_employee extends Zend_Form
 		$reportingmanager->addValidator(new Zend_Validate_Db_RecordExists(
 										array('table' => 'main_users',
                                         		'field' => 'id',
-                                                'exclude'=>'isactive = 1 AND school_id = "'.$school_id.'"',
+                                                'exclude'=>'isactive = 1',
 										)));
 		$reportingmanager->getValidator('Db_RecordExists')->setMessage('Selected reporting manager is inactivated.');
         			
@@ -58,26 +59,25 @@ class Default_Form_employee extends Zend_Form
 		$empstatus = new Zend_Form_Element_Select('emp_status_id');
 		$empstatus->setAttrib('onchange', 'displayempstatusmessage()');
 		$empstatus->setRegisterInArrayValidator(false);	
-        if($controller_name != 'organisationinfo')
-        {
-            $empstatus->setRequired(true);
-            $empstatus->addValidator('NotEmpty', false, array('messages' => 'Please select employment status.'));
-        }
-        $empstatus->addValidator(new Zend_Validate_Db_RecordExists(
+                if($controller_name != 'organisationinfo')
+                {
+                    $empstatus->setRequired(true);
+                    $empstatus->addValidator('NotEmpty', false, array('messages' => 'Please select employment status.'));
+                }
+                $empstatus->addValidator(new Zend_Validate_Db_RecordExists(
                                                         array('table' => 'main_employmentstatus',
                                                         'field' => 'workcodename',
-                                                        'exclude'=>'isactive = 1 AND school_id = "'.$school_id.'"',
+                                                        'exclude'=>'isactive = 1',
                                                         )));
-        $empstatus->getValidator('Db_RecordExists')->setMessage('Selected employment status is deleted.');
+                $empstatus->getValidator('Db_RecordExists')->setMessage('Selected employment status is deleted.');
                 
-//		$businessunit = new Zend_Form_Element_Select('businessunit_id');
-//		$businessunit->setAttrib('onchange', 'displayEmployeeDepartments(this,"department_id","")');
-//		$businessunit->addValidator(new Zend_Validate_Db_RecordExists(
-//										array('table' => 'main_businessunits',
-//                                        		'field' => 'id',
-//                                                'exclude'=>'isactive = 1',
-//										)));
-//		$businessunit->getValidator('Db_RecordExists')->setMessage('Selected business unit is deleted.');
+		$vendor_id = new Zend_Form_Element_Select('vendor_id');
+		$vendor_id->addValidator(new Zend_Validate_Db_RecordExists(
+                                            array('table' => 'main_vendors',
+                                        		'field' => 'id',
+                                                'exclude'=>'isactive = 1',
+										)));
+		$vendor_id->getValidator('Db_RecordExists')->setMessage('Selected vendor is deleted.');
 		
 		$department = new Zend_Form_Element_Select('department_id');
 		$department->addMultiOption('','Select Department');
@@ -109,7 +109,7 @@ class Default_Form_employee extends Zend_Form
 		$department->addValidator(new Zend_Validate_Db_RecordExists(
 										array('table' => 'main_departments',
                                         		'field' => 'id',
-                                                'exclude'=>'isactive = 1 AND school_id = "'.$school_id.'"',
+                                                'exclude'=>'isactive = 1',
 										)));
 		$department->getValidator('Db_RecordExists')->setMessage('Selected department is deleted.');
 
@@ -121,7 +121,7 @@ class Default_Form_employee extends Zend_Form
 		$jobtitle->addValidator(new Zend_Validate_Db_RecordExists(
 										array('table' => 'main_jobtitles',
                                         		'field' => 'id',
-                                                'exclude'=>'isactive = 1 AND school_id = "'.$school_id.'"',
+                                                'exclude'=>'isactive = 1',
 										)));
 		$jobtitle->getValidator('Db_RecordExists')->setMessage('Selected job title is deleted.');	                
 		
@@ -132,7 +132,7 @@ class Default_Form_employee extends Zend_Form
 		$position->addValidator(new Zend_Validate_Db_RecordExists(
 										array('table' => 'main_positions',
                                         		'field' => 'id',
-                                                'exclude'=>'isactive = 1 AND school_id = "'.$school_id.'"',
+                                                'exclude'=>'isactive = 1',
 										)));
 		$position->getValidator('Db_RecordExists')->setMessage('Selected position is deleted.');	
 		
@@ -143,7 +143,7 @@ class Default_Form_employee extends Zend_Form
 		$prefix_id->addValidator(new Zend_Validate_Db_RecordExists(
 										array('table' => 'main_prefix',
                                         		'field' => 'id',
-                                                'exclude'=>'isactive = 1 AND school_id = "'.$school_id.'"',
+                                                'exclude'=>'isactive = 1',
 										)));
 		$prefix_id->getValidator('Db_RecordExists')->setMessage('Selected prefix is deleted.');	        
 				
@@ -225,6 +225,7 @@ class Default_Form_employee extends Zend_Form
                 //for emp id
                 $employeeNumId = new Zend_Form_Element_Text("employeeNumId");
                 $employeeNumId->setRequired("true");
+                $employeeNumId->setAttrib("readonly","readonly");
                 $employeeNumId->setLabel("Employee Id");
                 $employeeNumId->setAttrib('maxLength', 4);       
                 $employeeNumId->setAttrib("class", "formDataElement");
@@ -263,7 +264,7 @@ class Default_Form_employee extends Zend_Form
                 $other_modeofentry->setAttrib('maxlength', 50);
                 
                 $modeofentry = new Zend_Form_Element_Select("modeofentry");                
-                $modeofentry->setLabel("Mode of Employment")
+                $modeofentry->setLabel("Employee Recruitment")
                             ->addMultiOptions(array('' => 'Select mode of entry',
 													'Direct' => 'Direct',
 													'Interview' => 'Interview',
@@ -418,10 +419,21 @@ class Default_Form_employee extends Zend_Form
                 //end of fields from user management
                 
                 
-                
+//                $emptype = new Zend_Form_Element_Select("emptype");        
+//                $emptype->setRegisterInArrayValidator(false);
+//                //$emptype->setRequired(true);
+//		$emptype->setLabel("Employee Type");
+//                $emptype->setAttrib("class", "formDataElement");
+//                //$emptype->addValidator('NotEmpty', false, array('messages' => 'Please select employee type.'));
+//                $emptype->addValidator(new Zend_Validate_Db_RecordExists(
+//                                            array('table' => 'main_employeetypes',
+//                                        		'field' => 'id',
+//                                                'exclude'=>'isActive = "1"',
+//										)));
+//				$emptype->getValidator('Db_RecordExists')->setMessage('Selected employee type is deleted.');
                 
 		$this->addElements(array($id,$userid,$reportingmanager,$empstatus,$department,$jobtitle,
-                                         $position,$prefix_id,$extension_number,$office_number,$office_faxnumber,$yearsofexp,$date_of_joining,$date_of_leaving,$submit,$employeeId,$modeofentry,$candidatereferredby,$rccandidatename,$emailaddress,$emprole,$hid_modeofentry,$hid_rccandidatename,$other_modeofentry,$act_inact,$disp_requi,$first_name,$last_name,$employeeNumId,$final_emp_id));
+                                         $position,$prefix_id,$extension_number,$office_number,$office_faxnumber,$yearsofexp,$date_of_joining,$date_of_leaving,$submit,$employeeId,$modeofentry,$candidatereferredby,$rccandidatename,$emailaddress,$emprole,$hid_modeofentry,$hid_rccandidatename,$other_modeofentry,$act_inact,$disp_requi,$first_name,$last_name,$employeeNumId,$final_emp_id,$vendor_id));
                 $this->setElementDecorators(array('ViewHelper')); 
                 $this->setElementDecorators(array(
                     'UiWidgetElement',

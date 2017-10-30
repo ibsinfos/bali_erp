@@ -93,11 +93,10 @@ if($this->session->flashdata('flash_message_error')) {?>
                     </div> 
                 </div>
                 <div class="col-md-6 form-group">
-                    <label for="field-1"><?php echo get_phrase("verdict"); ?><span class="mandatory"> *</span></label>
+                    <label for="field-1"><?php echo get_phrase("verdict"); ?></label>
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-sliders"></i></div>                  
-                        <input type="text" class="form-control" id="verdict" required="required" name="verdict" value="<?php echo set_value('verdict') ?>" placeholder="Verdict" data-validate="required" data-message-required ="<?php echo get_phrase('plesae_enter_the_verdict'); ?>">
-                        <span class="mandantory"> <?php echo form_error('verdict'); ?></span>
+                        <input type="text" class="form-control" id="verdict" name="verdict" value="<?php echo set_value('verdict') ?>" placeholder="Verdict">
                     </div> 
                 </div>
                 <div class="col-md-6 form-group">
@@ -110,7 +109,7 @@ if($this->session->flashdata('flash_message_error')) {?>
                         <?php
                         foreach ($teachers as $row):
                             ?>
-                            <option value="<?php echo $row['teacher_id']; ?>"><?php echo $row['name']; ?></option>
+                            <option value="<?php echo $row['teacher_id']; ?>"><?php echo $row['name']." ".$row['last_name']; ?></option>
                         <?php endforeach; ?>
 
                     </select> 
@@ -139,8 +138,8 @@ if($this->session->flashdata('flash_message_error')) {?>
                     </div> 
                 </div>
                 
-                <div class="col-md-12 form-group text-right">
-                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Add Incident" data-step="6" data-intro="<?php echo get_phrase('You can submit from here.');?>" data-position='left'/>
+                <div class="col-md-12 form-group text-center">
+                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Create Incident" data-step="6" data-intro="<?php echo get_phrase('You can create incident from here.');?>" data-position='left'/>
             </div>
             </div>
               

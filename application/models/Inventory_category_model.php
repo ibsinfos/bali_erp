@@ -34,6 +34,15 @@ class Inventory_category_model extends CI_Model {
         }
         $sql = "SELECT c.*,COUNT(p.product_id) AS TotalProduct FROM `categories` AS c LEFT JOIN `product` AS p ON(c.categories_id=p.product_id) ".$where." GROUP BY categories_id";
         $rs = $this->db->query($sql)->result_array();
+        
+        foreach($rs as $key=>$row)
+        {
+            $categories_id = $row['categories_id'];
+            $query = "SELECT COUNT(*) AS transaction FROM product WHERE categories_id = '$categories_id' and school_id = '$school_id'";
+            $result = $this->db->query($query)->result_array();
+            $rs[$key]['transaction'] = $result[0]['transaction'];
+            
+        }    
         return $rs;
     }
 

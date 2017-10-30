@@ -38,9 +38,17 @@ class Dormitory_model extends CI_Model {
             } 
         }
         if(!empty($condition)){
-            $this->db->where($condition);}
+            $this->db->where($condition);
+        }
         $dormitory_array = $this->db->get('dormitory')->result_array();
         return $dormitory_array;
+    }
+    
+    function get_dormitory_array_for_student_fee_config(){
+        $rs=$this->db->select('*')->from($this->_table.' AS d')->join('hostel_room AS hr','hr.hostel_id=d.dormitory_id')->where('hr.available_beds >','0')->get()->result_array();
+        //echo $this->db->last_query();die;
+       
+        return $rs;
     }
 
     public function get_name($param)

@@ -37,7 +37,12 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
      */
     public function getCandidatesData($sort_order, $sort_field, $pageNo, $perPage,$searchQuery)
     {
-        $where = "c.isactive = 1 and c.cand_status != 'Recruited'";
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
+        $where = "c.isactive = 1 and c.cand_status != 'Recruited' and c.school_id='".$school_id."'";
 
         if($searchQuery){
             $where .= " AND ".$searchQuery;       
@@ -93,7 +98,12 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
      */
     public function getCandidatesData_schedule($sort, $by, $pageNo, $perPage,$searchQuery)
     {
-        $where = "c.isactive = 1 and c.cand_status = 'Scheduled'";
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
+        $where = "c.isactive = 1 and c.cand_status = 'Scheduled' and c.school_id='".$school_id."'";
 
         if($searchQuery)
             $where .= " AND ".$searchQuery;       
@@ -122,7 +132,12 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
      */
     public function getCandidatesData_requisition($sort, $by, $pageNo, $perPage,$searchQuery,$req_id)
     {
-        $where = "c.isactive = 1 and c.requisition_id = ".$req_id;
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
+        $where = "c.isactive = 1 and c.requisition_id = ".$req_id." and c.school_id = '".$school_id."'";
 
         if($searchQuery)
             $where .= " AND ".$searchQuery;       
@@ -147,6 +162,11 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
      */
     public function SaveorUpdateCandidateData($data, $where='')
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
         if($where != '')
         {
             $this->update($data, $where);
@@ -154,6 +174,7 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
         }
         else 
         {
+            $data['school_id'] = $school_id;
             $this->insert($data);
             $id=$this->getAdapter()->lastInsertId($this->_name);
             return $id;
@@ -174,10 +195,15 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
      */
     public function getCandidatesNamesForUsers()
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select c.id,c.candidate_name,c.emailid from main_candidatedetails c 
                     where c.isactive = 1 and c.cand_status = 'Selected' and c.backgroundchk_status in ('Yet to start','Completed') and c.id not in (select rccandidatename from main_users 
-                    where isactive = 1 and rccandidatename is not null)";
+                    where isactive = 1 and rccandidatename is not null and school_id='".$school_id."')";
         $result = $db->query($query);
         $data = array();
         while($row = $result->fetch())
@@ -191,22 +217,32 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
     
     public function getCandidateForView($id)
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select cd.id rec_id,cd.*,r.requisition_code,r.jobtitle_name,ct.city_name city_name,c.country_name country_name,
                   s.state_name state_name from main_candidatedetails cd inner join main_requisition_summary r on 
                   cd.requisition_id = r.req_id and r.isactive = 1 left join tbl_countries c on c.id = cd.country 
-                   left join tbl_states s on s.id = cd.state  left join tbl_cities ct on ct.id = cd.city  where cd.isactive = 1 and cd.id = ".$id." ";
+                   left join tbl_states s on s.id = cd.state  left join tbl_cities ct on ct.id = cd.city  where cd.isactive = 1 and cd.id = ".$id." and cd.school_id='".$school_id."' ";
         $result = $db->query($query);
         $row = $result->fetch();
         return $row;
     }
     public function getViewforNotapplicableCandidates($id)
 	{
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
 		  $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select cd.id rec_id,cd.*,ct.city_name city_name,c.country_name country_name,
                   s.state_name state_name from main_candidatedetails cd
                   left join tbl_countries c on c.id = cd.country 
-                   left join tbl_states s on s.id = cd.state  left join tbl_cities ct on ct.id = cd.city  where cd.isactive = 1 and cd.id = ".$id." ";
+                   left join tbl_states s on s.id = cd.state  left join tbl_cities ct on ct.id = cd.city  where cd.isactive = 1 and cd.id = ".$id." and cd.school_id='".$school_id."' ";
         $result = $db->query($query);
         $row = $result->fetch();
         return $row;
@@ -218,10 +254,15 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
      */
     public function getCandidateById($cand_id)
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "select cd.*,r.requisition_code,r.id req_id from main_candidatedetails cd,main_requisition r 
                   where cd.isactive = 1 and cd.id = ".$cand_id." and cd.requisition_id = r.id 
-                  and r.isactive = 1";
+                  and r.isactive = 1 and cd.school_id='".$school_id."'";
         $result = $db->query($query);
         $row = $result->fetch();
         return $row;
@@ -239,11 +280,16 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
 	
 	public function getnotscheduledcandidateData($req_id)
 	{
-		$db = Zend_Db_Table::getDefaultAdapter();
-        $query = "select id,candidate_name from main_candidatedetails where cand_status = 'Not Scheduled' and( requisition_id = ".$req_id." or requisition_id=0) and isactive = 1 order by candidate_name;";
-        $result = $db->query($query);
-        $row = $result->fetchAll();
-        return $row;
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
+            $db = Zend_Db_Table::getDefaultAdapter();
+            $query = "select id,candidate_name from main_candidatedetails where cand_status = 'Not Scheduled' and( requisition_id = ".$req_id." or requisition_id=0) and isactive = 1 and school_id='".$school_id."' order by candidate_name";
+            $result = $db->query($query);
+            $row = $result->fetchAll();
+            return $row;
 	}	
 	
 	public function getcountofrecords($req_id)
@@ -256,8 +302,13 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
 	}
 
 		
-	public function SaveorUpdateUserData($data, $where)
+    public function SaveorUpdateUserData($data, $where)
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
         if($where != '')
         {
             $this->update($data, $where);
@@ -265,11 +316,11 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
         }
         else 
         {
+            $data['school_id'] = $school_id;
             $this->insert($data);
             $id=$this->getAdapter()->lastInsertId($this->_name);
             return $id;
         }
-        
     }
     /**
      * This function gives all content for grid view.
@@ -486,8 +537,12 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
 
 	// To generate report
 	public function getReportData($param_arr,$per_page,$page_no,$sort_name,$sort_type){
-		
-            $search_str = "c.isactive = 1";
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
+            $search_str = "c.isactive = 1 and c.school_id='".$school_id."'";
 			
             unset($param_arr['search_criteria']);
 			unset($param_arr['previous_search']);
@@ -535,10 +590,15 @@ class Default_Model_Candidatedetails extends Zend_Db_Table_Abstract
 	//get the selected candidatedetails
     public function getSelectedCandidatesDetails()
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
     	$db = Zend_Db_Table::getDefaultAdapter();
     	$query = "select c.id,c.candidate_name,c.emailid from main_candidatedetails c
                     where c.isactive = 1 and c.cand_status = 'Selected' and c.backgroundchk_status in ('Yet to start','Completed') and c.id not in (select rccandidatename from main_users
-                    where isactive = 1 and rccandidatename is not null)";
+                    where isactive = 1 and rccandidatename is not null and school_id='".$school_id."')";
     	 
     	$result = $db->query($query);
     	$candidateData= $result->fetchAll();

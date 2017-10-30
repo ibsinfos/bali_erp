@@ -26,15 +26,18 @@
                 <td><?php echo $row['assigned_date']?></td> 
                 <td><?php echo $row['submission_date']?></td>  
                 
-                <td><a href="javascript: void(0);" onclick="showDocumentPreview('<?php echo base_url();?>index.php?modal/popup/assignment_preview/<?php echo $row['file_name'];?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Assignment"><i class="fa fa-eye"></i></button></a>
-                 <?php if (!empty($row['file_name'])){?>
+                <td>
+                 <?php if (!empty($row['file_name']) && file_exists(FCPATH.'uploads/assignments/'.$row['file_name'])){ ?>   
+                    <a href="javascript: void(0);" onclick="showDocumentPreview('<?php echo base_url();?>index.php?modal/popup/assignment_preview/<?php echo $row['file_name'];?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Assignment"><i class="fa fa-eye"></i></button></a>
                           <a href="uploads/assignments/<?php echo $row['file_name']; ?>" target="blank"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Download">
                     <i class="fa fa-download"></i>
                 </button></a>
                          <?php } else{?>
-                    <a><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="" disabled="">
+                    <a href="javascript: void(0);"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Available" disabled=""><i class="fa fa-eye"></i></button></a>
+                    <a><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Attachment" disabled="">
                     <i class="fa fa-download"></i>
-                </button></a> 
+                </button>
+                    </a> 
                          <?php  }
                         $curnt_date = date('Y-m-d H:i'); 
 //                        echo "<br>".$row['submission_date']; die;

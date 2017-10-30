@@ -24,59 +24,75 @@
     </div>
 </div>
 
-<?php echo form_open(base_url() . 'index.php?school_admin/attendance_selector/', array('class' => 'validate','id'=>'manageAttendanceForm'));?>
+<?php echo form_open(base_url() . 'index.php?school_admin/manage_attendance/', array('class' => 'validate','id'=>'manageAttendanceForm'));?>
 <div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here select the class,section and date.');?>" data-position='top'>
-    <div class="col-sm-4 form-group">
-        <label for="field-1"><?php echo get_phrase('Select_Class');?><span class="error" style="color: red;"> *</span></label>
-        <select class="selectpicker" data-style="form-control" name="class_id" data-live-search="true" onchange="select_section(this.value)">
-            <option value=""><?php echo get_phrase('select_class'); ?></option>
-            <?php foreach($classes as $row):?>
-            <option value="<?php echo $row['class_id'];?>"><?php echo get_phrase('class'); ?>&nbsp;<?php echo $row['name'];?></option>
-            <?php endforeach;?>
-        </select> 
-        <label style="color:red;"> <?php echo form_error('class_id'); ?></label>
-    </div>
-        
-    <div class="col-sm-4 form-group">
-        <label for="field-1"><?php echo get_phrase('select_section');?><span class="error" style="color: red;"> *</span></label>       
-        <select  name="section_id" class="selectpicker" data-style="form-control" data-live-search="true" id="section_holder">
-            <option value=""><?php echo get_phrase('select_section'); ?></option>
-        </select> 
-        <label style="color:red;"> <?php echo form_error('section_id'); ?></label>
-    </div>  
-        
-    <div class="col-sm-4 form-group">               
-        <label for="field-1"><?php echo get_phrase('select_date');?><span class="error" style="color: red;"> *</span></label>
-        <div class="input-group">
-            <span class="input-group-addon"><i class="icon-calender"></i></span>
-            <input type="text" id= "mydatepicker_holiday_disable" class="form-control"  name="timestamp" value="" placeholder="<?php echo get_phrase('MM/DD/YYYY');?>">             
+    <div class="row">
+        <div class="col-sm-4 form-group">
+            <label for="field-1"><?php echo get_phrase('Select_Class');?><span class="error" style="color: red;"> *</span></label>
+            <select class="selectpicker" data-style="form-control" name="class_id" data-live-search="true" onchange="select_section(this.value)">
+                <option value=""><?php echo get_phrase('select_class'); ?></option>
+                <?php foreach($classes as $row):?>
+                <option value="<?php echo $row['class_id'];?>"><?php echo get_phrase('class'); ?>&nbsp;<?php echo $row['name'];?></option>
+                <?php endforeach;?>
+            </select> 
+            <label style="color:red;"> <?php echo form_error('class_id'); ?></label>
+        </div>
+            
+        <div class="col-sm-4 form-group">
+            <label for="field-1"><?php echo get_phrase('select_section');?><span class="error" style="color: red;"> *</span></label>       
+            <select  name="section_id" class="selectpicker" data-style="form-control" data-live-search="true" id="section_holder">
+                <option value=""><?php echo get_phrase('select_section'); ?></option>
+            </select> 
+            <label style="color:red;"> <?php echo form_error('section_id'); ?></label>
         </div>  
-        <label style="color:red;"> <?php echo form_error('timestamp'); ?></label>
-    </div>       
+            
+        <div class="col-sm-4 form-group">               
+            <label for="field-1"><?php echo get_phrase('select_date');?><span class="error" style="color: red;"> *</span></label>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="icon-calender"></i></span>
+                <input type="text" class="form-control" name="timestamp" autocomplete="off"
+                placeholder="<?php echo get_phrase('MM/DD/YYYY');?>">             
+            </div>  
+            <label style="color:red;"> <?php echo form_error('timestamp'); ?></label>
+        </div>      
+    </div>     
     
-    <input type="hidden" name="year" value="<?php echo $running_year;?>">
-    <div class="text-right col-xs-12">
-        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="6" data-intro="<?php echo get_phrase('Click here to view the attendance details.');?>" data-position='top'><?php echo get_phrase('MANAGE ATTENDANCE');?></button>
+    <div class="row">
+        <input type="hidden" name="year" value="<?php echo $running_year;?>">
+        <div class="text-right col-xs-12">
+            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="6" data-intro="<?php echo get_phrase('Click here to view the attendance details.');?>" data-position='top'><?php echo get_phrase('MANAGE ATTENDANCE');?></button>
+        </div>
     </div>
 </div>
 <?php echo form_close();?>
 <?php 
-if(count($holidays)){
-foreach($holidays as $key=>$holiday){
-    $harr[] = date('m/d/Y',strtotime($holiday));
-}
-$hstring = implode("','",$harr);
-$hstring = "'".$hstring."'";
-}
+    $harr = array();
+    foreach($holidays as $holi){
+        $harr[] = date('m/d/Y',strtotime($holi));
+    }
+    $hstring = implode("','",$harr);
+    $hstring = "'".$hstring."'";
 ?>
 
 <script type="text/javascript">
-    function select_section(class_id) {
-        $.ajax({
-            url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_sections_by_class/' + class_id,
-            success:function (response){
-                jQuery('#section_holder').html(response).selectpicker('refresh');
-            }
-        });
-    }    
+$(function(){
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    $('input[name="timestamp"]').datepicker({ 
+        //startDate: new Date(),
+        endDate: '0d',
+        todayHighlight: true,
+        datesDisabled: [<?php echo $hstring?>],
+    });
+});
+function select_section(class_id) {
+    $('body').loading('start');
+    $.ajax({
+        url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_sections_by_class/' + class_id,
+        success:function (response){
+            $('body').loading('stop');
+            $('#section_holder').html(response).selectpicker('refresh');
+        }
+    });
+}    
 </script>

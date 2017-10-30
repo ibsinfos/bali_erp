@@ -40,10 +40,16 @@ class Default_Model_Leaverequesthistory extends Zend_Db_Table_Abstract
      */
     public function saveOrUpdateLeaveRequestHistory($data, $where)
     {
+        $auth = Zend_Auth::getInstance();
+     	if($auth->hasIdentity())
+        {
+            $school_id = $auth->getStorage()->read()->school_id;			
+        } 
 		if($where != ''){
 			$this->update($data, $where);
 			return 'update';
 		} else {
+                    $data['school_id']=$school_id;
 			$this->insert($data);
 			$id=$this->getAdapter()->lastInsertId($this->_name);
 			return $id;

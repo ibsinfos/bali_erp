@@ -28,7 +28,7 @@
     </div>
     <input type="hidden" name="year" value="<?php echo $running_year; ?>">
     <div class="text-right col-sm-7">
-	<button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d m-t-20" data-step="6" data-intro="<?php echo get_phrase('On the click of this button you will see the Report of selecting month!');?>" data-position='left'><?php echo get_phrase('show_report');?></button>
+	<button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d m-t-5" data-step="6" data-intro="<?php echo get_phrase('On the click of this button you will see the Report of selecting month!');?>" data-position='left'><?php echo get_phrase('show_report');?></button>
     </div>
     <?php echo form_close();?>
 </div>

@@ -433,19 +433,19 @@ class Default_EmpjobhistoryController extends Zend_Controller_Action
 			$msgarray['jobtitleid'] = 'Job titles are not configured yet.';
 			$emptyFlag++;
 		}
-		$clientsArr = $clientsModel->getActiveClientsData();
-		$empjobhistoryform->client->addMultiOption('','Select a Client');
-		if(!empty($clientsArr))
-		{
-			foreach ($clientsArr as $clientsres){
-				$empjobhistoryform->client->addMultiOption($clientsres['id'],$clientsres['client_name']);
-			}
-		}
-		else
-		{
-			$msgarray['client'] = 'Clients are not configured yet.';
-			$emptyFlag++;
-		}
+//		$clientsArr = $clientsModel->getActiveClientsData();
+//		$empjobhistoryform->client->addMultiOption('','Select a Client');
+//		if(!empty($clientsArr))
+//		{
+//			foreach ($clientsArr as $clientsres){
+//				$empjobhistoryform->client->addMultiOption($clientsres['id'],$clientsres['client_name']);
+//			}
+//		}
+//		else
+//		{
+//			$msgarray['client'] = 'Clients are not configured yet.';
+//			$emptyFlag++;
+//		}
 		$empjobhistoryform->setAttrib('action',BASE_URL.'empjobhistory/addpopup/unitId/'.$id);
 		$this->view->form = $empjobhistoryform;
 		$this->view->controllername = 'empjobhistory';
@@ -641,14 +641,14 @@ class Default_EmpjobhistoryController extends Zend_Controller_Action
 
 				}
 			}
-			$clientsArr = $clientsModel->getActiveClientsData();
-			if(!empty($clientsArr))
-			{
-				$empjobhistoryform->client->addMultiOption('','Select a Client');
-				foreach ($clientsArr as $clientsres){
-					$empjobhistoryform->client->addMultiOption($clientsres['id'],$clientsres['client_name']);
-				}
-			}			
+//			$clientsArr = $clientsModel->getActiveClientsData();
+//			if(!empty($clientsArr))
+//			{
+//				$empjobhistoryform->client->addMultiOption('','Select a Client');
+//				foreach ($clientsArr as $clientsres){
+//					$empjobhistoryform->client->addMultiOption($clientsres['id'],$clientsres['client_name']);
+//				}
+//			}			
 			$data = $empjobhistoryModel->getsingleEmpJobHistoryData($id);
 			if(!empty($data))
 			{
@@ -656,7 +656,7 @@ class Default_EmpjobhistoryController extends Zend_Controller_Action
 				$empjobhistoryform->setDefault('department',$data[0]['department']);
 				$empjobhistoryform->setDefault('positionheld',$data[0]['positionheld']);
 				$empjobhistoryform->setDefault('jobtitleid',$data[0]['jobtitleid']);
-				$empjobhistoryform->setDefault('client',$data[0]['client_id']);
+				//$empjobhistoryform->setDefault('client',$data[0]['client_id']);
 				if(isset($data[0]['start_date']) && $data[0]['start_date'] !='')
 				{
 					$start_date = sapp_Global::change_date($data[0]['start_date'], 'view');
@@ -702,9 +702,9 @@ class Default_EmpjobhistoryController extends Zend_Controller_Action
 			$department = $this->_request->getParam('department');
 			$jobtitleid = $this->_request->getParam('jobtitleid');
 			
-			$vendor = $this->_request->getParam('vendor');
-			$receiving_amt = $this->_request->getParam('received_amount');
-			$paying_amt = $this->_request->getParam('paid_amount');
+//			$vendor = $this->_request->getParam('vendor');
+//			$receiving_amt = $this->_request->getParam('received_amount');
+//			$paying_amt = $this->_request->getParam('paid_amount');
 
 			$end_date = $this->_request->getParam('end_date',null);
 			$end_date = sapp_Global::change_date($end_date, 'database');
@@ -721,11 +721,11 @@ class Default_EmpjobhistoryController extends Zend_Controller_Action
 								 'jobtitleid'=>$jobtitleid,
 								 'start_date'=>($start_date!=''?$start_date:NUll),
 								 'end_date'=>($end_date!=''?$end_date:NUll), 								 
-								 'active_company'=>($active_company!=''?$active_company:NUll),
-								 'client_id'=>($client!=''?$client:NUll),
-								 'vendor'=>($vendor!=''?$vendor:NUll),
-								 'received_amount'=>(is_numeric($receiving_amt)?$receiving_amt:NUll),
-								 'paid_amount'=>(is_numeric($paying_amt)?$paying_amt:NUll),
+								 'active_company'=>NUll,
+								 'client_id'=>NUll,
+								 'vendor'=>NUll,
+								 'received_amount'=>NUll,
+								 'paid_amount'=>NUll,
 								 'modifiedby'=>$loginUserId,
 								 'modifieddate'=>gmdate("Y-m-d H:i:s")			
 			);

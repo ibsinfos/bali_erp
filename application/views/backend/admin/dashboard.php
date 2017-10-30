@@ -1,5 +1,4 @@
-<?php $currentMonth =
-        date('F'); ?>
+<?php $currentMonth = date('F'); ?>
 <div class="row bg-title">
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
         <h4 class="page-title"><?php echo $page_title; ?></h4> </div>
@@ -184,7 +183,7 @@
                         </select>
                     </div>
                     <div class="col-xs-4">
-                        <select class="selectpicker" data-style="form-control" onchange="showHolidaysByMonth(this.value);">
+                        <select class="selectpicker" data-style="form-control" id="month_list" onchange="showHolidaysByMonth(this.value);">
 <?php $monthStart =
         date('F',
         strtotime('Jan'));
@@ -431,6 +430,17 @@ var chart = new Highcharts.Chart(options);
             }
         });
     }
+    
+    function changeHolidays(school_id){
+        var monthValue = $('#month_list').val();
+        $.ajax({
+            url: '<?php echo base_url(); ?>index.php?admin/get_holidays_by_month/' + monthValue + '/' + school_id,
+            success: function (response)
+            {
+                $('#holiday_div').html(response);
+            }, error: function (xhr, status, error) {
 
-
+            }
+        });
+    }
 </script>

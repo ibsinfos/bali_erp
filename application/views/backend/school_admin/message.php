@@ -72,7 +72,7 @@ if(count($message_threads)){
                                                 $nameDataArr = $row['nameDataArr_student'];
                                                 if (!empty($nameDataArr)) {
                                                     if (property_exists($nameDataArr, 'name')) {
-                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->name . "</span>";
+                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->name." ".$nameDataArr->lname . "</span>";
                                                     } else {
                                                         echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->father_name . "</span>";
                                                     }
@@ -111,7 +111,7 @@ if(count($message_threads)){
                                                 $nameDataArr = $row['nameDataArr_teacher'];//$this->db->get_where($user_to_show_type, array($user_to_show_type . '_id' => $user_to_show_id))->row();
                                                 if (!empty($nameDataArr)) {
                                                     if (property_exists($nameDataArr, 'name')) {
-                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->name . "</span>";
+                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->name." " .$nameDataArr->last_name. "</span>";
                                                     } else {
                                                         echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->father_name . "</span>";
                                                     }
@@ -149,9 +149,9 @@ if(count($message_threads)){
                                                 $nameDataArr = $row['nameDataArr_parent'];//$this->db->get_where($user_to_show_type, array($user_to_show_type . '_id' => $user_to_show_id))->row();
                                                 if (!empty($nameDataArr)) {
                                                     if (property_exists($nameDataArr, 'name')) {
-                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->name . "</span>";
+                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->father_name." ".$nameDataArr->father_lname . "</span>";
                                                     } else {
-                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->father_name . "</span>";
+                                                        echo "<span class='label label-rouded label-purple text-white'>" . $nameDataArr->father_name ." ".$nameDataArr->father_lname. "</span>";
                                                     }
                                                 }
                                                 ?>
@@ -198,6 +198,9 @@ if(count($message_threads)){
 
 <script type="text/javascript">
     $(document).ready(function () {
+
+        var interval = null;
+
         var SelectedUserType = "<?php echo $SelectedUserType; ?>";
         if(SelectedUserType != ''){
             $('#'+SelectedUserType).click();
@@ -207,7 +210,7 @@ if(count($message_threads)){
         var current_thread = "<?php echo $current_thread;?>";
 
         if((segment=='message_read') && (current_thread!='')){
-            setInterval(ajaxCallUnreadMessage, 10000);
+            interval = setInterval(ajaxCallUnreadMessage, 5000);
             
             function ajaxCallUnreadMessage() {
                 if((segment=='message_read') && (current_thread!='')){
@@ -241,5 +244,13 @@ if(count($message_threads)){
                 }
             }
         }
+
+        
+        $('body').on('focus', 'textarea', function (event) {
+            clearInterval(interval);
+        }).on('focusout', 'textarea', function(event) {
+            interval = setInterval(ajaxCallUnreadMessage, 5000);
+        });
+
     });
 </script>

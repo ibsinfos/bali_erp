@@ -8,11 +8,11 @@ foreach($this->group_category_details AS $k => $v){
 
     <div style="position: relative">
     <div style="clear: both;"></div>    
-<div class="new-form-ui" id="PayrollGroupMinWidth">
+    <div class="new-form-ui" id="PayrollGroupMinWidth" style="width:100%;">
     <div class="division">
-        <div>
+        <div style="width:100%; float: left;">
         <?php foreach ($this->groupcode AS $k => $v):?>
-            <label id="cate_<?php echo $v['payroll_category_id'];?>">
+            <label id="cate_<?php echo $v['payroll_category_id'];?>" style="width:100%; float: left;">
                 <a class="sprite delete" href="javascript:void(0);" onclick="deleteEmpCategory('<?php echo $v['payroll_category_id'];?>');"></a>
                 <a class="sprite edit" href="javascript:void(0);" onclick="showEditPopup('<?php echo $v['payroll_category_id']; ?>');"></a>
                 <?php echo $v['name'].' - ';if($v['type']==0){ echo 'Earning';}else{ echo 'Deduction';}?>
@@ -51,7 +51,7 @@ function deleteEmpCategory(category_id){
     }
 }
 function confirmSubmit(frm){
-    if(confirm('Are sure to submit the data ? Yes/No')){
+    if(confirm('Are you sure to save changes?')){
         frm.submit();
     }else{
         return false;
@@ -99,14 +99,14 @@ $(document).ready(function(){
     });
     $("#name").on("change",function(){
         if($.trim($(this).val())==""){
-            $("#errors-group_name").text("Please enter value for Payrool group.");
+            $("#errors-group_name").text("Please enter value for Payroll group.");
         }else{
             $("#errors-group_name").text("");
         }
     });
     $("#group_code").on("change",function(){
         if($.trim($(this).val())==""){
-            $("#errors-group_group_code").text("Please enter value for Payrool group code.");
+            $("#errors-group_group_code").text("Please enter value for Payroll group code.");
         }else{
             $("#errors-group_group_code").text("");
         }

@@ -29,8 +29,8 @@
                         <div class="form-group">
                             <textarea class="form-control" rows="20" placeholder="Type your message" name="message" placeholder="<?php echo get_phrase('write_your_message'); ?>"id="sample_wysiwyg"></textarea>
                         </div>    
-                        <div class="custom-send m-t-20 text-right">
-                            <button class="btn btn-danger btn-rounded" type="submit"> <?php echo get_phrase('send'); ?></button>
+                        <div class="custom-send m-t-20 text-center">
+                            <button class="fcbtn btn btn-danger btn-outline btn-1d" type="submit"> <?php echo get_phrase('send'); ?></button>
                         </div>
                         <?php echo form_close(); ?>
                     </section>

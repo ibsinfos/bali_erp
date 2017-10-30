@@ -7,7 +7,7 @@
        <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -69,12 +69,15 @@
 </div>
 
 <script type="text/javascript">
-    function select_section(class_id) {
-        $.ajax({
-            url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_sections_by_class/' + class_id,
-            success:function (response){//alert(response);
-                jQuery('#section_holder').html(response).selectpicker('refresh');
-            }
-        });
-    }
+function select_section(class_id) {
+    $('body').loading('start');
+    $.ajax({
+        url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_sections_by_class/' + class_id,
+        success:function (response){//alert(response);
+            $('body').loading('stop');
+            $('#section_holder').html(response)
+            $('.selectpicker').selectpicker('refresh');
+        }
+    });
+}
 </script>

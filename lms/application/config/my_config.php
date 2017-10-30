@@ -2,7 +2,7 @@
 $config['default_page_url'] = 'page/blank';
 $config['product_name'] = 'Avant Garde';
 $config['product_short_name'] = 'Avant Garde' ;
-$config['product_version'] = ' v0.0.1   ';
+$config['product_version'] = ' v0.0.1    ';
 
 $config['institute_address1'] = 'Sharad Technologies LLC';
 $config['institute_address2'] = 'Plot 1017, Near Nehru park, Jodhpur, India';

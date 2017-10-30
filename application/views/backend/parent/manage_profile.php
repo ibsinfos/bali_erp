@@ -38,10 +38,13 @@
                                  <div class="col-md-12 no-padding m-b-20">
                                         <div class="col-xs-2 col-md-1 no-padding text-left table-stu-info">                                         
                                             <div class="profile-picture"> 
-                                                
-                                                <img src="<?php echo ($row['parent_image']!=" "?"uploads/parent_image/".$row['parent_image']:"uploads/user.png");?>" width="80px" height="80px"/> </div>
-                                       </div>
-
+                                            <?php if ($row['parent_image'] != "" && file_exists('uploads/parent_image/' . $row['parent_image'])) {
+                                                    $parent_image = $row['parent_image'];
+                                                    } else {
+                                                        $parent_image = '';
+                                                    } ?>
+                                                <img src="<?php echo ($parent_image!=""?"uploads/parent_image/".$parent_image:"uploads/user.png");?>" width="80px" height="80px"/> </div>
+                                        </div>
                                         <div class="col-xs-10 col-md-11 m-t-10">
                                             <h2 class="stu-name-margin"><?php echo $row['father_name']." ".$row['father_lname']; ?></h2>
                                         </div>

@@ -5,7 +5,7 @@
     #sample_wysiwyg{min-height: 175px;}
     .WellOuter{margin:0px !important;}
     .error{color: red; display: none;}
-    .required{color: red;}
+    .required{color: red !important;}
     #loader, #loader2, .AfterSend{display: none;}
     .loader2{color: green; font-weight: bold; padding-top: 50px;}
 </style>
@@ -39,7 +39,7 @@
         <div class="box-content">
         <?php echo form_open(base_url() . 'index.php?school_admin/create_custom_message', array('class' => 'form', 'id' => 'ReceiverTypeForm')); ?>
             <div class="row TopOuter">
-                <div class="form-group col-sm-5 data-step="5" data-intro="<?php echo get_phrase('Select a class.');?>" data-position='bottom'">
+                <div class="form-group col-sm-5" data-step="5" data-intro="<?php echo get_phrase('Select a class.');?>" data-position='bottom'>
                     <label class="control-label"><?php echo get_phrase('class'); ?><span class="required">*</span></label>
 
                     <input type="hidden" name="reciever_class_id[]" id="reciever_class_id" value="">

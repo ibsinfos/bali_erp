@@ -112,7 +112,7 @@ if(!function_exists('create_school_data_backup')){
 
 
 if(!function_exists('get_bread_crumb')){
-    function get_bread_crumb(){
+    function get_bread_crumb_old(){
         $CI=&get_instance();
         $AllLinks = $CI->session->all_userdata();
         $BreadCrumb = '';
@@ -153,7 +153,81 @@ if(!function_exists('get_bread_crumb')){
         }
         return $BreadCrumb;
     }
+
+    function get_bread_crumb(){
+        $CI=&get_instance();
+        $CI->load->dbutil();
+
+        $rec = $CI->db->get_where('session_links',array('id'=>$CI->session->userdata('session_link_id')))->row();
+
+        $links = $rec?json_decode($rec->links,true):array();
+
+        $BreadCrumb = '';
+
+        if($CI->uri->segment(1)=='fees'){
+            $segment = $CI->uri->segment(1).'/'.$CI->uri->segment(2).'/'.$CI->uri->segment(3);
+        }else{
+            $segment = $CI->uri->segment(1).'/'.$CI->uri->segment(2);
+        }
+
+        if((count($links)) && ($segment!='')){
+            $seg = rtrim($segment, '/');
+            $rs = get_current_url_nav($seg, $links);
+            if(is_array($rs) && count($rs) > 0){
+                $rs_key = key($rs);
+                $BreadCrumb = $links[$rs_key]['name'];
+
+                if(count($links[$rs_key]['children'])){
+                    $BreadCrumb.= create_breadcrumb($links[$rs_key]['children'], $seg);
+                }
+            }
+        }
+
+        return $BreadCrumb;
+    }
 }
+
+    if(!function_exists('get_current_url_nav')){
+        function get_current_url_nav($child, $stack) {
+            foreach ($stack as $k => $v) {
+                if (is_array($v)) {            
+                    $return = get_current_url_nav($child, $v);
+
+                    if (is_array($return)) {
+                        return array($k => $return);
+                    }
+                } else {
+                    if ($v == $child) {
+                        return array($k => $child);
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+
+    if(!function_exists('create_breadcrumb')){
+        function create_breadcrumb($links = array(), $segment=''){
+            $BreadCrumb = '';
+            $active = '';
+            if(count($links)){
+                $BreadCrumb.='^<ul>';
+                foreach ($links as $datum) {
+                    if($datum['link']!=$segment){
+                        $url = $datum['name'] == 'lms' ? base_url($datum['link']):base_url('index.php?'.$datum['link']);
+
+                        $BreadCrumb .='<li><a href="'.$url.'">'.get_phrase($datum['name']).'</a></li>';
+                    }else{
+                        $active = $datum['name'];
+                    }                  
+                }
+                $BreadCrumb.='</ul>^'.' _'.$active;
+            }
+            return $BreadCrumb;
+        }
+    }    
+
     if(!function_exists('_unique_sch')){
         function _unique_sch($val=false,$field=false){
             $CI=&get_instance();
@@ -284,6 +358,7 @@ if(!function_exists('get_bread_crumb')){
     }
 
     function get_session_links($sess_link_id=false){
+        
         $CI=&get_instance();
         $CI->load->dbutil();
         $rec = $CI->db->get_where('session_links',array('id'=>$sess_link_id))->row();
@@ -296,8 +371,41 @@ if(!function_exists('get_bread_crumb')){
         $branch = array();
     
         foreach ($elements as $element) {
-            if ($element['parent_id'] == $parentId) {
-                $element['children'] = buildTree($elements, $element['id']);
+            if($parentId==0){
+                $has_parent = 0;
+                foreach($elements as $ele){
+                    if($element['parent_id']==$ele['id']){
+                        $has_parent += 1;
+                    }
+                }
+                if($element['parent_id'] != 0 && $has_parent==0){
+                    $childern = array();
+                    foreach ($elements as $elem) {
+                        if($elem['parent_id'] ==  $element['id']){
+                            $childern[] = $elem;
+                        }
+                    }
+
+                    $element['children'] = $childern;//buildTree($elements, $element['id']);
+                    $branch[] = $element;  
+                }
+            }
+
+            if ($element['parent_id'] == $parentId) {// || $parentId==0
+                $childern = array();
+                foreach ($elements as $elem) {
+                    if($elem['parent_id'] == $element['id']){
+                        $childern2 = array();
+                        foreach ($elements as $elem3) {
+                            if($elem3['parent_id'] == $elem['id']){
+                                $childern2 [] = $elem3;
+                            }
+                        }
+                        $elem['children'] = $childern2;
+                        $childern[] = $elem;
+                    }
+                }
+                $element['children'] = $childern;//buildTree($elements, $element['id']);
                 $branch[] = $element;
             }
         }
@@ -307,9 +415,11 @@ if(!function_exists('get_bread_crumb')){
 
     function buildMenu(array $elements, $parentId = 0) {
         foreach ($elements as $element) {
-            if($element['parent_id']==$parentId){
+            if($element['parent_id']==$parentId || $parentId==0){
+                $element['children'] = isset($element['children'])?$element['children']:array();
                 $icon = explode(',',$element['image']);
-                $url = $element['name'] == 'lms' ? base_url($element['link']):base_url('index.php?'.$element['link']);
+                $url = ($element['name'] == 'lms' || strtolower($element['name']) == 'hrm') ? base_url().$element['link']:base_url('index.php?'.$element['link']);
+                //echo $url;
                 echo '<li class="p-0 menu-item-tile '.($element['children']?'has-submenu':'').'">
                         <a href="'.(!$element['children']?$url:'#').'" class="waves-effect active menu-items text-center">
                             <i class="'.$icon[0].'"></i>
@@ -326,6 +436,67 @@ if(!function_exists('get_bread_crumb')){
         }
     }
 
+    function unique_multidim_array($array, $key) { 
+        $temp_array = array(); 
+        $i = 0; 
+        $key_array = array(); 
+        
+        foreach($array as $val) { 
+            if (!in_array($val[$key], $key_array)) { 
+                $key_array[$i] = $val[$key]; 
+                $temp_array[$i] = $val; 
+            } 
+            $i++; 
+        } 
+        return $temp_array; 
+    }
+
     /* $arrModule = $this->session->userdata('arrAllLinks');
     $arrModule = $arrModule?$arrModule:array();
     buildMenu($arrModule); */
+
+    function create_passcode($type=''){
+        if(!empty($type)){
+            if($type==='parent'){
+                $passcode = "spa" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='admin'){
+                $passcode = "sad" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='teacher'){
+                $passcode = "sta" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='bus_driver'){
+                $passcode = "dri" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='student'){
+                $passcode = "stu" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='school_admin'){
+                $passcode = "sch" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='accountant'){
+                $passcode = "sac" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='cashier'){
+                $passcode = "sca" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='doctor'){
+                $passcode = "sdr" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='bus_admin'){
+                $passcode = "sba" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='super_admin'){
+                $passcode = "sup" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else if($type==='hostel_admin'){
+                $passcode = "sha" . mt_rand(10000000, 99999999);
+                return $passcode;
+            }else{
+                return 'invalid';
+            }            
+        }else{
+            return 'invalid';
+        }
+    }

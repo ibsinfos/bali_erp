@@ -75,8 +75,13 @@ class Exam_model extends CI_Model {
                 $this->db->where('school_id',$school_id);
             } 
         }
-       $query = $this->db->get_where('exam' , array('exam_id' => $exam_id))->row()->name;
-       return $query;
+        $row=$this->db->get_where('exam' , array('exam_id' => $exam_id))->row();
+        if(!empty($row)){
+            $query = $row->name;
+            return $query;
+        }else{
+            return '';
+        }
     }
     
     public function remove_exam($id)
@@ -1134,4 +1139,20 @@ class Exam_model extends CI_Model {
     function get_exam_classes($exam_id){
         
     }
+    
+    function get_upcoming_exams(){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $where = " AND e.school_id='".$school_id."'";
+            } 
+        }
+        $month = date('m');
+        $query = "select e.name,c.name as class_name,start_datetime from exam e LEFT JOIN exam_routine er ON e.exam_id=er.exam_id LEFT JOIN class c ON c.class_id=er.class_id WHERE MONTH(er.start_datetime)='".$month."'".$where."LIMIT 0,3";
+        $result = $this->db->query($query)->result_array();
+        return $result;
+    }
+    
+    
 }

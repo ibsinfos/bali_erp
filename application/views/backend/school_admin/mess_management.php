@@ -85,12 +85,16 @@
                     <div class="row">  
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
                             <label for="field-1"><?php echo get_phrase('amount');?><span class="mandatory">*</span></label>              
-                            <select data-container="body" class="selectpicker" required="required" data-style="form-control" name="amount" data-live-search="true">                                    
-                                <option value=""><?php echo get_phrase('select_amount'); ?></option>
-                                <?php foreach($mess_fee_list as $mfee){?>
-                                    <option value="<?php echo $mfee->sales_price?>"><?php echo $mfee->name.' -- '.$mfee->sales_price?></option>
-                                <?php }?>
-                            </select>
+                            <?php if(sett('new_fi')){?>
+                                <input type="number" class="form-control no-neg" name="amount" value="<?php echo set_value('amount')?>"/>
+                            <?php }else{?>
+                                <select data-container="body" class="selectpicker" required="required" data-style="form-control" name="amount" data-live-search="true">                                    
+                                    <option value=""><?php echo get_phrase('select_amount'); ?></option>
+                                    <?php foreach($mess_fee_list as $mfee){?>
+                                        <option value="<?php echo $mfee->sales_price?>"><?php echo $mfee->name.' -- '.$mfee->sales_price?></option>
+                                    <?php }?>
+                                </select>
+                            <?php }?>
                             <label class="mandatory"> <?php echo form_error('amount'); ?></label>
                         </div>
                     </div>         

@@ -159,13 +159,13 @@
 			if($this->empdata['is_orghead'] == 0)
 			{
 		?>					
-				<div class="new-form-ui">
+				<?php /* <div class="new-form-ui">
 				  <label>Business Unit</label>
 				<div class="division"><?php echo $this->form->businessunit_id; ?></div>
 				<?php if(isset($this->msgarray['businessunit_id'])){?>
 				   <span class="errors" id="errors-<?php echo $this->form->businessunit_id->getId(); ?>"><?php echo $this->msgarray['businessunit_id'];?></span>
 				<?php }?>
-				</div>
+				</div> */ ?>
 				
 				<div class="new-form-ui">
 				  <label>Department<!-- <img class="tooltip" title="Select business unit to populate departments" src="<?php //echo $this->baseUrl().'/public/media/';?>images/help.png">--></label>
@@ -255,7 +255,7 @@
 			</div>
 			
 			<div class="new-form-ui">
-			  <label ><?php echo $this->form->office_number->getLabel(); ?></label>
+			  <label class="required" ><?php echo $this->form->office_number->getLabel(); ?></label>
 			<div class="division"><?php echo $this->form->office_number; ?></div>
 			<?php if(isset($this->msgarray['office_number'])){?>
 			   <span class="errors" id="errors-<?php echo $this->form->office_number->getId(); ?>"><?php echo $this->msgarray['office_number'];?></span>
@@ -324,7 +324,7 @@ var yearrange = <?php echo "'".date("Y", strtotime("-30 years")).':'.date('Y')."
 <?php if (count($this->messages)) {?>
       setTimeout(function(){
 			$('#dispmsgemp').fadeOut('slow');
-		},3000);
+		},10000);
 
 <?php } ?>    
     $("#empdetails").addClass('active');

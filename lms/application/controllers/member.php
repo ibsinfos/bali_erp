@@ -250,7 +250,7 @@ class member extends Home
             // if data array is not empty insert data into database
             if (!empty($data)) {
                 $this->basic->insert_data($table, $data);
-                $this->session->set_flashdata('success_message', 1);
+                $this->session->set_flashdata('success_custom', 'Book requested successfully');
                 redirect('member/requested_books', 'location');
             } else {
                 $this->session->set_flashdata("error_message", 1);

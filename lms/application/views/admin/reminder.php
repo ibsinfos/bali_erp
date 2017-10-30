@@ -11,13 +11,6 @@
       padding-left: 5px !important;
     }
   }
-
-.theight{
-  width:100%;
-  height:523px;
-  
-}
-
 </style>
 <section class="content-header">
   <h1> <?php echo $this->lang->line("send notification to delayed members"); ?></h1>  
@@ -27,11 +20,12 @@
 <section class="content">  
   <div class="row">
     <div class="col-xs-12">
-        <div class="theight">
+        <div class="grid_container" style="min-height:700px">
             <table 
-            id="tt"  
+            id="mt"  
             class="easyui-datagrid" 
             url="<?php echo base_url()."reminder/reminders_data"; ?>" 
+            
             pagination="true" 
             rownumbers="true" 
             toolbar="#tb" 
@@ -42,7 +36,6 @@
             nowrap= "true" 
             view= "detailview"
             idField="id"
-            style="width:1029px;"
             >
             
                 <thead>
@@ -71,19 +64,19 @@
                 </div>
 
                 <div class="form-group">
-                    <input  id="issue_from_date" name="issue_from_date" class="form-control datepicker" size="20" placeholder="<?php echo $this->lang->line("issue from date");?>"/>
+                    <input  id="issue_from_date" name="issue_from_date" class="form-control datepicker" size="10" placeholder="<?php echo $this->lang->line("issue from date");?>"/>
                 </div>
 
                 <div class="form-group">
-                    <input  id="issue_to_date" name="issue_to_date" class="form-control datepicker" size="20" placeholder="<?php echo $this->lang->line("issue to date"); ?>"/>
+                    <input  id="issue_to_date" name="issue_to_date" class="form-control datepicker" size="10" placeholder="<?php echo $this->lang->line("issue to date"); ?>"/>
                 </div>
 
                 <div class="form-group">
-                    <input  id="expire_from_date" name="expire_from_date" class="form-control datepicker" size="20" placeholder="<?php echo $this->lang->line("expire from date"); ?>"/>
+                    <input  id="expire_from_date" name="expire_from_date" class="form-control datepicker" size="10" placeholder="<?php echo $this->lang->line("expire from date"); ?>"/>
                 </div>
 
                 <div class="form-group">
-                    <input  id="expire_to_date" name="expire_to_date" class="form-control datepicker" size="20" placeholder="<?php echo $this->lang->line("expire to date"); ?>"/>
+                    <input  id="expire_to_date" name="expire_to_date" class="form-control datepicker" size="10" placeholder="<?php echo $this->lang->line("expire to date"); ?>"/>
                 </div>
 
                 <div class="form-group">

@@ -48,7 +48,7 @@
                                     <div class="el-element-overlay col-lg-2 col-md-4 col-sm-6">
                                         <div class="el-card-item">
                                             <?php
-                                                    $image_url   =   ($student_personal_info->stud_image !=''?base_url().'uploads/student_image/'.$student_personal_info->stud_image:base_url() . 'uploads/user.jpg');
+                                                    $image_url   =   (($student_personal_info->stud_image !='' && file_exists('uploads/'.$student_personal_info->stud_image))?base_url().'uploads/student_image/'.$student_personal_info->stud_image:base_url() . 'uploads/user.png');
                                                ?>
                                                 <div class="el-overlay-1">
                                                     <img src="<?php echo $image_url;?>" />

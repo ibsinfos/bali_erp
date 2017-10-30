@@ -176,7 +176,7 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
                 $select = $this->select()
                             ->setIntegrityCheck(false)
                             ->from(array('d'=>'main_departments'),array('d.id','d.deptname'))
-                            ->where('d.unitid = '.$bussinessunitid.' AND d.isactive = 1'.$where)
+                            ->where('d.isactive = 1'.$where)
                             ->order('d.deptname');
 
                 return $this->fetchAll($select)->toArray();
@@ -368,7 +368,7 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
 	
 	}
         
-        public function getDepartmentWithCodeList_bu($bu_id)
+        public function getDepartmentWithCodeList_bu()
 	{
             $auth = Zend_Auth::getInstance();
             if($auth->hasIdentity()){
@@ -389,8 +389,8 @@ class Default_Model_Departments extends Zend_Db_Table_Abstract
                 $select = $this->select()
                             ->setIntegrityCheck(false)
                             ->from(array('d'=>'main_departments'),array('d.id','deptname'=>'concat(d.deptname," (",d.deptcode,")")'))
-                            ->joinLeft(array('b'=>'main_businessunits'), 'b.id=d.unitid',array('unitcode'=>'if(b.unitcode != "000",concat(b.unitcode,"","'.$a.'"),"")'))
-                            ->where('d.isactive = 1 and d.unitid in ('.$bu_id.')'.$where)
+                            //->joinLeft(array('b'=>'main_businessunits'), 'b.id=d.unitid',array('unitcode'=>'if(b.unitcode != "000",concat(b.unitcode,"","'.$a.'"),"")'))
+                            ->where('d.isactive = 1'.$where)
                             ->order('d.deptname');
 
                 return $this->fetchAll($select)->toArray();	

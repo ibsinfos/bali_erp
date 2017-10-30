@@ -25,7 +25,7 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <a href="<?php echo base_url(); ?>index.php?disciplinary/add_incident" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Incident" data-step="5" data-intro="From here you can add a new incident" data-position='left'>
+        <a href="<?php echo base_url(); ?>index.php?disciplinary/add_incident" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Incident" data-step="5" data-intro="From here you can create a new incident" data-position='left'>
             <i class="fa fa-plus"></i>
         </a>
     </div>
@@ -38,28 +38,26 @@ if($this->session->flashdata('flash_message_error')) {?>
 </div>
 <?php } ?>
 
-   <div class="col-md-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Here you can see the list of incident reported under your name.');?>" data-position='top'> 
-        <div class="text-center m-b-20" >
-             <h3><?php echo get_phrase('my_incident');?></h3>
-        </div>
-<table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
+   <div class="col-md-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Here you can see the list of incidents reported by you.');?>" data-position='top'> 
+       
+<table class= "custom_table table display" cellspacing="0" width="100%" id="ex">
     <thead>
         <tr>
-            <th><div><?php echo get_phrase('No'); ?></div></th>                               
+            <th width="5%"><div><?php echo get_phrase('s._no.'); ?></div></th>                               
             <th><div><?php echo get_phrase('violation_type'); ?></div></th>
-            <th><div><?php echo get_phrase('section_teacher'); ?></div></th>
+            <!--<th><div><?php // echo get_phrase('section_teacher'); ?></div></th>-->
             <th><div><?php echo get_phrase('violation_description'); ?></div></th>
             <th><div><?php echo get_phrase('class'); ?></div></th>
-            <th><div><?php echo get_phrase('section'); ?></div></th>
+            <th width="8%"><div><?php echo get_phrase('section'); ?></div></th>
             <th><div><?php echo get_phrase('parent_appeal'); ?></div></th>
             <th><div><?php echo get_phrase('student_name'); ?></div></th>
-            <th><div><?php echo get_phrase('parent_statement'); ?></div></th>
+            <th width="8%"><div><?php echo get_phrase('parent_statement'); ?></div></th>
             <th><div><?php echo get_phrase('verdict'); ?></div></th>
             <th><div><?php echo get_phrase('reporting_teacher'); ?></div></th>
             <th><div><?php echo get_phrase('corrective_action'); ?></div></th>
-            <th><div><?php echo get_phrase('date_of_occurrence'); ?></div></th>
+            <th width="10%"><div><?php echo get_phrase('date_of_occurrence'); ?></div></th>
             <th><div><?php echo get_phrase('expiry_date'); ?></div></th>
-            <th><div><?php echo get_phrase('action'); ?></div></th>
+            <th width="6%"><div><?php echo get_phrase('action'); ?></div></th>
         </tr>
     </thead>
     <tbody>
@@ -67,7 +65,7 @@ if($this->session->flashdata('flash_message_error')) {?>
         <tr>
             <td><?php echo $count++; ?></td>
             <td><?php echo $row['type']; ?></td>
-            <td><?php echo $row['raised_by']; ?></td>
+            <!--<td><?php // echo $row['raised_by']; ?></td>-->
             <td><?php echo $row['description']; ?></td>
             <td><?php echo $row['class_name']; ?></td>
             <td><?php echo $row['section_name']; ?></td>
@@ -77,8 +75,8 @@ if($this->session->flashdata('flash_message_error')) {?>
             <td><?php echo $row['verdict']; ?></td>
             <td><?php echo $row['reporting_teacher']; ?></td>
             <td><?php echo $row['corrective_action']; ?></td>
-            <td><?php echo $row['date_of_occurrence']; ?></td>
-            <td><?php echo $row['expiry_date']; ?></td>
+            <td><?php echo date('d/m/Y',strtotime($row['date_of_occurrence'])); ?></td>
+            <td><?php echo date('d/m/Y',strtotime($row['expiry_date'])); ?></td>
             <td>
                 <div class="btn-group">
                 <a href="<?php echo base_url(); ?>index.php?disciplinary/edit_incident/<?php echo $row['incident_id']; ?>">

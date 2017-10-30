@@ -28,7 +28,13 @@ if (count($this->messages)) {?><style>#messageData{color:green;}</style>
 				$flag = array("0");				
 				//$flag = array_keys($message);
 				echo "<div id='messageData' class='ml-alert-1-$flag[0]'><div style='display:block;'><span class='style-1-icon $flag[0]'></span>";
-				echo $message;
+                                if(is_array($message)){
+                                    foreach($message as $key=>$v){
+                                        echo $v.'<br/>';
+                                    }
+                                } else {
+                                    echo $message;
+                                }
 				echo "</div></div>";                                break;
 			} 
 		?>
@@ -53,7 +59,7 @@ $(document).ready(function(){
 <?php if (count($this->messages)) {?>
       setTimeout(function(){
 			$('#dispmsgemp').fadeOut('slow');
-		},3000);
+		},10000);
 
 <?php } ?>
 

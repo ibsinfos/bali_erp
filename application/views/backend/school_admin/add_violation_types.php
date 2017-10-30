@@ -30,17 +30,14 @@ if($this->session->flashdata('flash_message_error')) {?>
 <?php } ?>
 <div class="row">
     <div class="col-md-12">
-        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('You can add a new violation types from here.');?>" data-position='top'>
+        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('You_can_create_a_new_violation_type_from_here.');?>" data-position='top'>
             <?php echo form_open(base_url() . 'index.php?disciplinary/add_violation_types/create', array('class' => 'validate', 'target' => '_top')); ?> 
-
-        
-
             <div class="row">
                 <div class="col-md-6 form-group">
-                    <label for="field-1"><?php echo get_phrase("type"); ?><span class="mandatory"> *</span></label>
+                    <label for="field-1"><?php echo get_phrase("violation_type"); ?><span class="mandatory"> *</span></label>
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-database"></i></div>                  
-                        <input type="text" class="form-control" id="type" name="type" value="<?php echo set_value('type') ?>" placeholder="Type" data-validate="required" data-message-required ="<?php echo get_phrase('plesae_enter_the_type'); ?>">
+                        <input type="text" class="form-control" id="type" name="type" value="<?php echo set_value('type') ?>" placeholder="Violation Type" data-validate="required" data-message-required ="<?php echo get_phrase('plesae_enter_the_type'); ?>">
                         <span class="mandantory"> <?php echo form_error('type'); ?></span>
                     </div> 
                 </div>
@@ -53,8 +50,8 @@ if($this->session->flashdata('flash_message_error')) {?>
                     </div> 
                 </div>
             </div>
-            <div class="text-right">
-                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Add Type" data-step="6" data-intro="<?php echo get_phrase('You can submit from here.');?>" data-position='left'/>
+            <div class="text-center">
+                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Create Violation Type" data-step="6" data-intro="<?php echo get_phrase('You_can_create_violation_type_from_here.');?>" data-position='left'/>
             </div>  
             <?php echo form_close(); ?>
         </div>

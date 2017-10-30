@@ -124,7 +124,7 @@ $data = $this->data;
                     </ul>
                 </div>
 				
-                <div class="file_dwn">
+      <div class="file_dwn" style="padding-left:20px;">
 				
 				<?php if(count($this->data)>0) {
 				
@@ -132,11 +132,11 @@ $data = $this->data;
 					if($datares['receipt_name']!='')
 					{
 	              ?>
-
-                    <img src="<?php echo EXPENSES_MEDIA_PATH; ?>images/file_icon.png" alt="" />
-                    <p class="file_name"><?php echo $datares['receipt_name'];?></p>
-					<a onClick="downloadreceipt('<?php echo $name=$datares['receipt_filename'];?>');" class="file_dwn_btn"><i class="glyphicon glyphicon-cloud-download"></i> Download</a>
-					
+                    <div style="float:left; margin-right:20px;">
+                        <img src="<?php echo EXPENSES_MEDIA_PATH; ?>images/file_icon.png" alt="" />
+                        <p class="file_name"><?php echo $datares['receipt_name'];?></p>
+                        <a onClick="downloadreceipt('<?php echo $name=$datares['receipt_filename'];?>');" class="file_dwn_btn"><i class="glyphicon glyphicon-cloud-download"></i> Download</a>
+                    </div>
 			<?php } ?>  
 			<?php } ?>  
 			<?php } ?>

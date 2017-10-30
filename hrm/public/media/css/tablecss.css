@@ -161,6 +161,14 @@ background-color: #208bbd; border:1px solid #006391;  -webkit-border-radius: 4px
 .viewrecord { background-position: 0 -80px; float:left; width:14px; margin-right: 7px; height: 16px; border:0; text-indent: -999999px; cursor: pointer; outline: none; }
 .addrecord { background-position: 0 -463px; float:right; width:55px; margin-right: 10px; margin-top: 1px; height: 22px; border:0; text-indent: -999999px; cursor: pointer; outline: none; }
 
+.generate_icon{
+    background-position: 0px -175px; 
+    width: 12px;
+    height: 12px;
+    margin-right: 0;
+    float: left;
+}
+
 .all-grid-control .addrecord{margin-right: 63px; margin-top:0;}
 .all-grid-control .add-btn-div{margin-right: 63px;}
 .all-grid-control{ margin-right:0px;}

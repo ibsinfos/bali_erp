@@ -3,7 +3,7 @@ echo form_open(base_url() . 'index.php?school_admin/route_bus_stop/edit/'.$row['
 <div class="form-group">
          <div class="col-md-12 m-b-20">
     <label><?php echo get_phrase('route_name'); ?><span class="error mandatory"> *</span></label>
-           <select class="selectpicker1" data-style="form-control" data-live-search="true" id="route_id" name="route_id" required="required">
+    <select class="selectpicker1" data-style="form-control" data-live-search="true" id="route_id" name="route_id" required="required" disabled="">
             <option value=""><?php echo get_phrase('select_option'); ?></option>
                 <?php foreach ($route as $value): ?>
                 <option value="<?php echo $value['transport_id']; ?>" <?php  if ($row['route_id'] == $value['transport_id']) { echo "selected"; } ?>><?php echo $value['route_name']; ?>
@@ -29,9 +29,9 @@ echo form_open(base_url() . 'index.php?school_admin/route_bus_stop/edit/'.$row['
 <div class="col-md-12 m-b-20">
     <label><?php echo get_phrase('route_fare'); ?><span class="error mandatory"> *</span></label>
     <?php if(sett('new_fi')){?>
-        <input type="number" min="1" class="form-control" name="route_fare" placeholder="<?php echo get_phrase('route_fare');?>" value="<?php echo $row['route_fare']?>" required/>
+    <input type="number" min="1" class="form-control" name="route_fare" placeholder="<?php echo get_phrase('route_fare');?>" value="<?php echo $row['route_fare']?>" required disabled=""/>
     <?php }else{?>
-     <select class="selectpicker" data-style="form-control" data-live-search="true" id="route_fare" name="route_fare" required="required" data-max-options="2">
+        <select class="selectpicker" data-style="form-control" data-live-search="true" id="route_fare" name="route_fare" required="required" data-max-options="2" disabled="">
         <?php foreach ($charges as $charge): ?>
             <option <?php
             if ($row['route_fare'] == $charge['sales_price']) {
@@ -44,7 +44,7 @@ echo form_open(base_url() . 'index.php?school_admin/route_bus_stop/edit/'.$row['
     <?php }?>
 </div>
 <div class="col-md-12 m-b-20 text-right">
-    <button class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('Update'); ?></button>
+    <button class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('Update_bus_stop'); ?></button>
     </div>
 </div>
 

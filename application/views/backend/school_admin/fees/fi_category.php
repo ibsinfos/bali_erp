@@ -74,7 +74,7 @@
                 <section id="add"> 
         <?php echo form_open(base_url().'index.php?fees/main/fi_category/add'); if($this->session->flashdata('flash_message_error')) {?><div class="alert alert-danger"><?php echo $this->session->flashdata('flash_message_error'); ?></div><?php }?>
                     <div class="col-md-12 form-group">                       
-                        <div class="col-md-4 col-md-offset-2">
+                        <div class="col-md-6 col-md-offset-3">
                             <label for="category_name"><?php echo get_phrase("category_name"); ?><span class="error" style="color: red;">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-user"></i></div><input type="text" class="form-control" placeholder="<?php echo get_phrase("enter_category_name");?>" required="required" name="category_name" type="text" value="<?php echo set_value('category_name'); ?>" >
@@ -82,22 +82,20 @@
                         </div>
                     </div>
 
-                    <div class="col-md-6 col-md-offset-2">
-                        &nbsp;&nbsp;<label for="category_type"><?php echo get_phrase('type'); ?><span class="error mandatory">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <div class="col-md-6 col-md-offset-3">
+                        <label for="category_type"><?php echo get_phrase('type'); ?><span class="error mandatory">*</span></label>&nbsp;&nbsp;&nbsp;&nbsp;
                         <label class="form-check-label"><input class="form-check-input" type="radio" name="category_type" required="required" value="1" checked>&nbsp;<?php echo get_phrase('income'); ?></label>&nbsp;&nbsp;
                         <label class="form-check-label"><input class="form-check-input" type="radio" name="category_type" required="required" value="2">&nbsp;<?php echo get_phrase('expenditure'); ?></label>
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="col-md-8 col-md-offset-2"><br>
-                            <label for="description"><?php echo get_phrase('description');?><span class="error" style="color: red;">*</span></label>
-                            <textarea class="form-control" rows="8" name="description" required="required"><?php echo set_value('description'); ?></textarea>
-                        </div>
+                    <div class="col-md-6 col-md-offset-3">
+                        <label for="description"><?php echo get_phrase('description');?><span class="error" style="color: red;">*</span></label>
+                        <textarea class="form-control" rows="8" name="description" required="required"><?php echo set_value('description'); ?></textarea>
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-10 form-group text-right"><br>
-                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("submit");?></button> 
+                        <div class="col-sm-12 form-group text-center"><br>
+                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("add_category");?></button> 
                         </div>
                     </div>
                 <?php echo form_close();?>                            

@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <div class="row bg-title"> 
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
         <h4 class="page-title"><?php echo get_phrase('manage general settings'); ?> </h4></div>
@@ -7,7 +8,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+            <?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -19,7 +20,7 @@
     </div>
 </div>
 
-<?php echo form_open(base_url() . 'index.php?school_admin/system_settings/do_update' , array('class' => 'validate','target'=>'_top'));?>
+<?php echo form_open(base_url('index.php?school_admin/system_settings/do_update'), array('class' => 'validate','target'=>'_top'));?>
 <div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('you can configure system related settings from here!!');?>" data-position='top'>  
     <div class="row">
         <div class="col-sm-4 form-group">          
@@ -50,6 +51,7 @@
             </div>
         </div>
     </div>
+
     <div class ="row">
         <div class="col-md-4 form-group">
             <div class="form-group">
@@ -82,6 +84,7 @@
             </div>
         </div>
     </div>
+
     <div class ="row">
         <div class="col-md-4 form-group">
             <div class="form-group">
@@ -114,6 +117,7 @@
             </div>
         </div>
     </div>
+
     <div class ="row">       
         <div class="col-md-4 form-group">
             <div class="form-group">
@@ -135,6 +139,26 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4 form-group">
+            <div class="form-group">
+                <label for="running_session"><?php echo get_phrase('timezone'); ?></label>
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
+                    <select name="timezone" class="selectpicker" data-style="form-control" data-live-search="true">
+                          <option value=""><?php echo get_phrase('select_timezone');?></option>
+                          <?php foreach(DateTimeZone::listIdentifiers() as $timezone){?>
+                                <option value="<?php echo $timezone?>" <?php echo($timezone==fetch_parl_key_rec($settings,'timezone'))?'selected':'';?>>
+                                    <?php echo $timezone?>
+                                </option>
+                          <?php }?>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-md-4 form-group">
             <div class="form-group">
                 <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
@@ -151,9 +175,32 @@
                     </select>
                 </div>
             </div>
+        </div>                    
+    
+        <div class="col-md-4 form-group">
+            <div class="form-group">
+                <label for="end_time_from"><?php echo get_phrase('start_month'); ?></label>
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
+                    <input type="text" class="form-control mtp" id="start_month" name="start_month" placeholder="<?php echo get_phrase('start_month')?>" 
+                    value="<?php echo fetch_parl_key_rec($settings,'start_month')?>"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 form-group">
+            <div class="form-group">
+                <label  for="location"><?php echo get_phrase('end_month');?></label>
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-language"></i></div>
+                    <input type="text" class="form-control mtp" id="end_month" name="end_month" placeholder="<?php echo get_phrase('end_month')?>" 
+                    value="<?php echo fetch_parl_key_rec($settings,'end_month')?>"/>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="row">
+    
+    <div class="row"> 
         <div class="col-md-4 form-group">
             <div class="form-group">
                 <label for="end_time_from"><?php echo get_phrase("language"); ?></label>
@@ -171,9 +218,7 @@
             </div>
         </div>
 
-<?php $location = fetch_parl_key_rec($settings,'location');?>
-
-
+        <?php $location = fetch_parl_key_rec($settings,'location');?>
         <div class="col-md-4 form-group">
             <div class="form-group">
                 <label  for="location"><?php echo get_phrase('location');?></label>
@@ -187,6 +232,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="col-md-4 form-group">
             <div class="form-group">
                 <label for="text_align"><?php echo get_phrase('text_align');?></label>
@@ -198,10 +244,10 @@
                     </select>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <div class="row">
+        </div>         
+    </div>    
+
+    <div class="row">               
         <div class="col-md-4 form-group">
             <div class="form-group">
                 <label for="end_time_from"><?php echo get_phrase("enroll_code_prefix"); ?></label>
@@ -223,10 +269,59 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4 form-group">
+            <div class="form-group">
+                <label for="end_time_from"><?php echo get_phrase('bus_attendance_buffer_time');?></label>
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-check-square"></i></div>
+                    <input type="text" class="form-control" id="bus_attendance_buffer_time" name="bus_attendance_buffer_time" 
+                    placeholder="<?php echo get_phrase('bus_attendance_buffer_time')?>" 
+                    value="<?php echo fetch_parl_key_rec($settings,'bus_attendance_buffer_time')?>"/>
+                </div>
+            </div>
+        </div>
     </div>
 
-    
+    <div class="row">
+        <div class="col-md-4 form-group">
+            <div class="form-group">
+                <label for="end_time_from"><?php echo get_phrase('RFID_attendance_buffer_time');?></label>
+                <div class="input-group">
+                    <div class="input-group-addon"><i class="fa fa-check-square"></i></div>
+                    <input type="text" class="form-control" id="rfid_attendance_buffer_time" name="rfid_attendance_buffer_time" 
+                    placeholder="<?php echo get_phrase('RFID_attendance_buffer_time')?>" 
+                    value="<?php echo fetch_parl_key_rec($settings,'rfid_attendance_buffer_time')?>" >
+                </div>
+            </div>
+        </div>                    
 
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for=""><?php echo get_phrase('fees_pay_priority');?></label>
+                <ul id="sortable2" class="connectedSortable">
+                    <li id="<?php echo sett('fees_priority_1')?sett('fees_priority_1'):'tuition'?>" class="ui-state-highlight" 
+                        style="margin-left:0px;text-transform: capitalize;">
+                        <i class="fa fa-bars"></i> <?php echo sett('fees_priority_1')?sett('fees_priority_1'):get_phrase('tuition')?>
+                    </li>
+                    <li id="<?php echo sett('fees_priority_2')?sett('fees_priority_2'):'transport'?>" class="ui-state-highlight" 
+                        style="margin-left:0px;text-transform: capitalize;">
+                        <i class="fa fa-bars"></i> <?php echo sett('fees_priority_2')?sett('fees_priority_2'):get_phrase('transport')?>
+                    </li>
+                    <li id="<?php echo sett('fees_priority_3')?sett('fees_priority_3'):'hostel'?>" class="ui-state-highlight" 
+                        style="margin-left:0px;text-transform: capitalize;">
+                        <i class="fa fa-bars"></i> <?php echo sett('fees_priority_3')?sett('fees_priority_3'):get_phrase('hostel')?>
+                    </li>
+                </ul>
+                <input type="hidden" name="fees_priority_1" value="<?php echo fetch_parl_key_rec($settings,'fees_priority_1')?>"/>
+                <input type="hidden" name="fees_priority_2" value="<?php echo fetch_parl_key_rec($settings,'fees_priority_2')?>"/>
+                <input type="hidden" name="fees_priority_3" value="<?php echo fetch_parl_key_rec($settings,'fees_priority_3')?>"/>
+            </div>
+        </div>
+    </div>
+
+    <h2><?php echo get_phrase('social_settings')?></h2>
+    <hr/>
     <div class="row"> 
         <div class="col-md-4 form-group">
             <div class="form-group">
@@ -248,7 +343,7 @@
                 </div>
             </div>
         </div>
-	<div class="col-md-4 form-group">
+	    <div class="col-md-4 form-group">
             <div class="form-group">
                 <label for="twitter_page"><?php echo get_phrase("twitter"); ?></label>
                 <div class="input-group">
@@ -259,6 +354,7 @@
             </div>
         </div>	  
     </div>
+
     <div class="row">
         <div class="col-md-4 form-group">
             <div class="form-group">
@@ -290,10 +386,10 @@
 <?php echo form_open(base_url() . 'index.php?school_admin/system_settings/upload_logo' , array('class' => 'validate','target'=>'_top' , 'enctype' => 'multipart/form-data'));?>
 <div class="col-md-12 white-box" >
     <?php
-//    $filename = base_url().'uploads/logo.png';
-//    $lastModified = @filemtime($filename);
-//    $lastModified = @filemtime(utf8_decode($filename));
-//    $date_last_modif = date('Y-m-d', @filemtime($filename));
+    //    $filename = base_url().'uploads/logo.png';
+    //    $lastModified = @filemtime($filename);
+    //    $lastModified = @filemtime(utf8_decode($filename));
+    //    $date_last_modif = date('Y-m-d', @filemtime($filename));
     ?>
     <!--<img src="<?php //echo $filename."?".$lastModified ;?>">-->
     <label for="field-2"> <?php echo get_phrase('upload_logo'); ?> <span class="error mandatory"> *</span></label>
@@ -330,6 +426,17 @@
 
 
 <script type="text/javascript">
+$(function(){
+    $('#sortable2').sortable({
+        update: function(event, ui) {
+            var newOrder = $(this).sortable('toArray');
+            newOrder.forEach(function(o,i){
+                console.log('fees_priority_'+(i+1));
+                $('input[name=fees_priority_'+(i+1)+']').val(o);
+            });
+        }
+    });
+
     $(".gallery-env").on('click', 'a', function () {
         skin = this.id;
         $.ajax({
@@ -338,11 +445,18 @@
         });
     });
 
+    $('.mtp').datepicker({ 
+        minViewMode:1,
+        format:'MM-yyyy',
+        autoclose:true
+    });
+})
 
-    function valid_only_numeric(evt){
-        var charCode = (evt.which) ? evt.which : evt.keyCode;
-        if (charCode > 31 && (charCode < 48 || charCode > 57))
-            return false;
-        return true;
-    }
+
+function valid_only_numeric(evt){
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57))
+        return false;
+    return true;
+}
 </script>   

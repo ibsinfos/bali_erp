@@ -76,7 +76,7 @@ else
                <?php
                if($this->flag=='view'){
                sapp_Helper::viewHeader();
-               sapp_Helper::viewBody('alt','Business Unit ',(!empty($this->data['businessunit_id']))?$this->data['businessunit_id']:"...",'Applicability',(isset($this->data['performance_app_flag']))?$this->data['performance_app_flag']:"...");
+               sapp_Helper::viewBody('alt','Applicability',(isset($this->data['performance_app_flag']))?$this->data['performance_app_flag']:"...");
                ?>
                <div class="hidden">
                <?php

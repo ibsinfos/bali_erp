@@ -60,7 +60,7 @@ else
            </div> 
 <?php 
 sapp_Helper::viewHeader();
-sapp_Helper::viewBody('alt','Business Unit ',(!empty($this->data['unitname']))?$this->data['unitname']:"...",'Department',(!empty($this->data['deptname']))?$this->data['deptname']:"...");
+sapp_Helper::viewBody('alt','Department',(!empty($this->data['deptname']))?$this->data['deptname']:"...");
 sapp_Helper::viewBody('nor','Appraisal Mode',(!empty($this->data['appraisal_mode']))?$this->data['appraisal_mode']:"...",'From Year',(!empty($this->data['from_year']))?$this->data['from_year']:"...");
 sapp_Helper::viewBody('alt','To Year ',(!empty($this->data['to_year']))?$this->data['to_year']:"...",'Period ',(!empty($this->data['appraisal_period']))?$this->data['appraisal_period']:"...");
 sapp_Helper::viewBody('nor','Appraisal Status',(!empty($this->data['status']))?$this->data['status']:"...",'Eligibility ',(!empty($this->data['eligibility_names']))?$this->data['eligibility_names']:"..."); 

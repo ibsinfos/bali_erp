@@ -169,6 +169,18 @@
             <?php }  ?>
             </select>
         </div>
+		<div class="col-sm-4 form-group">
+            <label for="field-2" class="control-label"><?php echo get_phrase('mess'); ?></label>
+            <select name="mess_id" id="mess_id"  class="selectpicker" data-style="form-control" data-live-search="true">
+            <?php if($mess) { ?>
+            <option value=""><?php echo get_phrase('select'); ?></option>
+            <?php  foreach ($mess as $row): ?>
+            <option value="<?php echo $row['mess_management_id']; ?>"><?php echo $row['name']; ?></option>
+            <?php endforeach; } else { ?>
+            <option value=""><?php echo get_phrase('no_mess_set');?></option>
+            <?php }  ?>
+            </select>
+        </div>
     </div>
 
     <div class="row">

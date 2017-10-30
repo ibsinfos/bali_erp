@@ -8,7 +8,7 @@
 <?php if($this->uri->segment(2)=='update_homework'){?>
             <ol class="breadcrumb">
                 <li><a href="<?php echo base_url(); ?>index.php?teacher/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
-                <li><a href="<?php echo base_url(); ?>index.php?teacher/home_works"><?php echo get_phrase('Home Works'); ?></a></li>
+                <li><a href="<?php echo base_url(); ?>index.php?teacher/home_works"><?php echo get_phrase('HomeWorks'); ?></a></li>
                 <li class="active"><?php echo get_phrase('update_homework'); ?></li>
             </ol>
 <?php }else{?>            
@@ -100,17 +100,17 @@
                 <div class="sttabs tabs-style-flip">
                     <nav>
                         <ul>
-                            <li id="section1">
-                                <a href="#section-flip-1" class="sticon fa fa-list "data-step="5" data-intro="You can see list of home work you created." data-position='right'><span><?php echo get_phrase('home_work_types'); ?></span></a></li>
+<!--                            <li id="section1">
+                                <a href="#section-flip-1" class="sticon fa fa-list "data-step="5" data-intro="You can see list of homeworks you created." data-position='right'><span><?php echo get_phrase('homework_types'); ?></span></a></li>-->
                             <li id="section2">
-                                <a href="#section-flip-2" class="sticon fa fa-plus" data-step="6" data-intro="Form here you will add a home work." data-position='left'><span><?php echo get_phrase('add_home_work'); ?></span></a></li>
+                                <a href="#section-flip-2" class="sticon fa fa-plus" data-step="6" data-intro="Form here you can create a homework." data-position='left'><span><?php echo get_phrase('add_homework'); ?></span></a></li>
                            <li id="section3">
-                                <a href="#section-flip-3" class="sticon fa fa-list" data-step="7" data-intro="Form here you will add a home work." data-position='left'><span><?php echo get_phrase('home_work_done'); ?></span></a></li>
+                                <a href="#section-flip-3" class="sticon fa fa-list" data-step="7" data-intro="Form here you can create a homework." data-position='left'><span><?php echo get_phrase('homework_done'); ?></span></a></li>
 
                         </ul>
                     </nav>                                    
                     <div class="content-wrap">
-                        <section id="section-flip-1">
+                      <?php /*  <section id="section-flip-1">
 
                         <table id="example23" class="table display" cellspacing="0" width="100%">
                             <thead>
@@ -152,13 +152,13 @@
                             </tbody>
                         </table>
 
-                        </section>
+                        </section> */ ?>
 
                         <section id="section-flip-2">
-                            <?php echo form_open(base_url() . 'index.php?teacher/home_works_actions/create', array('class' => 'form-horizontal form-groups-bordered validate', 'target' => '_top', "onsubmit" => "return validate_form()")); ?>
+                            <?php echo form_open(base_url() . 'index.php?teacher/home_works_actions/create', array('class' => 'form-horizontal form-groups-bordered validate', 'target' => '_top', "onsubmit" => "return validate_form()",'enctype' => 'multipart/form-data')); ?>
                             <div class="row">          
                                 <div class="col-xs-12 col-md-offset-3 col-md-6">
-                                    <label for="field-1"><?php echo get_phrase('home_work_type'); ?><span class="mandatory"> *</span></label>
+                                    <label for="field-1"><?php echo get_phrase('homework_type'); ?><span class="mandatory"> *</span></label>
                                     <div class="input-group">
                                         <input type="hidden" name="hw_class_id" value="<?php echo $sel_class_id;?>" >
                                         <input type="hidden" name="hw_section_id" value="<?php echo $sel_section_id;?>" >
@@ -176,7 +176,7 @@
                             </div>
                             <div class="row">          
                                 <div class="col-xs-12 col-md-offset-3 col-md-6">
-                                    <label for="field-1"><?php echo get_phrase('home_work_name'); ?><span class="mandatory"> *</span></label>
+                                    <label for="field-1"><?php echo get_phrase('homework_name'); ?><span class="mandatory"> *</span></label>
                                     <div class="input-group">
                                         <div class="input-group-addon"><i class="fa fa-cutlery"></i></div>
                                         <input type="text" class="form-control"  data-validate="required"  name="name" id='name' placeholder="<?php echo get_phrase('name'); ?>"> 
@@ -218,14 +218,26 @@
                             <div class="row">
                                 <div class="col-xs-12 col-md-offset-3 col-md-6">
                                     <label for="poll_content">
-                                    <?php echo get_phrase('home_work_description'); ?>:<span class="error mandatory"> *</span></label>
+                                    <?php echo get_phrase('homework_description'); ?>:<span class="error mandatory"> *</span></label>
                                     <textarea class='summernote'  name="hw_description" id="hw_description"></textarea>
                                     <label> <?php echo form_error('description'); ?></label>
                                 </div>
                             </div>
-                            
-                            <div class="text-right">
-                                <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('submit'); ?></button>
+                            <div class="row">
+                                <div class="col-xs-12 col-md-offset-3 col-md-6">
+                                <label><?php echo get_phrase('file_to_upload'); ?></label>
+                                <div class="input-group">
+                                    <input type="file" name="file_name" class="form-control file2 inline btn " data-label="<i class='entypo-upload'></i> Browse"/>
+                       </div>
+                                
+                    </div><div class="row">
+                                <div class="col-xs-12 col-md-offset-3 col-md-6 tex-left">
+                                    <span class="mandatory"><?php echo get_phrase('supported_types_:_.doc_.xls_.pdf_.img');?></span>
+                                </div>
+                    </div>
+                            <div class="text-center col-md-12">
+                                <br/>
+                                <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('create_homework'); ?></button>
                             </div>
                             <?php echo form_close(); ?> 
                         </section>             
@@ -295,7 +307,9 @@
     ?>
 <script>
     $(document).ready(function(){
-
+        $('.mydatepicker').datepicker({ 
+               todayHighlight: true
+   });
     });
     
     function onclasschange(class_id){

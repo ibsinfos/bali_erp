@@ -90,6 +90,11 @@ class Default_Model_Leaverequest extends Zend_Db_Table_Abstract
 	
 	public function SaveorUpdateLeaveRequest($data, $where)
 	{
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity())
+            {
+                $school_id = $auth->getStorage()->read()->school_id;			
+            } 
 	    if($where != '')
 		{
 			$this->update($data, $where);
@@ -97,6 +102,7 @@ class Default_Model_Leaverequest extends Zend_Db_Table_Abstract
 		}
 		else
 		{
+                    $data['school_id']=$school_id;
 			$this->insert($data);
 			$id=$this->getAdapter()->lastInsertId('main_leaverequest');
 			return $id;

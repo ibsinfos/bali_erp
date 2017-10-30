@@ -108,10 +108,10 @@
             <label class="mandatory"> <?php echo form_error('room_fare'); ?></label>
         </div>  
         </div>
-               <div class="text-right">
+               <div class="text-center">
                 <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Add Room" data-step="6" data-intro="<?php echo get_phrase('You can submit from here.');?>" data-position='left'/>
 <!--                <a href="<?php echo base_url(); ?>index.php?school_admin/manage_hostel_room/">
-                <button  type="button" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="7" data-intro="<?php echo get_phrase('You can cancel from here.');?>" data-position='left'><?php echo get_phrase('cancel'); ?>
+                <button  type="button" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="7" data-intro="<?php echo get_phrase('You can cancel from here.');?>" data-position='left'><?php //echo get_phrase('cancel'); ?>
                 </button></a>-->
           </div>  
 <?php echo form_close(); ?>

@@ -1,7 +1,7 @@
 <div class="row bg-title">
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-        <h4 class="page-title"><?php echo get_phrase('Gender Report'); ?> </h4></div>
+        <h4 class="page-title"><?php echo get_phrase('Gender_Report'); ?> </h4></div>
     <!-- /.page title -->
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
@@ -23,11 +23,11 @@
     <!-- /.breadcrumb -->
 </div>
 
-
+<?php echo  $overview_column_line_mix_linner_chart; ?>
 
 <div class="row">
     <div class="col-sm-12">    
-        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('Here you can view the male and female student in different grade levels.');?>" data-position="top"> 
+        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('Here_you_can_view_the_male_and_female_student_in_different_grade_levels.');?>" data-position="top"> 
             <table id="example23" class="display nowrap" cellspacing="0" width="100%">
                 <thead>
                     <tr>

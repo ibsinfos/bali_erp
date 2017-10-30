@@ -5,14 +5,14 @@
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" id="take-tour" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         <ol class="breadcrumb">
-            <li><a href="<?php echo base_url(); ?>index.php?parents/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
-            <li><a href="<?php echo base_url(); ?>index.php?parents/online_polls"><?php echo get_phrase('online_polls'); ?></a></li>
+            <li><a href="<?php echo base_url(); ?>index.php?student/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li><a href="<?php echo base_url(); ?>index.php?student/online_polls"><?php echo get_phrase('online_polls'); ?></a></li>
             <li class="active"><?php echo get_phrase($page_title); ?></li>
         </ol>
     </div>
 </div>
 
-<?php $count = 0;  if(!empty($online_polls)){$count = 0;
+<?php $count = 0;  if(!empty($online_polls)){$count = 0;/*
     foreach ($online_polls as $row) {  //pre($row);
         if(isset($row['poll_id'])){ $count++;?>
 
@@ -46,11 +46,56 @@
 </div>
 </div>
 <?php  } 
-        } }
+        }*/ }
 
-if($count == 0) {  ?>
+$count = 0;  if(!empty($online_polls)){$count = 0;?>
+<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Lists vote result.');?>" data-position='top'>
+    <!--<table id="table" class="table_edjust table-responsive display nowrap" cellspacing="0" width="100%" >-->
+    <table class="custom_table table display example" id="polls">
+        <thead>
+            <tr>
+                <th width="30%"><div><?php echo get_phrase('title'); ?></div></th>   
+                <th width="45%"><div><?php echo get_phrase('description'); ?></div></th>                            
+                <th width="17%"><div><?php echo get_phrase('winner(%)'); ?></div></th>
+                <th width="8%"><div><?php echo get_phrase('action'); ?></div></th>
+            </tr>
+            <tbody>
+                <?php foreach ($online_polls as $row) {
+                    if(isset($row['poll_id'])){ $count++;?>
+                <tr>
+                    <td><?php echo $row['poll_title'];?>  <?php //echo ': '.$row['post_date'];?></td>
+                    <td><?php echo $row['poll_descreption']; ?></td>
+                    <?php if(!empty($row['answer_det'])) {
+                        $answ_count         =   1;
+                        $cHighestPer=0;
+                    foreach($row['answer_det'] as $answer) { 
+                        if($row['total_poll']==0){
+                            $answer_poll_percent=0;
+                        }else{
+                            $answer_poll_percent        =   ($answer['no_of_votes']/$row['total_poll'])*100;
+                        }
+                        if($cHighestPer<$answer_poll_percent){
+                            $cHighestPer=$answer_poll_percent;
+                            $winer=$answer['answer'];
+                        }
+                    } ?>
+                    <td><?php echo $winer."(".round($cHighestPer, 2).")";?></td>
+                    <td><a href="javascript:void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/modal_online_poll_view/<?php echo $row['poll_id']; ?>');"><button class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View"><i class="fa fa-eye"></i></button></a></td>
+                    <?php }else{?>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <?php }?>
+                </tr>
+                <?php }
+                }?>
+            </tbody>
+        </thead>
+    </table>
+    
+</div>
+<?php }else{?>
 <div class="panel panel-danger block6">
-    <div class="panel-heading">No polls available</div>
+    <div class="panel-heading">Poll result is not available</div>
 </div>            
 <?php } ?>
 

@@ -13,7 +13,6 @@
         </ol>
     </div>
 </div>
-<?php if (!empty($study_material_info)){ ?>
 <div class="col-md-12 white-box preview_outer">
     <div class="text-center">
         <h3><b><?php echo get_phrase('study_materials_for_').$student_name; ?> <?php echo "Class : ".$class_name; ?></b></h3>
@@ -35,10 +34,11 @@
     </thead>
 
     <tbody>
-        <?php    
+        <?php 
+        if (!empty($study_material_info)){
         $count = 1;
         foreach ($study_material_info as $row) { ?>   
-            <tr>               
+            <tr>    
                 <td><?php echo $count++; ?></td>               
                 <td><?php echo $row['title']?></td>
                 <td><?php echo $row['classname']?></td>
@@ -47,23 +47,29 @@
                 <td><?php echo $row['description']?></td> 
                 <td><?php echo $row['timestamp']; ?></td>
                 <td>                  
-                    <a href="javascript: void(0);" onclick="showDocumentPreview('<?php echo base_url(); ?>index.php?modal/popup/study_material_preview/<?php echo $row['file_name']; ?>');">
+                    <?php if (!empty($row['file_name']) && file_exists(FCPATH.'uploads/document/'.$row['file_name'])){  ?>
+                         <a href="javascript: void(0);" onclick="showDocumentPreview('<?php echo base_url(); ?>index.php?modal/popup/study_material_preview/<?php echo $row['file_name']; ?>');">
                         <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="<?php echo get_phrase('view') ?>" title="<?php echo get_phrase('view') ?>"><i class="fa fa-eye"></i></button>
                     </a>
-
-                    <a href="<?php echo base_url().'index.php?school_admin/download_study_material/'.$row['file_name']; ?>" class="btn btn-blue btn-icon icon-left">
+                    <a href="<?php echo base_url().'index.php?parents/download_study_material/'.$row['file_name']; ?>" class="btn btn-blue btn-icon icon-left">
                         <button type="button" class="btn btn-default  btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" 
-                                data-placement="top" data-original-title="<?php echo get_phrase('download') ?>" title="<?php echo get_phrase('download') ?>">
-                        <i class="fa fa-download"></i>
+                                data-placement="top" data-original-title="<?php echo get_phrase('download') ?>" title="<?php echo get_phrase('download') ?>">                        <i class="fa fa-download"></i>
                           </button>
-                    </a>                    
+                    </a>     
+                  <?php  }else{ ?>
+                      <a href="#"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Available" disabled=""><i class="fa fa-eye"></i></button> 
+                                            </a>
+                                            <a><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="No Attachment" disabled="">
+                                    <i class="fa fa-download"></i>
+                                    </button></a>
+                        
+                  <?php  } ?>
+                                  
                 </td>
                 
             </tr>
-        <?php } ?>
+        <?php }
+        } ?>
     </tbody>
 </table>
 </div>
-<?php } else { 
-echo "No Data Available";
- } ?>

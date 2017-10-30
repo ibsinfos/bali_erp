@@ -19,8 +19,7 @@
             <?php echo $msg; ?>
         </div>
     <?php } ?>
-    <div class="col-md-12">
-        <div class="white-box">        
+    <div class="col-md-12 white-box">
             <section>
                 <div class="sttabs tabs-style-flip">
                     <nav>
@@ -77,6 +76,8 @@
 
 
         </div>
+    </div>
+            </section>
     </div>
     
 <script>

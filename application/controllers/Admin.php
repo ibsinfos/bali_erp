@@ -16,6 +16,7 @@ class Admin extends CI_Controller {
     public $globalSettingsActiveSmsService = "";
     public $globalSettingsSkinColour = "";
     public $globalSettingsSystemTitle = "";
+    public $globalSettingsTheme = "";
 
     function __construct() {
         parent::__construct();
@@ -67,6 +68,7 @@ class Admin extends CI_Controller {
         $this->globalSettingsSkinColour = $this->globalSettingsSMSDataArr[5]->description;
         $this->globalSettingsTextAlign = $this->globalSettingsSMSDataArr[4]->description;
         $this->globalSettingsActiveSmsService = $this->globalSettingsSMSDataArr[3]->description;
+//        $this->globalSettingsTheme = fetch_parl_key_rec($setting_records, 'theme');
 
         $this->globalSettingsActiveSms = $this->globalSettingsActiveSmsService; //$this->Setting_model->get_setting_record(array('type' => 'active_sms_service'), 'description');
 
@@ -75,8 +77,8 @@ class Admin extends CI_Controller {
         ));
     }
 
-    /*     * *default functin, redirects to login page if no admin logged in yet** */
-    
+    /***default functin, redirects to login page if no admin logged in yet** */
+
     function parent_add($param1 = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
@@ -1733,6 +1735,48 @@ class Admin extends CI_Controller {
         return $page_data;
     }
      /*Holiday Settings*/
+    function manage_vehicle_details($param1 = '', $param2 = '', $param3 = '') {
+    if ($this->session->userdata('admin_login') != 1)
+        redirect(base_url(), 'refresh');
+    $page_data = $this->get_page_data_var();
+    $this->load->model('Vehicle_details');
+    $page_data['details'] = $this->Vehicle_details->get_all_details();
+    $page_data['page_title'] = get_phrase('manage_vehicle_details');
+    $page_data['page_name'] = 'manage_vehicle_details';
+    $this->load->view('backend/index', $page_data);
+
+    if ($param1 == 'service') {
+        $data['status'] = "service";
+        $dataArr['vehicle_details_id'] = $param2;
+        $dataArr['date_of_service'] = date('Y-m-d H:i:s');
+        $dataArr['reason_for_service'] = $this->input->post('reason');
+        $dataArr['vendor_name'] = $this->input->post('vendor_name');
+        $dataArr['vendor_phone_no'] = $this->input->post('vendor_phone_no');
+        $dataArr['vendor_address'] = $this->input->post('vendor_address');
+        $this->load->model('vehicle_service_maintenance_model');
+        $this->load->model('vehicle_details');
+        $this->vehicle_service_maintenance_model->add($dataArr);
+        $this->vehicle_details->updatebyId($param2, $data);
+        $this->session->set_flashdata('flash_message', get_phrase('vehicle is_sent for_service_sucessfully'));
+        redirect(base_url() . 'index.php?admin/manage_vehicle_details/', 'refresh');
+    }
+    if ($param1 == "return_from_service") {
+        $data['status'] = "Return From Service";
+        $dataArr['return_date_from_service'] = date('Y-m-d H:i:s');
+        $dataArr['reason_for_service'] = $this->input->post('reason');
+        $dataArr['vendor_name'] = $this->input->post('vendor_name');
+        $dataArr['vendor_phone_no'] = $this->input->post('vendor_phone_no');
+        $dataArr['vendor_address'] = $this->input->post('vendor_address');
+        $dataArr['payment_type'] = $this->input->post('payment_type');
+        $dataArr['cost_for_service'] = $this->input->post('cost_for_service');
+        $this->load->model('vehicle_service_maintenance_model');
+        $this->load->model('vehicle_details');
+        $this->vehicle_service_maintenance_model->updatebyId($param2, $dataArr);
+        $this->vehicle_details->updatebyId($param3, $data);
+        $this->session->set_flashdata('flash_message', get_phrase('vehicle_return_from_service_sucessfully'));
+        redirect(base_url() . 'index.php?admin/manage_vehicle_details/', 'refresh');
+    }
+}
 }
 
 // --------------------------------------------------------------------------

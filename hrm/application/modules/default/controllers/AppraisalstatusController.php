@@ -110,7 +110,9 @@ class Default_AppraisalstatusController extends Zend_Controller_Action
 			$this->view->bunitdataarr = $bunitdataArr;
 			$flag = 2;   
         }
-        
+        $deptModel = new Default_Model_Departments();
+                $departmentsData = $deptModel->getDepartmentList('');
+		$this->view->deptdataarr = $departmentsData;	
         $this->view->msgarray = $msgarray; 
         $this->view->ermsg = $errorMsg;
         $this->view->flag = $flag;
@@ -127,7 +129,7 @@ class Default_AppraisalstatusController extends Zend_Controller_Action
     	if($completedmgrids)
     	$completedmgrids = array_unique(explode(',', $completedmgrids));
     	$department_id = $this->_request->getParam('deptid');
-    	$businessunit_id = $this->_request->getParam('bunitid');
+    	//$businessunit_id = $this->_request->getParam('bunitid');
     	$performanceappflag = $this->_request->getParam('perf_app_flag');
     	$app_status = $this->_request->getParam('app_status');	
         $appqsprivilegesModel = new Default_Model_Appraisalqsmain();
@@ -162,7 +164,7 @@ class Default_AppraisalstatusController extends Zend_Controller_Action
         	}
         }else
         {
-        		$checkActiveApp = $appInitModel->checkAppraisalExists($businessunit_id, $department_id);//,$performanceappflag
+        		$checkActiveApp = $appInitModel->checkAppraisalExists('', $department_id);//,$performanceappflag
         		if(count($checkActiveApp) > 0)
                 {
                 	$checkActiveApp = $checkActiveApp[0];
@@ -262,7 +264,7 @@ class Default_AppraisalstatusController extends Zend_Controller_Action
      	if($auth->hasIdentity())
         {
             $loginUserId = $auth->getStorage()->read()->id;
-            $businessunit_id = $auth->getStorage()->read()->businessunit_id;
+            //$businessunit_id = $auth->getStorage()->read()->businessunit_id;
             $department_id = $auth->getStorage()->read()->department_id; 
             $loginuserRole = $auth->getStorage()->read()->emprole;
             $loginuserGroup = $auth->getStorage()->read()->group_id;
@@ -327,7 +329,9 @@ class Default_AppraisalstatusController extends Zend_Controller_Action
 	        		$bunitdataArr = $bunitModel->getBusinessUnits($bustr);
         		}	
         	}
-										
+                $deptModel = new Default_Model_Departments();
+                $departmentsData = $deptModel->getDepartmentList('');
+		$this->view->deptdataarr = $departmentsData;								
 			$this->view->bunitdataarr = $bunitdataArr;
 			$flag = 2;   
         }
@@ -345,7 +349,7 @@ class Default_AppraisalstatusController extends Zend_Controller_Action
     	$flag = $this->_request->getParam('flag');
     	$appraisalid = $this->_request->getParam('appraisalid');
     	$department_id = $this->_request->getParam('deptid');
-    	$businessunit_id = $this->_request->getParam('bunitid');
+    	//$businessunit_id = $this->_request->getParam('bunitid');
     	$performanceappflag = $this->_request->getParam('perf_app_flag');	
     	$app_status = $this->_request->getParam('app_status');
         $appqsprivilegesModel = new Default_Model_Appraisalqsmain();

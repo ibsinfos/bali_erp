@@ -34,9 +34,9 @@
 </div>
 
 
-<?php if ($this->session->flashdata('flash_message_error')) { ?>        
+<?php if ($this->session->flashdata('flash_validation_error')) { ?>        
     <div class="alert alert-danger">
-        <?php echo $this->session->flashdata('flash_message_error'); ?>
+        <?php echo $this->session->flashdata('flash_validation_error'); ?>
     </div>
 <?php } ?>
 <div class="col-sm-12 white-box" data-step="6" data-intro="<?php echo get_phrase('Here you can view list of Bus Driver.');?>" data-position="top">
@@ -50,7 +50,7 @@
                 <th><div><?php echo get_phrase('gender'); ?></div></th>
                 <th><div><?php echo get_phrase('bus'); ?></div></th>
                 <th><div><?php echo get_phrase('route'); ?></div></th>
-                <th><div data-step="7" data-intro="<?php echo get_phrase('You can do edit or delete driver details  from here');?>" data-position='left'><?php echo get_phrase('options'); ?></div></th>
+                <th><div data-step="7" data-intro="<?php echo get_phrase('You can do edit or delete driver details  from here');?>" data-position='left'><?php echo get_phrase('action'); ?></div></th>
             </tr>
         </thead>
         <tbody>
@@ -96,7 +96,7 @@
 
             //Set column definition initialisation properties.
             "columnDefs": [
-                {"targets": [0, 7], "orderable": false},
+                {"targets": [0, 3, 7], "orderable": false},
             ],
 
         });

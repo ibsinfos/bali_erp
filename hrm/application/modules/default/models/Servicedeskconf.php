@@ -26,7 +26,19 @@ class Default_Model_Servicedeskconf extends Zend_Db_Table_Abstract
 	
 	public function getServiceDeskRequestData($sort, $by, $pageNo, $perPage,$searchQuery)
 	{
-		$where = "c.isactive=1 AND b.isactive=1";
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
+		$where = "c.isactive=1 AND c.school_id = '".$school_id."'";
 		if($searchQuery)
 			$where .= " AND ".$searchQuery;
 		$db = Zend_Db_Table::getDefaultAdapter();		
@@ -36,8 +48,8 @@ class Default_Model_Servicedeskconf extends Zend_Db_Table_Abstract
                            ->from(array('c'=>'main_sd_configurations'),array('c.*','service_desk_flag'=>'if (c.service_desk_flag=1,"Business Unit wise","Department Wise")','attachment'=>'if (c.attachment=1,"Yes","No")','request_for'=>'if(c.request_for=1,"Service","Asset")','category_name'=>'if(c.request_for=1,s.service_desk_name,ac.name)'))
                            ->joinLeft(array('s'=>'main_sd_depts'), 'c.service_desk_id = s.id', array('s.service_desk_name'))
                            ->joinLeft(array('ac'=>'assets_categories'), 'c.service_desk_id = ac.id and ac.is_active=1 and ac.parent=0', array('ac.name'))
-                           ->joinLeft(array('b'=>'main_businessunits'), 'c.businessunit_id = b.id', array('deptname'=>'ifnull(d.deptname,"No department")'))
-                           ->joinLeft(array('d'=>'main_departments'), 'c.department_id = d.id', array('b.unitname'))
+                          // ->joinLeft(array('b'=>'main_businessunits'), 'c.businessunit_id = b.id', array('deptname'=>'ifnull(d.deptname,"No department")'))
+                           ->joinLeft(array('d'=>'main_departments'), 'c.department_id = d.id', array('d.deptname'))
                            ->where($where)
     					   ->order("$by $sort") 
     					   ->limitPage($pageNo, $perPage);
@@ -70,7 +82,7 @@ class Default_Model_Servicedeskconf extends Zend_Db_Table_Abstract
 			
 		$objName = 'servicedeskconf';
 		
-		$tableFields = array('action'=>'Action','unitname'=>'Business Unit','deptname' => 'Department',
+		$tableFields = array('action'=>'Action','deptname' => 'Department',
                     'service_desk_flag'=>'Applicability','request_for'=>'Request For','category_name' => 'Category','attachment' => 'Attachment',
                     'description' => 'Description');
 		
@@ -112,7 +124,7 @@ class Default_Model_Servicedeskconf extends Zend_Db_Table_Abstract
 	
 	public function getServiceDeskConfbyID($id)
 	{
-	    $select = $this->select()
+	   $select = $this->select()
 						->setIntegrityCheck(false)
 						->from(array('sc'=>'main_sd_configurations'),array('sc.*'))
 					    ->where('sc.isactive = 1 AND sc.id='.$id.' ');
@@ -127,11 +139,23 @@ class Default_Model_Servicedeskconf extends Zend_Db_Table_Abstract
  */	
 	public function SaveorUpdateServiceConfData($data, $where)
 	{
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
 	    if($where != ''){
 			$this->update($data, $where);
 			return 'update';
 		} else {
-			
+			$data['school_id'] = $school_id;
 			$this->insert($data);
 			$id=$this->getAdapter()->lastInsertId('main_sd_configurations');
 			return $id;
@@ -142,7 +166,19 @@ class Default_Model_Servicedeskconf extends Zend_Db_Table_Abstract
 	
 	public function getActiveServiceDepartments($bunitid,$deptid='',$reqfor)
 	{
-		$where = 'sc.isactive=1';
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
+		$where = "sc.isactive=1 AND sc.school_id = '".$school_id."'";
 		if($bunitid != '' && $bunitid !='null' )
 			$where .= ' AND sc.businessunit_id = '.$bunitid.'';
 		if($deptid !='' && $deptid !='null')
@@ -174,11 +210,22 @@ INNER JOIN main_sd_configurations msc where sdr.isactive = 1 and sd.isactive =1 
 	}
 public function getnotconfiguredActiveServiceDepartments($bunitid,$deptid='')
 	{
-		
-		$where = 'sc.isactive=1 and sc.request_for=1';		
+		$auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
+		$where = "sc.isactive=1 and sc.request_for=1 and sc.school_id='".$school_id."'";		
 		$service_desk_flag = ' AND service_desk_flag = 1';		
-		if($bunitid != '' && $bunitid !='null')
-			$where .= '  AND sc.businessunit_id = '.$bunitid.'';
+//		if($bunitid != '' && $bunitid !='null')
+//			$where .= '  AND sc.businessunit_id = '.$bunitid.'';
 		if($deptid !='' && $deptid !='null')
 		{
 			$service_desk_flag = ' AND service_desk_flag = 0';
@@ -220,8 +267,19 @@ public function getnotconfiguredActiveServiceDepartments($bunitid,$deptid='')
 	
 	public function checkuniqueServiceConfData($bunitid,$sdflag,$sdid,$deptid='',$request_for='')
 	{
-		
-		$where = 'sc.isactive=1 AND sc.businessunit_id ='.$bunitid.' AND sc.service_desk_flag ='.$sdflag.' AND sc.service_desk_id IN ('.$sdid.')';
+		$auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
+		$where = 'sc.isactive=1 AND sc.service_desk_flag ='.$sdflag.' AND sc.service_desk_id IN ('.$sdid.') AND sc.school_id = '.$school_id;
 		if($deptid !='' && $deptid !='null')
 			$where .= ' AND sc.department_id = '.$deptid.'';
 		if($request_for !='' && $request_for !='null')
@@ -242,7 +300,7 @@ public function getnotconfiguredActiveServiceDepartments($bunitid,$deptid='')
 	public function getPendingServiceReqData($bunitid)
 	{
 		
-		$where = 'sc.isactive=1 AND sc.businessunit_id ='.$bunitid.' and sr.isactive=1 ';
+		$where = 'sc.isactive=1 and sr.isactive=1 ';
 			
 	   	$db = Zend_Db_Table::getDefaultAdapter();
 		$qry = "select count(*) as count from main_sd_configurations sc
@@ -261,7 +319,19 @@ public function getnotconfiguredActiveServiceDepartments($bunitid,$deptid='')
 	 */
 	public function getServiceReqDeptCount($id,$flag='')
 	{
-		$where = 'sr.isactive=1'; 
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
+		$where = 'sr.isactive=1 and sr.school_id='.$school_id; 
 		if($flag !='')
 		{
 			if($flag==1)
@@ -279,11 +349,23 @@ public function getnotconfiguredActiveServiceDepartments($bunitid,$deptid='')
 	
 	public function getActiveCategoriesData()
 	{
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
 		$userdata=	$this->select()
 		->setIntegrityCheck(false)
 		->from(array('c'=>'assets_categories'),array('c.*'))
 		->order('c.id')
-		->where('c.is_active =1 and c.parent=0 ');
+		->where('c.is_active =1 and c.parent=0 and c.school_id='.$school_id);
 		return $this->fetchAll($userdata)->toArray();
 	
 	}
@@ -298,7 +380,19 @@ public function getnotconfiguredActiveServiceDepartments($bunitid,$deptid='')
 	}
 public function getConfigIdForAssetCategory($service_request_id,$login_bu='')
 	{
-		$where = "c.isactive = 1 AND c.request_for= 2";
+    $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserId = $auth->getStorage()->read()->id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                try {
+                    $school_id = $auth->getStorage()->read()->school_id;
+                }
+                catch(Exception $e){
+                }
+            }
+		$where = "c.isactive = 1 AND c.request_for= 2 AND c.school_id=".$school_id;
 		if($login_bu!='') {
 			$where.= " and c.businessunit_id=$login_bu";
 		}

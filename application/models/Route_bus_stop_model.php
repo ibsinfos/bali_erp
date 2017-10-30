@@ -36,6 +36,18 @@ class Route_bus_stop_model extends CI_Model {
             $sql = "SELECT bs.*,t.route_name FROM route_bus_stop bs join transport t on(bs.route_id=t.transport_id) order by bs.route_bus_stop_id desc";
         }
         $rs = $this->db->query($sql)->result_array();
+        foreach($rs as $key=>$row)
+        {
+            $route_id = $row['route_id'];
+            $query = "SELECT COUNT(*) as transaction FROM student_bus_allocation WHERE route_id = $route_id";
+            $rs1 = $this->db->query($query)->result_array();
+            if($rs1)
+            {
+                $rs[$key]['transaction'] = $rs1[0]['transaction'];
+            }    
+            
+        }    
+        
         return $rs;
     }
 

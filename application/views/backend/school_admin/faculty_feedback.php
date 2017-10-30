@@ -34,7 +34,7 @@
     </div>
 
     <div class="panel-wrapper collapse in" aria-expanded="true">
-        <div class="panel-body"><p>Please feel free to share your valuable feedback about the faculties. We are happy to hear from you.</p></div>
+        <div class="panel-body"><p>Please feel free in sharing your valuable feedback with us! We feel happy hearing from you.</p></div>
     </div>
 </div>
 
@@ -42,10 +42,9 @@
     <?php echo form_open(base_url() . 'index.php?school_admin/faculty_feedback/create/', array('class' => 'form-horizontal', 'id' => 'faculty_feedback', 'method' => 'POST')); ?>
     <div class="col-md-12">
         <div class="white-box" data-step="6" data-intro="Here you just fill information" data-position='top'>
-            <div class ="row m-0">
+            <div class = "row m-0">
                 <div class="col-sm-6 form-group">
                     <label for="teacher_id" class="control-label"><?php echo get_phrase('select_teacher'); ?>:<span class="error" style="color: red;"> *</span></label>
-
                     <select data-style="form-control" data-live-search="true" class="selectpicker" name="teacher_id" id="teacher">
                         <option value=" "><?php echo get_phrase('select_teacher'); ?></option>
                         <?php foreach ($teacher_list as $list): ?>

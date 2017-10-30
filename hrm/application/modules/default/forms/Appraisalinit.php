@@ -42,14 +42,14 @@ class Default_Form_Appraisalinit extends Zend_Form
         if($loginuserRole != SUPERADMINROLE && $loginuserGroup != MANAGEMENT_GROUP  && $loginuserGroup != HR_GROUP)
         {
             
-            $businessunit_id = new Zend_Form_Element_Hidden('businessunit_id');
+           // $businessunit_id = new Zend_Form_Element_Hidden('businessunit_id');
             $department_id = new Zend_Form_Element_Hidden('department_id');
 
-            $businessunit_name = new Zend_Form_Element_Text('businessunit_name');
-            $businessunit_name->setLabel("Business Unit");
-            $businessunit_name->setAttrib('readonly', 'true');
-            $businessunit_name->setAttrib('onfocus', 'this.blur()');
-            $businessunit_name->setOptions(array('class' => 'brdr_none'));
+//            $businessunit_name = new Zend_Form_Element_Text('businessunit_name');
+//            $businessunit_name->setLabel("Business Unit");
+//            $businessunit_name->setAttrib('readonly', 'true');
+//            $businessunit_name->setAttrib('onfocus', 'this.blur()');
+//            $businessunit_name->setOptions(array('class' => 'brdr_none'));
 
             $department_name = new Zend_Form_Element_Text('department_name');
             $department_name->setLabel("Department");
@@ -60,11 +60,11 @@ class Default_Form_Appraisalinit extends Zend_Form
         }
         else
         {
-            $businessunit_id = new Zend_Form_Element_Select('businessunit_id');
-            $businessunit_id->setLabel("Business Unit");                        
-            $businessunit_id->setRegisterInArrayValidator(false);
-            $businessunit_id->setRequired(true);
-            $businessunit_id->addValidator('NotEmpty', false, array('messages' => 'Please select business unit'));
+//            $businessunit_id = new Zend_Form_Element_Select('businessunit_id');
+//            $businessunit_id->setLabel("Business Unit");                        
+//            $businessunit_id->setRegisterInArrayValidator(false);
+//            $businessunit_id->setRequired(true);
+//            $businessunit_id->addValidator('NotEmpty', false, array('messages' => 'Please select business unit'));
             
             $department_id = new Zend_Form_Element_Select('department_id');
             $department_id->setLabel("Department");                        
@@ -222,12 +222,12 @@ class Default_Form_Appraisalinit extends Zend_Form
         
         if($loginuserRole != SUPERADMINROLE && $loginuserGroup != MANAGEMENT_GROUP && $loginuserGroup != HR_GROUP)
         {                    
-            $this->addElements(array($appraisal_ratings,$management_appraisal,$id,$appraisal_period,$from_year,$to_year,$businessunit_id,$department_id,$businessunit_name,$department_name,
+            $this->addElements(array($appraisal_ratings,$management_appraisal,$id,$appraisal_period,$from_year,$to_year,$department_id,$businessunit_name,$department_name,
                                     $appraisal_mode,$category_id,$status,$eligibility,$eligibility_hidden,$eligibility_value,$eligibilityflag,$enable,$mgr_due_date,$emp_due_date,$app_period_hid,$submit));
         }
         else
         {   
-            $this->addElements(array($appraisal_ratings,$management_appraisal,$id,$appraisal_period,$from_year,$to_year,$businessunit_id,$department_id,
+            $this->addElements(array($appraisal_ratings,$management_appraisal,$id,$appraisal_period,$from_year,$to_year,$department_id,
                                     $appraisal_mode,$category_id,$status,$eligibility,$eligibility_hidden,$eligibility_value,$eligibilityflag,$enable,$mgr_due_date,$emp_due_date,$app_period_hid,$submit));
         }
         $this->setElementDecorators(array('ViewHelper'));

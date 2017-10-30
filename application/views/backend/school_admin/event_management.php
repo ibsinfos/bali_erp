@@ -143,7 +143,7 @@ $csrf = new CSRF_Protect(); ?>
         <div class="modal fade none-border" id="add-event">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form role="form">
+                    <form role="form" class="form-material">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         <h4 class="modal-title"><strong>Add event </strong> </h4>

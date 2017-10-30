@@ -43,7 +43,7 @@
                     <h3 class="col-md-12 m-t-0 box-title"><?php echo $view_blogs[$i]['blog_title']; ?></h3>
                 </div>
 
-                <div class="row well p-l-0 p-r-0 blog_box" data-step="5" data-intro="<?php echo get_phrase('View blog content');?>" data-position='top'>
+                <div class="row well p-l-0 p-r-0 blog_box" data-step="5" data-intro="<?php echo get_phrase('View_blog_content');?>" data-position='top'>
                     <div class="col-md-12">
                         <div class="pull-left col-md-1">
                             <img src="uploads/user.jpg" class="img-circle" width="60" height="60" alt="user profile image">

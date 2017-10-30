@@ -23,10 +23,7 @@
                     <a href="#section-flip-1" class="sticon fa fa-list "data-step="5" data-intro="Here you can see class list." data-position='right'><span>
                     <?php echo get_phrase('form_list'); ?></span></a>
                 </li>
-                <li id="section2">
-                    <a href="#section-flip-2" class="sticon fa fa-plus" data-step="6" data-intro="From here you can add a class." data-position='left'><span>
-                    <?php echo get_phrase('add_form'); ?></span></a>
-                </li>
+             
             </ul>
         </nav>                                    
         <div class="content-wrap">

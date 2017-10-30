@@ -30,7 +30,7 @@ if($this->session->flashdata('flash_message_error')) {?>
 
 <div class="row">
     <div class="col-md-12">
-        <div class="white-box" data-step="5" data-intro="You can add a new incident from here." data-position='top'>
+        <div class="white-box" data-step="5" data-intro="You can create a new incident from here." data-position='top'>
             <?php echo form_open(base_url() . 'index.php?disciplinary/add_incident/create', array('class' => 'validate', 'target' => '_top')); ?> 
             <div class="row">
                 <div class="col-md-6 form-group">
@@ -53,7 +53,7 @@ if($this->session->flashdata('flash_message_error')) {?>
                         <?php echo get_phrase('class'); ?><span class="error mandatory"> *</span>
                     </label>
                     <select name="class_id" id="class_id" data-style="form-control" data-live-search="true" class="selectpicker"
-                            required="required" data-validate="required" data-message-required ="Please select a class">
+                            required="required" data-validate="required" data-message-required ="Please select a class" onchange="return onclasschange(this);">
                         <option value=""><?php echo get_phrase('select_class'); ?></option>
                         <?php
                         foreach ($classes as $row):
@@ -67,7 +67,7 @@ if($this->session->flashdata('flash_message_error')) {?>
                     <label for="field-1">
                         <?php echo get_phrase('section'); ?><span class="error mandatory"> *</span>
                     </label>
-                    <select name="section" data-style="form-control" data-live-search="true" class="selectpicker" id="section"  required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_section'); ?>">
+                    <select name="section" data-style="form-control" data-live-search="true" class="selectpicker" id="section_holder"  required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_section'); ?>" onchange="return onsectionchange(this);">
                         <option value=""><?php echo get_phrase('select_section'); ?></option>
                     </select> 
                 </div>
@@ -75,7 +75,7 @@ if($this->session->flashdata('flash_message_error')) {?>
                     <label for="field-1"> <?php echo get_phrase('student'); ?><span class="error mandatory"> *</span>
                     </label>
                     <select name="student_id" data-style="form-control" data-live-search="true" class="selectpicker" id="student_selection_holder"
-                            required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_name'); ?>" onchange="get_student_dormatory(this.value)">
+                            required="required" data-validate="required" data-message-required ="<?php echo get_phrase('please_select_name'); ?>" >
                         <option value=""><?php echo get_phrase('select_class_and_section_first'); ?></option>
                     </select>
                 </div>
@@ -88,16 +88,15 @@ if($this->session->flashdata('flash_message_error')) {?>
                     <label for="field-1"><?php echo get_phrase("parent_statement"); ?><span class="mandatory"> *</span></label>
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-sliders"></i></div>                  
-                        <input type="text" class="form-control" id="parent_statement" required="required" name="parent_statement" value="<?php echo set_value('parent_statement') ?>" placeholder="Parent Statement" data-validate="required" data-message-required ="<?php echo get_phrase('plesae_enter_the_parent_statement'); ?>">
+                        <input type="text" class="form-control" id="parent_statement" name="parent_statement" value="<?php echo set_value('parent_statement') ?>" placeholder="Parent Statement" data-validate="required" data-message-required ="<?php echo get_phrase('plesae_enter_the_parent_statement'); ?>">
                         <span class="mandantory"> <?php echo form_error('parent_statement'); ?></span>
                     </div> 
                 </div>
                 <div class="col-md-6 form-group">
-                    <label for="field-1"><?php echo get_phrase("verdict"); ?><span class="mandatory"> *</span></label>
+                    <label for="field-1"><?php echo get_phrase("verdict"); ?></label>
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-sliders"></i></div>                  
-                        <input type="text" class="form-control" id="verdict" required="required" name="verdict" value="<?php echo set_value('verdict') ?>" placeholder="Verdict" data-validate="required" data-message-required ="<?php echo get_phrase('plesae_enter_the_verdict'); ?>">
-                        <span class="mandantory"> <?php echo form_error('verdict'); ?></span>
+                        <input type="text" class="form-control" id="verdict" name="verdict" value="<?php echo set_value('verdict') ?>" placeholder="Verdict">
                     </div> 
                 </div>
                 <div class="col-md-6 form-group">
@@ -110,7 +109,7 @@ if($this->session->flashdata('flash_message_error')) {?>
                         <?php
                         foreach ($teachers as $row):
                             ?>
-                            <option value="<?php echo $row['teacher_id']; ?>"><?php echo $row['name']; ?></option>
+                            <option value="<?php echo $row['teacher_id']; ?>"><?php echo $row['name']." ".$row['last_name']; ?></option>
                         <?php endforeach; ?>
 
                     </select> 
@@ -137,42 +136,44 @@ if($this->session->flashdata('flash_message_error')) {?>
                         <input id= "expiry_date" type="text" class="form-control mydatepicker"  name="expiry_date" placeholder="Pick a date" required="required" data-validate="required" data-message-required ="Please pick a date">
                     </div> 
                 </div>
-                <div class="col-md-6 form-group text-right">
-                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Submit" data-step="6" data-intro="You can submit from here." data-position='left'/>
+                <div class="col-md-12 form-group text-center">
+                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Create Incident" data-step="6" data-intro="You can create incident from here." data-position='left'/>
             </div>
-            </div>
-              
+            </div>              
             <?php echo form_close(); ?>
         </div>
     </div>
 </div>
-<script>
-    $('#section').change(get_class_students);
-    function get_class_students() {
-        var section_id = $(this).val();
-        var class_id = $("#class_id option:selected").val();
-
-        $.ajax({
-            url: '<?php echo base_url(); ?>index.php?school_admin/get_students/' + class_id + '/' + section_id,
+<script type="text/javascript">
+   
+    function onclasschange(class_id)
+{
+    jQuery('#section_holder').html('<option value="">Select Section</option>');
+    $.ajax({
+            url: '<?php echo base_url();?>index.php?teacher/get_teacher_section/' + class_id.value,
             success: function (response)
             {
-                jQuery('#student_selection_holder').html(response).selectpicker('refresh');
+                jQuery('#section_holder').append(response).selectpicker('refresh');
             }
         });
-    }
-    $('#class_id').change(select_section);
-    function select_section() {
-        var class_id = $(this).val();
-        $.ajax({
-            url: '<?php echo base_url(); ?>index.php?school_admin/get_class_section/' + class_id,
-            success: function (response)
-            {
+           $('#section_holder').trigger("chosen:updated");           
+}
 
-                jQuery('#section').html(response).selectpicker('refresh');
+function onsectionchange(section_id)
+    {        
+        var class_id = $('#class_id').val();
+        $.ajax({
+            url: '<?php echo base_url(); ?>/index.php?teacher/get_teacher_student/' + section_id.value + '/' + class_id,
+            success: function (response)
+            { 
+                jQuery('#student_selection_holder').append(response).selectpicker('refresh');
             }
         });
+//        $('#student_selection_holder').trigger("chosen:updated");
     }
-    
+</script>
+
+    <script type="text/javascript">
     $(document).ready(function () {
         $("#parent_statement_display").hide();
 	$("#parent_appeal_yes").click(function () {
@@ -182,4 +183,4 @@ if($this->session->flashdata('flash_message_error')) {?>
 		$("#parent_statement_display").hide();
 	});
     });
-</script>
+    </script>

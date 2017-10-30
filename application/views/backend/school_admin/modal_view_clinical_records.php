@@ -7,7 +7,7 @@
                 $student_image  =   '';
             }
         ?>
-        <div class="col-xs-3"><a href="#" class="profile-picture"><img src="<?php echo ($student_image != "" ? 'uploads/student_image/' . $student_image : 'uploads/user.jpg') ?>" class="img-responsive" /></a></div>
+        <div class="col-xs-3"><a href="#" class="profile-picture"><img src="<?php echo ($student_image != "" ? 'uploads/student_image/' . $student_image : 'uploads/user.png') ?>" class="img-responsive" /></a></div>
 
         <div class="col-sm-9"><ul class="profile-info-sections list-unstyled"><li style="padding:0px; margin:0px;"><div class="profile-name"><h3><?php echo $student_details->name . " " . $student_details->lname; ?></h3><p class="student-info"><?php echo get_phrase('Class') . ' : ' . $student_details->class_name . '<br>';
     echo get_phrase('Section') . ' : ' . $student_details->section_name; ?><br>
@@ -92,4 +92,8 @@ $('#example').DataTable({
             'copy', 'excel', 'pdf', 'print'
         ]
     });
+    
+     $('#modal_ajax').on('shown.bs.modal', function (e) {
+  $('#modal_ajax #myModalLabel').html('<?php echo $page_title; ?>');
+})
 </script>

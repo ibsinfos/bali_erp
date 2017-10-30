@@ -40,7 +40,7 @@ class Default_Form_Servicerequest extends Zend_Form
         $request_for->setAttrib('onchange', 'displayassets(this)');
         $request_for->addMultiOptions(array(
         		'1' => 'Service',
-        		'2' => 'Asset',
+        		//'2' => 'Asset',
         
         ));
     

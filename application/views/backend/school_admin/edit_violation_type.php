@@ -5,7 +5,7 @@
         
         <div class="form-group">
             <div class="col-md-12 m-b-20">
-                <label><?php echo get_phrase("type"); ?></label><span class="mandatory"> *</span>
+                <label><?php echo get_phrase("violation_type"); ?></label><span class="mandatory"> *</span>
                 <input type="text" class="form-control" name="type" value="<?php echo $row['type']?>" required="required">
                 <label class="mandatory"> <?php echo form_error('type'); ?></label>
             </div>
@@ -16,7 +16,7 @@
             </div>
 
             <div class="col-md-12 text-right">
-                <button type="submit" class="fcbtn btn btn-danger btn-outline"><?php echo get_phrase('submit'); ?></button>
+                <button type="submit" class="fcbtn btn btn-danger btn-outline"><?php echo get_phrase('update'); ?></button>
             </div>
         </div> 
         

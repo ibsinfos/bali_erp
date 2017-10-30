@@ -16,50 +16,35 @@
     <!-- /.breadcrumb -->
 </div>
 <div class="row">
-    <div class="col-xs-2 pull-right visible-xs add-stu-btn">
-        <a href="<?php echo base_url(); ?>index.php?school_admin/add_question_online" class="btn btn-primary pull-right">
-            <i class="entypo-plus-circled"></i>
-            <?php echo get_phrase('add_new_question'); ?>
-        </a>
-    </div>
+    <div class="col-md-10 form-group">
+        <div class="form-group col-sm-6 p-0"  data-step="5" data-intro="<?php echo get_phrase('You_can_see_subject_wise_question_list_here.'); ?>" data-position='right'>
 
-    <div class="col-md-10 no-padding">
-        <div class="col-sm-6 p-b-20" data-step="5" data-intro="You can see subject wise question list here." data-position='right'>
-            <label class="control-label">Select Subject</label>
-            <select  class="selectpicker" data-style="form-control" data-live-search="true" onchange="window.location = this.options[this.selectedIndex].value">
-                <option value="">Select Subject</option>
+        <label class="control-label"><?php echo get_phrase('select_subject'); ?></label>            
+        <select  class="selectpicker" data-style="form-control" data-live-search="true" onchange="window.location = this.options[this.selectedIndex].value">
+                <option value=""> Select Subject </option>
                 <?php
                 foreach ($subject as $row):
                     ?>
-                    <option <?php
-                    if ($subject_id == $row['subject_id']) {
-                        echo 'selected';
-                    }
-                    ?> value="<?php echo base_url(); ?>index.php?school_admin/add_subject_online_exam/<?php echo $row['class_id']; ?>/<?php echo $exam_id ?>/<?php echo $row['subject_id']; ?>">
-                            <?php echo $row['name']; ?>
+                    <option <?php if ($subject_id == $row['subject_id']) { echo 'selected'; } ?> value="<?php echo base_url(); ?>index.php?school_admin/add_subject_online_exam/<?php echo $row['class_id']; ?>/<?php echo $exam_id ?>/<?php echo $row['subject_id']; ?>"><?php echo $row['name']; ?>
                     </option>
                 <?php endforeach; ?>
-            </select>
+        </select>
+    </div>
         </div>
-    </div>
-    <div class="col-md-2">
-        <input type="hidden" name="exam_id" value="<?php echo $exam_id; ?>">
-        <a href="<?php echo base_url(); ?>index.php?school_admin/add_question_online/<?php echo $row['class_id']; ?>/<?php echo $exam_id; ?>" class="btn btn-primary pull-right btn_float_center" data-step="6" data-intro="You can add question for selected exam from here." data-position='left'>
-            <i class="entypo-plus-circled"></i>
-            <?php echo get_phrase('add_new_question'); ?>
-        </a>
-
-    </div>
+  <div class="col-md-2 hidden-xs">
+    <a href="<?php echo base_url(); ?>index.php?school_admin/add_question_online/<?php echo $class_id; ?>" class="btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-toggle="tooltip" data-placement="left" title="" data-original-title="Add New Question" data-step="6" data-intro="<?php echo get_phrase('From_here_you_can_add_new_question_in_a_subject.');?>" data-position='left'>
+    <i class="fa fa-plus"></i>
+    </a>
+  </div>
 </div>
-
-<?php if ($subject_id != ''): ?>
+<input type="hidden" name="exam_id" value="<?php echo $exam_id; ?>">
     <div class="col-md-12 white-box" >
 
         <!--            <div class="tab-content">-->
-        <table  class="table display" id="example23">
+        <table class = "custom_table table display" cellspacing="0" width="100%" id="example23">
             <thead>
                 <tr>
-                    <th><div><?php echo get_phrase('no'); ?></div></th>                        
+                    <th><div><?php echo get_phrase('s._no.'); ?></div></th>                        
                     <th><div><?php echo get_phrase('question'); ?></div></th>                            
                     <th><div><?php echo get_phrase("class"); ?></div></th>
                     <th><div><?php echo get_phrase("expalnation"); ?></div></th>
@@ -69,6 +54,7 @@
             </thead>
             <tbody>
                 <?php
+                if ($subject_id != ''): 
                 $count = 1;
                 foreach ($question as $row):
                     ?>
@@ -91,13 +77,14 @@
                 </td>
 
                 </tr>
-            <?php endforeach; ?>
+            <?php endforeach; 
+endif;
+            ?>
 
             </tbody>
         </table>
 
     </div>
-<?php endif; ?>
 
 <!--    </div>-->
 

@@ -66,20 +66,20 @@ class Default_Form_Disciplinaryincident extends Zend_Form
                 $employee_id->setAttrib('onfocus', 'this.blur()');
                 $employee_id->addValidator('NotEmpty', false, array('messages' => 'Employee Id can\'t be empty.'));        
 
-                $businessunit_name = new Zend_Form_Element_Select("employee_bu_id"); 
-                $businessunit_name->setAttrib('onchange', 'displayEmployeeDepartments(this,"employee_dept_id","")');
-                $businessunit_name->setLabel("Business Unit");
-                $businessunit_name->setAttrib('name', 'employee_bu_id');
-                $businessunit_name->setAttrib('id', 'employee_bu_id');
-                $businessunit_name->setRequired(true);
-                $businessunit_name->addValidator('NotEmpty', false, array('messages' => 'Please Select Business Unit.'));
-                $bunitModel = new Default_Model_Businessunits();
-                $bunitdata = $bunitModel->fetchAll('isactive=1 AND school_id = '.$school_id,'unitname');
-                $businessunit_name->addMultiOption('','Select Business Unit');
-                $businessunit_name->addMultiOption('0','No Business Unit');
-                foreach ($bunitdata->toArray() as $data){
-                        $businessunit_name->addMultiOption($data['id'],$data['unitname']);
-                }
+//                $businessunit_name = new Zend_Form_Element_Select("employee_bu_id"); 
+//                $businessunit_name->setAttrib('onchange', 'displayEmployeeDepartments(this,"employee_dept_id","")');
+//                $businessunit_name->setLabel("Business Unit");
+//                $businessunit_name->setAttrib('name', 'employee_bu_id');
+//                $businessunit_name->setAttrib('id', 'employee_bu_id');
+//                $businessunit_name->setRequired(true);
+//                $businessunit_name->addValidator('NotEmpty', false, array('messages' => 'Please Select Business Unit.'));
+//                $bunitModel = new Default_Model_Businessunits();
+//                $bunitdata = $bunitModel->fetchAll('isactive=1 AND school_id = '.$school_id,'unitname');
+//                $businessunit_name->addMultiOption('','Select Business Unit');
+//                $businessunit_name->addMultiOption('0','No Business Unit');
+//                foreach ($bunitdata->toArray() as $data){
+//                        $businessunit_name->addMultiOption($data['id'],$data['unitname']);
+//                }
 
                 $department_name = new Zend_Form_Element_Select("employee_dept_id");        
                 $department_name->setLabel("Department");
@@ -238,7 +238,7 @@ class Default_Form_Disciplinaryincident extends Zend_Form
 
                 if(defined('sentrifugo_gilbert'))
                 {
-                        $this->addElements(array($id,$incident_raised_by,$employee_name,$employee_id,$businessunit_name, $department_name,$job_title,$reporting_manager,$date_of_occurrence,$type_of_violation,$violation_description,$employee_appeal,$employee_statement,$verdict,$corrective_action,$corrective_action_other,$submit));
+                        $this->addElements(array($id,$incident_raised_by,$employee_name,$employee_id,$department_name,$job_title,$reporting_manager,$date_of_occurrence,$type_of_violation,$violation_description,$employee_appeal,$employee_statement,$verdict,$corrective_action,$corrective_action_other,$submit));
 
                         $this->setElementDecorators(array('ViewHelper')); 
                         $this->setElementDecorators(array(
@@ -247,7 +247,7 @@ class Default_Form_Disciplinaryincident extends Zend_Form
                 }
                 else
                 {
-                        $this->addElements(array($id,$incident_raised_by,$employee_name,$employee_id,$businessunit_name, $department_name,$job_title,$reporting_manager,$date_of_occurrence,$type_of_violation,$violation_description,$employee_appeal,$employee_statement,$verdict,$corrective_action,$corrective_action_other,$expiry_date,$submit));
+                        $this->addElements(array($id,$incident_raised_by,$employee_name,$employee_id, $department_name,$job_title,$reporting_manager,$date_of_occurrence,$type_of_violation,$violation_description,$employee_appeal,$employee_statement,$verdict,$corrective_action,$corrective_action_other,$expiry_date,$submit));
 
                         $this->setElementDecorators(array('ViewHelper')); 
                         $this->setElementDecorators(array('UiWidgetElement',),array('date_of_occurrence','violation_expiry')); 		

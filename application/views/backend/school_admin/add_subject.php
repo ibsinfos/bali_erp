@@ -17,7 +17,7 @@
     <!-- /.breadcrumb -->
 </div>            
 
-<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('To fill the details, you can add a new subject from here.');?>" data-position='top'>
+<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('To_fill_the_details,_you_can_add_a_new_subject_from_here.');?>" data-position='top'>
     <?php echo form_open(base_url() . 'index.php?school_admin/subject/create', array('class' => ' form-groups-bordered validate', 'target' => '_top')); ?>
     <div class="row">          
         <div class="col-xs-12 col-md-6 form-group">

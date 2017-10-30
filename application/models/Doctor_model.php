@@ -66,6 +66,6 @@ class Doctor_model extends CI_Model {
     function update_status($dataArray, $condition){
         $this->db->where($condition);
         $this->db->update($this->_table, $dataArray);
-        echo $this->db->last_query(); die;
+//        echo $this->db->last_query(); die;
     }
 }

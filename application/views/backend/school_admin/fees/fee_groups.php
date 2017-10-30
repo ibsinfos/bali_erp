@@ -91,7 +91,7 @@
                     'target' => '_top','id'=>'add-form')); ?>
                     <div class="row">
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                            <label for="running_session"><strong><?php echo get_phrase("current_session");?></strong></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                                 <input type="text" class="form-control" name="name" value="<?php echo $running_year?>" readonly/> 
@@ -102,7 +102,7 @@
 
                     <div class="row">          
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="field-1"><?php echo get_phrase('group_name');?><span class="error mandatory">*</span></label>
+                            <label for="field-1"><strong><?php echo get_phrase('group_name');?></strong><span class="error mandatory">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-road"></i></div>
                                 <input type="text" class="form-control" name="name" value="<?php echo set_value('name')?>" data-validate="required" 
@@ -165,7 +165,7 @@
 
                     <div class="row">          
                         <div class="col-xs-12 col-md-offset-3 col-md-6">
-                            <label for="field-1"><?php echo get_phrase('description'); ?></label>
+                            <label for="field-1"><strong><?php echo get_phrase('description');?></strong></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-book"></i></div>
                                 <input type="text" class="form-control" name="description" value="<?php echo set_value('description')?>"/>

@@ -151,4 +151,18 @@ class Fee_fi_model extends CI_Model {
 
         return $rs;
     }
+    
+    function get_due_fees_month_wise($month='',$running_year=''){
+        
+    }
+    
+    function get_collection_by_month($month='',$running_year=''){
+        $month = $month?$month:date('m');
+        $school_id = $this->session->userdata('school_id');
+        $where = array('fpt.school_id'=>$school_id, 'MONTH(pay_date)'=>$month, 'running_year'=>$running_year);
+        $this->db->select('SUM(paid_amount) as total_collection');
+        $this->db->from('fee_pay_transactions fpt');
+        $this->db->where($where);
+        return $this->db->get()->result_array();
+    }
 }

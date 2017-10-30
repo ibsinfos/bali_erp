@@ -31,7 +31,7 @@ class sapp_Mail
 	
 	public static function _email($options = array()) {
 		
-		$options['fromEmail'] = (!empty($options['fromEmail']))?$options['fromEmail']:SUPERADMIN_EMAIL;
+		$options['fromEmail'] = (!empty($options['fromEmail']))?$options['fromEmail']:FROM_EMAIL;
 		$options['fromName'] = (!empty($options['fromName']))?$options['fromName']:DONOTREPLYNAME;
 		
 		$orglogo = '';
@@ -49,7 +49,7 @@ class sapp_Mail
 		
 		$header="";
 		$footer="";
-        $smtpServer = "";
+                $smtpServer = "";
 		$config = array();
 
 		if(!empty($options['server_name']) && !empty($options['auth']) && !empty($options['port']) )
@@ -111,7 +111,7 @@ class sapp_Mail
 		return self::send_php_mail($config, $smtpServer, $imgsource, $options);
 }	
 
-public static function _checkMail($options = array()) {
+    public static function _checkMail($options = array()) {
 		
 		$options['fromEmail'] = (!empty($options['fromEmail']))?$options['fromEmail']:SUPERADMIN_EMAIL;
 		$options['fromName'] = (!empty($options['fromName']))?$options['fromName']:DONOTREPLYNAME;

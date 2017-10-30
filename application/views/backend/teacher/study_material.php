@@ -8,7 +8,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?teacher/dashboard"><?php echo get_phrase('dashboard'); ?></a></li>
 
-<?php $BRC = get_bread_crumb(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
+<?php $BRC = get_bread_crumb_old(); if (strpos($BRC, '^') !== false) { $ExpBrd = explode('^', $BRC);?>
             <li>
                 <?php echo get_phrase(@$ExpBrd[0]); ?>
                 <?php echo @$ExpBrd[1]; ?>
@@ -57,7 +57,7 @@
                 <th><div><?php echo get_phrase('No');?></div></th>           
                 <th><div><?php echo get_phrase('title');?></div></th>
                 <th><div><?php echo get_phrase('class');?></div></th>
-                <th><div><?php echo get_phrase('file_name');?></div></th>
+                <th><div><?php echo get_phrase('uploaded_by');?></div></th>
                 <th><div><?php echo get_phrase('description');?></div></th> 
                  <th><div><?php echo get_phrase('added_on');?></div></th> 
                 <th data-step="7" data-intro="<?php echo get_phrase('Here you will get options like edit, delete, download.');?>" data-position='top'><div><?php echo get_phrase('options');?></div></th>
@@ -71,7 +71,7 @@
                     <td><?php echo $count++; ?></td>               
                     <td><?php echo $row['title']?></td>
                     <td><?php echo $row['classname']?></td>
-                    <td><?php echo $row['file_name']?></td>
+                    <td><?php echo $row['uploader_type']=='SA' ? 'School Admin':'Teacher'; ?></td>
                     <td><?php echo $row['description']?></td> 
                     <td><?php echo date('d,M Y', strtotime($row['timestamp'])); ?></td>
                     <td>

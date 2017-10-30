@@ -5,7 +5,17 @@
 
     class Modal extends CI_Controller
     {
-
+        public $globalSettingsSMSDataArr = array();
+        public $globalSettingsLocation = "";
+        public $globalSettingsAppPackageName = "";
+        public $globalSettingsRunningYear = "";
+        public $globalSettingsSystemName = "";
+        public $globalSettingsSystemEamil = "";
+        public $globalSettingsSystemFCMServerrKey = "";
+        public $globalSettingsTextAlign = "";
+        public $globalSettingsActiveSmsService = "";
+        public $globalSettingsSkinColour = "";
+        public $globalSettingsSystemTitle = "";
         function __construct()
         {
             parent::__construct();
@@ -32,9 +42,24 @@
             $this->load->model('Linkmodule_model');
             $this->load->model('Role_model');
             $this->globalSettingsSMSDataArr=get_data_generic_fun('settings','description',array('condition_type'=>'in','condition_in_col'=>'type','condition_in_data'=>'location,app_package_name,running_year,system_name,system_email'));
-
             $this->load->helper('send_notifications');
 
+            $setting_records = $this->Setting_model->get_data_by_cols('*', array(), 'result_array');
+            $this->globalSettingsRunningYear = fetch_parl_key_rec($setting_records, 'running_year');
+            $this->globalSettingsLocation = fetch_parl_key_rec($setting_records, 'location');
+            $this->globalSettingsAppPackageName = fetch_parl_key_rec($setting_records, 'app_package_name');
+            $this->globalSettingsSystemTitle = fetch_parl_key_rec($setting_records, 'system_title');
+            $this->globalSettingsSystemName = fetch_parl_key_rec($setting_records, 'system_name');
+            $this->globalSettingsSystemEmail = fetch_parl_key_rec($setting_records, 'system_email');
+            $this->globalSettingsSystemFCMServerrKey = fetch_parl_key_rec($setting_records, 'fcm_server_key');
+            $this->globalSettingsSkinColour = fetch_parl_key_rec($setting_records, 'skin_colour');
+            $this->globalSettingsTheme = fetch_parl_key_rec($setting_records, 'theme');
+            $this->globalSettingsTextAlign = fetch_parl_key_rec($setting_records, 'text_align');
+            $this->globalSettingsActiveSmsService = fetch_parl_key_rec($setting_records, 'active_sms_service');
+            $this->new_fi = fetch_parl_key_rec($setting_records, 'new_fi');
+            $this->globalSettingsActiveSms = $this->globalSettingsActiveSmsService;
+        
+            
         }
 
         /** *default functin, redirects to login page if no admin logged in yet** */
@@ -517,10 +542,10 @@
                         $message_threads[$k]['nameDataArr'] = $this->db->get_where($user_to_show[0], array($user_to_show[0] . '_id' => $user_to_show[1]))->row();
                      }
                 endforeach;
-                 $page_data['message_threads'] = $message_threads;
-//                pre($page_data['message_threads']);exit;
+                $page_data['message_threads'] = $message_threads;
+//              pre($page_data['message_threads']);exit;
             }  
-             
+              
             // echo "<hr>************************";
            // exit;
             /********************************model_parent*********************************/
@@ -528,9 +553,10 @@
             
             if($page_name=="modal_parent_view"){
                 //$page_data['parent_record']   = get_data_generic_fun('parent','*', array('parent_id' => $param2),'result_array');
-                $page_data['page_title'] = "View Parent";
+                $page_data['page_title'] = "View Parent Information";
                 $page_data['parent_record']   = $this->Parent_model->get_parent_details($param2);
-                $page_data['student_name']    = $this->Student_model->get_student_infoBYparentID($param2);
+                $page_data['student_name']    = $this->Student_model->get_student_infoBYparentID($param2, $this->globalSettingsRunningYear);
+                
             }
             
             /********************************model_parent_view*********************************/
@@ -539,13 +565,12 @@
             
             if($page_name=="modal_parent_edit"){
                 $page_data['CountryList'] = get_country_list();
-                  $page_data['page_title'] = "Edit Parent";
+                  $page_data['page_title'] = "Edit Parent Information";
                 $page_data['parent_record']   = get_data_generic_fun('parent','*', array('parent_id' => $param2),'result_array');
 
                 $page_data['StateList'] = array();
                 if($page_data['parent_record'][0]['country']!=''){
                     $where = array('location_type' => 1, 'parent_id' => $page_data['parent_record'][0]['country']);
-                      $page_data['page_title'] = "StateList";
                     $page_data['StateList'] = get_data_generic_fun('country', '*', $where, 'result_array', array('name'=>'asc'));    
                 }
             }
@@ -588,12 +613,26 @@
                 $page_data['classes'] = $this->Subject_model->get_classes_by_teacher($teacher_id);               
             }
 
+            if($page_name=="modal_study_material_add_by_admin"){ 
+                $this->load->model('Class_model');
+                $page_data['page_title'] = "Add Study Material";
+                $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array', array('name_numeric' => 'asc'));
+            }
+
             /********************************modal_study_material_edit********************************/            
             if($page_name=="modal_study_material_edit_teacher"){ 
                 $this->load->model('Subject_model');
                 $teacher_id = $this->session->userdata('teacher_id');
                   $page_data['page_title'] = "Edit Study Material";
                 $page_data['classes'] = $this->Subject_model->get_classes_by_teacher($teacher_id);                 
+                $page_data['single_study_material_info'] = get_data_generic_fun('document','*',array('document_id' => $param2),'result_array');
+                //echo '<pre>'; print_r($page_data['single_study_material_info']); exit;                
+            }
+
+            if($page_name=="modal_study_material_edit_by_admin"){ 
+                $this->load->model('Class_model');
+                $page_data['page_title'] = "Edit Study Material";
+                $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array', array('name_numeric' => 'asc'));                 
                 $page_data['single_study_material_info'] = get_data_generic_fun('document','*',array('document_id' => $param2),'result_array');
                 //echo '<pre>'; print_r($page_data['single_study_material_info']); exit;                
             }
@@ -842,6 +881,24 @@
             }
             
             
+            /*******************************Modal View Assignments*************************************/
+            if($page_name           ==      "modal_certificate_preview"){
+               $file_name = $param2;
+                $page_data['page_title'] = "Certificate Template";
+                $page_data['file_type'] = 'file';
+                if (strpos($file_name, '.') !== false) {
+                    $FileType = explode('.', $file_name);
+                    $ImageFile = array('PNG', 'JPEG', 'JPG', 'png', 'jpeg', 'jpg');
+                    if(in_array($FileType[1], $ImageFile)){
+                        $page_data['file_type'] = 'image';
+                    }
+                } //                echo $folder_name; die;
+                $page_data['url'] = base_url("assets/images/certificate/".$file_name);
+            }
+            
+            
+            
+            
             /*******************************Modal submit Assignments*************************************/
             if($page_name           ==      "modal_assignment_submit"){
                 $assignment_Details  =       get_data_generic_fun("student_assignments","*",array('assignment_id' => $param2),"result_arr");
@@ -980,7 +1037,7 @@
             
             if($page_name   == 'modal_add_comment'){
                 $page_data['comment_details']      =       $this->db->get_where('discussion_post' , array('comment_id' => $param2) )->result_array();
-                 $page_data['page_title'] = "Add Comment";
+                 $page_data['page_title'] = "Reply or Comment";
             }
             
             if($page_name == 'section_edit'){
@@ -1064,7 +1121,7 @@
 
             if($page_name == 'seller_document_preview'){
                 $file_name = $param2;
-                 $page_data['page_title'] = "Seller Document Preview";
+                 $page_data['page_title'] = "Business Card Preview";
                 $page_data['file_type'] = 'file';
                 if (strpos($file_name, '.') !== false) {
                     $FileType = explode('.', $file_name);
@@ -1222,6 +1279,19 @@
                 $page_data['edit_data'] =  $this->Role_model->get_role_array(array("id" => $param2));
                 $page_data['school'] = $this->School_model->get_school_array();
             }
+/*******************Allocate hostel Starts*************************************/			
+	if($page_name=="modal_hostel_room_allocate"){
+                $this->load->model('Hostel_room_model');
+				$formdata=base64_decode($param2);
+				parse_str($formdata, $searcharray);
+				$page_data['formdata']=$formdata;
+                $page_data['page_title'] = "Hostel Room";
+                $page_data['room'] =  $this->Hostel_room_model->get_data_by_cols('*', array('hostel_room_id' => $searcharray['room_no']));
+                
+            }		
+			
+			
+			
 
 /*******************Edit Role Ends*************************************/ 
 
@@ -1318,12 +1388,59 @@
             
              if($page_name=="modal_certificate_content"){
                 $this->load->model('Class_model');
+                $this->load->model('Student_certificate_model');
+                $this->load->model('Certificate_authorities_model');
                 $page_data['page_title'] = "Certificate Content";
                 $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array');
                 $this->load->model('Teacher_model');
+                if($param2 == 's'){
+                    $dataArray = array('certificate_for' => 'S');
+                    $page_data['certificate_type_list'] = $this->Student_certificate_model->get_certificate_type_list($dataArray);    
+//                pre($page_data['certificate_type_list']); die;
+                    
+                }
+                if($param2 == 't'){
+                    $dataArray = array('certificate_for' => 'T');
+                    $page_data['certificate_type_list'] = $this->Student_certificate_model->get_certificate_type_list($dataArray);    
+//                pre($page_data['certificate_type_list']); die;
+                    
+                }                
+                $page_data['authorities_list'] =   $this->Certificate_authorities_model->get_authorities_array();
+//                pre($page_data['authorities_list']); die;
+                $page_data['size_list'] =   $this->Student_certificate_model->get_template_size();
                 $page_data['teacher_list'] = $this->Teacher_model->get_teacher(); 
                 $page_data['user_type'] = $param2;
             } 
+            
+            if($page_name=="modal_edit_certificate_content"){
+                $this->load->model('Class_model');
+                $this->load->model('Student_certificate_model');
+                $this->load->model('Certificate_authorities_model');
+                $this->load->model('Teacher_certificate_model');
+                $page_data['page_title'] = "Certificate Content";
+                $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array');
+                $this->load->model('Teacher_model');
+                if($param2 == 's'){
+                    $dataArray = array('certificate_for' => 'S');
+                    $page_data['certificate_type_list'] = $this->Student_certificate_model->get_certificate_type_list($dataArray); 
+                    $page_data['edit_data'] = $this->Student_certificate_model->get_data_by_id($param3); 
+//                pre($page_data['certificate_type_list']); die;
+                    
+                }
+                if($param2 == 't'){
+                    $dataArray = array('certificate_for' => 'T');
+                    $page_data['certificate_type_list'] = $this->Student_certificate_model->get_certificate_type_list($dataArray);   
+                    $page_data['edit_data'] = $this->Teacher_certificate_model->get_data_by_id($param3); 
+//                pre($page_data['certificate_type_list']); die;
+                    
+                }                
+                $page_data['authorities_list'] =   $this->Certificate_authorities_model->get_authorities_array();
+//                pre($page_data['authorities_list']); die;
+                $page_data['size_list'] =   $this->Student_certificate_model->get_template_size();
+                $page_data['teacher_list'] = $this->Teacher_model->get_teacher(); 
+                $page_data['user_type'] = $param2;
+            } 
+                      
              if($page_name=="modal_get_student_nameforCertificate"){
                 $this->load->model('Class_model');
                 $page_data['page_title'] = "Student Name For Certificate";
@@ -1382,6 +1499,87 @@
                 $page_data['clinical_record'] = $clinical_record;
             }
             
+            if($page_name=="modal_camp_edit"){
+                $this->load->model('Medical_camp_model');
+                $this->load->model('Doctor_model');
+                $page_data['page_title'] = "Edit Camp";
+                $camp_record = $this->Medical_camp_model->get_data_by_id($param2);
+                $page_data['doctor_name_list'] =   $this->Doctor_model->get_doctor_array();
+                $page_data['class_array'] = $this->Class_model->get_class_array();
+                $page_data['edit_data'] = $camp_record;
+            }
+            
+            if($page_name=="modal_camp_assign"){
+                $this->load->model('Class_model');
+                $this->load->model('Medical_camp_model');
+                $page_data['page_title'] = "Assign Camp";
+                $page_data['camp'] = $this->Medical_camp_model->get_camp_array();
+                $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array');
+//                $page_data['edit_data'] = $camp_record;
+            }
+            
+            if($page_name=="modal_camp_assign_edit"){
+                $this->load->model('Class_model');
+                $this->load->model('Medical_camp_model');
+                $this->load->model('Camp_assign_model');
+                $this->load->model('Section_model');
+                $running_year = $this->Setting_model->get_year();
+                $this->load->model("Enroll_model");
+                $page_data['page_title'] = "Edit Assign Camp";
+                $page_data['camp'] = $this->Medical_camp_model->get_camp_array();
+                $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array');
+                $page_data['camp_assign_edit'] =   $this->Camp_assign_model->get_data_by_id($param2);
+                $page_data['camp_assign_id'] = $param2;
+                $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array');
+//                echo $page_data['camp_assign_edit']->class_id; die;
+                $page_data['sections'] = $this->Section_model->get_section_by_classid($page_data['camp_assign_edit']->class_id);
+                $page_data['camp_arr'] = $this->Medical_camp_model->get_camp_array(array("class_id" => $page_data['camp_assign_edit']->class_id));
+                $student_arr = $this->Enroll_model->get_student_array(array('section_id' => $page_data['camp_assign_edit']->section_id, 'class_id' => $page_data['camp_assign_edit']->class_id, 'year' => $running_year));
+                $data = array();
+        foreach ($student_arr as $student):
+                $stu_rs = get_data_generic_fun('student', 'student_id, name, lname', array('student_id' => $student['student_id'], 'isActive' => '1', 'student_status' => '1'), 'result_arr');
+                if (isset($stu_rs[0])) {
+                    $data[] = $stu_rs[0];
+                }
+            endforeach;
+            $page_data['students'] = $data;
+            }
+            
+            if($page_name=="modal_edit_certificate_type"){
+                $this->load->model('Student_certificate_model');
+                $page_data['page_title'] = "Edit Certificate Type";
+                $page_data['certificate_type_data'] = $this->Student_certificate_model->get_data_by_id_certificate_type($param2);
+//                pre($page_data['certificate_type_data']); die;
+                
+            }
+            
+            if($page_name=="modal_edit_template_type"){
+                $this->load->model('Certificate_template_model');
+                $page_data['page_title'] = "Edit Template Type";
+                $page_data['edit_data'] = $this->Certificate_template_model->get_data_by_id($param2);
+//                pre($page_data['certificate_type_data']); die;
+                
+            }
+            
+            if($page_name == "modal_add_certificate_template_type"){
+                $this->load->model('Certificate_template_model');
+                $this->load->model('Student_certificate_model');
+                $page_data['page_title'] = "Edit Template Type";
+                $page_data['certificate_template_list'] = $this->Certificate_template_model->get_template_array();
+                $page_data['certificate_template_merge_list'] = $this->Certificate_template_model->get_template_certificate_merge_array($param2);
+//                pre($page_data['certificate_template_merge_list']); die;
+                $page_data['certificate_type_id']  = $param2;
+//                pre($page_data['certificate_type_data']); die;
+                
+            }
+            
+            if($page_name=="modal_edit_authorities"){
+                $this->load->model('Certificate_authorities_model');
+                $page_data['page_title'] = "Edit Certificate Authorities";
+                $page_data['edit_data'] = $this->Certificate_authorities_model->get_data_by_id($param2);
+//                pre($page_data['edit_data']); die;
+                
+            }
             //echo "<br>here account type is $account_type";die;
             $this->load->view('backend/' . $account_type . '/' . $page_name . '.php', $page_data);
             
@@ -1469,6 +1667,7 @@
             } else {
                 $page_data['data_not_found'] =  'Data Not Found';
             }
+            $page_data['student_details'] = $student_details;
             $page_data['class_id']=$class_id;
             $this->load->view('backend/' . $account_type . '/' . $page_name . '.php', $page_data);
             //echo '<script src="assets/js/neon-custom-ajax.js"></script>';
@@ -1477,7 +1676,7 @@
         /*
          * View all medical records by student
          */
-        public function view_all_medical_record($student_id,$class_id,$section_id) {
+        public function view_all_medical_record($student_id = '',$class_id='',$section_id='') {
             $page_data                  =   array();
             $this->load->model("Medical_events_model");   
             $account_type               =   $this->session->userdata('login_type');
@@ -1694,74 +1893,70 @@
         }
             
         public function modal_online_poll_view($poll_id) {
-            if ($this->session->userdata('school_admin_login') != 1)
-                redirect(base_url(), 'refresh');
+            
             $this->load->model("Onlinepoll_model");
-            $this->load->model("Class_model");
-            $page_name                          =   'modal_online_poll_view';
-            $page_data['page_title']            =   get_phrase('online_polls');
-            $online_polls                       =   $this->Onlinepoll_model->getOninePolls( array('poll_id'=>$poll_id) );
-            if(!$online_polls)
-                $page_data['data_not_found']    =   'online_poll';
-            $online_poll_list                   =   $online_polls;
-            foreach($online_polls as $key=>$poll) {
-                if($poll['classes'] != 0) {
-                    $class_ids                  =   explode(',',$poll['classes']);
-                    $class_name                 =   '';
-                    foreach($class_ids as $class_id) {
-                        $class                          =   $this->Class_model->get_name_by_id((int)$class_id);
-                        $class_name                     =   $class[0]->name.",".$class_name;
-                    }
-                    $class_name                         =   rtrim($class_name,',');
-                    $online_polls[$key]['class_name']        =   $class_name;
-
-                } else {
-                    $online_polls[$key]['class_name']        =   '';
+        $this->load->model("Class_model");
+        $page_name = 'modal_online_poll_view';
+        $page_data['page_title'] = get_phrase('online_polls');
+        $online_polls = $this->Onlinepoll_model->getOninePolls(array('poll_id' => $poll_id));
+        if (!$online_polls)
+            $page_data['data_not_found'] = 'online_poll';
+        $online_poll_list = $online_polls;
+        foreach ($online_polls as $key => $poll) {
+            if ($poll['classes'] != 0) {
+                $class_ids = explode(',', $poll['classes']);
+                $class_name = '';
+                foreach ($class_ids as $class_id) {
+                    $class = $this->Class_model->get_name_by_id((int) $class_id);
+                    $class_name = $class[0]->name . "," . $class_name;
                 }
-                
-                $answer                             =   $this->Onlinepoll_model->getOnlinpollAnswer(array('poll_id'=>$poll['poll_id']));
-                if(!$answer)
-                    $answer                             =   array();
-                $online_polls[$key]['answer_det']       =   $answer;
-                
-                $total_poll                             =   $this->Onlinepoll_model->getPollCount($poll['poll_id']);
-                $online_polls[$key]['total_poll']       =   $total_poll[0]->total_poll;
+                $class_name = rtrim($class_name, ',');
+                $online_polls[$key]['class_name'] = $class_name;
+            } else {
+                $online_polls[$key]['class_name'] = '';
             }
-            
-            $account_type                               =   $this->session->userdata('login_type');
-            $page_data['online_polls']                  =   $online_polls[0];
+
+            $answer = $this->Onlinepoll_model->getOnlinpollAnswer(array('poll_id' => $poll['poll_id']));
+            if (!$answer)
+                $answer = array();
+            $online_polls[$key]['answer_det'] = $answer;
+
+            $total_poll = $this->Onlinepoll_model->getPollCount($poll['poll_id']);
+            $online_polls[$key]['total_poll'] = $total_poll[0]->total_poll;
+        }
+
+        $account_type = $this->session->userdata('login_type');
+        $page_data['online_polls'] = $online_polls[0];
 //            pre($page_data['online_polls']);die();
-            $this->load->view('backend/' . $account_type . '/' . $page_name . '.php', $page_data);
-            //echo '<script src="assets/js/neon-custom-ajax.js"></script>';
+        $this->load->view('backend/' . $account_type . '/' . $page_name . '.php', $page_data);
+        //echo '<script src="assets/js/neon-custom-ajax.js"></script>';
+    }
+
+    public function modal_view_hw_details($hw_id) {
+        if ($this->session->userdata('teacher_login') != 1) {
+            $teacher_id = $this->session->userdata('teacher_id');
+            $parent_id = '';
+        } else if ($this->session->userdata('parent_login') != 1) {
+            $parent_id = $this->session->userdata('parent_id');
+            $teacher_id = '';
         }
-        
-        public function modal_view_hw_details($hw_id) {
-            if ($this->session->userdata('teacher_login') != 1) {
-                $teacher_id             =   $this->session->userdata('teacher_id');
-                $parent_id              =   '';
-            } else if($this->session->userdata('parent_login') != 1 ){
-                $parent_id              =   $this->session->userdata('parent_id');
-                $teacher_id             =   '';
-            }
 
 
-            $this->load->model('Homeworks_model');
-            
-            $page_name                          =   'modal_view_hw_details';
-            $page_data['page_title']            =   get_phrase('home_work_details');
-            
-            
-            $hw_details             =   $this->Homeworks_model->get_all_data( '' , array('home_work_id'=>$hw_id));
-            if(!$hw_details)
-                $page_data['data_not_found']    =   'home_work';
-                        
-            $account_type                               =   $this->session->userdata('login_type');
-            $page_data['home_work_det']                 =   $hw_details[0];
-            $this->load->view('backend/' . $account_type . '/' . $page_name . '.php', $page_data);
-            //echo '<script src="assets/js/neon-custom-ajax.js"></script>';
+        $this->load->model('Homeworks_model');
+
+        $page_name = 'modal_view_hw_details';
+        $page_data['page_title'] = get_phrase('home_work_details');
 
 
-        }
+        $hw_details = $this->Homeworks_model->get_all_data('', array('home_work_id' => $hw_id));
+        if (!$hw_details)
+            $page_data['data_not_found'] = 'home_work';
+
+        $account_type = $this->session->userdata('login_type');
+        $page_data['home_work_det'] = $hw_details[0];
+        $this->load->view('backend/' . $account_type . '/' . $page_name . '.php', $page_data);
+        //echo '<script src="assets/js/neon-custom-ajax.js"></script>';
+    }
         public function modal_view_hw_details_submitted($hw_id) {
            
             if ($this->session->userdata('teacher_login') != 1) {

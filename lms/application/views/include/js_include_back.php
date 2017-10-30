@@ -85,6 +85,19 @@ $.widget.bridge('uibutton', $.ui.button);
 
 
 <script>
+$j('document').ready(function() {
+if (window.location.href.indexOf("config_category/success") > -1) {
+	
+    $('.alert-success').html("<h4 style='margin:0;'><i class='fa fa-check-circle'></i> <?php echo $this->lang->line("category edited successfully"); ?></h4>");
+}
+if (window.location.href.indexOf("admin/add_book_action") > -1) {
+	
+    $('.alert-success').html("<h4 style='margin:0;'><i class='fa fa-check-circle'></i> <?php echo $this->lang->line("Book has been added.you can generate catalog"); ?></h4><br><h4 style='margin:0;'><a class='btn btn-lg alert' onclick='print_barcode(\"#div_for_print_book_ids\")'>Print Catalog <i class=\"fa fa-print\"></i></a></h4>");
+	$("#div_for_print_book_ids").hide();
+}
+
+
+});
 // grid formatter
 function status(value,row,index)
 {   
@@ -117,7 +130,19 @@ $j('document').ready(function() {
   else
   var replace_dropdown='<select class="chosen-select" name="user_type" id="field-user_type"><option value=""></option><option value="Member" selected="yes">'+'<?php echo $this->lang->line("member level user"); ?>'+'</option><option value="Admin">'+'<?php echo $this->lang->line("admin level user"); ?>'+'</option></select>';  
  $("#user_type_input_box").html(replace_dropdown);
- 
+ $(document).click (function (e) {
+    if (e.target != $('#noty_top_layout_container')[0]) {
+        $('#noty_top_layout_container').hide();
+    }
+    if (e.target != $('#list-report-success')[0]) {
+        $('#list-report-success').hide();
+    }
+    if (e.target != $('.alert')[0]) {
+        $('.alert').hide();
+    }
+    
+    
+});
 });
 
 
@@ -137,6 +162,8 @@ $j('document').ready(function() {
 			 $(this).not("input, .box-footer *,.rtl,.datagrid-body").addClass('ltr');			 
 		}
 	});
+	
+	
 });
 	
 	
@@ -175,6 +202,9 @@ $j('document').ready(function() {
 	    }
 	    return isRTL;
 	}
+	
+	
+	
 	
 </script>
 

@@ -16,6 +16,7 @@ $('document').ready(function() {
 	      $(this).not("input").addClass('ltr');
 	}
 	});
+	
 });
 
 

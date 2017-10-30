@@ -18,10 +18,10 @@
     </div>
 </div>
 <div class="col-md-12 white-box">
-    <table class="table datatable" id="example23">
+    <table class = "custom_table table display" cellspacing="0" width="100%" id="ex">
         <thead>
             <tr>
-                <th><div><?php echo get_phrase('no'); ?></div></th>
+                <th><div><?php echo get_phrase('s._no.'); ?></div></th>
                 <th><div><?php echo get_phrase('name'); ?></div></th>
                 <th><div><?php echo get_phrase('obtained_percentage'); ?></div></th>
                 <th><div><?php echo get_phrase('passing_percentage'); ?></div></th> 
@@ -43,4 +43,4 @@
 <?php endforeach; ?>
         </tbody>
     </table>
-</div>
+</div>   

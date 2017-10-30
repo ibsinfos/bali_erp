@@ -49,8 +49,8 @@
                    
                        
                             <div class="col-xs-12 col-sm-6 col-md-6 form-group">
-                                <label for="field-1"><?php echo get_phrase("father's_profession"); ?><span class="error error-color"> *</span></label>
-                                <input type="text" class="form-control" name="fprof" value="<?php echo $row['father_profession'];?>" required="required">
+                                <label for="field-1"><?php echo get_phrase("father's_profession"); ?></label>
+                                <input type="text" class="form-control" name="fprof" value="<?php echo $row['father_profession'];?>">
                             </div>
                             
                             <div class="col-xs-12 col-sm-6 col-md-6 form-group">
@@ -105,7 +105,7 @@
 
                             <div class="col-xs-12 col-sm-6 col-md-6 form-group">
                                  <label for="field-1" class="field-size"><?php echo get_phrase('country'); ?><span class="error error-color"> *</span></label>
-                                <select  class="form-control" data-style="form-control" data-live-search="true" id="country" name= "country" required onchange="get_state()">
+                                <select  class="selectpicker1" data-style="form-control" data-live-search="true" id="country" name= "country" required onchange="get_state()">
                                     <option value="">Select Country</option>
                 <?php if(count($CountryList)){ foreach($CountryList as $country){ ?>
                                     <option value="<?php echo $country['location_id'];?>"  <?php if($row['country']==$country['location_id']){echo 'selected';}?> ><?php echo ucwords($country['name']);?></option><?php }}?>
@@ -114,7 +114,7 @@
                             
                             <div class="col-xs-12 col-sm-6 col-md-6 form-group">
                                 <label for="field-1" class="field-size"><?php echo get_phrase('state'); ?><span class="error error-color"> *</span></label>
-                                <select class="form-control" data-style="form-control" data-live-search="true" id="state" name= "state" required>
+                                <select class="selectpicker1" data-style="form-control" data-live-search="true" id="state" name= "state" required>
                                     <option value="">Select State</option>
                 <?php if(count($StateList)){ foreach($StateList as $state){ ?>
                                     <option value="<?php echo $state['location_id'];?>"  <?php if($row['state']==$state['location_id']){echo 'selected';}?> ><?php echo ucwords($state['name']);?></option><?php }}?>
@@ -146,10 +146,10 @@
                                 <label for="field-1" class="field-size"><?php echo get_phrase('work_#'); ?></label>
                                 <input type="tel"  class="form-control numeric" name="work_phone" value="<?php echo $row['work_phone'];?>"> 
                             </div>
-                    
-                           <div class="col-xs-12 col-sm-6 col-md-6 form-group m-t-20">
-                            <div class="text-right">
-                                <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('save');?></button>
+                        
+                           <div class="col-xs-12 col-sm-12 col-md-12 form-group m-t-20">
+                            <div class="text-center">
+                                <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('Update');?></button>
                             </div>
                         </div>
                      
@@ -188,7 +188,7 @@ function get_state(){
                     alert('State not found');
                 }
                 $('#state').empty();
-                $('#state').html(state); 
+                $('#state').html(state).selectpicker('refresh'); 
             },
             error: function(){
                 alert('State not found');
@@ -199,4 +199,10 @@ function get_state(){
     }
 }
     
+</script>
+
+<script type="text/javascript">
+$('#modal_ajax').on('shown.bs.modal', function (e) {
+    $('#modal_ajax #myModalLabel').html('Edit Parent Information');
+})
 </script>

@@ -1,0 +1,55 @@
+#tagbox
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 240px;
+}
+#tagbox .box
+{
+	border: 1px solid #ea1553;
+	width: 100px;
+	height: 100px;
+	float: left;
+}
+#tagbox .name
+{
+	float: left;
+	background-color: #FFF;
+	width: 140px;
+	height: 100px;
+	padding: 5px;
+	font-size: 10pt;
+	border: 1px solid #ea1553;
+}
+#tagbox DIV.text
+{
+	margin-bottom: 5px;
+}
+#tagbox INPUT[type=text]
+{
+	margin-bottom: 5px;
+	margin-top:10px;
+}
+.tagview
+{
+	border: 1px solid #ea1553;
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	/*display:none;*/
+	opacity: 0;
+	color: #FFFFFF;
+	text-align: center;
+}
+.tagview .square
+{
+	display: block;
+	height: 80%;
+}
+.tagview .person
+{
+	background: #282828;
+	border-top: 1px solid #ea1553;
+	height: 20%;
+}

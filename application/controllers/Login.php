@@ -43,8 +43,7 @@ class Login extends CI_Controller {
             redirect(base_url() . 'index.php?teacher/dashboard', 'refresh');
 		
 	    if ($this->session->userdata('librarian_login') == 1)
-           // redirect(base_url() . 'index.php?librarian/dashboard', 'refresh');
-            redirect(base_url().'lms/admin/index','refresh');
+           redirect(base_url().'lms/admin/index','refresh');
 
         if ($this->session->userdata('student_login') == 1)
             redirect(base_url() . 'index.php?student/dashboard', 'refresh');
@@ -138,8 +137,28 @@ class Login extends CI_Controller {
 
         // Checking credential for bus driver
         $query_bus_driver           =   $this->db->get_where('bus_driver' , array('LOWER(email)' => $email));
+
+        // Checking credential for doctor
+        $query_doctor           =   $this->db->get_where('doctors' , array('LOWER(email)' => $email));
+
+        // Checking credential for bus_admin
+        $query_bus_admin           =   $this->db->get_where('bus_administrator' , array('LOWER(email)' => $email));
+
+        // Checking credential for super_admin
+        $query_super_admin           =   $this->db->get_where('master_users' , array('LOWER(email)' => $email));
+
+        // Checking credential for hostel_admin
+        $query_hostel_admin           =   $this->db->get_where('hostel_admin' , array('LOWER(email)' => $email));
+
+        // Checking credential for accountant and cashier
+        $query_accountant_cashier = $this->db->get_where('accountant' , array('LOWER(email)' => $email));
+
+        $to_name ='';
         
         if ($query_admin->num_rows() > 0) {
+            $data = $query_admin->row();
+            $to_name = ucfirst($data->name);
+
             $reset_account_type     =   'admin';
 
             $new_password = create_passcode('admin');
@@ -150,6 +169,9 @@ class Login extends CI_Controller {
             $this->db->update('admin' , array('password' => $password, 'passcode' => $passcode));
             $response['status']     = 'true';
         } else if ($query_student->num_rows() > 0) {
+            $data = $query_student->row();
+            $to_name = ucwords($data->name.' '.$data->mname.' '.$data->lname);
+
             $reset_account_type     =   'student';
 
             $new_password = create_passcode('student');
@@ -160,6 +182,9 @@ class Login extends CI_Controller {
             $this->db->update('student' , array('password' => $password, 'passcode' => $passcode));
             $response['status']         = 'true';
         } else if ($query_teacher->num_rows() > 0) {
+            $data = $query_teacher->row();
+            $to_name = ucwords($data->name.' '.$data->middle_name.' '.$data->last_name);
+
             $reset_account_type     =   'teacher';
 
             $new_password = create_passcode('teacher');
@@ -170,6 +195,9 @@ class Login extends CI_Controller {
             $this->db->update('teacher' , array('password' => $password, 'passcode' => $passcode));
             $response['status']         = 'true';
         } else if ($query_parent->num_rows() > 0) {
+            $data = $query_parent->row();
+            $to_name = ucwords($data->father_name.' '.$data->father_mname.' '.$data->father_lname);
+
             $reset_account_type         =   'parent';
 
             $new_password = create_passcode('parent');
@@ -180,6 +208,9 @@ class Login extends CI_Controller {
             $this->db->update('parent' , array('password' => $password, 'passcode' => $passcode));
             $response['status']         =   'true';
         }else if ($query_bus_driver->num_rows() > 0) {
+            $data = $query_bus_driver->row();
+            $to_name = ucfirst($data->name);
+
             $reset_account_type         =   'bus driver';
 
             $new_password = create_passcode('bus_driver');
@@ -189,7 +220,80 @@ class Login extends CI_Controller {
             $this->db->where('email' , $email);
             $this->db->update('bus_driver' , array('password' => $password, 'passcode' => $passcode));
             $response['status']         =   'true';
-        } else if ($query_school_admin->num_rows() > 0) {
+        }else if ($query_doctor->num_rows() > 0) {
+            $data = $query_doctor->row();
+            $to_name = ucfirst($data->name);
+
+            $reset_account_type         =   'Doctor';
+
+            $new_password = create_passcode('doctor');
+            $password = ($new_password != 'invalid') ? sha1($new_password) : '';
+            $passcode = ($new_password != 'invalid') ? $new_password : '';
+
+            $this->db->where('email' , $email);
+            $this->db->update('doctors' , array('password' => $password, 'passcode' => $passcode));
+            $response['status']         =   'true';
+        }else if ($query_bus_admin->num_rows() > 0) {
+            $data = $query_bus_admin->row();
+            $to_name = ucfirst($data->name);
+
+            $reset_account_type         =   'Bus Administrator';
+
+            $new_password = create_passcode('bus_admin');
+            $password = ($new_password != 'invalid') ? sha1($new_password) : '';
+            $passcode = ($new_password != 'invalid') ? $new_password : '';
+
+            $this->db->where('email' , $email);
+            $this->db->update('bus_administrator' , array('password' => $password, 'passcode' => $passcode));
+            $response['status']         =   'true';
+        }else if ($query_super_admin->num_rows() > 0) {
+            $data = $query_super_admin->row();
+            $to_name = ucfirst($data->name);
+
+            $reset_account_type         =   'Super Admin';
+
+            $new_password = create_passcode('super_admin');
+            $password = ($new_password != 'invalid') ? sha1($new_password) : '';
+            $passcode = ($new_password != 'invalid') ? $new_password : '';
+
+            $this->db->where('email' , $email);
+            $this->db->update('master_users' , array('password' => $password, 'passcode' => $passcode));
+            $response['status']         =   'true';
+        }else if ($query_hostel_admin->num_rows() > 0) {
+            $data = $query_hostel_admin->row();
+            $to_name = ucfirst($data->name);
+
+            $reset_account_type         =   'Hostel Admin';
+
+            $new_password = create_passcode('hostel_admin');
+            $password = ($new_password != 'invalid') ? sha1($new_password) : '';
+            $passcode = ($new_password != 'invalid') ? $new_password : '';
+
+            $this->db->where('email' , $email);
+            $this->db->update('hostel_admin' , array('password' => $password, 'passcode' => $passcode));
+            $response['status']         =   'true';
+        }else if ($query_accountant_cashier->num_rows() > 0) {
+            $data = $query_accountant_cashier->row();
+            if($data->acc_type == 1){
+                $new_password = create_passcode('accountant');
+                $reset_account_type         =   'Accountant';    
+            }else if($data->acc_type == 2){
+                $new_password = create_passcode('cashier');
+                $reset_account_type         =   'Cashier';
+            }
+            
+            $to_name = ucfirst($data->name);
+
+            $password = ($new_password != 'invalid') ? sha1($new_password) : '';
+            $passcode = ($new_password != 'invalid') ? $new_password : '';
+
+            $this->db->where('email' , $email);
+            $this->db->update('accountant' , array('password' => $password, 'passcode' => $passcode));
+            $response['status']         =   'true';
+        }else if ($query_school_admin->num_rows() > 0) {
+            $data = $query_school_admin->row();
+            $to_name = ucwords($data->first_name.' '.$data->last_name);
+
             $reset_account_type     =   'school_admin';
 
             $new_password = create_passcode('school_admin');
@@ -219,11 +323,11 @@ class Login extends CI_Controller {
 //            send_school_notification( 'update_passcode' , $message , '' , $rsTeacherData[0]->email );
             //send_custom_email($email_to,$email_sub ,$email_msg , $email_to);
 
-            if( send_custom_email($email_to,$email_sub ,$email_msg , $email_to) ) {
+            if(send_custom_email($email_to, $email_sub , $email_msg , $to_name)){
                 $response['status']     =   'true';
                 $response['message']    =   'Password has been send to '.$email;
                 //$response['email_msg'] = $email_msg;
-                $this->session->set_flashdata('flash_message', 'password_changed_successfully');
+                //$this->session->set_flashdata('flash_message', 'password_changed_successfully');
             } else {
                 $response['status']     =   'false';
                 $response['message']    =   'Password reset error , Try again.';

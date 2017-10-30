@@ -14,16 +14,17 @@
 </div>
 
 <!------CONTROL TABS START------>
-
+<?php // pre($certificate_list);  ?>
 <div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('This shows list of subject details.'); ?>" data-position='top'>
 
-    <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
+    <table class= "custom_table table display" cellspacing="0" width="100%" id="ex">
         <thead>
             <tr>
                 <th><div><?php echo get_phrase('S._no.'); ?></div></th>
                 <th><div><?php echo get_phrase('certificate_title'); ?></div></th>
                 <th><div><?php echo get_phrase('sub_title'); ?></div></th>
                 <th><div><?php echo get_phrase('issue_date'); ?></div></th>
+                <th><div><?php echo get_phrase('page_size'); ?></div></th>
                 <th><div><?php echo get_phrase('options'); ?></div></th>
             </tr>
         </thead>
@@ -31,19 +32,16 @@
             <?php
             if (!empty($certificate_list)):
                 $count = 1;
-
                 foreach ($certificate_list as $row):
                     ?>
                     <tr>
                         <td><?php echo $count++; ?></td>
                         <td><?php echo ucfirst($row['certificate_title']); ?></td>
-                        <td><?php
-                            echo ucfirst($row['sub_title']);
-                            ?>
-                        </td>
+                        <td><?php echo ucfirst($row['sub_title']); ?></td>
                         <td><?php echo $row['date']; ?></td>
+                        <td><?php echo $row['page_size']; ?></td>
                         <td>
-                            <a href="<?php echo base_url(); ?>index.php?student/template<?php echo $row['template_type']; ?>/download/<?php echo $row['student_id']; ?>/<?php echo $row['certificate_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Certificate"><i class="fa fa-eye"></i></button></a>                                                </td>
+                            <a href="<?php echo base_url(); ?>index.php?certificate/<?php echo strtolower($row['template_type']); ?>/download/<?php echo $row['student_id']; ?>/<?php echo $row['certificate_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Certificate"><i class="fa fa-eye"></i></button></a>                                                              </td>
                     </tr>
                 <?php endforeach; ?>
             <?php endif; ?>

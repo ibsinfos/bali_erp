@@ -25,7 +25,7 @@
                     <td class="text-center"><?php echo $stu->enroll_code;?></td>
                     <td>
                         <select name="hostel_ids[<?php echo $stu->student_id;?>]" id="dormitory_id_<?php echo $stu->student_id;?>"
-                        student_id="<?php echo $stu->student_id;?>" class="dormitory_select selectpicker1" data-style="form-control" data-live-search="true">
+                        student_id="<?php echo $stu->student_id;?>" class="selectpicker dormitory_select" data-style="form-control" data-live-search="true">
                             <option value=""><?php echo get_phrase('no_dormitory');?></option>
                             <?php foreach ($dormitories as $host):?>
                                 <option value="<?php echo $host['dormitory_id']; ?>">
@@ -34,17 +34,19 @@
                             <?php endforeach; ?>
                         </select>
                         <br>
-                        <select name="room_ids[<?php echo $stu->student_id;?>]" id="room_id_<?php echo $stu->student_id; ?>" class="room_select selectpicker" data-style="form-control" data-live-search="true">
+                        <select name="room_ids[<?php echo $stu->student_id;?>]" id="room_id_<?php echo $stu->student_id; ?>" 
+                            class="selectpicker" data-style="form-control room_select mt10" data-live-search="true">
                             <option value=""><?php echo get_phrase('no_hostel_selected');?></option>
                         </select>
                         <br>
                         <select name="hostel_term_selected[<?php echo $stu->student_id;?>]" id="hostel_fee_inst_<?php echo $stu->student_id;?>" 
-                            class="selectpicker" data-style="form-control" data-live-search="true">
+                            class="selectpicker" data-style="form-control mt10" data-live-search="true">
                             <?php if($term_config['hostel_term_setting']) { ?>
                                 <option value=""><?php echo get_phrase('select_hostel_fee_instalment');?></option>
-                            <?php foreach ($fee_terms as $term): ?>
+                            <?php foreach ($fee_terms as $term):
+                                    if(in_array($term->id,$term_config['hostel_term_setting'])){?>
                                 <option value="<?php echo $term->id; ?>"><?php echo $term->name.'('.$term->term_num.')';?></option>
-                            <?php endforeach; 
+                            <?php } endforeach; 
                                 } else { ?>
                                 <option value=""><?php echo get_phrase('hostel_fee_instalment_not_set');?></option>
                             <?php } ?>
@@ -52,7 +54,7 @@
                     </td>
                     <td>
                         <select name="route_ids[<?php echo $stu->student_id;?>]" id="route_id_<?php echo $stu->student_id;?>" student_id="<?php echo $stu->student_id;?>" 
-                            class="transport_select selectpicker" data-style="form-control" data-live-search="true">
+                            class="selectpicker transport_select" data-style="form-control" data-live-search="true">
                             <option value=""><?php echo get_phrase('no_transport_service');?></option>
                             <?php foreach ($transports as $trans):?>
                             <option value="<?php echo $trans['transport_id']; ?>">
@@ -61,17 +63,19 @@
                             <?php endforeach; ?>
                         </select>
                         <br>
-                        <select name="route_stop_ids[<?php echo $stu->student_id;?>]" id="transport_id_<?php echo $stu->student_id;?>" class="route_select selectpicker" data-style="form-control" data-live-search="true">
+                        <select name="route_stop_ids[<?php echo $stu->student_id;?>]" id="transport_id_<?php echo $stu->student_id;?>" 
+                            class="selectpicker" data-style="form-control route_select mt10" data-live-search="true">
                             <option value=""><?php echo get_phrase('select_route');?></option>
                         </select>
                         <br>
                         <select name="transport_term_selected[<?php echo $stu->student_id;?>]" id="transp_fee_inst_<?php echo $stu->student_id;?>" 
-                            class="selectpicker" data-style="form-control" data-live-search="true">
+                            class="selectpicker" data-style="form-control mt10" data-live-search="true">
                             <?php if($term_config['transport_term_setting']){?>
                                 <option value=""><?php echo get_phrase('select_transport_fee_instalment'); ?></option>
-                                <?php foreach ($fee_terms as $term): ?>
+                                <?php foreach ($fee_terms as $term):
+                                        if(in_array($term->id,$term_config['transport_term_setting'])){?>
                                     <option value="<?php echo $term->id; ?>"><?php echo $term->name.'('.$term->term_num.')';?></option>
-                                <?php endforeach; 
+                                <?php } endforeach; 
                                 } else { ?>
                                 <option value=""><?php echo get_phrase('transport_fee_instalment_not_set');?></option>
                             <?php } ?>
@@ -82,16 +86,18 @@
                             class="selectpicker" data-style="form-control" data-live-search="true">
                             <?php if($term_config['school_term_setting']) { ?>
                                 <option value=""><?php echo get_phrase('select_school_fee_instalment');?></option>
-                                <?php foreach ($fee_terms as $term): ?>
+                                <?php foreach ($fee_terms as $term): 
+                                        if(in_array($term->id,$term_config['school_term_setting'])){?>
                                     <option value="<?php echo $term->id;?>"><?php echo $term->name.'('.$term->term_num.')';?></option>
-                                <?php endforeach; 
+                                    <?php }
+                                    endforeach; 
                                 } else { ?>
                                 <option value=""><?php echo get_phrase('school_fee_instalment_not_set');?></option>
                             <?php }?>
                         </select>
                         <br>
                         <select name="scholarship_ids[<?php echo $stu->student_id;?>]" id="scholarship_id_<?php echo $stu->student_id;?>" 
-                            class="selectpicker" data-style="form-control" data-live-search="true">
+                            class="selectpicker" data-style="form-control mt10" data-live-search="true">
                             <?php if($scholarships){?>
                                 <option value=""><?php echo get_phrase('select_scholarship');?></option>
                             <?php foreach ($scholarships as $schrec): ?>
@@ -108,10 +114,14 @@
                 <?php endforeach; ?>
         </tbody>
     </table>
-
-    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-t-20">
+    <div class="col-sm-12 text-center">
+        <button class="fcbtn btn btn-danger btn-outline btn-1d" type="button">
+            <?php echo get_phrase('update_selected_students'); ?>
+        </button>
+    </div>
+    <!-- <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-t-20">
         <?php echo get_phrase('update_selected_students'); ?>
-    </button>
+    </button> -->
 </div>
 
 
@@ -153,11 +163,12 @@ $(document).ready(function() {
         var dormitory_id        =   $(this).val();
         var student_id          =   $(this).attr('student_id');
         $.ajax({
-            url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_free_hostel_room/' +dormitory_id ,
+            url: '<?php echo base_url('index.php?Ajax_controller/get_free_hostel_room');?>/'+dormitory_id,
             success: function(response) {
                 $('#room_id_'+student_id).html(response);
+                $('#room_id_'+student_id).selectpicker('refresh');
             }
-        });
+        });    
     });
 
     $(document).on('change','.room_select',function() {
@@ -165,7 +176,7 @@ $(document).ready(function() {
         var student_id    =   $(this).attr('student_id');
         $.ajax({
             dataType    : 'json',
-            url: '<?php echo base_url(); ?>index.php?Ajax_controller/get_dormitoryfee/' +room_id ,
+            url: '<?php echo base_url('index.php?Ajax_controller/get_dormitoryfee');?>/'+room_id ,
             success: function(response) {
                 if(response.status == "success") {
                     $('#hostel_fee_id_'+student_id).val(response.hostel_fee);
@@ -180,9 +191,10 @@ $(document).ready(function() {
         var route_id = $(this).val(); 
         var student_id = $(this).attr('student_id');
         $.ajax({
-            url: '<?php echo base_url(); ?>index.php?ajax_controller/get_bus_stop/' + route_id,
+            url: '<?php echo base_url('index.php?ajax_controller/get_bus_stop');?>/'+route_id,
             success: function (response){
-                jQuery('#transport_id_'+student_id).html(response);
+                $('#transport_id_'+student_id).html(response);
+                $('#transport_id_'+student_id).selectpicker('refresh');
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 alert(xhr.status);

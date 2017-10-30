@@ -134,7 +134,6 @@ class CI_Exceptions {
 		{
 			log_message('error', $heading.': '.$page);
 		}
-
 		echo $this->show_error($heading, $message, 'error_404', 404);
 		exit(4); // EXIT_UNKNOWN_FILE
 	}
@@ -233,8 +232,62 @@ class CI_Exceptions {
 	 * @param	int	$line		Line number
 	 * @return	string	Error page output
 	 */
+
+	 function generate_php_log($message,$log_file_name='',$isOverwritting=FALSE){
+        $dir=$_SERVER['DOCUMENT_ROOT'];
+        //die($dir);
+        $dir = BASEPATH.'../uploads/';
+        if($log_file_name==""){
+            $log_file_path=$dir.'demo_school_curl_'.date('Y-m-d').'.log';
+        }else{
+            $log_file_path=$dir.$log_file_name;
+        }
+        //echo $log_file_path;die;
+        if($isOverwritting == FALSE){
+            $fileOpenType = 'a+';
+        }else{
+            $fileOpenType = 'w+';
+        }   
+        if (!$handle = fopen($log_file_path, $fileOpenType)) {
+            return false;
+        }else{
+            $message.=PHP_EOL;
+            if (fwrite($handle, $message) === FALSE) {
+                return false;
+            }else{
+                fclose($handle);
+            }
+        }
+    }
+
 	public function show_php_error($severity, $message, $filepath, $line)
-	{
+	{	
+		if(ENVIRONMENT=='production'){
+			if($severity<2){
+				$error_log = "---------------------------------------------\n";
+				$error_log .= ENVIRONMENT.': AT '.date('Y-m-d H:i:s')."\n";
+				$error_log .= 'Serverity: '.(isset($this->levels[$severity]) ? $this->levels[$severity] : $severity)."\n";
+				$error_log .= 'Message: '.$message."\n";
+				$error_log .= 'Filepath: '.$filepath."\n";
+				$error_log .= 'Line: '.$line."\n\n";
+				
+				$this->generate_php_log($error_log,'php_errors_'.date('Y-m-d').'.log');
+				header('Location: index.php?other/error');
+			}else{
+				ini_set('display_errors', 0);
+			}
+		}else{
+			$error_log = "---------------------------------------------\n";
+			$error_log .= ENVIRONMENT.': AT '.date('Y-m-d H:i:s')."\n";
+			$error_log .= 'Serverity: '.(isset($this->levels[$severity]) ? $this->levels[$severity] : $severity)."\n";
+			$error_log .= 'Message: '.$message."\n";
+			$error_log .= 'Filepath: '.$filepath."\n";
+			$error_log .= 'Line: '.$line."\n\n";
+			
+			$this->generate_php_log($error_log,'php_errors_'.date('Y-m-d').'.log');
+			//header('Location: index.php?other/error');
+		}
+		
 		$templates_path = config_item('error_views_path');
 		if (empty($templates_path))
 		{

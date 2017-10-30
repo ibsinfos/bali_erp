@@ -23,7 +23,7 @@
         <?php
             foreach($student_info as $row){  ?>
             
-            <div class="col-xs-12 col-sm-6 col-lg-4 text-center">
+            <div class="col-xs-12 col-sm-4 col-lg-4 text-center">
              <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('On click of student name, will display information of hostel and warden');?>" data-position='top'>
                 <div class="panel panel-default">
                     <img style="border-radius:50%; margin-top:10px;" width="150px" class="card-img-top" src="<?php echo $photo_url;?>">
@@ -130,13 +130,11 @@
                     </div>
                 </div>
             </div>
-        </div>
-        </div>
+                </div>
+            </div>
+        <?php } ?>
         </div>
     </div>
-
-
-<?php } ?>
 <?php } else { ?>
   <div class="panel panel-heading" data-collapsed="0" >
    <div class="panel-heading">

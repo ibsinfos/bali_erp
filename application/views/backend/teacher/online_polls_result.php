@@ -12,7 +12,7 @@
     </div>
 </div>
 
-<?php $count = 0;  if(!empty($online_polls)){$count = 0;
+<?php $count = 0;  if(!empty($online_polls)){$count = 0;/*
     foreach ($online_polls as $row) {  //pre($row);
         if(isset($row['poll_id'])){ $count++;?>
 
@@ -46,10 +46,55 @@
 </div>
 </div>
 <?php  } 
-        } }
+        }*/ }
 
-if($count == 0) {  ?>
+$count = 0;  if(!empty($online_polls)){$count = 0;?>
+<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Lists vote result.');?>" data-position='top'>
+    <!--<table id="table" class="table_edjust table-responsive display nowrap" cellspacing="0" width="100%" >-->
+    <table class="custom_table table display example" id="polls">
+        <thead>
+            <tr>
+                <th width="30%"><div><?php echo get_phrase('title'); ?></div></th>   
+                <th width="45%"><div><?php echo get_phrase('description'); ?></div></th>                            
+                <th width="17%"><div><?php echo get_phrase('winner'); ?></div></th>
+                <th width="8%"><div><?php echo get_phrase('%'); ?></div></th>
+            </tr>
+            <tbody>
+                <?php foreach ($online_polls as $row) {
+                    if(isset($row['poll_id'])){ $count++;?>
+                <tr>
+                    <td><?php echo $row['poll_title'];?>  <?php //echo ': '.$row['post_date'];?></td>
+                    <td><?php echo $row['poll_descreption']; ?></td>
+                    <?php if(!empty($row['answer_det'])) {
+                        $answ_count         =   1;
+                        $cHighestPer=0;
+                    foreach($row['answer_det'] as $answer) { 
+                        if($row['total_poll']==0){
+                            $answer_poll_percent=0;
+                        }else{
+                            $answer_poll_percent        =   ($answer['no_of_votes']/$row['total_poll'])*100;
+                        }
+                        if($cHighestPer<$answer_poll_percent){
+                            $cHighestPer=$answer_poll_percent;
+                            $winer=$answer['answer'];
+                        }
+                    } ?>
+                    <td><?php echo $winer;?></td>
+                    <td><?php echo round($cHighestPer, 2);?></td>
+                    <?php }else{?>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <?php }?>
+                </tr>
+                <?php }
+                }?>
+            </tbody>
+        </thead>
+    </table>
+    
+</div>
+<?php }else{?>
 <div class="panel panel-danger block6">
-    <div class="panel-heading">No polls available</div>
+    <div class="panel-heading">Poll result is not available</div>
 </div>            
 <?php } ?>

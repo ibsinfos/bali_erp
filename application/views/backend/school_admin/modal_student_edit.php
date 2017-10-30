@@ -2,7 +2,6 @@
 if (!empty($student_personal_info)) {
     ?>
     <from class="form-horizontal form-material">
-
     <?php echo form_open(base_url() . 'index.php?school_admin/student/do_update/' . $student_personal_info->student_id . '/' . $student_personal_info->class_id, array('class' => 'form-horizontal form-groups-bordered validate', 'enctype' => 'multipart/form-data')); ?>
 
         <div class="form-group">
@@ -14,7 +13,6 @@ if (!empty($student_personal_info)) {
                     ?>
                     <div class="el-overlay-1">
                         <img src="<?php echo $image_url; ?>" id="blah" alt="image" width="150" height="150" onmouseover="$('#profile_overlay').show();" onmouseout="$('#profile_overlay').show();">
-
                         <span class="select-wrapper-file"><input class="image-src-file" type='file' name ="userfile" onchange="readURL(this);" /></span> 
                     </div>
 
@@ -49,8 +47,8 @@ if (!empty($student_personal_info)) {
         </div>
         <div class="form-group">
             <div class="col-md-6 m-b-20"> 
-                <label><?php echo get_phrase('First_Name'); ?><span class="error mandatory"> *</span></label>
-                <input type="text" class="form-control" placeholder="Enter First Name" name="name" data-validate="required" required="required"  value="<?php echo $student_personal_info->name; ?>"></div>
+                <label><?php echo get_phrase('First_Name'); ?></label>
+                <input type="text" class="form-control" placeholder="Enter First Name" name="name" value="<?php echo $student_personal_info->name; ?>"></div>
 
             <div class="col-md-6 m-b-20">
                 <label><?php echo get_phrase('Middle_Name'); ?></label>
@@ -61,8 +59,8 @@ if (!empty($student_personal_info)) {
                 <input type="text" class="form-control" name="lname" placeholder="Enter Last Name" data-validate="required" value="<?php echo $student_personal_info->lname; ?>"></div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('birthdate'); ?><span class="error mandatory"> *</span></label>
-                <input type="text" id="datepicker" class="form-control" name="birthday"  placeholder="Enter Birthday" required="required" value="<?php echo $student_personal_info->birthday; ?>" data-start-view="2" data-validate="required"></div>
+                <label><?php echo get_phrase('date_of_birth'); ?></label>
+                <input type="text" id="datepicker" class="form-control" name="birthday"  placeholder="Enter Birthday" value="<?php echo $student_personal_info->birthday; ?>" data-start-view="2" data-validate="required" onchange="valid_dob(this.value);"></div>
 
             <?php if ($student_personal_info->class_name != 'Nursery') { ?>
                 <div class="col-sm-6">
@@ -82,14 +80,14 @@ if (!empty($student_personal_info)) {
                 <input type="text" class="form-control" name="course" placeholder="Enter Cousre" value="<?php echo $student_personal_info->course; ?>" data-validate="required" > </div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('Class'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('Class'); ?></label>
                 <input type="text" class="form-control" name="class" placeholder="Enter Class" disabled value="<?php echo $student_personal_info->class_name; ?>" 
                        data-validate="required" required="required">
             </div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('Section'); ?><span class="error mandatory"> *</span></label>
-                <select name="section_id" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" required="required" placeholder="Enter Section">
+                <label><?php echo get_phrase('Section'); ?></label>
+                <select name="section_id" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" placeholder="Enter Section">
                     <option value=""><?php echo get_phrase('select_section'); ?></option>
                             <?php
                             foreach ($sections as $section):
@@ -101,15 +99,15 @@ if (!empty($student_personal_info)) {
             </div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('admission_no'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('admission_no'); ?></label>
                 <input type="text" class="form-control" name="admission_no" placeholder="Enter Admission No." 
                        value="<?php echo $student_personal_info->admission_no ?>">
                 <input type="hidden" name="old_admission_no" value="<?php echo $student_personal_info->admission_no ?>">
             </div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('Gender'); ?><span class="error mandatory"> *</span></label>
-                <select name="sex" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" required="required" placeholder="Enter Gender">
+                <label><?php echo get_phrase('Gender'); ?></label>
+                <select name="sex" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" placeholder="Enter Gender">
     <?php
     $gender = $student_personal_info->sex;
     ?>
@@ -130,10 +128,10 @@ if (!empty($student_personal_info)) {
             <div class="col-md-6 m-b-20">
                 <label><?php echo get_phrase('icard_type'); ?></label>
                 <input type="text" class="form-control" name="type" data-validate="required" placeholder="Enter Icard type" value="<?php echo $student_personal_info->type; ?>"></div>
-
+<?php // pre($student_personal_info); die; ?>
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('Select_parent_name'); ?><span class="error mandatory"> *</span></label>
-                <select name="parent_id" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" required="required" placeholder="Select Parent Name">
+                <label><?php echo get_phrase('Select_parent_name'); ?></label>
+                <select name="parent_id" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" placeholder="Select Parent Name">
                     <option value=""><?php echo get_phrase('select'); ?></option>
                             <?php
                                 $parent_id = $student_personal_info->parent_id;
@@ -141,7 +139,7 @@ if (!empty($student_personal_info)) {
                                     ?>
                         <option value="<?php echo $parent['parent_id']; ?>"
                         <?php if ($parent['parent_id'] == $parent_id) echo 'selected'; ?>>
-        <?php echo $parent['father_name']; ?>
+        <?php echo $parent['father_name']." ".$parent['father_mname']; ?>
                         </option>
         <?php
     endforeach;
@@ -150,8 +148,8 @@ if (!empty($student_personal_info)) {
             </div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('nationality'); ?><span class="error mandatory"> *</span></label>
-                <select id="nationality" name ="nationality" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" placeholder="Select Nationality" data-message-required ="Please select your country of residence" required="required" >
+                <label><?php echo get_phrase('nationality'); ?></label>
+                <select id="nationality" name ="nationality" class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" placeholder="Select Nationality" data-message-required ="Please select your country of residence" >
                     <option value="">--Select Nationality--</option>
                     <?php
                     $selected = '';
@@ -172,11 +170,11 @@ if (!empty($student_personal_info)) {
                 </select></div>
 
             <div class="col-md-12 m-b-20">
-                <label><?php echo get_phrase('Address'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('Address'); ?></label>
                 <textarea class="form-control" rows="2" name="address" placeholder="Enter Address" data-validate="required" required="required"><?php echo $student_personal_info->address; ?></textarea></div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('Country'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('Country'); ?></label>
                 <select id="country" name ="country" placeholder="Select Country"  class="selectpicker1" data-style="form-control" data-live-search="true" data-validate="required" data-message-required ="Please select your country of residence" required="required">
                     <option value=""></option>
                     <?php
@@ -202,11 +200,11 @@ if (!empty($student_personal_info)) {
                 <input type="text" class="form-control" name="place_of_birth" placeholder="Enter Place of Borth" value="<?php echo $student_personal_info->place_of_birth; ?>" ></div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('Phone_no'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('Phone_no'); ?></label>
                 <input type="tel" class="form-control" name="phone" placeholder="Enter Phone No" value="<?php echo $student_personal_info->phone; ?>" title=""  required="required"></div>
 
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('Card_id'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('Card_id'); ?></label>
                 <input type="text" class="form-control" name="card_id" placeholder="Enter Card Id" value="<?php echo $student_personal_info->card_id; ?>" data-validate="required" required="required"></div>
 
             <div class="col-md-6 m-b-20">
@@ -246,27 +244,30 @@ if (!empty($student_personal_info)) {
                     $select1 = '';
                 }
                 ?>
-                <label for="media_consent"><?php echo get_phrase("media_consent"); ?><span class="error mandatory"> *</span></label>
+                <label for="media_consent"><?php echo get_phrase("media_consent"); ?></label>
                 <input type="radio" name="media_consent" value="NO" <?php echo $select1; ?> >NO &nbsp;
                 <input type="radio" name="media_consent" value="YES" <?php echo $select2; ?> >YES
             </div>
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('emirates_id'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('emirates_id'); ?></label>
                 <input type="text" class="form-control" name="emirates_id" placeholder="Enter Emirates Id" value="<?php echo $student_personal_info->emirates_id; ?>" data-validate="required" required="required"></div>
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('visa_no'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('visa_no'); ?></label>
                 <input type="text" class="form-control" name="visa_no" placeholder="Enter Visa Number" value="<?php echo $student_personal_info->visa_no; ?>" data-validate="required" required="required"></div>
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('visa_expiry_date'); ?><span class="error mandatory"> *</span></label>
-                <input type="text" class="form-control" name="visa_expiry_date" placeholder="Enter Visa Expiry Date" value="<?php echo $student_personal_info->visa_expiry_date; ?>" data-validate="required" required="required"></div>
+                <label><?php echo get_phrase('visa_expiry_date'); ?></label>
+                <input type="text" class="form-control mydatepicker" name="visa_expiry_date" placeholder="Enter Visa Expiry Date" value="<?php echo $student_personal_info->visa_expiry_date; ?>" data-validate="required" required="required"></div>
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('passport_expiry_date'); ?><span class="error mandatory"> *</span></label>
-                <input type="text" class="form-control" name="passport_expiry_date" placeholder="Enter Passport Expiry Date" value="<?php echo $student_personal_info->passport_expiry_date; ?>" data-validate="required" required="required"></div>
+                <label><?php echo get_phrase('passport_expiry_date'); ?></label>
+                <input type="text" class="form-control mydatepicker" name="passport_expiry_date" placeholder="Enter Passport Expiry Date" value="<?php echo $student_personal_info->passport_expiry_date; ?>" data-validate="required" required="required"></div>
             <div class="col-md-6 m-b-20">
-                <label><?php echo get_phrase('allergies'); ?><span class="error mandatory"> *</span></label>
+                <label><?php echo get_phrase('allergies'); ?></label>
                 <input type="text" class="form-control" name="allergies" placeholder="Enter Allergies" value="<?php echo $student_personal_info->allergies; ?>" data-validate="required" required="required"></div>
+                <div class="col-md-6 m-b-20">
+                <label><?php echo get_phrase('emergency_contact_number'); ?></label>
+                <input type="text" class="form-control" name="emergency_contact_number" placeholder="Enter Emergency Contact Number" value="<?php echo $student_personal_info->emergency_contact_number; ?>" data-validate="required" required="required"></div>
             <div class="col-md-12 m-b-20 text-right">
-                <button class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('Update'); ?>
+                <button class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('edit_student'); ?>
                 </button></div>
         </div>
     <?php echo form_close(); ?>
@@ -276,9 +277,15 @@ if (!empty($student_personal_info)) {
 ?>
 <script type="text/javascript">
     $(function () {
-        $('#datepicker').datepicker();
+        $('#datepicker').datepicker({
+             format: 'dd-mm-yyyy',
+        });
     });
 
+
+   $('.mydatepicker').datepicker({
+             format: 'dd-mm-yyyy',
+   });
     function remove_profile(student_id) {
         $.ajax({
             url: '<?php echo base_url(); ?>index.php?ajax_controller/remove_student_image/',
@@ -289,5 +296,43 @@ if (!empty($student_personal_info)) {
         });
         window.location.reload();
     }
+jQuery('.mydatepicker, #datepicker').datepicker();
 
+    var minAge = 2;
+
+   function valid_dob(dob){
+    var age = _calcAge(dob);
+        //alert("my age is " + age);
+        if (age < minAge) {
+            alert("Age Should be Two Year Minimum");
+            document.getElementById("datepicker").focus();
+            document.getElementById("datepicker").value = "'";
+        }
+   }
+
+
+
+ //Calculates age from given Birth Date in the form//
+    function _calcAge(dt1) {
+//alert("success"); die;
+        var birth_date = new Date(dt1);
+
+        var birth_year = birth_date.getFullYear();
+        var birth_month = birth_date.getMonth();
+        var calc_year = curr_year - birth_year;
+        var calc_month = curr_month - birth_month;
+
+        return calc_year;
+        //The following below is what I am not sure about. 
+        //I need to combine years and months and
+        //convert them into a string??? Is this syntax dead wrong?
+        
+//    var final_result = (calc_year && "." && calc_month).toString();
+
+        // final result should be a number with a decimal point, example: 35.5
+//        final_result = parseFloat;
+//alert(final_result); die;
+//        return (final_result);
+        
+    }
 </script>

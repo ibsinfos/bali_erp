@@ -68,47 +68,52 @@
                     <span class="mandatory"> <?php echo form_error('contactName'); ?></span>
                 </div>  
             </div>
-
-            <div class="row">    
+        <div class="row">
                 <div class="col-xs-12 col-md-6 form-group">
                     <label class="control-label"><?php echo get_phrase('seller_address'); ?><span class="error mandatory"> *</span></label> 
-                    <input type="text" class="form-control" id="sellerAddress" value="<?php echo $seller_address; ?>"  placeholder="Seller Address" name="sellerAddress" autocomplete="off" required="required">
+                     <textarea class="form-control" id="sellerAddress" name="sellerAddress" rows="9" required placeholder="Please enter seller address"><?php echo $seller_address; ?></textarea>
                     <span class="mandatory"> <?php echo form_error('sellerAddress'); ?></span>
-                </div>
-
-                <div class="col-xs-12 col-md-4 form-group ">
+                </div>                
+<input type="hidden" name="old_doc" value="<?php echo $attached_document;?>">
+                <?php if($attached_document!=" ") { 
+                     $attached_document = "uploads/inventory_seller_document/".$attached_document;
+                }else{
+                    $attached_document = '';
+                }
+?>
+                <div class="col-xs-12 col-md-6 form-group ">
                     <label for="sellerAddress">
                         <?php echo get_phrase('change_business_card:'); ?>
                     </label>
-                    <div class="input-group">
-                        <div class="input-group-addon"><i class="fa fa-address-book"></i></div>
-                        <input type="file" id="input-file-now" class="dropify" name="attached_document" />
-                    </div>
+<!--                    <div class="input-group">
+                        <div class="input-group-addon"><i class="fa fa-address-book"></i></div>-->
+<?php if (!empty($attached_document) && file_exists(FCPATH.'uploads/inventory_seller_document/'.$attached_document)){ ?>
+                        <input type="file" id="input-file-now" class="dropify" name="attached_document" data-default-file="<?php echo $attached_document;?>" />
+<?php }else{ ?>
+    <input type="file" id="input-file-now" class="dropify" name="attached_document"  />
+<?php } ?>
+                    <!--</div>-->
                 </div>
+        </div>
 
-                <div class="col-xs-2 col-md-1">
-                    <?php if($attached_document!=" ") {?>
-                    <input type="hidden" name="old_doc" value="<?php echo $attached_document;?>">
-                    <img src="<?php echo "uploads/inventory_seller_document/".$attached_document;?>" class="attached_document"/> <?php }else {?>
+<!--                <div class="col-xs-2 col-md-1">
+                    <?php // if($attached_document!=" ") {?>
+                    
+                    <img src="<?php // echo "uploads/inventory_seller_document/".$attached_document;?>" class="attached_document"/> <?php // }else {?>
 
-                        <img src="<?php echo "uploads/inventory_seller_document/document.jpg";?>" class="attached_document"/>
+                        <img src="<?php // echo "uploads/inventory_seller_document/document.jpg";?>" class="attached_document"/>
 
-                        <?php }?>
-                </div>
-            </div>
-
+                        <?php /// }?>
+                </div>-->
+            
             <div class=" text-right">
-
                 <button data-step="6" data-intro="<?php echo get_phrase('Click onn the edit button to save the details of the seller.');?>" data-position="left" type="submit" class="fcbtn btn btn-danger btn-outline btn-1d">
-                    <?php echo get_phrase('update'); ?>
+                    <?php echo get_phrase('update_seller'); ?>
                 </button>
             </div>
         </form>
-
     </div>
-</div>
-
-
+    </div>
 <script type="text/javascript">
     jQuery(document).ready(function () {
         $(".numeric").numeric();

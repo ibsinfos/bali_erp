@@ -1,3 +1,9 @@
+<style type="text/css">
+    .dropdown-menu{
+        position: relative !important;
+    }
+</style>
+
 <div class="row bg-title">
     <!-- .page title -->
     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
@@ -34,7 +40,7 @@
             </li>
             <li data-step="6" data-intro="<?php echo get_phrase('New bus stop can be add from here');?>" data-position='bottom'>
                 <a href="#add" class="sticon fa fa-plus-circle" >
-                    <span><?php echo get_phrase('add_bus_stops'); ?></span>
+                    <span><?php echo get_phrase('add_bus_stop'); ?></span>
                 </a>
             </li>
         </ul>
@@ -50,7 +56,7 @@
                             <th><div><?php echo get_phrase('bus_stop_from'); ?></div></th>
                             <th><div><?php echo get_phrase('bus_stop_to'); ?></div></th>
                             <th><div><?php echo get_phrase('route_fare'); ?></div></th>                                
-                            <th><div><?php echo get_phrase('options'); ?></div></th>
+                            <th><div><?php echo get_phrase('action'); ?></div></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,9 +72,21 @@
 
                                 <td>
                                      <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_edit_bus_stops/<?php echo $row['route_bus_stop_id']; ?>');"> <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil-square-o"></i></button></a>
-                                                  
+      <?php
+        $transaction = $row['transaction'];
+        if(intval($transaction)>0)
+        {    
+             echo '<button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 disabled"  data-placement="top" data-original-title="'.get_phrase('delete_class').'" title="'.get_phrase('delete_class').'"><i class="fa fa-trash-o"></i> </button>';
+                            }
+                            else
+                            {
+                                ?>
+        
       <a href="#" onclick="confirm_modal('<?php echo base_url(); ?>index.php?school_admin/route_bus_stop/delete/<?php echo $row['route_bus_stop_id']; ?>');">
-                                             <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete"><i class="fa fa-trash-o"></i></button></a>                                    
+                                             <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete"><i class="fa fa-trash-o"></i></button></a>
+                                  <?php
+                            }
+                            ?>
                                     </div>
                                 </td>
                             </tr>
@@ -132,7 +150,7 @@
                             <?php if(sett('new_fi')){?>
                                 <input type="number" min="1" class="form-control" name="route_fare" placeholder="<?php echo get_phrase('route_fare');?>" required/>
                             <?php }else{?>
-                                <select class="selectpicker" data-style="form-control" data-live-search="true" id="route_fare" name="route_fare" required="required" data-max-options="2">
+                                <select class="selectpicker" data-style="form-control" data-live-search="true" id="route_fare" name="route_fare" required="required" data-max-options="2" >
                                     <option value=""><?php echo get_phrase('select_option'); ?></option>
                                     <?php foreach ($charges as $charge):?>
                                         <option value="<?php echo $charge['sales_price'] . '|' .

@@ -7,9 +7,20 @@
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" id="take-tour" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
-        <ol class="breadcrumb">
+        <?php /* <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
             <li><a href="<?php echo base_url(); ?>index.php?disciplinary/manage_incident"><?php echo get_phrase('manage_violation_types'); ?></a></li>
+            <li class="active"><?php echo get_phrase($page_title); ?></li>
+        </ol> */ ?>
+		<ol class="breadcrumb">
+            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li><?php echo get_phrase('disciplinary'); ?>
+                <ul>                    
+                    <li><a href="<?php echo base_url(); ?>index.php?disciplinary/manage_violation_types"><?php echo get_phrase('Violation Type'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?disciplinary/manage_incident"><?php echo get_phrase('All Incidents'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?disciplinary/my_incident"><?php echo get_phrase('My Incidents'); ?></a></li>
+                </ul>
+            </li>
             <li class="active"><?php echo get_phrase($page_title); ?></li>
         </ol>
     </div>
@@ -25,7 +36,7 @@ if($this->session->flashdata('flash_message_error')) {?>
 <div class="row">
     <div class="col-md-12">
         <?php foreach($details as $row){?>
-        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('You can add a new incident from here.');?>" data-position='top'>
+        <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('You can update incident from here.');?>" data-position='top'>
             <?php echo form_open(base_url() . 'index.php?disciplinary/add_incident/edit/'.$row['incident_id'], array('class' => 'validate', 'target' => '_top')); ?> 
             <div class="row">
                 <div class="col-md-6 form-group">
@@ -103,7 +114,7 @@ if($this->session->flashdata('flash_message_error')) {?>
                         echo 'selected';
                     }
                     ?> value="<?php echo $value['teacher_id']; ?>">
-                            <?php echo $value['name']; ?>
+                            <?php echo $value['name']." ".$value['last_name']; ?>
                     </option>
                 <?php endforeach; ?>
                     </select> 
@@ -130,8 +141,8 @@ if($this->session->flashdata('flash_message_error')) {?>
                         <input id= "expiry_date" type="text" class="form-control mydatepicker"  name="expiry_date" value="<?php echo date('d-m-Y',strtotime($row['expiry_date'])); ?>" placeholder="Pick a date" required="required" data-validate="required" data-message-required ="Please pick a date">
                     </div> 
                 </div>
-                <div class="col-md-6 form-group text-right">
-                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Submit" data-step="6" data-intro="<?php echo get_phrase('You can submit from here.');?>" data-position='left'/>
+                <div class="col-md-12 form-group text-center">
+                <input type="submit" class="fcbtn btn btn-danger btn-outline btn-1d" value="Update" data-step="6" data-intro="<?php echo get_phrase('You can update incident from here.');?>" data-position='left'/>
             </div>
             </div>
               

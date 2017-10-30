@@ -277,8 +277,8 @@ class Default_EmppersonaldetailsController extends Zend_Controller_Action
 				
 				$genderaddpermission = sapp_Global::_checkprivileges(GENDER,$loginUserGroup,$loginUserRole,'add');
 				$msaddpermission = sapp_Global::_checkprivileges(MARITALSTATUS,$loginUserGroup,$loginUserRole,'add');
-				$ethnicaddpermission = sapp_Global::_checkprivileges(ETHNICCODE,$loginUserGroup,$loginUserRole,'add');
-				$racecodepermission = sapp_Global::_checkprivileges(RACECODE,$loginUserGroup,$loginUserRole,'add');
+//				$ethnicaddpermission = sapp_Global::_checkprivileges(ETHNICCODE,$loginUserGroup,$loginUserRole,'add');
+//				$racecodepermission = sapp_Global::_checkprivileges(RACECODE,$loginUserGroup,$loginUserRole,'add');
 				$languagepermission = sapp_Global::_checkprivileges(LANGUAGE,$loginUserGroup,$loginUserRole,'add');
 				$nationalityaddpermission = sapp_Global::_checkprivileges(NATIONALITY,$loginUserGroup,$loginUserRole,'add');
 				$id = $this->getRequest()->getParam('userid');
@@ -316,8 +316,8 @@ class Default_EmppersonaldetailsController extends Zend_Controller_Action
 								$genderModel = new Default_Model_Gender();
 								$maritalstatusmodel = new Default_Model_Maritalstatus();
 								$nationalitymodel = new Default_Model_Nationality();
-								$ethniccodemodel = new Default_Model_Ethniccode();
-								$racecodemodel = new Default_Model_Racecode();
+//								$ethniccodemodel = new Default_Model_Ethniccode();
+//								$racecodemodel = new Default_Model_Racecode();
 								$languagemodel = new Default_Model_Language();
 								$msgarray = array();
 
@@ -361,31 +361,31 @@ class Default_EmppersonaldetailsController extends Zend_Controller_Action
 									$emptyFlag++;
 								}
 
-								$ethniccodeArr = $ethniccodemodel->gettotalEthnicCodeData();
-								if(!empty($ethniccodeArr))
-								{
-									foreach ($ethniccodeArr as $ethniccoderes){
-										$emppersonaldetailsform->ethniccodeid->addMultiOption($ethniccoderes['id'],$ethniccoderes['ethnicname']);
-
-									}
-								}else
-								{
-									$msgarray['ethniccodeid'] = 'Ethnic codes are not configured yet.';
-									$emptyFlag++;
-								}
-
-								$racecodeArr = $racecodemodel->gettotalRaceCodeData();
-								if(!empty($racecodeArr))
-								{
-									foreach ($racecodeArr as $racecoderes){
-										$emppersonaldetailsform->racecodeid->addMultiOption($racecoderes['id'],$racecoderes['racename']);
-
-									}
-								}else
-								{
-									$msgarray['racecodeid'] = 'Race codes are not configured yet.';
-									$emptyFlag++;
-								}
+//								$ethniccodeArr = $ethniccodemodel->gettotalEthnicCodeData();
+//								if(!empty($ethniccodeArr))
+//								{
+//									foreach ($ethniccodeArr as $ethniccoderes){
+//										$emppersonaldetailsform->ethniccodeid->addMultiOption($ethniccoderes['id'],$ethniccoderes['ethnicname']);
+//
+//									}
+//								}else
+//								{
+//									$msgarray['ethniccodeid'] = 'Ethnic codes are not configured yet.';
+//									$emptyFlag++;
+//								}
+//
+//								$racecodeArr = $racecodemodel->gettotalRaceCodeData();
+//								if(!empty($racecodeArr))
+//								{
+//									foreach ($racecodeArr as $racecoderes){
+//										$emppersonaldetailsform->racecodeid->addMultiOption($racecoderes['id'],$racecoderes['racename']);
+//
+//									}
+//								}else
+//								{
+//									$msgarray['racecodeid'] = 'Race codes are not configured yet.';
+//									$emptyFlag++;
+//								}
 
 								$languageArr = $languagemodel->gettotalLanguageData();
 								if(!empty($languageArr))
@@ -428,8 +428,8 @@ class Default_EmppersonaldetailsController extends Zend_Controller_Action
 									$emppersonaldetailsform->setDefault('genderid',$data[0]['genderid']);
 									$emppersonaldetailsform->setDefault('maritalstatusid',$data[0]['maritalstatusid']);
 									$emppersonaldetailsform->setDefault('nationalityid',$data[0]['nationalityid']);
-									$emppersonaldetailsform->setDefault('ethniccodeid',$data[0]['ethniccodeid']);
-									$emppersonaldetailsform->setDefault('racecodeid',$data[0]['racecodeid']);
+//									$emppersonaldetailsform->setDefault('ethniccodeid',$data[0]['ethniccodeid']);
+//									$emppersonaldetailsform->setDefault('racecodeid',$data[0]['racecodeid']);
 									$emppersonaldetailsform->setDefault('languageid',$data[0]['languageid']);
 								}
 								$emppersonaldetailsform->user_id->setValue($id);
@@ -578,8 +578,8 @@ class Default_EmppersonaldetailsController extends Zend_Controller_Action
 					$genderid = $this->_request->getParam('genderid');
 					$maritalstatusid = $this->_request->getParam('maritalstatusid');
 					$nationalityid = $this->_request->getParam('nationalityid');
-					$ethniccodeid = $this->_request->getParam('ethniccodeid');
-					$racecodeid = $this->_request->getParam('racecodeid');
+//					$ethniccodeid = $this->_request->getParam('ethniccodeid');
+//					$racecodeid = $this->_request->getParam('racecodeid');
 					$languageid = $this->_request->getParam('languageid');
 		
 					$dob = $this->_request->getParam('dob');
@@ -597,8 +597,8 @@ class Default_EmppersonaldetailsController extends Zend_Controller_Action
 						                 'genderid'=>$genderid,
 										 'maritalstatusid'=>$maritalstatusid,
 		                                 'nationalityid'=>$nationalityid,
-		                                 'ethniccodeid'=>$ethniccodeid,
-		                                 'racecodeid'=>$racecodeid,
+		                                 'ethniccodeid'=>0,
+		                                 'racecodeid'=>0,
 		                                 'languageid'=>$languageid,    								 
 						      			 'dob'=>$dob,
 										 //'celebrated_dob'=>($celebrated_dob!=''?$celebrated_dob:NULL),

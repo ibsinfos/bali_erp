@@ -25,7 +25,7 @@ class Default_Model_Payrollcategory extends Zend_Db_Table_Abstract {
     protected $_name = 'payroll_category';
     protected $_primary = 'payroll_category_id';
 
-    public function getAllEarnings() {
+    public function getAllEarnings() { 
         $db = Zend_Db_Table::getDefaultAdapter();
         $query="SELECT pc.`payroll_category_id`,pc.`name`, pc.`code`,pc.`type`, pv.`payroll_value_id`,pv.`value_type_id`, "
                 . " (case "
@@ -37,7 +37,7 @@ class Default_Model_Payrollcategory extends Zend_Db_Table_Abstract {
                 . "     ( SELECT pvc.`value_category_id` FROM `payroll_value_condition` AS pvc WHERE pvc.`value_category_id`=pv.`value_category_id`) "
                 . " END) as value_formula "
                 . " FROM `payroll_category` AS pc, `payroll_value` AS pv "
-                . " WHERE pc.`payroll_category_id`=pv.`payroll_category_id` AND pc.`type`=0 ";
+                . " WHERE pc.`payroll_category_id`=pv.`payroll_category_id` AND pc.`type`=0 AND (pc.emp_id='0' OR pc.emp_id IS NULL)";
         //die($query);
         $usersData = $db->query($query);
         $usersResult = $usersData->fetchAll();
@@ -66,7 +66,7 @@ class Default_Model_Payrollcategory extends Zend_Db_Table_Abstract {
                 . "     ( SELECT pvc.`value_category_id` FROM `payroll_value_condition` AS pvc WHERE pvc.`value_category_id`=pv.`value_category_id`) "
                 . " END) as value_formula "
                 . " FROM `payroll_category` AS pc, `payroll_value` AS pv "
-                . " WHERE pc.`payroll_category_id`=pv.`payroll_category_id` AND pc.`type`=1 ";
+                . " WHERE pc.`payroll_category_id`=pv.`payroll_category_id` AND pc.`type`=1  AND (pc.emp_id='0' OR pc.emp_id IS NULL)";
         $usersData = $db->query($query);
         $usersResult = $usersData->fetchAll();
         $i = 0;
@@ -101,7 +101,7 @@ class Default_Model_Payrollcategory extends Zend_Db_Table_Abstract {
 
 FROM `payroll_category` AS pc, `payroll_group_category` AS pgc, `payroll_value` AS pv,`main_employees_summary` AS mes  
 WHERE pc.`payroll_category_id`=pgc.`category_id` AND pc.`payroll_category_id`=pv.`payroll_category_id` AND pc.`type`=0 AND
-mes.`emprole`=pgc.`group_id` AND mes.`user_id`=" . $user_id;
+mes.`emprole`=pgc.`group_id` AND mes.`user_id`='" . $user_id."' AND (pc.emp_id='0' OR pc.emp_id IS NULL)";
         $usersData = $db->query($query);
         $usersResult = $usersData->fetchAll();
 
@@ -126,7 +126,7 @@ mes.`emprole`=pgc.`group_id` AND mes.`user_id`=" . $user_id;
 
 FROM `payroll_category` AS pc, `payroll_group_category` AS pgc, `payroll_value` AS pv,`main_employees_summary` AS mes  
 WHERE pc.`payroll_category_id`=pgc.`category_id` AND pc.`payroll_category_id`=pv.`payroll_category_id` AND pc.`type`=1 AND
-mes.`emprole`=pgc.`group_id` AND mes.`user_id`=" . $user_id;
+mes.`emprole`=pgc.`group_id` AND mes.`user_id`='" . $user_id."' AND (pc.emp_id='0' OR pc.emp_id IS NULL)";
         $usersData = $db->query($query);
         $usersResult = $usersData->fetchAll();
 
@@ -147,6 +147,9 @@ mes.`emprole`=pgc.`group_id` AND mes.`user_id`=" . $user_id;
     }
 
     function save_category_values($dataArray,$emp_id) {
+        if($emp_id==''){
+            $emp_id = '';
+        }
         if ($dataArray['category_value'] == "numeric") {
             $payroll_value_numeric_db = new Default_Model_Payrollvaluenumeric();
             $value_category_id = $payroll_value_numeric_db->save_payroll_value_numeric(array("amount" => $dataArray['numeric'],"emp_id" => $emp_id));
@@ -195,14 +198,14 @@ mes.`emprole`=pgc.`group_id` AND mes.`user_id`=" . $user_id;
 
 FROM `payroll_category` AS pc, `payroll_group_category` AS pgc, `payroll_value` AS pv,`main_employees_summary` AS mes  
 WHERE pc.`payroll_category_id`=pgc.`category_id` AND pc.`payroll_category_id`=pv.`payroll_category_id` AND
-mes.`emprole`=pgc.`group_id` AND mes.`user_id`=" . $userId;
+mes.`emprole`=pgc.`group_id` AND mes.`user_id`='" . $userId."' AND (pc.emp_id IS NULL OR pc.emp_id = '0')";
         //echo $query;die;
         $usersData = $db->query($query);
         $usersResult = $usersData->fetchAll();
         return $usersResult;
     }
     
-    function get_emp_earning_deduction($userId) {
+    function get_emp_earning_deduction($userId,$payslip_id = '') {
         $db = Zend_Db_Table::getDefaultAdapter();
         $query = "SELECT pc.`payroll_category_id`,pc.`name`, pc.`code`,pc.`type`, pv.`payroll_value_id`,pv.`value_type_id`,`emprole_name`,
 (case when (pv.`value_type_id` = 0) 
@@ -218,8 +221,8 @@ mes.`emprole`=pgc.`group_id` AND mes.`user_id`=" . $userId;
  END)
  as value_formula
 
-FROM `payroll_category` AS pc,`payroll_value` AS pv,`main_employees_summary` AS mes  
-WHERE pc.`payroll_category_id` = pv.`payroll_category_id` AND mes.`user_id`=" . $userId." AND pc.emp_id = '".$userId."'";
+FROM `payroll_category` AS pc,`payroll_value` AS pv,`main_employees_summary` AS mes , payroll_payslip_details as ppd 
+WHERE pc.`payroll_category_id` = pv.`payroll_category_id` AND mes.`user_id`=" . $userId." AND pc.emp_id = '".$userId."' AND ppd.payroll_payslip_id = '".$payslip_id."'";
         //echo $query;die;
         $usersData = $db->query($query);
         $usersResult = $usersData->fetchAll();
@@ -446,9 +449,9 @@ WHERE pc.`payroll_category_id` = pv.`payroll_category_id` AND mes.`user_id`=" . 
         if($searchQuery != '')
             $where .= " AND ".$searchQuery;
         
-        $where .= " AND pc.emp_id IS NULL";
+        $where .= " AND (pc.emp_id IS NULL or pc.emp_id = '0')";
 
-      $payrollCategoryData = $this->select()
+     $payrollCategoryData = $this->select()
                                 ->setIntegrityCheck(false)	
                                 ->from(
                                         array('pc' => 'payroll_category'),array('pc.`payroll_category_id` id,pc.`name`, pc.`code`,pv.`payroll_value_id`,pv.`value_type_id`, (case when (pv.`value_type_id` = 0) THEN ( SELECT pvn.`amount` FROM `payroll_value_numeric` AS pvn WHERE pvn.`value_category_id`=pv.`value_category_id` )when (pv.`value_type_id` = 1) THEN  ( SELECT pvf.`formula` FROM `payroll_value_formula` AS pvf WHERE pvf.`value_category_id`=pv.`value_category_id` )  when (`value_type_id` = 2) THEN  ( SELECT pvc.`value_category_id` FROM `payroll_value_condition` AS pvc WHERE pvc.`value_category_id`=pv.`value_category_id`) END) as value_formula,(CASE WHEN (pc.type = 0) THEN  "Earning" WHEN (pc.type = 1) THEN "Deduction" END) as e_d_type','pc.payroll_category_id' => 'pv.payroll_category_id')
@@ -459,7 +462,7 @@ WHERE pc.`payroll_category_id` = pv.`payroll_category_id` AND mes.`user_id`=" . 
                                         )
                                 ->where($where)
                                 ->order("$by $sort")
-                                ->limitPage($pageNo, $perPage); //die;
+                                ->limitPage($pageNo, $perPage);
        //die;
                                 /*->from(array('pc' => 'payroll_category','pv' => 'payroll_value'),array('pc.`payroll_category_id`,pc.`name`, pc.`code`,pc.`type`, pv.`payroll_value_id`,pv.`value_type_id`, (case "" when (pv.`value_type_id` = 0) THEN      ( SELECT pvn.`amount` FROM `payroll_value_numeric` AS pvn WHERE pvn.`value_category_id`=pv.`value_category_id` )when (pv.`value_type_id` = 1) THEN  ( SELECT pvf.`formula` FROM `payroll_value_formula` AS pvf WHERE pvf.`value_category_id`=pv.`value_category_id` )  when (`value_type_id` = 2) THEN  ( SELECT pvc.`value_category_id` FROM `payroll_value_condition` AS pvc WHERE pvc.`value_category_id`=pv.`value_category_id`) "" END) as value_formula','pc.payroll_category_id' => 'pv.payroll_category_id','pc.type'=> 0))->where($where)->order("$by $sort")->limitPage($pageNo, $perPage); die;*/
         
@@ -515,8 +518,8 @@ WHERE pc.`payroll_category_id` = pv.`payroll_category_id` AND mes.`user_id`=" . 
     }
     
     function get_final_charges_of_payroll_category_by_code($code,$baseSal){
-        error_reporting(E_ALL|E_STRICT);
-        ini_set('display_errors', 'on');
+//        error_reporting(E_ALL|E_STRICT);
+//        ini_set('display_errors', 'on');
         
         $db = Zend_Db_Table::getDefaultAdapter();
         /*$sql="SELECT `pv.value_type_id` FROM `payroll_category` AS pc JOIN `payroll_value` AS pv ON(pc.payroll_categoryy_id=pv.payroll_category_id) "
@@ -578,7 +581,8 @@ WHERE pc.`payroll_category_id` = pv.`payroll_category_id` AND mes.`user_id`=" . 
         $result1 = $db->query($query1);
         $resultData1 = $result1->fetchAll();
 
-        $payslip_data=$db->query("SELECT * FROM `payroll_payslip` WHERE `emp_id`='".$emp_id."' and MONTH(generate_date)='".date('m',strtotime('-1 month'))."' and YEAR(generate_date)='".date('Y')."'");
+//        $payslip_data=$db->query("SELECT * FROM `payroll_payslip` WHERE `emp_id`='".$emp_id."' and payslip_month='".date('m',strtotime('-1 month'))."' and YEAR(generate_date)='".date('Y')."'");
+        $payslip_data=$db->query("SELECT * FROM `payroll_payslip` WHERE id='".$resultData1[0]['payroll_payslip_id']."'");
         $payslip_data_result = $payslip_data->fetchAll();
         
         $net_pay = $payslip_data_result[0]['net_pay'];

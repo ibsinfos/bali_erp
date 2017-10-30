@@ -28,7 +28,8 @@
 
     <div class="col-sm-4 form-group">
         <label class="control-label"><?php echo get_phrase('select_section'); ?></label>
-        <select id="section_holder" name="section_id" class="selectpicker" data-style="form-control" onchange="onsectionchange(this);" data-step="7" data-intro="<?php echo get_phrase('Here select you section for which you want to progress detail'); ?> " data-position='top'><option value="">Select Section</option>
+        <select id="section_holder" name="section_id" class="selectpicker" data-style="form-control" onchange="onsectionchange(this);" data-step="7" data-intro="<?php echo get_phrase('Here select you section for which you want to progress detail'); ?> " data-position='top' data-live-search="true">
+            <!--<option value="">Select Section</option>-->
             <?php foreach ($sections as $section) { ?>
                 <option value="<?php echo $section['section_id'] ?>" <?php if ($section_id == $section['section_id']) echo "selected"; ?>><?php echo $section['name']; ?></option>';
 
@@ -38,8 +39,8 @@
     <div class="col-sm-4 form-group">
         <label class="control-label"><?php echo get_phrase('student'); ?></label>
         <?php //pre($students); die;?>
-        <select id="student_holder" name="student_id" class="selectpicker" data-style="form-control" onchange="onstudentchange(this);" data-step="10" data-intro="<?php echo get_phrase('Here select you student for which you want to progress detail '); ?>" data-position='top'>  <option value="">Select Student</option>
-            <?php foreach ($students as $data) { ?>
+        <select id="student_holder" name="student_id" class="selectpicker" data-style="form-control" onchange="onstudentchange(this);" data-step="10" data-intro="<?php echo get_phrase('Here select you student for which you want to progress detail '); ?>" data-position='top' data-live-search="true">
+                <?php foreach ($students as $data) { ?>
                 <option value="<?php echo $data['student_id']; ?>" <?php if ($student_id == $data['student_id']) echo "selected"; ?>><?php echo $data['name']; ?></option>
             <?php } ?>
         </select>

@@ -2,7 +2,7 @@
 <table class="grid" width="100%" cellspacing="0" cellpadding="4" border="0" align="center">
     <?php if(!empty($this->filterData)):?>
     <thead>
-        <th>&nbsp;</th>
+        <th width="10%">&nbsp;</th>
         <th width=120><span class='action-text'>First Name</span></th>
         <th width=120><span class='action-text'>Last Name</span></th>
         <th width=120><span class='action-text'>Employee ID</span></th>
@@ -23,7 +23,7 @@
             <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['firstname'];?></span></td>
             <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['lastname'];?></span></td>
             <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['employeeId'];?></span></td>
-            <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['net_pay'];?></span></td>
+            <td><span title="<?php echo $v['rolename'];?>"><?php echo number_format($v['net_pay'],2);?></span></td>
             <td><span title="<?php echo $v['rolename'];?>"><?php echo $v['emprole_name'];?></span></td>
         </tr>
     <?php endforeach;?>

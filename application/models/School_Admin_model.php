@@ -71,10 +71,20 @@ class School_Admin_model extends CI_Model {
     }
     
     public function update_profile($dataArray, $admin_id){
-        
+        $emailData = $this->db->where("school_admin_id='".$admin_id."'")->get('school_admin')->result_array();  
         $this->db->where('school_admin_id', $admin_id);
         $this->db->update('school_admin', $dataArray);
-        return true; 
+
+        $email = $dataArray['email'];
+        // Fi Update
+        $fiData = array('username'=>$email);
+        $this->db->where('username', $emailData[0]['email']);
+        $this->db->update('sys_users',$fiData);
+        // HRM Update
+        $hrmData = array('emailaddress'=>$email);
+        $this->db->where('emailaddress', $emailData[0]['email']);
+        $this->db->update('main_users',$hrmData);
+        return true;
     }
         
     public function updateadmin_password($dataArray, $admin_id) {
@@ -106,9 +116,11 @@ class School_Admin_model extends CI_Model {
     }
     
     public function get_school_admin_list($school_id = '') {
-        $this->db->where(array('status' => '1'));
-        $this->db->order_by("first_name", "asc");
-        $data = $this->db->get('school_admin')->result_array();
+       $sql = " SELECT school_admin.* FROM `school_admin`  
+                INNER JOIN admin_school_mapping ON school_admin.`school_admin_id` = admin_school_mapping.`admin_id`
+                WHERE admin_school_mapping.`school_id` = $school_id AND STATUS = '1'
+                ORDER BY `first_name` ASC";
+       $data = $this->db->query($sql)->result_array();
         
         if(count($data)){
             foreach($data as $k => $datum){
@@ -260,4 +272,20 @@ class School_Admin_model extends CI_Model {
         $data = $this->db->get()->result_array();
         return $data;
     }
+    
+    function get_school_admin_image($id){
+                $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+        }
+     return   $this->db->get_where($this->_table, array('school_admin_id' => $id))->row();
+//    echo $this->db->last_query(); die;
+       
+        }
+        
+    function get_school_admin_name($school_admin_id){
+        $result = $this->db->select('first_name,last_name,name')->from($this->_table)->where('school_admin_id',$school_admin_id)->get()->row();
+        return $result;
+    }
+    
 }

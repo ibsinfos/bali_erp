@@ -54,7 +54,7 @@
                              <td><?php echo $row['allot_sms'];?></td>
                              <td>
                                  <!--edit -->
-                                 <a href="#" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/get_shcool_info_edit/<?php echo $row['id'];?>');" data-step="6" data-intro="<?php echo get_phrase('Here select you class for which you want to assessment list and add new assessment');?>" data-position='bottom'><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit Assessment"><i class="fa fa-pencil-square-o"></i></button></a>
+                                 <a href="#" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/get_shcool_info_edit/<?php echo $row['id'];?>');" data-step="6" data-intro="<?php echo get_phrase('Here_select_you_class_for_which_you_want_to_assessment_list_and_add_new_assessment');?>" data-position='bottom'><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit Assessment"><i class="fa fa-pencil-square-o"></i></button></a>
                              <!--delete -->
                              <a href="#" onclick="confirm_modal('<?php echo base_url(); ?>index.php?school_admin/add_school/delete/<?php echo $row['id']; ?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete Assessment"><i class="fa fa-trash-o"></i></button></a>
                                                

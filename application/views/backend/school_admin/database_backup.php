@@ -57,7 +57,7 @@
                         <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete"><i class="fa fa-trash-o"></i></button>
                     </a> &nbsp;
                     <a href="<?php echo base_url(); ?>index.php?school_admin/download_database_manual_backups/<?php echo $datum['name']; ?>">
-                        <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete"><i class="fa fa-download"></i></button>
+                        <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Download"><i class="fa fa-download"></i></button>
                     </a>
                 </td>
             </tr><?php }} ?>

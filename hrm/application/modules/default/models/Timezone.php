@@ -131,6 +131,14 @@ class Default_Model_Timezone extends Zend_Db_Table_Abstract
 		$result = $db->query($query)->fetchAll();
 		return $result;
 	}
+        
+        public function get_all_timezones()
+	{
+		$db = Zend_Db_Table::getDefaultAdapter();
+		$query = "select * from tbl_timezones";
+		$result = $db->query($query)->fetchAll();
+		return $result;
+	}
 	
 	public function savetimezonedetails($str,$desc,$loginid)
 	{	

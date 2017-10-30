@@ -22,7 +22,7 @@
         </div>
 
         <div class="row">
-            <div class="col-sm-10 form-group text-right"><br>
+            <div class="col-sm-12 form-group text-center"><br>
                 <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("update");?></button> 
             </div>
         </div>

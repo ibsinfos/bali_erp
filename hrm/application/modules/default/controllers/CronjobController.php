@@ -640,8 +640,8 @@ class Default_CronjobController extends Zend_Controller_Action {
         $empsalarydetailsModal = new Default_Model_Empsalarydetails();
         //$this->pre($alllEmployee);die;
 
-        error_reporting(E_ALL|E_STRICT);
-        ini_set('display_errors', 'on');
+//        error_reporting(E_ALL|E_STRICT);
+//        ini_set('display_errors', 'on');
         /// getting payslip generatting date;
 
         $payfrequency= new Default_Model_Payfrequency();
@@ -777,7 +777,8 @@ class Default_CronjobController extends Zend_Controller_Action {
                         $totalSal+=$tempSalaryCategoryalue;
                     }else{
                         $totalSal-=$tempSalaryCategoryalue;
-                    } $this->pre("come at 741");
+                    } 
+                    $this->pre("come at 741");
                 }
                 //$this->pre($totalSal);
             }
@@ -801,6 +802,63 @@ class Default_CronjobController extends Zend_Controller_Action {
             }
         }
         //die("KK");
+    }
+    
+    public function empworkpermitexpiryAction() {
+        $this->_helper->viewRenderer->setNoRender(true);
+        $this->_helper->layout()->disableLayout();
+
+        $email_model = new Default_Model_EmailLogs();
+        $cron_model = new Default_Model_Cronstatus();
+
+        $cron_status = $cron_model->getActiveCron('Employee expiry');
+
+        $earr = array('workpermit' => 'Workpermit', 'visa' => 'Visa', 'passport' => 'Passport');
+        if ($cron_status == 'yes') {
+            try {
+                //updating cron status table to in-progress
+                $cron_data = array(
+                    'cron_status' => 1,
+                    'cron_type' => 'Employee expiry',
+                    'started_at' => gmdate("Y-m-d H:i:s"),
+                );
+
+                $cron_id = $cron_model->SaveorUpdateCronStatusData($cron_data, '');
+
+                if ($cron_id != '') {
+                    $calc_date = new DateTime(date('Y-m-d'));
+                    $calc_date->add(new DateInterval('P1M'));
+                    $print_date = $calc_date->format(DATEFORMAT_PHP);
+                    $calc_date = $calc_date->format('Y-m-d');
+                    $mail_data = $email_model->getEmpExpiryData($calc_date);
+                    if (count($mail_data) > 0) {
+                        foreach ($mail_data as $mdata) {
+                            $base_url = 'http://' . $this->getRequest()->getHttpHost() . $this->getRequest()->getBaseUrl();
+                            $view = $this->getHelper('ViewRenderer')->view;
+                            $this->view->emp_name = $mdata['userfullname'];
+                            $this->view->etype = $earr[$mdata['etype']];
+                            $this->view->expiry_date = $print_date;
+                            $text = $view->render('mailtemplates/empexpirycron.phtml');
+                            $options['subject'] = APPLICATION_NAME . ': ' . $earr[$mdata['etype']] . ' renewal';
+                            $options['header'] = 'Greetings from ' . APPLICATION_NAME;
+                            $options['toEmail'] = $mdata['emailaddress'];
+                            $options['toName'] = $mdata['userfullname'];
+                            $options['message'] = $text;
+                            $options['cron'] = 'yes';
+
+                            sapp_Global::_sendEmail($options);
+                        }
+                    }
+                    $cron_data = array(
+                        'cron_status' => 0,
+                        'completed_at' => gmdate("Y-m-d H:i:s"),
+                    );
+                    $cron_id = $cron_model->SaveorUpdateCronStatusData($cron_data, "id = " . $cron_id);
+                }//end of cron status id if  
+            } catch (Exception $e) {
+                
+            }
+        }//end of cron status if
     }
 
     function pre($var) {

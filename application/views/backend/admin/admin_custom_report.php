@@ -21,6 +21,11 @@
     $view_flag = 0;
     if(!empty($arrDbField)){
         $view_flag = 1;
+		if(count($arrDbField) >2){
+            $md_class = 'col-sm-4 ';
+        } else {
+            $md_class = 'col-sm-6 ';
+        }
         foreach($arrDbField as $db_key => $db_field)
         {    
             $view_flag = 1;
@@ -59,7 +64,7 @@
                         else
                             $val = '';
                         echo "
-                                           <div class='col-sm-4 form-group text-left'>
+                                           <div class='".$md_class." form-group text-left'>
                                                <label for='field-1'>".
                                                    get_phrase($label);
                                             
@@ -95,7 +100,7 @@
                             }   
                           }    
                           $selected = '';
-                        echo "<div class='col-sm-5 form-group '>
+                        echo "<div class='".$md_class." form-group '>
                         <label for='control-label'>".
                             get_phrase($label);
 

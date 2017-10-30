@@ -45,7 +45,7 @@ if($this->ermsg !=''){?>
 			<?php 
 sapp_Helper::viewHeader();
 sapp_Helper::viewBody('nor','Incident Raised By',$this->data['incidentraisedby'],'Type Of Violation',$this->data['violationname']);
-sapp_Helper::viewBody('alt','Business unit',(!empty($this->data['unitname']))?$this->data['unitname']:"...",'Department',(!empty($this->data['deptname']))?$this->data['deptname']:"...");
+//sapp_Helper::viewBody('alt','Business unit',(!empty($this->data['unitname']))?$this->data['unitname']:"...",'Department',(!empty($this->data['deptname']))?$this->data['deptname']:"...");
 sapp_Helper::viewBody('nor','Employee Id',$this->data['employeeId'],'Employee Name',$this->data['employeename']);
 sapp_Helper::viewBody('alt','Job Title',!empty($this->data['jobtitlename'])?$this->data['jobtitlename']:'...','Reporting Manager',$this->data['reportingmanagername']);
 sapp_Helper::viewBody('nor','Violation Description',$this->data['employer_statement'],'Date Of Occurence',sapp_Global::change_date($this->data['date_of_occurrence'],'view'));

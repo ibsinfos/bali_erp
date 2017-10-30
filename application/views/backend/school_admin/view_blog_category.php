@@ -33,7 +33,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-10"  data-step="5" data-intro="<?php echo get_phrase('List the available category.');?>" data-position='top'>
+    <div class="col-md-10"  data-step="5" data-intro="<?php echo get_phrase('List_the_available_category.');?>" data-position='top'>
         <div class="form-group col-md-6 p-0">
             <label for="blog_category">
                 <?php echo get_phrase('select_category');?>
@@ -64,7 +64,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="white-box" data-step="6" data-intro="<?php echo get_phrase('List the blogs available.');?>" data-position='top'>
+        <div class="white-box" data-step="6" data-intro="<?php echo get_phrase('List_the_blogs_available.');?>" data-position='top'>
                 <table id="table" class="table display" cellspacing="0" width="100%">
                     <thead>
                         <tr>

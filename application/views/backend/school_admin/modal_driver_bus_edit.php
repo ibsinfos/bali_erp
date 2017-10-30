@@ -32,7 +32,7 @@
                 </div>
         
                 <div class="form-group">
-                  <div class="col-sm-offset-3 text-right">
+                  <div class="col-md-12 text-center">
                       <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase('update');?></button>
                          
                   </div>

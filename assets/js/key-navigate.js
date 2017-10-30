@@ -30,8 +30,20 @@ $(document).ready(function() {
     });
 
     $(document).on('keydown', function(event){ 
-        sideMenu = $('#side-menu'); 
         sidebar = $('.sidebar');
+        sideMenu = $('#side-menu'); 
+        if(event.ctrlKey && event.keyCode === 32 && sidebar.hasClass('side_menu1')==false){
+            $('.fix-sidebar').addClass('overflow-toggle');
+            sidebar.addClass('side_menu1');
+            sideMenu.show();
+            act = sideMenu.find('li.active');
+            if(act.length==0){
+                act = sideMenu.find('li:eq(0)');
+                act.addClass('active');  
+            } 
+            scrollInView(act);   
+            return false;
+        }
         if(sidebar.hasClass('side_menu1')){ 
             act = sideMenu.find('li.active');
             newAct = false;

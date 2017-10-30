@@ -29,11 +29,11 @@
             <nav>
                 <ul>
                     <li class="active">
-                        <a href="#list" class="sticon fa fa-list"><span class="hidden-xs"><?php echo get_phrase('list'); ?></span></a>
+                        <a href="#list" class="sticon fa fa-list"><span class="hidden-xs"><?php echo get_phrase('asset_list'); ?></span></a>
                     </li>
                     <li>
                         <a href="#add" class="sticon fa fa-plus-circle">
-                            <span class="hidden-xs"><?php echo get_phrase('add'); ?></span>
+                            <span class="hidden-xs"><?php echo get_phrase('add_asset'); ?></span>
                         </a>
                     </li>
                 </ul>
@@ -72,7 +72,7 @@
                 <section id="add"> 
     <?php echo form_open(base_url().'index.php?fees/assets/add'); if($this->session->flashdata('flash_message_error')) {?><div class="alert alert-danger"><?php echo $this->session->flashdata('flash_message_error'); ?></div><?php }?>
                     <div class="col-md-12 form-group">                       
-                        <div class="col-md-4 col-md-offset-2">
+                        <div class="col-md-6 col-md-offset-3">
                             <label for="title"><?php echo get_phrase("title"); ?><span class="error" style="color: red;">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-user"></i></div><input type="text" class="form-control" placeholder="<?php echo get_phrase("enter_title");?>" required="required" name="title" type="text" value="<?php echo set_value('title'); ?>" >
@@ -81,7 +81,7 @@
                     </div>
 
                     <div class="col-md-12 form-group">                       
-                        <div class="col-md-4 col-md-offset-2">
+                        <div class="col-md-6 col-md-offset-3">
                             <label for="amount"><?php echo get_phrase("amount"); ?><span class="error" style="color: red;">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-addon"><i class="fa fa-money"></i></div><input type="text" class="form-control" placeholder="<?php echo get_phrase("enter_amount");?>" required="required" name="amount" type="text" value="<?php echo set_value('amount'); ?>" >
@@ -90,15 +90,15 @@
                     </div>
 
                     <div class="col-md-12">
-                        <div class="col-md-8 col-md-offset-2"><br>
+                        <div class="col-md-6 col-md-offset-3"><br>
                             <label for="description"><?php echo get_phrase('description');?><span class="error" style="color: red;">*</span></label>
                             <textarea class="form-control" rows="8" name="description" required="required"><?php echo set_value('description'); ?></textarea>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-9 form-group text-right"><br>
-                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("submit");?></button> 
+                        <div class="col-sm-12 form-group text-center"><br>
+                            <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d"><?php echo get_phrase("Add_Asset");?></button> 
                         </div>
                     </div>
                 <?php echo form_close();?>                            

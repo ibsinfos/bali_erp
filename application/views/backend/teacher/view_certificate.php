@@ -41,7 +41,7 @@
 
 <div class="col-md-12 white-box">
 
-    <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
+    <table class= "custom_table table display" cellspacing="0" width="100%" id="ex">
         <thead>
             <tr>
                 <th><div><?php echo get_phrase('s._no.'); ?></div></th>
@@ -67,7 +67,7 @@
                         </td>
                         <td><?php echo $row['date']; ?></td>
                         <td>
-                            <a href="<?php echo base_url(); ?>index.php?teacher/teacher_template<?php echo $row['template_type']; ?>/download/<?php echo $row['teacher_id']; ?>/<?php echo $row['certificate_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Certificate"><i class="fa fa-eye"></i></button></a>                                                </td>
+                            <a href="<?php echo base_url(); ?>index.php?certificate/<?php echo "teacher_".strtolower($row['template_type']); ?>/download/<?php echo $row['teacher_id']; ?>/<?php echo $row['certificate_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="View Certificate"><i class="fa fa-eye"></i></button></a>                                                </td>
                     </tr>
                 <?php endforeach; ?>
             <?php endif; ?>

@@ -24,8 +24,8 @@
     <div class="sttabs tabs-style-flip">
         <nav>
             <ul>
-                <li data-step="5" data-intro="From here you can view and edit the category." data-position="top"><a href="#section-flip-1" class="sticon fa fa-bars"><span><?php echo get_phrase('view_categories');?></span></a></li>
-                <li data-step="6" data-intro="From here you can add a new category." data-position="top"><a href="#section-flip-2" class="sticon fa fa-plus-circle"><span><?php echo get_phrase('add_category');?></span></a></li>
+                <li data-step="5" data-intro="<?php echo get_phrase('From_here_you_can_view_and_edit_the_category');?>" data-position="top"><a href="#section-flip-1" class="sticon fa fa-bars"><span><?php echo get_phrase('view_categories');?></span></a></li>
+                <li data-step="6" data-intro="<?php echo get_phrase('From_here_you_can_add_a_new_category');?>" data-position="top"><a href="#section-flip-2" class="sticon fa fa-plus-circle"><span><?php echo get_phrase('add_category');?></span></a></li>
 
             </ul>
         </nav>

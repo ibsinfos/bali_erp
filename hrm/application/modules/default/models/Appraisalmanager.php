@@ -130,7 +130,7 @@ class Default_Model_Appraisalmanager extends Zend_Db_Table_Abstract
 			
         $objName = 'appraisalmanager';
 
-        $tableFields = array('action'=>'Action','unitname' => 'Business Unit','deptname' => 'Department','fin_year' => 'Financial Year',
+        $tableFields = array('action'=>'Action','deptname' => 'Department','fin_year' => 'Financial Year',
                     'appraisal_mode'=>'Appraisal Mode','app_period' => 'Period','status' => 'Appraisal Status','appraisal_process_status' => 'Process Status');
 
         $tablecontent = $this->getAppraisalManagerData($sort, $by, $pageNo, $perPage,$searchQuery);     

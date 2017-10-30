@@ -44,7 +44,7 @@
         </thead>
         <tbody>
             <?php $count = 1;
-            $userTypes = array("T"=>"Teacher","S"=>"Student","A"=>"Admin","P"=>"Parent","SA"=>"School Admin","N"=>"");
+            $userTypes = array("T"=>"Teacher","S"=>"Student","A"=>"Admin","P"=>"Parent","SA"=>"School Admin","BD"=>"Bus Driver","ACCT"=>"Accountant");
             foreach ($link_modules as $row):
                ?>
                 <tr>

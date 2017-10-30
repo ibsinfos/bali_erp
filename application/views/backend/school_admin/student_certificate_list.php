@@ -15,7 +15,7 @@
 </div>
 
 <?php echo form_open(base_url() . 'index.php?school_admin/attendance_selector/', array('class' => 'validate', 'id' => 'manageAttendanceForm')); ?>
-<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here select the class,section and date.'); ?>" data-position='top'>
+<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Here_select_the_class,section_and_date.'); ?>" data-position='top'>
     <div class="col-sm-4 form-group">
         <label for="field-1"><?php echo get_phrase('Select_Class'); ?><span class="error" style="color: red;"> *</span></label>
         <select class="selectpicker" data-style="form-control" id="classs_id" name="class_id" data-live-search="true" onchange="select_section(this.value)">
@@ -29,7 +29,7 @@
 
     <div class="col-sm-4 form-group">
         <label class="control-label"><?php echo get_phrase('select_section'); ?></label>
-        <select id="section_holder" name="section_id" class="selectpicker" data-style="form-control" onchange="onsectionchange(this);" data-step="7" data-intro="<?php echo get_phrase('Here select you section for which you want to progress detail'); ?> " data-position='top'><option value="">Select Section</option>
+        <select id="section_holder" name="section_id" class="selectpicker" data-style="form-control" onchange="onsectionchange(this);" data-step="7" data-intro="<?php echo get_phrase('Here_select_you_section_for_which_you_want_to_progress_detail'); ?> " data-position='top'><option value="">Select Section</option>
             <?php foreach ($sections as $section) { ?>
                 <option value="<?php echo $section['section_id'] ?>" <?php if ($section_id == $section['section_id']) echo "selected"; ?>><?php echo $section['name']; ?></option>';
 
@@ -39,7 +39,7 @@
     <div class="col-sm-4 form-group">
         <label class="control-label"><?php echo get_phrase('student'); ?></label>
         <?php //pre($students); die;?>
-        <select id="student_holder" name="student_id" class="selectpicker" data-style="form-control" onchange="onstudentchange(this);" data-step="10" data-intro="<?php echo get_phrase('Here select you student for which you want to progress detail '); ?>" data-position='top'>  <option value="">Select Student</option>
+        <select id="student_holder" name="student_id" class="selectpicker" data-style="form-control" onchange="onstudentchange(this);" data-step="10" data-intro="<?php echo get_phrase('Here_select_you_student_for_which_you_want_to_progress_detail'); ?>" data-position='top'>  <option value="">Select Student</option>
             <?php foreach ($students as $data) { ?>
                 <option value="<?php echo $data['student_id']; ?>" <?php if ($student_id == $data['student_id']) echo "selected"; ?>><?php echo $data['name']; ?></option>
             <?php } ?>
@@ -49,7 +49,7 @@
 <?php echo form_close(); ?>
 <!------CONTROL TABS START------>
 
-<div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('This shows list of subject details.'); ?>" data-position='top'>
+<div class="col-md-12 white-box" data-step="7" data-intro="<?php echo get_phrase('This_shows_list_of_subject_details.'); ?>" data-position='top'>
 
     <table class= "custom_table table display" cellspacing="0" width="100%" id="example23">
         <thead>
@@ -64,6 +64,7 @@
         </thead>
         <tbody>
             <?php
+//            pre($certificate_list); die;
             if (!empty($certificate_list)):
                 $count = 1;
                 foreach ($certificate_list as $row):
@@ -71,14 +72,12 @@
                     <tr>
                         <td><?php echo $count++; ?></td>
                         <td><?php echo ucfirst($row['certificate_title']); ?></td>
-                        <td><?php
-                            echo ucfirst($row['sub_title']);
-                            ?>
-                        </td>
+                        <td><?php echo ucfirst($row['sub_title']); ?></td>
                         <td><?php echo $row['date']; ?></td>
-                        <td><?php echo "Template " . $row['template_type']; ?></td>
+                        <td><?php echo ucfirst($row['template_type']); ?></td>
                         <td>
-                            <a href="<?php echo base_url(); ?>index.php?school_admin/template<?php echo $row['template_type']; ?>/download/<?php echo $row['student_id']; ?>/<?php echo $row['certificate_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Print Certificate"><i class="fa fa-print"></i></button></a>
+                            <a href="javascript: void(0);" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_edit_certificate_content/s/<?php echo $row['certificate_id']; ?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil-square-o"></i></button></a>
+                            <a href="<?php echo base_url(); ?>index.php?certificate/<?php echo strtolower($row['template_type']); ?>/download/<?php echo $row['student_id']; ?>/<?php echo $row['certificate_id']; ?>"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Print Certificate"><i class="fa fa-print"></i></button></a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -86,11 +85,6 @@
         </tbody>
     </table>
 </div>    
-
-
-
-
-
 <script type="text/javascript">
     function select_section(class_id) {
         $.ajax({

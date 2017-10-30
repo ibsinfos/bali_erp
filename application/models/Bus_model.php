@@ -10,7 +10,7 @@ class Bus_model extends CI_Model {
     private $_table_transport = "transport";
     var $column_order = array(null, 'b.name', 'b.bus_unique_key', 'b.description', 't.route_name','device_imei', 'b.number_of_seat'); //set column field database for datatable orderable
     var $column_search = array('b.name', 'b.bus_unique_key', 'b.description', 't.route_name','device_imei', 'b.number_of_seat'); //set column field database for datatable searchable 
-    var $order = array('b.bus_id' => 'asc'); // default order 
+    var $order = array('b.bus_id' => 'desc'); // default order 
     
 
                 function __construct() {
@@ -27,6 +27,18 @@ class Bus_model extends CI_Model {
             } 
         }
     	return	$this->db->from($this->_table)->like('bus_unique_key', trim($key))->get()->result();
+    }
+    
+    public function get_bus_imei($key)
+    {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+    	return	$this->db->from($this->_table)->like('device_imei', trim($key))->get()->result();
     }
     
     function add($dataArr){
@@ -233,5 +245,18 @@ class Bus_model extends CI_Model {
         $this->db->from($this->_table);
         return $this->db->count_all_results();
     }
+    
+    public function bus_seat($bus_id = '') {
+         $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+     return $this->db->select('number_of_seat')->from($this->_table)->where('bus_id ',$bus_id)->get()->row();
+    }
+    
+    
     
 }

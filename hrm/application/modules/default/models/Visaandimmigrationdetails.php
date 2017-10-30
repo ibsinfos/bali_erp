@@ -27,23 +27,39 @@ class Default_Model_Visaandimmigrationdetails extends Zend_Db_Table_Abstract
        
     public function getvisadetails($sort, $by, $pageNo, $perPage,$searchQuery)
 	{
-        $where = "v.isactive = 1";
-		if($searchQuery)
-			$where .= " AND ".$searchQuery;		
-		$creditcarddata = $this->select()
-						->from(array('v'=>'main_empvisadetails'))
-						 ->where($where)
-						  ->order("$by $sort") 
-						  ->limitPage($pageNo, $perPage);
-		return $creditcarddata;  
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            $where = "v.isactive = 1";
+            if($searchQuery)
+                    $where .= " AND ".$searchQuery;	
+            $where .= " AND v.school_id = '".$school_id."'";	
+            $creditcarddata = $this->select()
+                                            ->from(array('v'=>'main_empvisadetails'))
+                                             ->where($where)
+                                              ->order("$by $sort") 
+                                              ->limitPage($pageNo, $perPage);
+            return $creditcarddata;  
 	}
 	public function getvisadetailsRecord($id=0)
 	{  
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
 		$creditcardDetailsArr="";$where = "";
+                $where = "v.school_id = '".$school_id."'";
 		$db = Zend_Db_Table::getDefaultAdapter();		
 		if($id != 0)
 		{
-			$where = "user_id =".$id." AND isactive = 1";
+			$where .= " AND user_id =".$id." AND isactive = 1";
 			$creditcardDetailsData = $this->select()
 									->from(array('v'=>'main_empvisadetails'))
 									->where($where);
@@ -92,7 +108,7 @@ class Default_Model_Visaandimmigrationdetails extends Zend_Db_Table_Abstract
 		/** search from grid - END **/
 			$objName = 'visaandimmigrationdetails';
 	
-	    	$tableFields = array('action'=>'Action','passport_number'=>'Passport Number','passport_expiry_date'=>'Passport Expiry Date','visa_number'=>'Visa Number','visa_expiry_date'=>'Visa Expiry Date','inine_status'=>'Inine Status','ininetyfour_status'=>'Ininetyfour Status');
+	    	$tableFields = array('action'=>'Action','passport_number'=>'Passport Number','passport_expiry_date'=>'Passport Expiry Date','visa_number'=>'Visa Number','visa_expiry_date'=>'Visa Expiry Date','emirates_id'=>'Emirates ID','emirates_renewal_date'=>'Emirates Renewal Date','work_permit_expiry_date'=>'Work Permit Expiry Date');
 						
 			$tablecontent = $this->getEmpVisaDetails($sort,$by,$pageNo,$perPage,$searchQuery,$exParam1);
 			$dataTmp = array('userid'=>$exParam1,
@@ -123,19 +139,27 @@ class Default_Model_Visaandimmigrationdetails extends Zend_Db_Table_Abstract
 	}
 	public function getEmpVisaDetails($sort, $by, $pageNo, $perPage,$searchQuery,$id)
 	{
-		$where = " e.user_id = ".$id." AND e.isactive = 1 ";
-	
-		if($searchQuery)
-			$where .= " AND ".$searchQuery;
-		$db = Zend_Db_Table::getDefaultAdapter();
-	
-		$empvisaData = $this->select()
-		->setIntegrityCheck(false)
-		->from(array('e' => 'main_empvisadetails'),array('id'=>'e.id','passport_number'=>'e.passport_number','passport_expiry_date'=>'DATE_FORMAT(e.passport_expiry_date,"'.DATEFORMAT_MYSQL.'")','visa_number'=>'e.visa_number','visa_expiry_date'=>'DATE_FORMAT(e.visa_expiry_date,"'.DATEFORMAT_MYSQL.'")','inine_status'=>'e.inine_status','ininetyfour_status'=>'e.ininetyfour_status'))
-		->where($where)
-		->order("$by $sort")
-		->limitPage($pageNo, $perPage);
-		return $empvisaData;
+            $auth = Zend_Auth::getInstance();
+            $request = Zend_Controller_Front::getInstance();
+            if($auth->hasIdentity()){
+                $loginUserGroup = $auth->getStorage()->read()->group_id;
+                $loginUserRole = $auth->getStorage()->read()->emprole;
+                $school_id = $auth->getStorage()->read()->school_id;
+            }
+            $where = " e.school_id = ".$school_id."";
+            $where .= " AND e.user_id = ".$id." AND e.isactive = 1 ";
+
+            if($searchQuery)
+                    $where .= " AND ".$searchQuery;
+            $db = Zend_Db_Table::getDefaultAdapter();
+
+            $empvisaData = $this->select()
+            ->setIntegrityCheck(false)
+            ->from(array('e' => 'main_empvisadetails'),array('id'=>'e.id','passport_number'=>'e.passport_number','passport_expiry_date'=>'DATE_FORMAT(e.passport_expiry_date,"'.DATEFORMAT_MYSQL.'")','visa_number'=>'e.visa_number','issuing_authority'=>'e.issuing_authority','visa_expiry_date'=>'DATE_FORMAT(e.visa_expiry_date,"'.DATEFORMAT_MYSQL.'")','emirates_id'=>'e.emirates_id','emirates_renewal_date'=>'DATE_FORMAT(e.emirates_renewal_date,"'.DATEFORMAT_MYSQL.'")','work_permit_expiry_date'=>'DATE_FORMAT(e.work_permit_expiry_date,"'.DATEFORMAT_MYSQL.'")'))
+            ->where($where)
+            ->order("$by $sort")
+            ->limitPage($pageNo, $perPage);
+            return $empvisaData;
 	}
 	public function getsinglevisadetailsRecord($id)
 	{

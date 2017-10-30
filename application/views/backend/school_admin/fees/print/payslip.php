@@ -156,15 +156,15 @@
                 <div class="slimScrollDiv">
                     <div id="empleavesummary" class="details_data_display_block newtablegrid" style="width:100% !important;">
                         <div class="row">
-                            <div class="col-md-12">
-                                <span class="text-left"> 
+                            <div class="col-md-12 text-center">
+                                <span class="text-center"> 
                                     <img id="image" src="<?php echo base_url('assets/images/logo_ag.png')?>"  width="40" height="40" alt="logo"/>
                                 </span>
                             </div>
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="panel panel-info">
-                                        <div class="panel-heading"><?php echo sett('system_title')?></div>
+                                        <div class="panel-heading text-center"><?php echo sett('system_title')?></div>
                                         <div class="text-center year_info"><b>Payslip For <?php echo date('F Y',strtotime($psrec->generate_date))?></b></div>
                                         <div class="panel-body">
                                             <table class="table table-bordered"  width="100%">

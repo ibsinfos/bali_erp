@@ -17,6 +17,9 @@ class School_admin extends CI_Controller {
     public $globalSettingsSkinColour = "";
     public $globalSettingsSystemTitle = "";
 
+    private $field = array();
+    public $globalSettingsTheme = "";
+
     function __construct() {
         parent::__construct();
         $this->load->model("Setting_model");
@@ -54,7 +57,9 @@ class School_admin extends CI_Controller {
         $this->load->model('Subject_model');
         $this->load->model('School_Admin_model');
         $this->load->helper('functions');
-
+        $this->load->model('Parent_teacher_meeting_model');
+        $this->load->model('Fee_fi_model');
+        
         $this->globalSettingsSMSDataArr = get_data_generic_fun('settings', 'description', array('condition_type' => 'in', 'condition_in_col' => 'type', 'condition_in_data' => 'location,app_package_name,running_year,system_name,system_email,fcm_server_key,system_title,text_align,skin_colour,active_sms_service'));
         
         $setting_records = $this->Setting_model->get_data_by_cols('*', array(), 'result_array');
@@ -66,6 +71,7 @@ class School_admin extends CI_Controller {
         $this->globalSettingsSystemEmail = fetch_parl_key_rec($setting_records, 'system_email');
         $this->globalSettingsSystemFCMServerrKey = fetch_parl_key_rec($setting_records, 'fcm_server_key');
         $this->globalSettingsSkinColour = fetch_parl_key_rec($setting_records, 'skin_colour');
+        $this->globalSettingsTheme = fetch_parl_key_rec($setting_records, 'theme');
         $this->globalSettingsTextAlign = fetch_parl_key_rec($setting_records, 'text_align');
         $this->globalSettingsActiveSmsService = fetch_parl_key_rec($setting_records, 'active_sms_service');
         $this->new_fi = fetch_parl_key_rec($setting_records, 'new_fi');
@@ -83,7 +89,7 @@ class School_admin extends CI_Controller {
     }
 
     /***default functin, redirects to login page if no admin logged in yet***/
-    public function index() {
+     function index() {
         if ($this->session->userdata('school_admin_login') != 1)
             redirect(base_url() . 'index.php?login', 'refresh');
         if ($this->session->userdata('school_admin_login') == 1)
@@ -187,17 +193,9 @@ class School_admin extends CI_Controller {
         $page_data['page_title'] = get_phrase('Message_board');
         //pre($page_data); die();
         $this->load->view('backend/index', $page_data);
-    }
+    }   
 
-    function db_error() {
-        $page_data['page_name'] = 'db_error_page';
-        $page_data['error_type'] = 'db_error';
-        $page_data['page_title'] = get_phrase('admin_dashboard');
-        $this->load->view('backend/index', $page_data);
-    }
-
-    /*     * *ADMIN DASHBOARD** */
-
+    /***ADMIN DASHBOARD***/
     function dashboard() {
         if ($this->session->userdata('school_admin_login') != 1)
             redirect(base_url(), 'refresh');
@@ -209,7 +207,7 @@ class School_admin extends CI_Controller {
         $this->load->model("Attendance_model");
 
         //Get Setting Records
-        /* $page_data['system_name'] = $this->Setting_model->get_setting_record(array('type' => 'system_name'), 'description');
+        /*$page_data['system_name'] = $this->Setting_model->get_setting_record(array('type' => 'system_name'), 'description');
           $page_data['system_title'] = $this->Setting_model->get_setting_record(array('type' => 'system_title'), 'description');
           $page_data['text_align'] = $this->Setting_model->get_setting_record(array('type' => 'text_align'), 'description');
           $page_data['skin_colour'] = $this->Setting_model->get_setting_record(array('type' => 'skin_colour'), 'description');
@@ -229,14 +227,20 @@ class School_admin extends CI_Controller {
         $all_section_student_array = array();
         $no_student = 0;
         foreach ($page_data['sections'] as $section) {
-            $selected_section_student = $this->Student_model->getstudents_section_for_report('all', $page_data['running_year'], $section['section_id']);
+            $selected_section_student = $this->Student_model->getstudents_section_for_report('all', $page_data['running_year'],$section['section_id']);
             $no_student = count($selected_section_student) + $no_student;
         }
         $page_data['tot_student'] = $no_student;
 
-        $check2 = array('timestamp' => strtotime(date('Y-m-d')), 'status' => '1');
+        /* $check2 = array('timestamp' => strtotime(date('Y-m-d')), 'status' => '1');
         $query2 = $this->Attendance_model->get_data_by_cols('*', $check2, 'result_type');
-        $page_data['tot_student_present'] = count($query2);
+        $page_data['tot_student_present'] = count($query2); */
+
+        $page_data['current_data'] = $cur_date = date('Y-m-d');
+        $whr = array('AT.status'=>1,
+                     "(date = '".$cur_date."' OR DATE_FORMAT(FROM_UNIXTIME(`timestamp`), '%Y-%m-%d') = '".$cur_date."')" => FALSE);
+        $att_records = $this->Attendance_model->get_student_att($whr);
+        $page_data['tot_student_present'] = count($att_records);
         //Graphical Attendance Report - Added By Meera - July 1st 2017
         $page_data['currentMonth'] = date('F');
 
@@ -245,8 +249,15 @@ class School_admin extends CI_Controller {
 
         $this->load->model("Holiday_model");
         $page_data['holidays'] = $this->Holiday_model->get_holiday_active_list();
+        
+        $page_data['teacher_holidays'] = $this->Holiday_model->get_teacher_holiday_active_list();
 
         $this->load->model("Admission_settings_model");
+        
+        $page_data['current_month_exam_data'] = $this->Exam_model->get_upcoming_exams();
+        $page_data['current_month_ptm_data'] = $this->Parent_teacher_meeting_model->get_current_month_ptm();
+        $collectData = $this->Fee_fi_model->get_collection_by_month('',$running_year);
+        $page_data['this_month_collection'] = $collectData[0]['total_collection']?$collectData[0]['total_collection']:0;
         //pre($page_data['holidays']);die;
         $page_data['arrAllLinks'] = $this->session->userdata('arrAllLinks');
         $this->save_report_link();
@@ -269,10 +280,10 @@ class School_admin extends CI_Controller {
                 $order++;
                 $arrLink['link'] = "admin_report/custom_report/" . $value['id'];
                 $arrLink['name'] = $caption = $value['report_caption'];
-
+                //echo "<br>here caption is $caption";
                 $result = $this->Dynamic_report_model->checkCaptionExist($caption);
                 $count = count($result);
-
+               
                 if ($count) { // find duplicate
                     
                 } else {
@@ -290,7 +301,7 @@ class School_admin extends CI_Controller {
                     $this->Dynamic_report_model->dynamicLinkSave($arrLink, $role_id, $type);
                 }
             }
-        }
+        }    
     }
 
     function sendemail() {
@@ -306,25 +317,27 @@ class School_admin extends CI_Controller {
         echo "success";
     }
 
-    /*     * **MANAGE STUDENTS CLASSWISE**** */
-
+    /****MANAGE STUDENTS CLASSWISE*****/
     function student_add() {
         if ($this->session->userdata('school_admin_login') != 1)
             redirect(base_url(), 'refresh');
 
+        $this->load->library('Fi_functions');
         $this->config->load('country_list', true);
+
         $country_name = $this->config->item('countries', 'country_list');
         $nationalities = $this->Student_model->get_nationality_array();
         $this->load->model("Parent_model");
         $this->load->model("Class_model");
         $this->load->model("Dormitory_model");
         $this->load->model("Transport_model");
+        $this->load->model('fees/Fees_model');
 
         $parents_array = $this->Parent_model->get_parents_array();
         $class_array = $this->Class_model->get_class_array();
         $dormitory_array = $this->Dormitory_model->get_dormitory_array((array("status" => "Active")));
         $transport_array = $this->Transport_model->get_transport_array();
-        $this->load->library('Fi_functions');
+        //echo '<pre>';print_r($transport_array);exit;
         $running_year = $this->globalSettingsRunningYear;
         $scholarships = $this->fi_functions->getScholarships($running_year);
         $page_data = $this->get_page_data_var();
@@ -364,7 +377,6 @@ class School_admin extends CI_Controller {
         $page_data['classes'] = $class_array;
         $page_data['dormitories'] = $dormitory_array;
         $page_data['transports'] = $transport_array;
-        $page_data['page_name'] = 'student_add';
         $page_data['countries'] = $country_name;
         $page_data['nationality'] = $nationalities;
         $this->load->model("Dynamic_field_model");
@@ -393,9 +405,11 @@ class School_admin extends CI_Controller {
             $arrGroups[$group_id] = $group_name . "||||" . $group_image . "||||" . $group_intro . "||||" . $section_name . "||||" . $is_active;
             $arrFields = $this->Dynamic_field_model->getDynamicFields($group_id);
 
+            if($group_id==5){
+                //echo '<pre>';print_r($arrFields);exit;
+            }
 
             foreach ($arrFields as $field) {
-
                 $db_field = $field['db_field'];
                 $arrDbField[$group_id . "_" . $i] = $db_field;
                 $arrLabel[$group_id][$db_field] = $field['label'];
@@ -409,8 +423,16 @@ class School_admin extends CI_Controller {
                 if (strtolower($field['field_values']) == "query") {
                     if (empty($field['field_where']))
                         $field['field_where'] = " 1 = 1";
-                    $result = $this->Dynamic_field_model->getDynamicQuery($field['field_table'], $field['field_select'], $field['field_where']);
 
+                    if($db_field=='scholarship_id'){
+                        if(sett('new_fi')){
+                            $field['field_table'] = 'fee_scholarships';
+                            $field['field_select'] = 'id,name';   
+                        }
+                        $result = $this->Dynamic_field_model->getDynamicQuery($field['field_table'], $field['field_select'], $field['field_where']); 
+                    }else{
+                        $result = $this->Dynamic_field_model->getDynamicQuery($field['field_table'], $field['field_select'], $field['field_where']);
+                    }    
                     $field_split = explode(",", $field['field_select']);
 
                     foreach ($result as $row) {
@@ -419,8 +441,21 @@ class School_admin extends CI_Controller {
                     }
                     //$arrFieldQuery[$group_id][$db_field] = $field['field_table']."||".$field['field_select']."||".$field['field_where'];
                 }
+
             }
         }
+
+        //For new fi
+        $term_setting = $this->Fees_model->get_term_setting();
+        $term_config = array();
+        $term_config['school_term_setting'] = $term_setting ? explode(',', $term_setting->school_term_setting) : array();
+        $term_config['hostel_term_setting'] = $term_setting ? explode(',', $term_setting->hostel_term_setting) : array();
+        $term_config['transport_term_setting'] = $term_setting ? explode(',', $term_setting->transport_term_setting) : array();
+        $page_data['term_config'] = $term_config;
+
+        $page_data['fee_terms'] = $this->Fees_model->get_fee_terms();
+        $page_data['scholarships'] = $this->Fees_model->get_fee_scholarships();
+        //echo '<pre>';print_r($page_data['fee_terms']);exit;
 
         $page_data['total_notif_num'] = $this->get_no_of_notication();
         $page_data['arrDynamic'] = $arrDynamic;
@@ -436,6 +471,7 @@ class School_admin extends CI_Controller {
         $page_data['arrInstallment'] = $arrInstallment;
 
         $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $page_data['page_name'] = 'student_add';
         $page_data['page_title'] = get_phrase('add_student');
         $this->load->view('backend/index', $page_data);
     }
@@ -521,11 +557,16 @@ class School_admin extends CI_Controller {
                     $fielsdString = $rs_student_bulk_upload_fields[0]['tableCol'];
                     //$fielsdStringMandotary = "name,sex,birthday,class_id,section_id,parent_id,address,location,email,country,nationality";
                     $fielsdStringMandotary = $rs_student_bulk_upload_mandatory_fields[0]['tableCol'];
-
+                    
                     $fielsdArr = explode(',', $fielsdString);
                     $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
                     $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
-
+                    $fielsdStringForAdminArr1=array();
+                    foreach ($fielsdStringForAdminArr AS $k=>$v){
+                        $fielsdStringForAdminArr1[]= get_phrase($v);
+                    }
+                    $fielsdStringForAdminArr=$fielsdStringForAdminArr1;
+                    //pre($fielsdArr);die;
                     $someRowError = FALSE;
                     $errorMsgArr = array();
                     $errorExcelArr = array();
@@ -564,8 +605,8 @@ class School_admin extends CI_Controller {
                                     $rsEmailPhoneUnique = array();
                                     // now check teh uniques for email then phone
 
-                                    $fieldType= $this->Dynamic_field_model->get_field_type($fielsdArr[$i],'1');
-
+                                    $fieldType= $this->Dynamic_field_model->get_field_type_student($fielsdArr[$i]);
+                                    //pre('$fieldType : '.$fieldType);
                                     if($fieldType=='email'){
                                         $rsEmailPhoneUnique = $this->Student_model->get_data_by_cols('student_id', array($fielsdArr[$i] => trim($r[$i])));
                                         $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
@@ -675,6 +716,61 @@ class School_admin extends CI_Controller {
                                     $data[$fielsdArr[$i]] = trim($r[$i]);
                                 }
                             } else {
+                                $validPhoneEmailCheck = "";
+                                $rsEmailPhoneUnique = array();
+                                // now check teh uniques for email then phone
+
+                                $fieldType= $this->Dynamic_field_model->get_field_type($fielsdArr[$i],'1');
+                                if(trim($r[$i]) != ""){
+                                    if($fieldType=='email'){
+                                        $rsEmailPhoneUnique = $this->Student_model->get_data_by_cols('student_id', array($fielsdArr[$i] => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+                                    }
+
+                                    if($fieldType=='tel'){
+                                        $rsEmailPhoneUnique = $this->Student_model->get_data_by_cols('student_id', array($fielsdArr[$i] => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'phone');
+                                    }
+
+                                    /*if ($fielsdArr[$i] == 'email') {
+                                        $rsEmailPhoneUnique = $this->Student_model->get_data_by_cols('student_id', array('email' => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+                                    } elseif ($fielsdArr[$i] == 'phone') {
+                                        $rsEmailPhoneUnique = $this->Student_model->get_data_by_cols('student_id', array('phone' => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'phone');
+                                    }*/
+
+                                    if (count($rsEmailPhoneUnique) > 0) {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " is already entered.Should be unique information at row no -" . $errorRowNo;
+                                        //echo '<br>';
+                                    }
+
+                                    if ($validPhoneEmailCheck != 'ok' && ($fieldType == 'email' || $fieldType == 'tel')) {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
+                                    }else{
+                                        $data[$fielsdArr[$i]] = trim($r[$i]);
+                                    }
+                                    
+                                    if ($fielsdArr[$i] == 'parent_id' && trim($r[$i])!="") { //echo "parent_id ";
+                                        $rsParent = $this->Parent_model->get_data_by_cols('*', array('email' => trim($r[$i])));
+                                        //echo $this->db->last_query();
+                                        //pre($rsParent);die;
+                                        if (count($rsParent) > 0) {
+                                            $data['parent_id'] = $rsParent[0]->parent_id;
+                                        } else {
+                                            $error = TRUE;
+                                            $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo;
+                                        }
+                                    }else{
+                                        if($fielsdArr[$i] == 'parent_id' && trim($r[$i])==""){
+                                            $error = TRUE;
+                                            $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo;
+                                        }
+                                    }
+                                }
+                                
                                 if ($fielsdArr[$i] == 'roll' && trim($r[$i]) == "") {
                                     $data['roll'] = ""; //substr(uniqid(),0,8);
                                 }
@@ -721,6 +817,7 @@ class School_admin extends CI_Controller {
                                 }
                             }
                         }
+                        //pre($errorMsgArr);
                         //pre('$error');
                         if ($error === FALSE) {
                             //pre('comming to add data');
@@ -740,7 +837,7 @@ class School_admin extends CI_Controller {
                             $dataStudent['year'] = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
                             $data = array_filter($data, create_function('$a', 'return $a!=="";'));
                             //pre('final student data');
-                            //pre($data); //die;
+                            //pre($data); die;
                             //pre($dataStudent);die;
                             $student_id = $this->Student_model->save_student($data);
                             $dataStudent['student_id'] = $student_id;
@@ -904,7 +1001,7 @@ class School_admin extends CI_Controller {
         /*         * ******** MEDICAL RECORD ****** */
         $this->load->model("Medical_events_model");
         $student_allergy = $this->Medical_events_model->student_allergy($student_id);
-//        pre($student_allergy); die;
+        //        pre($student_allergy); die;
         $student_medical_history = $this->Medical_events_model->get_data_by_cols('*', array('user_id' => $student_id), 'result_array');
         $count_arr = count($student_medical_history);
         $page_data['count_arr'] = $count_arr;
@@ -1193,6 +1290,7 @@ class School_admin extends CI_Controller {
         $classData = $this->Enroll_model->get_data_by_cols('', array('student_id' => $student_id, 'year' => $runningYr));
 
         $class_id = @$classData[0]->class_id;
+        $section_id = @$classData[0]->section_id;
         $studentData = $this->Student_model->get_data_by_id($student_id, 'name');
         $student_name = @$studentData[0]->name;
 
@@ -1205,7 +1303,7 @@ class School_admin extends CI_Controller {
         $marksData = array();
         foreach ($exams as $row2) {
             $marksData[$m]['marks'] = $row2;
-            $subjects = $this->Subject_model->get_data_by_cols('', array('class_id' => $class_id, 'year' => $runningYr), 'result_array');
+            $subjects = $this->Subject_model->get_data_by_cols('', array('class_id' => $class_id, 'section_id' => $section_id,  'year' => $runningYr), 'result_array');
             $exam_types = array("FA1", "FA2", "SA1", "FA3", "FA4", "SA2");
             $k = 0;
             foreach ($subjects as $row3) {
@@ -1290,10 +1388,14 @@ class School_admin extends CI_Controller {
         $this->load->model("Subject_model");
         $this->load->model("Mark_model");
         $page_data = $this->get_page_data_var();
+        $page_data['system_logo'] = $this->db->get_where('settings', array('type' => 'system_logo'))->row()->description;
         $running_year = $this->globalSettingsRunningYear;
         $class_id = $this->Student_model->get_enroll_record(array('student_id' => $student_id, 'year' => $running_year), "class_id");
+        $classData = $this->Enroll_model->get_data_by_cols('', array('student_id' => $student_id, 'year' => $running_year));
+        $section_id = @$classData[0]->section_id; 
+        $section_name = $this->Section_model->single_name($section_id);
         $class_name = $this->Class_model->get_class_record(array('class_id' => $class_id), "name");
-
+        $page_data['section_name'] = $section_name; 
         $page_data['total_notif_num'] = $this->get_no_of_notication();
         $page_data['student_id'] = $student_id;
         $page_data['class_id'] = $class_id;
@@ -1345,7 +1447,6 @@ class School_admin extends CI_Controller {
     }
 
     function student($param1 = '', $param2 = '', $param3 = '') {
-
         if ($this->session->userdata('school_admin_login') != 1)
             redirect('login', 'refresh');
         $this->config->load('country_list', true);
@@ -1354,10 +1455,13 @@ class School_admin extends CI_Controller {
         $running_year = $this->globalSettingsRunningYear;
         $page_data['countries'] = $country_name;
 
+        $this->load->library('Fi_functions');
         $this->load->model("Parent_model");
         $this->load->model("Class_model");
         $this->load->model("Dormitory_model");
         $this->load->model("Transport_model");
+        $this->load->model('fees/Fees_model');
+        
         $parents_array = $this->Parent_model->get_parents_array();
         $class_array = $this->Class_model->get_class_array();
         $dormitory_array = $this->Dormitory_model->get_dormitory_array();
@@ -1369,12 +1473,9 @@ class School_admin extends CI_Controller {
             if ($this->form_validation->run() == FALSE) {// print_r(validation_errors());die("cp1");
                 $this->session->set_flashdata('flash_validation_error', validation_errors());
 
-                $this->load->library('Fi_functions');
                 $running_year = $this->globalSettingsRunningYear;
                 $scholarships = $this->fi_functions->getScholarships($running_year);
-                if ($scholarships) {
-                    $page_data['scholarships'] = $scholarships;
-                }
+                $page_data['scholarships'] = $scholarships?$scholarships:array();
                 $active_installments = $this->fi_functions->getActiveInstallments($running_year);
 
                 $school_fee_inst = array();
@@ -1402,6 +1503,7 @@ class School_admin extends CI_Controller {
                     }
                 }
                 $fee_installment = array('school_fee_inst' => $school_fee_inst, 'transp_fee_inst' => $transp_fee_inst, 'hostel_fee_inst' => $hostel_fee_inst);
+               
                 $page_data['fee_installment'] = $fee_installment;
                 $page_data['parents'] = $parents_array;
                 $page_data['classes'] = $class_array;
@@ -1413,182 +1515,59 @@ class School_admin extends CI_Controller {
                 foreach ($arr as $key => $value) {
                     $page_data[$key] = $value;
                 }
+                $arrPost = array();
+                foreach($_POST as $key => $value){
+                    $arrPost[$key] = $value;
+                }
+
+                //For new fi
+                $term_setting = $this->Fees_model->get_term_setting();
+                $term_config = array();
+                $term_config['school_term_setting'] = $term_setting ? explode(',', $term_setting->school_term_setting) : array();
+                $term_config['hostel_term_setting'] = $term_setting ? explode(',', $term_setting->hostel_term_setting) : array();
+                $term_config['transport_term_setting'] = $term_setting ? explode(',', $term_setting->transport_term_setting) : array();
+                $page_data['term_config'] = $term_config;
+                $page_data['fee_terms'] = $this->Fees_model->get_fee_terms();
+                if(sett('new_fi')){
+                    $page_data['scholarships'] = $this->Fees_model->get_fee_scholarships();
+                }
+                //echo '<pre>';print_r($page_data['scholarships']);exit;
+
+                $page_data['arrPost'] =     $arrPost;
                 $page_data['page_name'] = 'student_add';
                 $page_data['page_title'] = get_phrase('add_student');
                 $this->load->view('backend/index', $page_data);
-            } else { //echo "here";die("cp2");
-                $data['name'] = $this->input->post('name');
-                $bday = $this->input->post('birthday');
-                $data['birthday'] = date('d-m-Y', strtotime($bday));
-                $data['sex'] = $this->input->post('sex');
-                $data['address'] = $this->input->post('address');
-                $data['city'] = $this->input->post('city');
-                $data['caste_category'] = $this->input->post('category');
-                $data['phone'] = $this->input->post('phone');
-                $data['card_id'] = $this->input->post('card_id');
-                $data['email'] = $this->input->post('email');
-                $data['blood_group'] = $this->input->post('blood_group');
-                $data['emirates_id'] = $this->input->post('emirates_id');
-                $data['visa_no'] = $this->input->post('visa_no');
-                $data['visa_expiry_date'] = $this->input->post('visa_expiry_date');
-                $data['passport_expiry_date'] = $this->input->post('passport_expiry_date');
-                $data['allergies'] = $this->input->post('allergies');
-                $password = $this->input->post('password');
-                $data['password'] = sha1($password);
-                $parent_email = $this->input->post('parent');
-
-                $stu_password = create_passcode('student');
-                $data['password'] = ($stu_password != 'invalid') ? sha1($stu_password) : '';
-                $data['passcode'] = ($stu_password != 'invalid') ? $stu_password : '';
-
-                $parent_email = $this->input->post('parent'); //echo $parent_email; exit;
-
-                $data['parent_id'] = $this->Parent_model->get_parent_id($parent_email);
-                if ($this->input->post('dormitory_id') != "")
-                    $data['dormitory_id'] = $this->input->post('dormitory_id');
-                if ($this->input->post('transport_id') != "")
-                    $data['transport_id'] = $this->input->post('transport_id');
-                $data['mname'] = $this->input->post('mname');
-                $data['lname'] = $this->input->post('lname');
-                $data['passport_no'] = $this->input->post('passport_no');
-                $data['country'] = $this->input->post('country');
-                $data['nationality'] = $this->input->post('nationality');
-                $data['type'] = $this->input->post('type');
-                $data['icard_no'] = $this->input->post('icard_no');
-                $data['place_of_birth'] = $this->input->post('place_of_birth');
-                //$data['previous_class'] = $this->input->post('previous_class');
-                $data['previous_school'] = $this->input->post('previous_school');
-                $data['course'] = $this->input->post('course');
-                $data['media_consent'] = $this->input->post('media_consent');
-                $data['location'] = $this->input->post('searchLocation');
-                $latitude = $this->input->post('searchLat');
-                $longitude = $this->input->post('searchLong');
-                $data['loc_cords'] = $latitude . "," . $longitude;
-                $data['isActive'] = '1';
-                $data['date_time'] = date("Y-m-d H:i:s");
-                $page_data['added_data'] = $this->input->post('name');
-                if (is_section_available_for_admission($this->input->post('class_id'), $this->input->post('section_id'), $running_year) == 0) {
-                    $page_data['parents'] = $parents_array;
-                    $page_data['classes'] = $class_array;
-                    $page_data['dormitories'] = $dormitory_array;
-                    $page_data['transports'] = $transport_array;
-                    $page_data['page_name'] = 'student_add';
-
-                    $page_data['page_title'] = get_phrase('add_student');
-                    $this->load->view('backend/index', $page_data);
-                } else if (is_section_available_for_admission($this->input->post('class_id'), $this->input->post('section_id'), $running_year) == 1) {
-                    $this->session->set_flashdata('flash_message', get_phrase('student_admitted'));
-                }
-
-                if(($data['email'] == "") && ($data['name']!='')){
-                    //$email = $parant_email;
-                    $email = strtolower($data['name'].'@'.CURRENT_INSTANCE.'.com');
-                    $data['email'] = $email; 
-                }else{
-                    $email = $data['email'];
-                }
-
-                $student_id = $this->Student_model->save_student($data);
-
-                $stud_image = '';
-                if ($_FILES['userfile']['name'] != '') {
-                    $img = $_FILES['userfile']['name'];
-                    $img = explode(".", $img);
-                    $stud_image = $student_id . "." . end($img);
-                    move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/student_image/' . $stud_image);
-                    copy('uploads/student_image/' . $stud_image, 'fi/sysfrm/uploads/user-pics/' . $stud_image);
-                }
-
-                $this->Student_model->update_student(array('stud_image' => $stud_image), array("student_id" => $student_id));
-                /* finance module account creation start for student start */
-
-                $class_id = $this->input->post('class_id');
-                $this->load->library('Fi_functions');
-                $tution_fee_det = $this->fi_functions->get_fee_detailsbygroup($class_id);
-                if ($tution_fee_det)
-                    $tution_fee_id = $tution_fee_det['id'];
-                else
-                    $tution_fee_id = 0;
-                $scholarship_id = $this->input->post('scholarship_id');
-                $hostfee_inst_type = $this->input->post('hostfee_inst_type');
-                $transpfee_inst_type = $this->input->post('transpfee_inst_type');
-                $tutionfee_inst_type = $this->input->post('tutionfee_inst_type');
-                $dormitory_fee_id = $this->input->post('dormitory_fee_id');
-                $transport_fee_id = $this->input->post('transport_fee_id');
-
-                $parentname = $this->Parent_model->get_data_by_cols('*', array('parent_id' => $data['parent_id']));
-                $sname = $parentname[0]->father_name . " " . $parentname[0]->father_lname;
-                $parant_email = $parentname[0]->email;                
-
-                $data3['id'] = $student_id;
-                $data3['account'] = $data['name'];
-                $data3['fname'] = '';
-                $data3['company'] = $sname;
-                $data3['lname'] = $data['lname'];
-                $data3['gid'] = $this->input->post('class_id');
-                $data3['email'] = $email;
-                $data3['second_email'] = $parant_email;
-                $data3['address'] = $data['address'];
-                $data3['phone'] = $data['phone'];
-                $data3['img'] = $stud_image;
-                $data3['city'] = $data['location'];
-                $data3['country'] = $data['nationality'];
-                $data3['dob'] = date("Y-m-d", strtotime($data['birthday']));
-                //$data3['password']          =  sha1( $password );
-                $data3['password'] = ($stu_password != 'invalid') ? sha1($stu_password) : '';
+            } else { 
+                $form_id = 1; //student form id
+                $arrData = $this->get_dynamic_form_data($form_id);
+                $sname = '';
+                $parant_email = '';
+                if(!empty($_POST['parent']))
+                {    
+                    $this->load->model("Parent_model");
+                    $parent_email = $_POST['parent']; 
+                    $parent_id = $this->Parent_model->get_parent_id($parent_email);
+                    $parentname = $this->Parent_model->get_data_by_cols('*', array('parent_id' => $parent_id));
+                    $sname = $parentname[0]->father_name . " " . $parentname[0]->father_lname;
+                    $parant_email = $parentname[0]->email;
+                } 
 
                 $message = array();
-                $message['sms_message'] = "Welcome To " . $this->globalSettingsSystemName . " " . $sname . ", Your admission procedure is started. Your passcode for app is " . $data['passcode'] . " and email id is ".$data['email']." download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
-                ;
-                $message['subject'] = "Admission has been started to the " . $this->globalSettingsSystemName;
-                $message['messagge_body'] = "<br><br>Welcome To " . $this->globalSettingsSystemName . " " . $sname . " Your Child's admission procedure is started.<br><br><br><br><br>With regards";
-                $message['to_name'] = $sname;
-                if ($parant_email != '')
-                    $email = array($parant_email);
-                else
-                    $email = '';
-                send_school_notification('new_user', $message, array($data['phone']), $email);
-
-                $finance_det = array(
-                    'student_id' => $student_id,
-                    'academic_year' => $running_year,
-                    'tution_fee_id' => ($tution_fee_id != '' ? $tution_fee_id : 0),
-                    'trans_fee_id' => ($transport_fee_id != '' ? $transport_fee_id : 0),
-                    'hostel_fee_id' => ($dormitory_fee_id != '' ? $dormitory_fee_id : 0),
-                    'scholarship_id' => ($scholarship_id != '' ? $scholarship_id : 0),
-                    'tutionfee_inst_type' => ($tutionfee_inst_type != '' ? $tutionfee_inst_type : 0),
-                    'transpfee_inst_type' => ($transpfee_inst_type != '' ? $transpfee_inst_type : 0),
-                    'hostfee_inst_type' => ($hostfee_inst_type != '' ? $hostfee_inst_type : 0),
-                    'created_by' => $this->session->userdata('user_id')
-                );
-                $finance_stud_config = $this->Student_model->add_student_fee_det($finance_det);
-
-                $this->load->model("Enroll_model");
-                $last_roll_no = $this->Enroll_model->get_latest_roll_no($this->input->post('class_id'), $this->input->post('section_id'));
-
-                //die($last_roll_no);
-                $last_roll_no++;
-
-                $finance = $this->Student_model->create_finance_customer_account($data3);
-                /* finance module account creation start for student end */
-                $data2['student_id'] = $student_id;
-
-                $data2['roll'] = $last_roll_no; //substr(md5(rand(0, 1000000)), 0, 7);
-                $data2['class_id'] = $this->input->post('class_id');
-                if ($this->input->post('section_id') != '') {
-                    $data2['section_id'] = $this->input->post('section_id');
-                }
-
-                $data2['enroll_code'] = $this->input->post('roll');
-                $data2['date_added'] = strtotime(date("Y-m-d H:i:s"));
-                $data2['year'] = $running_year;
-                $enroll_id = $this->Student_model->enroll_student($data2);
-
-                $this->generate_admission_invoice($student_id);
-                $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-                $this->Email_model->account_opening_email('student', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL
-                //echo "here";die('cp3');
-                redirect(base_url() . 'index.php?school_admin/student_add/', 'refresh');
+                if($arrData['student_id'])
+                {    
+                    $message['sms_message'] = "Welcome To ".$this->globalSettingsSystemName." ".$sname.", Your admission procedure is started. Your passcode for app is " . $arrData['passcode'] . " and email id is ".$arrData['email']." download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
+                    $message['subject'] = "Admission has been started to the ".$this->globalSettingsSystemName;
+                    $message['messagge_body'] = "<br><br>Welcome To ".$this->globalSettingsSystemName." ".$sname." Your Child's admission procedure is started.<br><br><br><br><br>With regards";
+                    $message['to_name'] = $sname;
+                
+                    $email = ($parant_email != '')?array($parant_email):'';
+                    send_school_notification('new_user', $message, array($arrData['phone']), $email);
+                    $this->generate_admission_invoice($arrData['student_id']);
+                    $this->session->set_flashdata('flash_message', get_phrase('student_data_added_successfully'));
+                    //$this->Email_model->account_opening_email('student', $arrData['email'], $arrData['password']); //SEND EMAIL ACCOUNT OPENING EMAIL
+                
+                    redirect(base_url('index.php?school_admin/student_add/'), 'refresh');
+                }  
             }
         }
 
@@ -1631,6 +1610,7 @@ class School_admin extends CI_Controller {
             $data['passport_expiry_date'] = $this->input->post('passport_expiry_date');
             $data['allergies'] = $this->input->post('allergies');
             $data['change_time'] = date("Y-m-d H:i:s");
+            $data['emergency_contact_number'] = $this->input->post('emergency_contact_number');
 
 
             $types = array('image/jpeg', 'image/gif', 'image/png');
@@ -1645,7 +1625,7 @@ class School_admin extends CI_Controller {
                         $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
                     }
                 } else {
-                    $this->session->set_flashdata('flash_message_error', get_phrase('It may be the wrong filetype. We only allow JPG, GIF, and PNG filetypes!!'));
+                    $this->session->set_flashdata('flash_message_error', get_phrase('It_may_be_the_wrong_filetype._We_only_allow_JPG,_GIF,_and_PNG_filetypes!!'));
                     //redirect(base_url() . 'index.php?school_admin/student_information/' , 'refresh');
                 }
             } else {
@@ -1655,17 +1635,14 @@ class School_admin extends CI_Controller {
                 $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
                 // redirect(base_url() . 'index.php?school_admin/student_information/' , 'refresh');
             }
-//                $config['upload_path']      =   'uploads/student_image';
-//                    $config['max_size']         =   1024 * 10;
-//                    $config['allowed_types']    =    'gif|png|jpg|jpeg';
-//                    $config['encrypt_name']     = TRUE;
-//
-//                    $this->load->library('upload', $config);
+            //                $config['upload_path']      =   'uploads/student_image';
+            //                $config['max_size']         =   1024 * 10;
+            //                $config['allowed_types']    =    'gif|png|jpg|jpeg';
+            //                $config['encrypt_name']     = TRUE;
+            //
+            //                $this->load->library('upload', $config);
 
-
-
-            /*             * ************update fi data start************* */
-
+            /**************update fi data start**************/
             $parentname = $this->Parent_model->get_data_by_cols('*', array('parent_id' => $data['parent_id']));
             $sname = $parentname[0]->father_name . " " . $parentname[0]->father_lname;
             $parant_email = $parentname[0]->email;
@@ -1680,28 +1657,20 @@ class School_admin extends CI_Controller {
             $data3['second_email'] = $parant_email;
             $data3['dob'] = date("Y-m-d", strtotime($data['birthday']));
             $this->Student_model->update_finance_customer_account($data3, array("id" => $param2));
-            /*             * ************update fi data end************* */
+            /**************update fi data end**************/
 
             $data2['section_id'] = $this->input->post('section_id');
             $data2['enroll_code'] = $this->input->post('roll');
-
-
             $enroll_data = array(
                 'section_id' => $data2['section_id'],
             );
             $classArr = $this->Section_model->get_data_by_cols("class_id", $enroll_data);
 
-            $enroll_cond = array(
-                "student_id" => $param2,
-                "year" => $this->globalSettingsRunningYear
-            );
+            $enroll_cond = array("student_id" => $param2,"year" => $this->globalSettingsRunningYear);
             $this->Student_model->update_enroll($enroll_data, $enroll_cond);
-
-
             //$this->crud_model->clear_cache();
 
             if (empty($classArr[0])) {
-
                 $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
                 redirect(base_url() . 'index.php?school_admin/student_information/', 'refresh');
             } else {
@@ -1714,7 +1683,6 @@ class School_admin extends CI_Controller {
             $class_id = $this->uri->segment(5);
             $dataArray = array('student_id' => $param2);
             if ($this->Student_model->delete_student($dataArray)) {
-
                 $this->session->set_flashdata('flash_message', get_phrase('data_successfully_deleted'));
                 redirect(base_url() . 'index.php?school_admin/student_information/' . $class_id, 'refresh');
             }
@@ -1859,8 +1827,7 @@ class School_admin extends CI_Controller {
     /*
      * student fee configration
      */
-
-    public function student_fee_configuration($action = '') {
+    function student_fee_configuration($action = '') {
         if ($this->session->userdata('school_admin_login') != 1)
             redirect('login', 'refresh');
         $page_data = $this->get_page_data_var();
@@ -1966,6 +1933,7 @@ class School_admin extends CI_Controller {
 
     public function get_students_setfee($class_id, $section_id, $running_year) {
         $page_data = array();
+        //die("ll");
         $page_data = $this->get_page_data_var();
         $page_data['class_id'] = $class_id;
         $page_data['section_id'] = $section_id;
@@ -1983,8 +1951,8 @@ class School_admin extends CI_Controller {
         $this->load->model("Student_model");
         $this->load->model("Class_model");
 
-        $dormitory_array = $this->Dormitory_model->get_dormitory_array();
-        $transport_array = $this->Transport_model->get_transport_array();
+        $dormitory_array = $this->Dormitory_model->get_dormitory_array_for_student_fee_config();
+        $transport_array = $this->Transport_model->get_transport_array_for_student_fees_config();
 
         $school_fee_inst = array();
         $transp_fee_inst = array();
@@ -2053,11 +2021,11 @@ class School_admin extends CI_Controller {
         $term_config['hostel_term_setting'] = $term_setting ? explode(',', $term_setting->hostel_term_setting) : array();
         $term_config['transport_term_setting'] = $term_setting ? explode(',', $term_setting->transport_term_setting) : array();
         $page_data['term_config'] = $term_config;
-
+        //echo '<pre>';print_r($page_data['term_config']);exit;
 
         $page_data['fee_terms'] = $this->Fees_model->get_fee_terms();
-        $page_data['dormitories'] = $this->Dormitory_model->get_dormitory_array();
-        $page_data['transports'] = $this->Transport_model->get_transport_array();
+        $page_data['dormitories'] = $this->Dormitory_model->get_dormitory_array_for_student_fee_config();
+        $page_data['transports'] = $this->Transport_model->get_transport_array_for_student_fees_config();
         $page_data['students'] = $this->Fees_model->get_students(array('E.class_id' => $class_id, 'E.section_id' => $section_id), array('has_config' => 0));
         $page_data['scholarships'] = $this->Fees_model->get_fee_scholarships();
         //echo '<pre>';print_r($students);exit;
@@ -2081,7 +2049,6 @@ class School_admin extends CI_Controller {
         $page_data['from_class_name'] = $class_name[0]->name;
         $class_name = $this->Class_model->get_name_by_id($class_id_to);
         $page_data['to_class_name'] = $class_name[0]->name;
-
 
         $this->load->library('Fi_functions');
         $running_year = $promotion_year;
@@ -2140,171 +2107,235 @@ class School_admin extends CI_Controller {
         $this->load->view('backend/school_admin/student_promotion_selector', $page_data);
     }
 
-    /*     * **MANAGE PARENTS CLASSWISE**** */
-
+    /****MANAGE PARENTS CLASSWISE*****/
     function parent($param1 = '', $param2 = '', $param3 = ''){
-    if($this->  session->userdata('school_admin_login') != 1)
-        redirect('login', 'refresh');
-    $this->load->model("Parent_model");
-    $page_data = $this->get_page_data_var();
-    $page_data['search_text'] = '';
+        if($this->  session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+            $this->load->model("Parent_model");
+            $page_data = $this->get_page_data_var();
+            $page_data['search_text'] = '';
 
-    if ($param1 == 'edit') {
-        $this->form_validation->set_rules('fname', 'Father Name', 'trim|required');
-        $this->form_validation->set_rules('flname', 'Father Last Name', 'trim|required');
-        $this->form_validation->set_rules('mname', 'Mother Name', 'trim|required');
-        $this->form_validation->set_rules('mlname', 'Mother Lastname', 'trim|required');
-        $this->form_validation->set_rules('fprof', 'Father Profession', 'trim|required');
-        $this->form_validation->set_rules('fqual', 'father Qualification', 'trim|required');
-        $this->form_validation->set_rules('mqual', 'Mother Qualification', 'trim|required');
-        $this->form_validation->set_rules('address', 'Address', 'trim|required');
-        $this->form_validation->set_rules('city', 'City', 'trim|required');
-        $this->form_validation->set_rules('state', 'State', 'trim|required');
-        $this->form_validation->set_rules('country', 'Country', 'trim|required');
-        $this->form_validation->set_rules('phone', 'Phone Number', 'trim|required|numeric|max_length[12]');
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash_validation_error', validation_errors());
-            redirect(base_url() . 'index.php?school_admin/parent/');
-        } else {
-            $data['father_name'] = $this->input->post('fname');
-            $data['father_mname'] = $this->input->post('fmname');
-            $data['father_lname'] = $this->input->post('flname');
-            $data['mother_name'] = $this->input->post('mname');
-            $data['mother_mname'] = $this->input->post('mmname');
-            $data['mother_lname'] = $this->input->post('mlname');
-            //$data['email'] = $this->input->post('email');
-            $data['father_profession'] = $this->input->post('fprof');
-            $data['mother_profession'] = $this->input->post('mprof');
-            $data['father_qualification'] = $this->input->post('fqual');
-            $data['mother_quaification'] = $this->input->post('mqual');
-            $data['father_passport_number'] = $this->input->post('fpass_no');
-            $data['mother_passport_number'] = $this->input->post('mpass_no');
-            $data['father_icard_no'] = $this->input->post('ficard_no');
-            $data['father_icard_type'] = $this->input->post('ficard_type');
-            $data['mother_icard_no'] = $this->input->post('micard_no');
-            $data['mother_icard_type'] = $this->input->post('micard_type');
-            $data['address'] = $this->input->post('address');
-            $data['city'] = $this->input->post('city');
-            $data['state'] = $this->input->post('state');
-            $data['country'] = $this->input->post('country');
-            $data['zip_code'] = $this->input->post('zip_code');
-            $data['cell_phone'] = $this->input->post('phone');
-            $data['home_phone'] = $this->input->post('home_phone');
-            $data['work_phone'] = $this->input->post('work_phone');
-            $data['change_time'] = date('Y-m-d H:i:s');
-            $data['isActive'] = '1';
-            $this->Parent_model->update_parent($data, array('parent_id' => $param2));
-            $this->session->set_flashdata('flash_message', get_phrase('changes_saved_successfully'));
-            redirect(base_url() . 'index.php?school_admin/parent/', 'refresh');
-            //$this->Email_model->account_opening_email('parent', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL       
-        }
-    } else if ($param1 == 'enable_disable') {
-        $dataArray = array('parent_id' => $param2);
-        $status = $this->Parent_model->enable_disable_parent($dataArray);
-        $this->session->set_flashdata('flash_message', get_phrase(($status == '1') ? 'enabled_successfully' : 'disabled_successfully'));
-//            redirect(base_url() . 'index.php?school_admin/parent/', 'refresh');
-    }
-
-
-
-    /*     * ***Parent Bulk Upload Function****** */ else if ($param1 == 'import_excel') {
-        //pre($_FILES);die;
-        if (empty($_FILES['userfile']['name'])) {
-            $this->form_validation->set_rules('userfile', 'Document', 'required');
-            $this->session->set_flashdata('flash_message_error', 'Please select a document to upload!!');
-            redirect(base_url() . 'index.php?school_admin/bulk_upload');
-        } else {
-            $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip');
-            if (in_array($_FILES['userfile']['type'], $allowed_types)) {
-                $path = "uploads/parent_import.xlsx";
-                //@unlink('uploads/Parent_Upload_Template.xlsx');
-                @unlink($path);
-                @unlink('uploads/parent_bulk_upload_error_details.log');
-
-                if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $path)) {
-                    die('not moving');
+            if ($param1 == 'edit') {
+                $this->form_validation->set_rules('fname', 'Father Name', 'trim|required');
+                $this->form_validation->set_rules('flname', 'Father Last Name', 'trim|required');
+                $this->form_validation->set_rules('mname', 'Mother Name', 'trim|required');
+                $this->form_validation->set_rules('mlname', 'Mother Lastname', 'trim|required');
+                $this->form_validation->set_rules('fprof', 'Father Profession', 'trim|required');
+                $this->form_validation->set_rules('fqual', 'father Qualification', 'trim|required');
+                $this->form_validation->set_rules('mqual', 'Mother Qualification', 'trim|required');
+                $this->form_validation->set_rules('address', 'Address', 'trim|required');
+                $this->form_validation->set_rules('city', 'City', 'trim|required');
+                $this->form_validation->set_rules('state', 'State', 'trim|required');
+                $this->form_validation->set_rules('country', 'Country', 'trim|required');
+                $this->form_validation->set_rules('phone', 'Phone Number', 'trim|required|numeric|max_length[12]');
+                if ($this->form_validation->run() == FALSE) {
+                    $this->session->set_flashdata('flash_validation_error', validation_errors());
+                    redirect(base_url() . 'index.php?school_admin/parent/');
+                } else {
+                    $data['father_name'] = $this->input->post('fname');
+                    $data['father_mname'] = $this->input->post('fmname');
+                    $data['father_lname'] = $this->input->post('flname');
+                    $data['mother_name'] = $this->input->post('mname');
+                    $data['mother_mname'] = $this->input->post('mmname');
+                    $data['mother_lname'] = $this->input->post('mlname');
+                    //$data['email'] = $this->input->post('email');
+                    $data['father_profession'] = $this->input->post('fprof');
+                    $data['mother_profession'] = $this->input->post('mprof');
+                    $data['father_qualification'] = $this->input->post('fqual');
+                    $data['mother_quaification'] = $this->input->post('mqual');
+                    $data['father_passport_number'] = $this->input->post('fpass_no');
+                    $data['mother_passport_number'] = $this->input->post('mpass_no');
+                    $data['father_icard_no'] = $this->input->post('ficard_no');
+                    $data['father_icard_type'] = $this->input->post('ficard_type');
+                    $data['mother_icard_no'] = $this->input->post('micard_no');
+                    $data['mother_icard_type'] = $this->input->post('micard_type');
+                    $data['address'] = $this->input->post('address');
+                    $data['city'] = $this->input->post('city');
+                    $data['state'] = $this->input->post('state');
+                    $data['country'] = $this->input->post('country');
+                    $data['zip_code'] = $this->input->post('zip_code');
+                    $data['cell_phone'] = $this->input->post('phone');
+                    $data['home_phone'] = $this->input->post('home_phone');
+                    $data['work_phone'] = $this->input->post('work_phone');
+                    $data['change_time'] = date('Y-m-d H:i:s');
+                    $data['isActive'] = '1';
+                    $this->Parent_model->update_parent($data, array('parent_id' => $param2));
+                    $this->session->set_flashdata('flash_message', get_phrase('parent_details_updated_successfully'));
+                    redirect(base_url() . 'index.php?school_admin/parent/', 'refresh');
+                    //$this->Email_model->account_opening_email('parent', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL       
                 }
-                @ini_set('memory_limit', '-1');
-                @set_time_limit(0);
-                include 'Simplexlsx.class.php';
-                $bulk_upload_strt_time = microtime(true);
-                generate_log("bulk_upload_start at " . $bulk_upload_strt_time, "parent_bulk_upload_time_checker_" . date('d_m_Y') . '.log');
-                $xlsx = new SimpleXLSX($path);
-                list($num_cols, $num_rows) = $xlsx->dimension();
-                $end_time = microtime(TRUE);
-                generate_log("time take till 1847 at " . ($end_time - $bulk_upload_strt_time), "parent_bulk_upload_time_checker_" . date('d_m_Y') . '.log');
-                $f = 0;
-                $this->load->model("Dynamic_field_model");
-                $rs_parent_bulk_upload_fields= $this->Dynamic_field_model->get_parent_bulk_upload();
-                $rs_parent_bulk_upload_mandatory_fields= $this->Dynamic_field_model->get_parent_bulk_upload_mandatory();
-                $rs_parent_bulk_upload_label_fields= $this->Dynamic_field_model->get_parent_bulk_upload_label();
+            } else if ($param1 == 'enable_disable') {
+                $dataArray = array('parent_id' => $param2);
+                $status = $this->Parent_model->enable_disable_parent($dataArray);
+                $this->session->set_flashdata('flash_message', get_phrase(($status == '1') ? 'enabled_successfully' : 'disabled_successfully'));
+            //            redirect(base_url() . 'index.php?school_admin/parent/', 'refresh');
+            }
 
-                //$fielsdStringForAdmin = "Father's First Name,Father's Last Name,Mother's First Name,Mother's Last Name,Father's Profession,Mother's Profession,Email Id,Identity Card #,Identity Card Type,Address,City,State,Country,ZIP Code,Mobile,Home Phone,Work Phone";
-                $fielsdStringForAdmin = $rs_parent_bulk_upload_label_fields[0]['tableCol'];
-                //$fielsdString = "father_name,father_lname,mother_name,mother_lname,father_profession,mother_profession,email,father_icard_no,father_icard_type,address, city,state,country,zip_code,cell_phone,home_phone,work_phone";
-                $fielsdString = $rs_parent_bulk_upload_fields[0]['tableCol'];
-                //$fielsdStringMandotary = "father_name,mother_name,email,cell_phone";
-                $fielsdStringMandotary = $rs_parent_bulk_upload_mandatory_fields[0]['tableCol'];
-                
-                $fielsdArr = explode(',', $fielsdString);
-                $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
-                $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
-                $someRowError = FALSE;
-                $errorMsgArr = array();
-                $errorExcelArr = array();
-                $errorExcelArr[] = $fielsdStringForAdminArr;
-                $errorRowNo = 2;
-                //pre($xlsx->rows());die;
-                $time_start_foreach = microtime(TRUE);
-                foreach ($xlsx->rows() as $r) {
-                    $time_start_row_foreach = microtime(TRUE);
-                    //echo '<pre>'; //print_r($r);die;
-                    $data = array();
-                    $dataParent = array();
-                    $error = FALSE;
-                    // Ignore the inital name row of excel file
-                    if ($f == 0) {
-                        $f++;
-                        continue;
-                    } $f++;
-                    //pre($r); //die('here');
-                    //pre($r);pre('above are $r data');
-                    if ($num_cols > count($fielsdArr)) {
-                        $num_cols = count($fielsdArr);
+
+
+            /*     * ***Parent Bulk Upload Function****** */ else if ($param1 == 'import_excel') {
+            //pre($_FILES);die;
+            if (empty($_FILES['userfile']['name'])) {
+                $this->form_validation->set_rules('userfile', 'Document', 'required');
+                $this->session->set_flashdata('flash_message_error', 'Please select a document to upload!!');
+                redirect(base_url() . 'index.php?school_admin/bulk_upload');
+            } 
+            else {
+                $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip');
+                if (in_array($_FILES['userfile']['type'], $allowed_types)) {
+                    $path = "uploads/parent_import.xlsx";
+                    //@unlink('uploads/Parent_Upload_Template.xlsx');
+                    @unlink($path);
+                    @unlink('uploads/parent_bulk_upload_error_details.log');
+
+                    if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $path)) {
+                        die('not moving');
                     }
-                    $blankErrorMsgArr = array();
-                    $errorRowIncrease = FALSE;
-                    $time_before_for_loop = microtime(TRUE);
-                    //generate_log("time takeing for each row in excel data ".($time_start_foreach-$time_end_foreach)." sec","parent_bulk_upload_time_checker_".date("d_m_Y").".log");
-                    for ($i = 0; $i < $num_cols; $i++) {    // checking is filds is mandetory or not
-                        //echo $fielsdArr[$i].'<br>';
-                        $time_start_col_validate = microtime(true);
-                        if (in_array($fielsdArr[$i], $fielsdStringMandotaryArr)) {
-                            //now validating mandetory fiels
+                    @ini_set('memory_limit', '-1');
+                    @set_time_limit(0);
+                    include 'Simplexlsx.class.php';
+                    $bulk_upload_strt_time = microtime(true);
+                    generate_log("bulk_upload_start at " . $bulk_upload_strt_time, "parent_bulk_upload_time_checker_" . date('d_m_Y') . '.log');
+                    $xlsx = new SimpleXLSX($path);
+                    list($num_cols, $num_rows) = $xlsx->dimension();
+                    $end_time = microtime(TRUE);
+                    generate_log("time take till 1847 at " . ($end_time - $bulk_upload_strt_time), "parent_bulk_upload_time_checker_" . date('d_m_Y') . '.log');
+                    $f = 0;
+                    $this->load->model("Dynamic_field_model");
+                    $rs_parent_bulk_upload_fields= $this->Dynamic_field_model->get_parent_bulk_upload();
+                    $rs_parent_bulk_upload_mandatory_fields= $this->Dynamic_field_model->get_parent_bulk_upload_mandatory();
+                    $rs_parent_bulk_upload_label_fields= $this->Dynamic_field_model->get_parent_bulk_upload_label();
 
-                            generate_log("Field " . $fielsdArr[$i] . " value " . $r[$i] . "\n", 'parent_bulk_upload_' . date('d-m-Y-H') . '.log');
-                            if (trim($r[$i]) == "") {
-                                //echo "here"; //die();
-                                $error = TRUE;
-                                $blankErrorMsgArr[] = $fielsdStringForAdminArr[$i] . " should not be blank at row no " . $errorRowNo;
+                    //$fielsdStringForAdmin = "Father's First Name,Father's Last Name,Mother's First Name,Mother's Last Name,Father's Profession,Mother's Profession,Email Id,Identity Card #,Identity Card Type,Address,City,State,Country,ZIP Code,Mobile,Home Phone,Work Phone";
+                    $fielsdStringForAdmin = $rs_parent_bulk_upload_label_fields[0]['tableCol'];
+                    //$fielsdString = "father_name,father_lname,mother_name,mother_lname,father_profession,mother_profession,email,father_icard_no,father_icard_type,address, city,state,country,zip_code,cell_phone,home_phone,work_phone";
+                    $fielsdString = $rs_parent_bulk_upload_fields[0]['tableCol'];
+                    //$fielsdStringMandotary = "father_name,mother_name,email,cell_phone";
+                    $fielsdStringMandotary = $rs_parent_bulk_upload_mandatory_fields[0]['tableCol'];
+                    
+                    $fielsdArr = explode(',', $fielsdString);
+                    $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
+                    $fielsdStringForAdminArr1=array();
+                    foreach ($fielsdStringForAdminArr AS $k=>$v){
+                        $fielsdStringForAdminArr1[]= get_phrase($v);
+                    }
+                    $fielsdStringForAdminArr=$fielsdStringForAdminArr1;
+                    $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
+                    /*pre($fielsdStringForAdminArr);
+                    pre($fielsdStringMandotaryArr);die;*/
+                    $someRowError = FALSE;
+                    $errorMsgArr = array();
+                    $errorExcelArr = array();
+                    $errorExcelArr[] = $fielsdStringForAdminArr;
+                    $errorRowNo = 2;
+                    //pre($xlsx->rows());die;
+                    $time_start_foreach = microtime(TRUE);
+                    foreach ($xlsx->rows() as $r) {
+                        $time_start_row_foreach = microtime(TRUE);
+                        //echo '<pre>'; //print_r($r);die;
+                        $data = array();
+                        $dataParent = array();
+                        $error = FALSE;
+                        // Ignore the inital name row of excel file
+                        if ($f == 0) {
+                            $f++;
+                            continue;
+                        } $f++;
+                        //pre($r); //die('here');
+                        //pre($r);pre('above are $r data');
+                        if ($num_cols > count($fielsdArr)) {
+                            $num_cols = count($fielsdArr);
+                        }
+                        $blankErrorMsgArr = array();
+                        $errorRowIncrease = FALSE;
+                        $time_before_for_loop = microtime(TRUE);
+                        //generate_log("time takeing for each row in excel data ".($time_start_foreach-$time_end_foreach)." sec","parent_bulk_upload_time_checker_".date("d_m_Y").".log");
+                        for ($i = 0; $i < $num_cols; $i++) {    // checking is filds is mandetory or not
+                            //echo $fielsdArr[$i].'<br>';
+                            $time_start_col_validate = microtime(true);
+                            if (in_array($fielsdArr[$i], $fielsdStringMandotaryArr)) {
+                                //now validating mandetory fiels
+
+                                generate_log("Field " . $fielsdArr[$i] . " value " . $r[$i] . "\n", 'parent_bulk_upload_' . date('d-m-Y-H') . '.log');
+                                if (trim($r[$i]) == "") {
+                                    //echo "here"; //die();
+                                    $error = TRUE;
+                                    $blankErrorMsgArr[] = $fielsdStringForAdminArr[$i] . " should not be blank at row no " . $errorRowNo;
+                                } else {
+                                    $time_cal_start_email_phone = microtime(TRUE);
+                                    //pre($i);
+                                    $validPhoneEmailCheck = "ok";
+                                    $rsEmailPhoneUnique = array();
+                                    // now check teh uniques for email then phone
+                                    $fieldType= $this->Dynamic_field_model->get_field_type($fielsdArr[$i],'2');
+                                    
+                                    if($fieldType=='email'){
+                                        $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array($fielsdArr[$i] => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+                                    }
+                                    
+                                    if($fieldType=='tel'){
+                                        $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array($fielsdArr[$i] => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'phone');
+                                    }
+                                    
+                                    /*if ($fielsdArr[$i] == 'email') {
+                                        $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array('email' => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+                                    } elseif ($fielsdArr[$i] == 'cell_phone') {
+                                        $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array('cell_phone' => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'phone');
+                                    }*/
+
+                                    if (count($rsEmailPhoneUnique) > 0) {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " is already entered.Should be unique information at row no -" . $errorRowNo;
+                                        //echo '<br>';
+                                    }
+
+                                    if ($validPhoneEmailCheck != 'ok' && ($fieldType == 'email' || $fieldType == 'tel')) {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
+                                    }
+                                    
+                                    $time_cal_end_email_phone = microtime(TRUE);
+                                    generate_log("time take to validate for emial or phone : " . trim($fielsdArr[$i]) . " with " . ($time_cal_end_email_phone - $time_cal_start_email_phone) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
+                                }
+                                //pre($errorMsgArr);//die;
+                                //pre(trim($fielsdArr[$i]));pre('$error');pre($error);
                             } else {
-                                $time_cal_start_email_phone = microtime(TRUE);
-                                //pre($i);
                                 $validPhoneEmailCheck = "ok";
                                 $rsEmailPhoneUnique = array();
                                 // now check teh uniques for email then phone
                                 $fieldType= $this->Dynamic_field_model->get_field_type($fielsdArr[$i],'2');
-                                
-                                if($fieldType=='email'){
-                                    $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array($fielsdArr[$i] => trim($r[$i])));
-                                    $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+                                if(trim($r[$i])!=""){
+                                    if($fieldType=='email'){
+                                        $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array($fielsdArr[$i] => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+                                    }
+                                    
+                                    if($fieldType=='tel'){
+                                        $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array($fielsdArr[$i] => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'phone');
+                                    }
+                                    
+                                    if (count($rsEmailPhoneUnique) > 0) {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " is already entered.Should be unique information at row no -" . $errorRowNo;
+                                        //echo '<br>';
+                                    }
+
+                                    if ($validPhoneEmailCheck != 'ok' && ($fieldType == 'email' || $fieldType == 'tel')) {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
+                                    }
+
+                                    //$time_cal_end_email_phone = microtime(TRUE);
+                                    //generate_log("time take to validate for emial or phone : " . trim($fielsdArr[$i]) . " with " . ($time_cal_end_email_phone - $time_cal_start_email_phone) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
                                 }
+
                                 
-                                if($fieldType=='tel'){
-                                    $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array($fielsdArr[$i] => trim($r[$i])));
-                                    $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'phone');
-                                }
-                                
+
                                 /*if ($fielsdArr[$i] == 'email') {
                                     $rsEmailPhoneUnique = $this->Parent_model->get_data_by_cols('parent_id', array('email' => trim($r[$i])));
                                     $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
@@ -2313,154 +2344,177 @@ class School_admin extends CI_Controller {
                                     $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'phone');
                                 }*/
 
-                                if (count($rsEmailPhoneUnique) > 0) {
-                                    $error = TRUE;
-                                    $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " is already entered.Should be unique information at row no -" . $errorRowNo;
-                                    //echo '<br>';
-                                }
-
-                                if ($validPhoneEmailCheck != 'ok' && ($fieldType == 'email' || $fieldType == 'tel')) {
-                                    $error = TRUE;
-                                    $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
-                                }
                                 
-                                $time_cal_end_email_phone = microtime(TRUE);
-                                generate_log("time take to validate for emial or phone : " . trim($fielsdArr[$i]) . " with " . ($time_cal_end_email_phone - $time_cal_start_email_phone) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
+                                
+                                /* if($fielsdArr[$i]=='date_time'){
+                                $rawDOB=trim($r[$i]);
+                                $newDOB=$this->get_mysql_date_formate_from_raw($rawDOB);
+                                if($newDOB!=""){
+                                $data[$fielsdArr[$i]]=$newDOB;
+                                }else{
+                                $data[$fielsdArr[$i]]=date('Y-m-d H:i:s');
+                                }
+                                } */
                             }
-                            //pre($errorMsgArr);//die;
-                            //pre(trim($fielsdArr[$i]));pre('$error');pre($error);
+                            if ($fielsdArr[$i] != 'date_time') {
+                                $data[trim($fielsdArr[$i])] = trim($r[$i]);
+                            }
+                            $time_end_col_validate = microtime(TRUE);
+                            generate_log("time take to validate for column : " . trim($fielsdArr[$i]) . " with " . ($time_end_col_validate - $time_start_col_validate) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
+                        }
+                        if (count($blankErrorMsgArr) > 0) {
+                            $error = TRUE;
+                            if (count($blankErrorMsgArr) <= count($fielsdArr)) {
+                                foreach ($blankErrorMsgArr AS $errorKey => $errorVal) {
+                                    $errorMsgArr[] = $errorVal;
+                                }
+                            }
+                        }
+                        //pre($data); die('//hii');
+                        //pre('$error');pre($error); //die();
+                        if ($error === FALSE) {
+                            //$data['date_time']=strtotime(date("Y-m-d H:i:s")); 
+                            //$data['parent_id'] = $parent_id;
+                            $passcode = "spa" . mt_rand(10000000, 99999999);
+                            $data['password'] = sha1($passcode);
+                            $data['passcode'] = $passcode;
+                            $data['isActive'] = "1";
+                            //pre($data);
+                            //pre('kkkkkkkkkkkkk');die;
+                            //pre($data);die;
+
+                            $parent_id = $this->Parent_model->save_parent($data);
+                            $time_end_row_foreach_just_before_insert = microtime(TRUE);
+                            generate_log("time take to insrt row no : " . $f . " just before save in parent table " . ($time_end_row_foreach_just_before_insert - $time_start_row_foreach) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
+                            generate_log("Parent uploaded done for " . $data['father_name']);
+                            if ($parent_id > 0) {
+                                /* $post = [
+                                'location' => $this->globalSettingsLocation,
+                                'cell_phone' => $data['cell_phone'],
+                                'message' => "Welcome Mr " . $data['father_name'] . " your passcode for app is " . $passcode . "   download app here https://play.google.com/store/apps/details?id=".$this->globalSettingsAppPackageName."&hl=en",
+                                ];
+                                //echo print_r($post);exit;
+                                $url = "http://".SMS_IP_ADDR."/School/index.php/?admin/send_common_sms/";
+                                fire_api_by_curl($url,$post); */
+                                $message = array();
+                                $activity = "new_user";
+                                $message['messagge_body'] = "Welcome Mr " . $data['father_name'] . " your passcode for app is " . $passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
+                                $message['subject'] = "Your login details for " . CURRENT_INSTANCE . " School";
+                                $message['to_name'] = $data['father_name'];
+                                $phone = array($data['cell_phone']);
+                                $email = array($data['email']);
+                                $user_details = array('user_id' => $parent_id, 'user_type' => 'parent');
+                                //send_school_notification($activity, $message, $phone, $email, $user_details);
+                            }
                         } else {
-                            /* if($fielsdArr[$i]=='date_time'){
-                              $rawDOB=trim($r[$i]);
-                              $newDOB=$this->get_mysql_date_formate_from_raw($rawDOB);
-                              if($newDOB!=""){
-                              $data[$fielsdArr[$i]]=$newDOB;
-                              }else{
-                              $data[$fielsdArr[$i]]=date('Y-m-d H:i:s');
-                              }
-                              } */
-                        }
-                        if ($fielsdArr[$i] != 'date_time') {
-                            $data[trim($fielsdArr[$i])] = trim($r[$i]);
-                        }
-                        $time_end_col_validate = microtime(TRUE);
-                        generate_log("time take to validate for column : " . trim($fielsdArr[$i]) . " with " . ($time_end_col_validate - $time_start_col_validate) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
-                    }
-                    if (count($blankErrorMsgArr) > 0) {
-                        $error = TRUE;
-                        if (count($blankErrorMsgArr) <= count($fielsdArr)) {
-                            foreach ($blankErrorMsgArr AS $errorKey => $errorVal) {
-                                $errorMsgArr[] = $errorVal;
-                            }
-                        }
-                    }
-                    //pre($data); //die('//hii');
-                    //pre('$error');pre($error); //die();
-                    if ($error === FALSE) {
-                        //$data['date_time']=strtotime(date("Y-m-d H:i:s")); 
-                        //$data['parent_id'] = $parent_id;
-                        $passcode = "spa" . mt_rand(10000000, 99999999);
-                        $data['password'] = sha1($passcode);
-                        $data['passcode'] = $passcode;
-                        $data['isActive'] = "1";
-                        //pre($data);
-                        //pre('kkkkkkkkkkkkk');die;
-                        //pre($data);die;
+                            $time_end_row_foreach_just_before_final_error_handle = microtime(TRUE);
+                            generate_log("time take to insrt row no : " . $f . " just before final error array handle " . ($time_end_row_foreach_just_before_final_error_handle - $time_start_row_foreach) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
+                            //pre($errorMsgArr);//die;
 
-                        $parent_id = $this->Parent_model->save_parent($data);
-                        $time_end_row_foreach_just_before_insert = microtime(TRUE);
-                        generate_log("time take to insrt row no : " . $f . " just before save in parent table " . ($time_end_row_foreach_just_before_insert - $time_start_row_foreach) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
-                        generate_log("Parent uploaded done for " . $data['father_name']);
-                        if ($parent_id > 0) {
-                            /* $post = [
-                              'location' => $this->globalSettingsLocation,
-                              'cell_phone' => $data['cell_phone'],
-                              'message' => "Welcome Mr " . $data['father_name'] . " your passcode for app is " . $passcode . "   download app here https://play.google.com/store/apps/details?id=".$this->globalSettingsAppPackageName."&hl=en",
-                              ];
-                              //echo print_r($post);exit;
-                              $url = "http://".SMS_IP_ADDR."/School/index.php/?admin/send_common_sms/";
-                              fire_api_by_curl($url,$post); */
-                            $message = array();
-                            $activity = "new_user";
-                            $message['messagge_body'] = "Welcome Mr " . $data['father_name'] . " your passcode for app is " . $passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
-                            $message['subject'] = "Your login details for " . CURRENT_INSTANCE . " School";
-                            $message['to_name'] = $data['father_name'];
-                            $phone = array($data['cell_phone']);
-                            $email = array($data['email']);
-                            $user_details = array('user_id' => $parent_id, 'user_type' => 'parent');
-                            //send_school_notification($activity, $message, $phone, $email, $user_details);
+                            $errorExcelArr[] = $r;
+                            $someRowError = TRUE;
                         }
+                        $errorRowNo++;
+                        $time_end_row_foreach = microtime(TRUE);
+                        generate_log("time take to insrt row no : " . $f . " with " . ($time_end_row_foreach - $time_start_row_foreach) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
+                    } //ends foreach
+                    //pre($errorMsgArr); exit;
+                    if ($someRowError == FALSE) {
+                        //$this->generate_cv$error_msg);
+                        generate_log("No error for this upload at - " . time(), 'parent_bulk_upload' . date('d-m-Y-H') . '.log');
+                        $this->session->set_flashdata('flash_message', get_phrase('parent_details_added'));
+                        redirect(base_url() . 'index.php?school_admin/bulk_upload/', 'refresh');
                     } else {
-                        $time_end_row_foreach_just_before_final_error_handle = microtime(TRUE);
-                        generate_log("time take to insrt row no : " . $f . " just before final error array handle " . ($time_end_row_foreach_just_before_final_error_handle - $time_start_row_foreach) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
-                        //pre($errorMsgArr);//die;
-
-                        $errorExcelArr[] = $r;
-                        $someRowError = TRUE;
+                        //pre($errorMsgArr); die('here');
+                        generate_log(json_encode($errorMsgArr), 'parent_bulk_upload_error_details.log', TRUE);
+                        $file_name_with_path = 'uploads/parent_bulk_upload_error_details_for_excel_file.xlsx';
+                        @unlink($file_name_with_path);
+                        create_excel_file($file_+name_with_path, $errorExcelArr, 'Parent Upload Data');
+                        $this->session->set_flashdata('flash_message_error', "Some rows are not uploaded,due to invalid data.");
+                        redirect(base_url() . 'index.php?school_admin/parent_bulk_upload_error', 'refresh');
                     }
-                    $errorRowNo++;
-                    $time_end_row_foreach = microtime(TRUE);
-                    generate_log("time take to insrt row no : " . $f . " with " . ($time_end_row_foreach - $time_start_row_foreach) . " sec", "parent_bulk_upload_time_checker_" . date("d_m_Y") . ".log");
-                } //ends foreach
-                //pre($errorMsgArr); exit;
-                if ($someRowError == FALSE) {
-                    //$this->generate_cv$error_msg);
-                    generate_log("No error for this upload at - " . time(), 'parent_bulk_upload' . date('d-m-Y-H') . '.log');
-                    $this->session->set_flashdata('flash_message', get_phrase('parent_details_added'));
-                    redirect(base_url() . 'index.php?school_admin/bulk_upload/', 'refresh');
-                } else {
-                    //pre($errorMsgArr); die('here');
-                    generate_log(json_encode($errorMsgArr), 'parent_bulk_upload_error_details.log', TRUE);
-                    $file_name_with_path = 'uploads/parent_bulk_upload_error_details_for_excel_file.xlsx';
-                    @unlink($file_name_with_path);
-                    create_excel_file($file_name_with_path, $errorExcelArr, 'Parent Upload Data');
-                    $this->session->set_flashdata('flash_message_error', "Some rows are not uploaded,due to invalid data.");
-                    redirect(base_url() . 'index.php?school_admin/parent_bulk_upload_error', 'refresh');
+                }//ends allowed type code
+                else {
+                    $this->session->set_flashdata('flash_message_error', 'Sorry, File extension is not supported, Please enter data in Excel Spread Sheet!!');
+                    redirect(base_url() . 'index.php?school_admin/bulk_upload');
                 }
-            }//ends allowed type code
-            else {
-                $this->session->set_flashdata('flash_message_error', 'Sorry, File extension is not supported, Please enter data in Excel Spread Sheet!!');
-                redirect(base_url() . 'index.php?school_admin/bulk_upload');
             }
-        }
-    } else if (($param1 == 'search') && ($param2 != '')) {
-        $page_data['search_text'] = $param2;
-    } //ends impport excel
-    /*     * ******Ends Here******* */
+        } else if (($param1 == 'search') && ($param2 != '')) {
+            $page_data['search_text'] = $param2;
+        } //ends impport excel
+        /*     * ******Ends Here******* */
 
-    /*     * *******************View Parent************************* */
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    $page_data['parents'] = $this->Parent_model->get_data_by_cols('*', array(), 'result_array', array('father_name' => 'asc'));
-    $page_data['page_title'] = get_phrase('all_parents');
-    $page_data['page_name'] = 'parent';
-    $this->load->view('backend/index', $page_data);
+        /*     * *******************View Parent************************* */
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $page_data['parents'] = $this->Parent_model->get_data_by_cols('*', array(), 'result_array', array('father_name' => 'asc'));
+        $page_data['page_title'] = get_phrase('all_parents');
+        $page_data['page_name'] = 'parent';
+        $this->load->view('backend/index', $page_data);
 
-    /*     * *********************End of Function*********************************** */
-}
+        /*     * *********************End of Function*********************************** */
+    }
 
-/* * **MANAGE TEACHERS**** */
+    /******MANAGE TEACHERS*****/
+    function teacher($param1 = '', $param2 = '', $param3 = '') {
+        $this->load->model("Teacher_model");
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect(base_url(), 'refresh');
+        $page_data = $this->get_page_data_var();
+        $page_data['search_text'] = '';
+        if ($param1 == 'create') {
+            $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[teacher.email]');
+            if ($this->form_validation->run() == FALSE) {
+                $this->session->set_flashdata('flash_message_error', get_phrase('Email_already_taken_please_enter_other_email'));
+                redirect(base_url() . 'index.php?school_admin/teacher/', 'refresh');
+            } else {
+                $data['emp_id'] = $this->input->post('emp_id');
+                $data['name'] = $this->input->post('first_name');
+                $data['middle_name'] = $this->input->post('middle_name');
+                $data['last_name'] = $this->input->post('last_name');
+                $data['email'] = $this->input->post('email');
+                $data['password'] = sha1($this->input->post('password'));
+                $bday = $this->input->post('birthday');
+                $data['date_of_birth'] = date('Y-m-d', strtotime($bday));
+                //echo $data['date_of_birth'];exit;
+                $data['gender'] = $this->input->post('gender');
+                $data['religion'] = $this->input->post('religion');
+                $data['nationality'] = $this->input->post('nationality');
+                $data['blood_group'] = $this->input->post('blood_group');
+                $data['address'] = $this->input->post('present_address');
+                $data['country'] = $this->input->post('country');
+                $data['state'] = $this->input->post('state');
+                $data['city'] = $this->input->post('city');
+                $data['zip_code'] = $this->input->post('zip_code');
+                $data['cell_phone'] = $this->input->post('mobile_phone');
+                $data['home_phone'] = $this->input->post('home_phone');
+                $data['work_phone'] = $this->input->post('work_phone');
+                $data['job_title'] = $this->input->post('job_title');
+                $data['qualification'] = $this->input->post('qualification');
+                $data['specialisation'] = $this->input->post('stream');
+                $data['experience'] = $this->input->post('expereince');
+                $data['summary'] = $this->input->post('summary');
+                $data['awards'] = $this->input->post('awards');
+                $data['card_id'] = $this->input->post('card_id');
+                $data['passport_number'] = $this->input->post('passport_no');
+                $data['idcard_number'] = $this->input->post('icard_no');
+                $data['idcard_type'] = $this->input->post('type');
+                $data['teacher_image'] = $_FILES['userfile']['name'];
 
-function teacher($param1 = '', $param2 = '', $param3 = '') {
-    $this->load->model("Teacher_model");
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect(base_url(), 'refresh');
-    $page_data = $this->get_page_data_var();
-    $page_data['search_text'] = '';
-    if ($param1 == 'create') {
-        $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[teacher.email]');
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash_message_error', get_phrase('Email already taken please enter other email'));
-            redirect(base_url() . 'index.php?school_admin/teacher/', 'refresh');
-        } else {
-            $data['emp_id'] = $this->input->post('emp_id');
+                $data['isActive'] = '1';
+                $data['date_time'] = date('Y-m-d H:i:s');
+                $teacher_id = $this->Teacher_model->save_teacher($data);
+                move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/teacher_image/' . $teacher_id . '.jpg');
+                $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+                $this->Email_model->account_opening_email('teacher', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL
+                redirect(base_url() . 'index.php?school_admin/teacher_information/', 'refresh');
+            }
+        } else if ($param1 == 'do_update') {
+            //$data['emp_id'] = $this->input->post('emp_id');
             $data['name'] = $this->input->post('first_name');
             $data['middle_name'] = $this->input->post('middle_name');
             $data['last_name'] = $this->input->post('last_name');
-            $data['email'] = $this->input->post('email');
-            $data['password'] = sha1($this->input->post('password'));
             $bday = $this->input->post('birthday');
             $data['date_of_birth'] = date('Y-m-d', strtotime($bday));
-            //echo $data['date_of_birth'];exit;
             $data['gender'] = $this->input->post('gender');
             $data['religion'] = $this->input->post('religion');
             $data['nationality'] = $this->input->post('nationality');
@@ -2470,7 +2524,7 @@ function teacher($param1 = '', $param2 = '', $param3 = '') {
             $data['state'] = $this->input->post('state');
             $data['city'] = $this->input->post('city');
             $data['zip_code'] = $this->input->post('zip_code');
-            $data['cell_phone'] = $this->input->post('mobile_phone');
+            $data['cell_phone'] = $this->input->post('cell_phone');
             $data['home_phone'] = $this->input->post('home_phone');
             $data['work_phone'] = $this->input->post('work_phone');
             $data['job_title'] = $this->input->post('job_title');
@@ -2483,76 +2537,73 @@ function teacher($param1 = '', $param2 = '', $param3 = '') {
             $data['passport_number'] = $this->input->post('passport_no');
             $data['idcard_number'] = $this->input->post('icard_no');
             $data['idcard_type'] = $this->input->post('type');
+            
             $data['teacher_image'] = $_FILES['userfile']['name'];
-
             $data['isActive'] = '1';
-            $data['date_time'] = date('Y-m-d H:i:s');
-            $teacher_id = $this->Teacher_model->save_teacher($data);
-            move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/teacher_image/' . $teacher_id . '.jpg');
-            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-            $this->Email_model->account_opening_email('teacher', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL
+            $data['change_time'] = date('Y-m-d H:i:s');
+            $this->Teacher_model->update_teacher($data, $param2);
+            move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/teacher_image/' . $param2 . '.jpg');
+            $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
             redirect(base_url() . 'index.php?school_admin/teacher_information/', 'refresh');
-        }
-    } else if ($param1 == 'do_update') {
-        //$data['emp_id'] = $this->input->post('emp_id');
-        $data['name'] = $this->input->post('first_name');
-        $data['middle_name'] = $this->input->post('middle_name');
-        $data['last_name'] = $this->input->post('last_name');
-        $bday = $this->input->post('birthday');
-        $data['date_of_birth'] = date('Y-m-d', strtotime($bday));
-        $data['gender'] = $this->input->post('gender');
-        $data['religion'] = $this->input->post('religion');
-        $data['nationality'] = $this->input->post('nationality');
-        $data['blood_group'] = $this->input->post('blood_group');
-        $data['address'] = $this->input->post('present_address');
-        $data['country'] = $this->input->post('country');
-        $data['state'] = $this->input->post('state');
-        $data['city'] = $this->input->post('city');
-        $data['zip_code'] = $this->input->post('zip_code');
-        $data['cell_phone'] = $this->input->post('cell_phone');
-        $data['home_phone'] = $this->input->post('home_phone');
-        $data['work_phone'] = $this->input->post('work_phone');
-        $data['job_title'] = $this->input->post('job_title');
-        $data['qualification'] = $this->input->post('qualification');
-        $data['specialisation'] = $this->input->post('stream');
-        $data['experience'] = $this->input->post('expereince');
-        $data['summary'] = $this->input->post('summary');
-        $data['awards'] = $this->input->post('awards');
-        $data['card_id'] = $this->input->post('card_id');
-        $data['passport_number'] = $this->input->post('passport_no');
-        $data['idcard_number'] = $this->input->post('icard_no');
-        $data['idcard_type'] = $this->input->post('type');
-        $data['teacher_image'] = $_FILES['userfile']['name'];
-        $data['isActive'] = '1';
-        $data['change_time'] = date('Y-m-d H:i:s');
-        $this->Teacher_model->update_teacher($data, $param2);
-        move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/teacher_image/' . $param2 . '.jpg');
-        $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
-        redirect(base_url() . 'index.php?school_admin/teacher_information/', 'refresh');
-    } else if ($param1 == 'personal_profile') {
-        $page_data['personal_profile'] = true;
-        $page_data['current_teacher_id'] = $param2;
-    } else if ($param1 == 'edit') {
-        $page_data['edit_data'] = $this->Teacher_model->get_data_by_cols('*', array('teacher_id' => $param2), 'result_array');
-    } else if ($param1 == 'delete') {
-        unlink('uploads/teacher_image/' . $param2 . '.jpg');
-        $dataArray = array('teacher_id' => $param2);
-        $this->Teacher_model->delete_teacher($dataArray);
-        $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
-        redirect(base_url() . 'index.php?school_admin/teacher_information/', 'refresh');
-    } else if ($param1 == 'update_passcode') {
-        $rsTeacherData = $this->Teacher_model->get_data_by_cols('passcode,name,cell_phone,email', array('teacher_id' => $param2));
+        } else if ($param1 == 'personal_profile') {
+            $page_data['personal_profile'] = true;
+            $page_data['current_teacher_id'] = $param2;
+        } else if ($param1 == 'edit') {
+            $page_data['edit_data'] = $this->Teacher_model->get_data_by_cols('*', array('teacher_id' => $param2), 'result_array');
+        } else if ($param1 == 'delete') {
+            unlink('uploads/teacher_image/' . $param2 . '.jpg');
+            $dataArray = array('teacher_id' => $param2);
+            $this->Teacher_model->delete_teacher($dataArray);
+            $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+            redirect(base_url() . 'index.php?school_admin/teacher_information/', 'refresh');
+        } else if ($param1 == 'update_passcode') {
+            $rsTeacherData = $this->Teacher_model->get_data_by_cols('passcode,name,cell_phone,email', array('teacher_id' => $param2));
 
-        if (count($rsTeacherData) > 0) {
-            $phoneNumber = $rsTeacherData[0]->cell_phone;
+            if (count($rsTeacherData) > 0) {
+                $phoneNumber = $rsTeacherData[0]->cell_phone;
 
-            if ($phoneNumber != "") {
-                $passcode = create_passcode('teacher');
-                $data['passcode'] = ($passcode != 'invalid') ? $passcode : '';
-                $data['password'] = ($passcode != 'invalid') ? md5($passcode) : '';
-                $this->Teacher_model->update_teacher($data, $param2);
+                if ($phoneNumber != "") {
+                    $passcode = create_passcode('teacher');
+                    $data['passcode'] = ($passcode != 'invalid') ? $passcode : '';
+                    $data['password'] = ($passcode != 'invalid') ? md5($passcode) : '';
+                    $this->Teacher_model->update_teacher($data, $param2);
+                    $data1['emppassword'] = md5($passcode);
+                    $this->Teacher_model->update_hrm_password($data1, $param2);
 
-                $msg = "Welcome to Sharad School Mr. " . $rsTeacherData[0]->name . " your passcode for app is  " . $passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
+                    $msg = "Welcome to Sharad School Mr. " . $rsTeacherData[0]->name . " your passcode for app is  " . $passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
+                    $phone = $phoneNumber;
+                    $message = array();
+                    $message_body = $msg;
+                    $message['sms_message'] = $msg;
+                    $message['subject'] = 'Password Reset ' . $this->globalSettingsSystemName;
+                    $message['messagge_body'] = $message_body;
+                    $message['to_name'] = $rsTeacherData[0]->name;
+                    send_school_notification('update_passcode', $message, array($phone), array($rsTeacherData[0]->email));
+                    $this->session->set_flashdata('flash_message', get_phrase('Passcode_is_sent_successfully_to_registered_number'));
+                } else {
+                    $this->session->set_flashdata('flash_message_error', "Phone no is not found.");
+                }
+
+                /* if ($rsTeacherData[0]->passcode == "") {
+                $passcode = 'sta' . mt_rand(10000000, 99999999);
+                $this->Teacher_model->update_teacher(array('passcode' => $passcode), $param2);
+                if ($phoneNumber != "" || $rsTeacherData[0]->email != "") {
+
+                $phone = $phoneNumber;
+                $message = array();
+                $msg = "Welcome to " . $this->globalSettingsSystemName . " Mr. " . $rsTeacherData[0]->name . " " . $rsTeacherData[0]->name . " your passcode for app is  " . $passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
+                $message_body = $msg;
+
+                $message['sms_message'] = $msg;
+                $message['subject'] = 'Password Reset ' . $this->globalSettingsSystemName;
+                $message['messagge_body'] = $message_body;
+                $message['to_name'] = $rsTeacherData[0]->name;
+                send_school_notification('update_passcode', $message, array($phone), array($rsTeacherData[0]->email));
+                }
+                } else {
+                if ($phoneNumber != "" || $rsTeacherData[0]->email != "") {
+                $passcode = $rsTeacherData[0]->passcode;
+                $msg = "Welcome to Sharad School Mr. " . $rsTeacherData[0]->name . " your passcode for app is  " . $rsTeacherData[0]->passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
                 $phone = $phoneNumber;
                 $message = array();
                 $message_body = $msg;
@@ -2561,712 +2612,678 @@ function teacher($param1 = '', $param2 = '', $param3 = '') {
                 $message['messagge_body'] = $message_body;
                 $message['to_name'] = $rsTeacherData[0]->name;
                 send_school_notification('update_passcode', $message, array($phone), array($rsTeacherData[0]->email));
-                $this->session->set_flashdata('flash_message', get_phrase('Passcode_is_sent_successfully_to_registered_number'));
+                }
+                } */
             } else {
-                $this->session->set_flashdata('flash_message_error', "Phone no is not found.");
+                $this->session->set_flashdata('flash_message_error', "Unknown error arises to update the passcode");
             }
-
-            /* if ($rsTeacherData[0]->passcode == "") {
-              $passcode = 'sta' . mt_rand(10000000, 99999999);
-              $this->Teacher_model->update_teacher(array('passcode' => $passcode), $param2);
-              if ($phoneNumber != "" || $rsTeacherData[0]->email != "") {
-
-              $phone = $phoneNumber;
-              $message = array();
-              $msg = "Welcome to " . $this->globalSettingsSystemName . " Mr. " . $rsTeacherData[0]->name . " " . $rsTeacherData[0]->name . " your passcode for app is  " . $passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
-              $message_body = $msg;
-
-              $message['sms_message'] = $msg;
-              $message['subject'] = 'Password Reset ' . $this->globalSettingsSystemName;
-              $message['messagge_body'] = $message_body;
-              $message['to_name'] = $rsTeacherData[0]->name;
-              send_school_notification('update_passcode', $message, array($phone), array($rsTeacherData[0]->email));
-              }
-              } else {
-              if ($phoneNumber != "" || $rsTeacherData[0]->email != "") {
-              $passcode = $rsTeacherData[0]->passcode;
-              $msg = "Welcome to Sharad School Mr. " . $rsTeacherData[0]->name . " your passcode for app is  " . $rsTeacherData[0]->passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
-              $phone = $phoneNumber;
-              $message = array();
-              $message_body = $msg;
-              $message['sms_message'] = $msg;
-              $message['subject'] = 'Password Reset ' . $this->globalSettingsSystemName;
-              $message['messagge_body'] = $message_body;
-              $message['to_name'] = $rsTeacherData[0]->name;
-              send_school_notification('update_passcode', $message, array($phone), array($rsTeacherData[0]->email));
-              }
-              } */
-        } else {
-            $this->session->set_flashdata('flash_message_error', "Unknown error arises to update the passcode");
+            redirect(base_url() . 'index.php?school_admin/teacher_information/', 'refresh');
+        } else if (($param1 == 'search') && ($param2 != '')) {
+            $page_data['search_text'] = $param2;
         }
-        redirect(base_url() . 'index.php?school_admin/teacher_information/', 'refresh');
-    } else if (($param1 == 'search') && ($param2 != '')) {
-        $page_data['search_text'] = $param2;
+
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $page_data['teachers_id'] = $this->Teacher_model->get_teacher_record(array('teacher_id' => $param2));
+        //$page_data['teachers'] = $this->Teacher_model->get_teacher_array();
+        $page_data['page_name'] = 'teacher';
+        $page_data['page_title'] = get_phrase('manage_teacher');
+        $this->load->view('backend/index', $page_data);
     }
 
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    $page_data['teachers_id'] = $this->Teacher_model->get_teacher_record(array('teacher_id' => $param2));
-    //$page_data['teachers'] = $this->Teacher_model->get_teacher_array();
-    $page_data['page_name'] = 'teacher';
-    $page_data['page_title'] = get_phrase('manage_teacher');
-    $this->load->view('backend/index', $page_data);
-}
+    function teacher_information() {
+        $this->load->model("Teacher_model");
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+        $page_data = $this->get_page_data_var();
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $page_data['teachers'] = $this->Teacher_model->get_teacher_array();
+        $page_data['page_name'] = 'teacher';
+        $page_data['page_title'] = get_phrase('manage_teacher');
+        $this->load->view('backend/index', $page_data);
+    }
 
-function teacher_information() {
-    $this->load->model("Teacher_model");
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect('login', 'refresh');
-    $page_data = $this->get_page_data_var();
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    $page_data['teachers'] = $this->Teacher_model->get_teacher_array();
-    $page_data['page_name'] = 'teacher';
-    $page_data['page_title'] = get_phrase('manage_teacher');
-    $this->load->view('backend/index', $page_data);
-}
+    function generate_invoice() {
+        $student_id = $this->input->post('student_id');
+        $this->load->library('Fi_functions');
+        $this->fi_functions->save_invoice($student_id);
+    }
 
-function generate_invoice() {
-    $student_id = $this->input->post('student_id');
-    $this->load->library('Fi_functions');
-    $this->fi_functions->save_invoice($student_id);
-}
+    /* add subject */
 
-/* add subject */
-
-function add_subject() {
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect('login', 'refresh');
-    $page_data = $this->get_page_data_var();
-    $page_data['teachers'] = $this->Teacher_model->get_data_by_cols("*", array(), "result_array", array('name' => 'asc'));
-    $page_data['classes'] = $this->Class_model->get_class_array();
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
+    function add_subject() {
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+        $page_data = $this->get_page_data_var();
+        $page_data['teachers'] = $this->Teacher_model->get_data_by_cols("*", array(), "result_array", array('name' => 'asc'));
+        $page_data['classes'] = $this->Class_model->get_class_array();
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
 
 
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    $page_data['page_name'] = 'add_subject';
-    $page_data['page_title'] = get_phrase('add_subject');
-    $this->load->view('backend/index', $page_data);
-}
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $page_data['page_name'] = 'add_subject';
+        $page_data['page_title'] = get_phrase('add_subject');
+        $this->load->view('backend/index', $page_data);
+    }
 
-/* * **MANAGE SUBJECTS**** */
+    /* * **MANAGE SUBJECTS**** */
 
-function subject($param1 = '', $param2 = '', $param3 = '') {
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect(base_url(), 'refresh');
-    $this->load->model('Subject_model');
-    $page_data = $this->get_page_data_var();
-    if ($param1 == 'create') {
-        $data['class_id'] = $this->input->post('class_id');
-        $this->form_validation->set_rules('name', 'Subject Name', 'trim|required');
-        $this->form_validation->set_rules('class_id', 'Class', 'required');
-        $this->form_validation->set_rules('section_id', 'Section', 'required');
-        $this->form_validation->set_rules('teacher_id', 'Teacher', 'required');
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash_message_error', validation_errors());
-            redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
-        } else {
+    function subject($param1 = '', $param2 = '', $param3 = '') {
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect(base_url(), 'refresh');
+        $this->load->model('Subject_model');
+        $page_data = $this->get_page_data_var();
+        if ($param1 == 'create') {
+            $data['class_id'] = $this->input->post('class_id');
+            $this->form_validation->set_rules('name', 'Subject Name', 'trim|required');
+            $this->form_validation->set_rules('class_id', 'Class', 'required');
+            $this->form_validation->set_rules('section_id', 'Section', 'required');
+            $this->form_validation->set_rules('teacher_id', 'Teacher', 'required');
+            if ($this->form_validation->run() == FALSE) {
+                $this->session->set_flashdata('flash_message_error', validation_errors());
+                redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
+            } else {
+                $data['name'] = $this->input->post('name');
+                $data['class_id'] = $this->input->post('class_id');
+                $data['section_id'] = $this->input->post('section_id');
+                $data['teacher_id'] = $this->input->post('teacher_id');
+                $data['year'] = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
+                $count = $this->Subject_model->get_data_by_cols('count(name)as count', array('class_id' => $data['class_id'], 'name' => $data['name'], 'section_id' => $data['section_id']), 'result_array');
+                if ($count[0]['count'] < 1) {
+                    $new_subject_id = $this->Subject_model->save_subject($data);
+                    $this->session->set_flashdata('flash_message', get_phrase('subject_added_successfully'));
+                    redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry'));
+                    redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
+                }
+                //            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+                //            redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
+            }
+        }
+        if ($param1 == 'do_update') {
             $data['name'] = $this->input->post('name');
             $data['class_id'] = $this->input->post('class_id');
-            $data['section_id'] = $this->input->post('section_id');
             $data['teacher_id'] = $this->input->post('teacher_id');
+            $data['section_id'] = $this->input->post('section_id');
             $data['year'] = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
-            $count = $this->Subject_model->get_data_by_cols('count(name)as count', array('class_id' => $data['class_id'], 'name' => $data['name'], 'section_id' => $data['section_id']), 'result_array');
-            if ($count[0]['count'] < 1) {
-                $new_subject_id = $this->Subject_model->save_subject($data);
-                $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-                redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
-            } else {
-                $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry'));
-                redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
-            }
-//            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-//            redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
+            $subject_id = $this->Subject_model->update_subject($data, array("subject_id" => $param2));
+            $this->session->set_flashdata('flash_message', get_phrase('subject_updated_successfully.'));
+            //$data['class_id'] = $this->input->post('class_id');
+            redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
+        } else if ($param1 == 'edit') {
+            $page_data['edit_data'] = $this->Subject_model->get_subject_array(array("subject_id" => $param2));
         }
-    }
-    if ($param1 == 'do_update') {
-        $data['name'] = $this->input->post('name');
-        $data['class_id'] = $this->input->post('class_id');
-        $data['teacher_id'] = $this->input->post('teacher_id');
-        $data['section_id'] = $this->input->post('section_id');
-        $data['year'] = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
-        $subject_id = $this->Subject_model->update_subject($data, array("subject_id" => $param2));
-        $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
-        //$data['class_id'] = $this->input->post('class_id');
-        redirect(base_url() . 'index.php?school_admin/subject/' . $data['class_id'], 'refresh');
-    } else if ($param1 == 'edit') {
-        $page_data['edit_data'] = $this->Subject_model->get_subject_array(array("subject_id" => $param2));
-    }
-    if ($param1 == 'delete') {
-        $this->Subject_model->delete_subject(array("subject_id" => $param2));
-        $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
-        redirect(base_url() . 'index.php?school_admin/subject/' . $param3, 'refresh');
-    }
+        if ($param1 == 'delete') {
+            $this->Subject_model->delete_subject(array("subject_id" => $param2));
+            $this->session->set_flashdata('flash_message', get_phrase('subject_deleted_successfully.'));
+            redirect(base_url() . 'index.php?school_admin/subject/' . $param3, 'refresh');
+        }
 
-    if ($param1 == 'import_excel') {
-        if (empty($_FILES['userfile']['name'])) {
-            $this->form_validation->set_rules('userfile', 'Document', 'required');
-            $this->session->set_flashdata('flash_message_error', 'Please select a document to upload!!');
-            redirect(base_url() . 'index.php?school_admin/bulk_upload');
-        } else {
-            $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip');
-            if (in_array($_FILES['userfile']['type'], $allowed_types)) {
-                $path = "uploads/subject_import.xlsx";
-                //@unlink('uploads/subject_import.xlsx');
-                @unlink($path);
-                @unlink('uploads/subject_bulk_upload_error_details.log');
+        if ($param1 == 'import_excel') {
+            if (empty($_FILES['userfile']['name'])) {
+                $this->form_validation->set_rules('userfile', 'Document', 'required');
+                $this->session->set_flashdata('flash_message_error', 'Please select a document to upload!!');
+                redirect(base_url() . 'index.php?school_admin/bulk_upload');
+            } else {
+                $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip');
+                if (in_array($_FILES['userfile']['type'], $allowed_types)) {
+                    $path = "uploads/subject_import.xlsx";
+                    //@unlink('uploads/subject_import.xlsx');
+                    @unlink($path);
+                    @unlink('uploads/subject_bulk_upload_error_details.log');
 
-                if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $path)) {
-                    die('not moving');
-                }
-                @ini_set('memory_limit', '-1');
-                @set_time_limit(0);
-                include 'Simplexlsx.class.php';
-                $xlsx = new SimpleXLSX($path);
-                list($num_cols, $num_rows) = $xlsx->dimension();
-                $f = 0;
-                $fielsdStringForAdmin = "Class Name,Section Name,Subject Name,Teacher Email Id";
-                $fielsdString = "class_id,section_id,name,email";
-                $fielsdStringMandotary = "class_id,section_id,name,email";
-                $fielsdArr = explode(',', $fielsdString);
-                $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
-                $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
-                $someRowError = FALSE;
-                $errorMsgArr = array();
-                $errorExcelArr = array();
-                $errorExcelArr[] = $fielsdStringForAdminArr;
-                $errorRowNo = 2;
-                //pre($xlsx->rows());die;
-                foreach ($xlsx->rows() as $r) {
-                    //echo '<pre>'; //print_r($r);die;
-                    $data = array();
-                    $dataParent = array();
-                    $error = FALSE;
-                    // Ignore the inital name row of excel file
-                    if ($f == 0) {
-                        $f++;
-                        continue;
-                    } $f++;
-                    //pre($r); //die('here');
-                    //pre($r);
-                    //pre('above are $r data');
-                    if ($num_cols > count($fielsdArr)) {
-                        $num_cols = count($fielsdArr);
+                    if (!move_uploaded_file($_FILES['userfile']['tmp_name'], $path)) {
+                        die('not moving');
                     }
-                    $blankErrorMsgArr = array();
-                    $errorRowIncrease = FALSE;
-                    for ($i = 0; $i < $num_cols; $i++) {    // checking is filds is mandetory or not
-                        //echo $fielsdArr[$i].'<br>';
-                        if (in_array($fielsdArr[$i], $fielsdStringMandotaryArr)) {
-                            //now validating mandetory fiels
-                            generate_log("Field " . $fielsdArr[$i] . " value " . $r[$i] . "\n", 'subject_bulk_upload_' . date('d-m-Y-H') . '.log');
-                            if (trim($r[$i]) == "") {
-                                //echo "here"; //die();
-                                $error = TRUE;
-                                $blankErrorMsgArr[] = $fielsdStringForAdminArr[$i] . " should not be blank at row no " . $errorRowNo;
-                            } else {
-                                //pre($i);
-                                $validPhoneEmailCheck = "ok";
-                                $rsEmailPhoneUnique = array();
-                                // now check teh uniques for email then phone
-                                if ($fielsdArr[$i] == 'email') {
-                                    //echo 'Meera';die();
-                                    $rsEmailPhoneUnique = $this->Teacher_model->get_data_by_cols('teacher_id', array('email' => trim($r[$i])));
-                                    if (count($rsEmailPhoneUnique) == 0) {
-                                        $error = TRUE;
-                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " is not exists at row no -" . $errorRowNo;
-                                        //echo '<br>';
-                                    } else {
-                                        $data['teacher_id'] = $rsEmailPhoneUnique[0]->teacher_id;
+                    @ini_set('memory_limit', '-1');
+                    @set_time_limit(0);
+                    include 'Simplexlsx.class.php';
+                    $xlsx = new SimpleXLSX($path);
+                    list($num_cols, $num_rows) = $xlsx->dimension();
+                    $f = 0;
+                    $fielsdStringForAdmin = "Class Name,Section Name,Subject Name,Teacher Email Id";
+                    $fielsdString = "class_id,section_id,name,email";
+                    $fielsdStringMandotary = "class_id,section_id,name,email";
+                    $fielsdArr = explode(',', $fielsdString);
+                    $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
+                    $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
+                    $someRowError = FALSE;
+                    $errorMsgArr = array();
+                    $errorExcelArr = array();
+                    $errorExcelArr[] = $fielsdStringForAdminArr;
+                    $errorRowNo = 2;
+                    //pre($xlsx->rows());die;
+                    foreach ($xlsx->rows() as $r) {
+                        //echo '<pre>'; //print_r($r);die;
+                        $data = array();
+                        $dataParent = array();
+                        $error = FALSE;
+                        // Ignore the inital name row of excel file
+                        if ($f == 0) {
+                            $f++;
+                            continue;
+                        } $f++;
+                        //pre($r); //die('here');
+                        //pre($r);
+                        //pre('above are $r data');
+                        if ($num_cols > count($fielsdArr)) {
+                            $num_cols = count($fielsdArr);
+                        }
+                        $blankErrorMsgArr = array();
+                        $errorRowIncrease = FALSE;
+                        for ($i = 0; $i < $num_cols; $i++) {    // checking is filds is mandetory or not
+                            //echo $fielsdArr[$i].'<br>';
+                            if (in_array($fielsdArr[$i], $fielsdStringMandotaryArr)) {
+                                //now validating mandetory fiels
+                                generate_log("Field " . $fielsdArr[$i] . " value " . $r[$i] . "\n", 'subject_bulk_upload_' . date('d-m-Y-H') . '.log');
+                                if (trim($r[$i]) == "") {
+                                    //echo "here"; //die();
+                                    $error = TRUE;
+                                    $blankErrorMsgArr[] = $fielsdStringForAdminArr[$i] . " should not be blank at row no " . $errorRowNo;
+                                } else {
+                                    //pre($i);
+                                    $validPhoneEmailCheck = "ok";
+                                    $rsEmailPhoneUnique = array();
+                                    // now check teh uniques for email then phone
+                                    if ($fielsdArr[$i] == 'email') {
+                                        //echo 'Meera';die();
+                                        $rsEmailPhoneUnique = $this->Teacher_model->get_data_by_cols('teacher_id', array('email' => trim($r[$i])));
+                                        if (count($rsEmailPhoneUnique) == 0) {
+                                            $error = TRUE;
+                                            $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " is not exists at row no -" . $errorRowNo;
+                                            //echo '<br>';
+                                        } else {
+                                            $data['teacher_id'] = $rsEmailPhoneUnique[0]->teacher_id;
+                                        }
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
                                     }
-                                    $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+
+
+                                    if ($validPhoneEmailCheck != 'ok' && $fielsdArr[$i] == 'email') {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
+                                    }
                                 }
 
+                                if ($fielsdArr[$i] == 'class_id') {
+                                    $rsClass = $this->Class_model->get_name($r[$i]);
 
-                                if ($validPhoneEmailCheck != 'ok' && $fielsdArr[$i] == 'email') {
-                                    $error = TRUE;
-                                    $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
-                                }
-                            }
-
-                            if ($fielsdArr[$i] == 'class_id') {
-                                $rsClass = $this->Class_model->get_name($r[$i]);
-
-                                if (count($rsClass) > 0) {
-                                    $data['class_id'] = $rsClass[0]->class_id;
-                                } else {
-                                    $data['class_id'] = "";
-                                    $error = TRUE;
-                                    $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo;
-                                }
-                            }
-
-                            if ($fielsdArr[$i] == 'section_id') {
-                                if ($data['class_id'] == "") {
-                                    $error = TRUE;
-                                    $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo;
-                                } else {
-                                    $rsClassSection = $this->Section_model->get_name($data['class_id'], $r[$i]);
-
-                                    if (count($rsClassSection) > 0) {
-                                        $data['section_id'] = $rsClassSection[0]->section_id;
+                                    if (count($rsClass) > 0) {
+                                        $data['class_id'] = $rsClass[0]->class_id;
                                     } else {
+                                        $data['class_id'] = "";
                                         $error = TRUE;
                                         $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo;
                                     }
                                 }
-                            }
 
-                            if ($fielsdArr[$i] == 'name') {
-                                $data['name'] = trim($r[$i]);
-                            }
-                            //pre($errorMsgArr);//die;
-                            //pre(trim($fielsdArr[$i]));pre('$error');pre($error);
-                        } else {
-                            /* if($fielsdArr[$i]=='date_time'){
-                              $rawDOB=trim($r[$i]);
-                              $newDOB=$this->get_mysql_date_formate_from_raw($rawDOB);
-                              if($newDOB!=""){
-                              $data[$fielsdArr[$i]]=$newDOB;
-                              }else{
-                              $data[$fielsdArr[$i]]=date('Y-m-d H:i:s');
-                              }
-                              } */
-                        }
-                    }
-                    if (count($blankErrorMsgArr) > 0) {
-                        $error = TRUE;
-                        if (count($blankErrorMsgArr) <= count($fielsdArr)) {
-                            foreach ($blankErrorMsgArr AS $errorKey => $errorVal) {
-                                $errorMsgArr[] = $errorVal;
-                            }
-                        }
-                    }
-                    //pre($data); //die('//hii');
-                    //pre('$error');pre($error); //die();
-                    if ($error === FALSE) {
-                        //$data['date_time']=strtotime(date("Y-m-d H:i:s")); 
-                        //$data['parent_id'] = $parent_id;
-                        $data['year'] = $this->globalSettingsRunningYear;
-                        //pre($data);
-                        //pre('kkkkkkkkkkkkk');die;
-                        //pre($data);die;
-                        $subject_id = $this->Subject_model->save_subject($data);
-                    } else {
-                        //pre($errorMsgArr);//die;
-                        $errorExcelArr[] = $r;
-                        $someRowError = TRUE;
-                    }
-                    $errorRowNo++;
-                } //ends foreach
-                //pre($errorMsgArr); exit;
+                                if ($fielsdArr[$i] == 'section_id') {
+                                    if ($data['class_id'] == "") {
+                                        $error = TRUE;
+                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo;
+                                    } else {
+                                        $rsClassSection = $this->Section_model->get_name($data['class_id'], $r[$i]);
 
-                if ($someRowError == FALSE) {
-                    //$this->generate_cv$error_msg);
-                    generate_log("No error for this upload at - " . time(), 'subject_bulk_upload' . date('d-m-Y-H') . '.log');
-                    $this->session->set_flashdata('flash_message', get_phrase('subject_details_added'));
-                    redirect(base_url() . 'index.php?school_admin/bulk_upload/', 'refresh');
-                } else {
-                    //pre($errorMsgArr); die('here');
-                    generate_log(json_encode($errorMsgArr), 'subject_bulk_upload_error_details.log', TRUE);
-                    $file_name_with_path = 'uploads/subject_bulk_upload_error_details_for_excel_file.xlsx';
-                    @unlink($file_name_with_path);
-                    create_excel_file($file_name_with_path, $errorExcelArr, 'subject Upload Data');
-                    $this->session->set_flashdata('flash_message_error', "Some rows are not uploaded,due to invalid data.");
-                    redirect(base_url() . 'index.php?school_admin/subject_bulk_upload_error', 'refresh');
-                }
-            }//ends allowed type code
-            else {
-                $this->session->set_flashdata('flash_message_error', 'Sorry, File extension is not supported, Please enter data in Excel Spread Sheet!!');
-                redirect(base_url() . 'index.php?school_admin/bulk_upload');
-            }
-        }
-        $this->session->set_flashdata('flash_message', get_phrase('subjects_added'));
-        redirect(base_url() . 'index.php?school_admin/bulk_upload', 'refresh');
-    }
+                                        if (count($rsClassSection) > 0) {
+                                            $data['section_id'] = $rsClassSection[0]->section_id;
+                                        } else {
+                                            $error = TRUE;
+                                            $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo;
+                                        }
+                                    }
+                                }
 
-    $page_data['teachers'] = $this->Teacher_model->get_data_by_cols("*", array(), "result_array", array('name' => 'asc'));
-    $page_data['classes'] = $this->Class_model->get_class_array();
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    if ($param1 == '') {
-        $this->load->model("Class_model");
-
-        $page_data['class_id'] = $this->Class_model->get_first_class_id();
-        //$subjects = $this->Subject_model->get_subject_array(array('class_id' => $page_data['class_id']));
-        $subjects = $this->Subject_model->get_all_subjects(array('sub.class_id' => $page_data['class_id']));
-
-        if (count($subjects)) {
-            foreach ($subjects as $key => $row) {
-                $subjects[$key]['transaction'] = $this->Crud_model->getSubjectTransaction($row['subject_id']);
-            }
-        }
-
-        $page_data['subjects'] = $subjects;
-    } else {
-        $page_data['class_id'] = $param1;
-        //'$subjects = $this->Subject_model->get_subject_array(array('class_id' => $param1));
-        $subjects = $this->Subject_model->get_all_subjects(array('sub.class_id' => $page_data['class_id']));
-
-        if (count($subjects)) {
-            foreach ($subjects as $key => $row) {
-                $subjects[$key]['transaction'] = $this->Crud_model->getSubjectTransaction($row['subject_id']);
-            }
-        }
-        $page_data['subjects'] = $subjects;
-    }
-
-    $page_data['page_name'] = 'subject';
-    $page_data['page_title'] = get_phrase('manage_subject');
-    $this->load->view('backend/index', $page_data);
-}
-
-/* * **MANAGE CLASSES**** */
-
-function classes($param1 = '', $param2 = '') {
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect(base_url(), 'refresh');
-    $this->load->model("Class_model");
-    $this->load->model("Teacher_model");
-    $page_data = $this->get_page_data_var();
-    if ($param1 == 'create') {
-        $this->form_validation->set_rules('name', 'Class name', 'trim|required');
-        $this->form_validation->set_rules('name_numeric', 'Class numeric name', 'numeric|trim|required|_unique_sch[class.name_numeric]');
-        $this->form_validation->set_message('is_unique', 'Name Numeric ' . $this->input->post('name_numeric') . " is already used by other class, please enter other Name Numeric");
-        $this->form_validation->set_rules('teacher_id', 'Teacher name', 'trim|required');
-        $this->form_validation->set_error_delimiters('', '');
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash_message_error', validation_errors());
-        } else {
-            $name = $this->input->post('name');
-            $data['name'] = $this->input->post('name');
-            $data['name_numeric'] = $this->input->post('name_numeric');
-            $data['teacher_id'] = $this->input->post('teacher_id');
-            $class_id = $this->Class_model->save_class($data, $name);
-            if ($class_id == '' || $class_id == NULL) {
-                $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry'));
-                redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
-            } else {
-                //create a section by default
-                $data2['class_id'] = $class_id;
-                $data2['name'] = 'A';
-                $data2['nick_name'] = 'Section A';
-                $data2['teacher_id'] = $data['teacher_id'];
-                $data2['max_capacity'] = 20;
-                // echo '<pre>'; print_r($data2); exit;
-                $section_id = $this->Class_model->save_section($data2);
-
-                /* Create Group in fincance system start here */
-                $group_data = array('id' => $class_id, 'gname' => $name, 'sorder' => $class_id);
-                $group_id = $this->Class_model->add_group_finance($group_data);
-                /* Create Group in finance system end here */
-
-                $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-                redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
-            }
-        }
-    }
-    if ($param1 == 'do_update') {
-
-        $this->form_validation->set_rules('name', 'Class name', 'trim|required');
-        $this->form_validation->set_rules('name_numeric', 'Class numeric name', 'trim|required');
-        //$this->form_validation->set_rules('teacher_id', 'Teacher name', 'trim|required');
-        $this->form_validation->set_error_delimiters('', '');
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash_message_error', validation_errors());
-            //redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
-            redirect($_SERVER['HTTP_REFERER']);
-        } else {
-            $data['name'] = $this->input->post('name');
-            $data['name_numeric'] = $this->input->post('name_numeric');
-            //$data['teacher_id'] = $this->input->post('teacher_id');
-            //$data['number_of_seat'] = $this->input->post('number_of_seat');
-            $count = $this->Class_model->get_data_by_cols('count(name) as count', array('name' => $data['name'], 'class_id' . '!=' => $param2), 'result_array');
-            if ($count[0]['count'] == 0) {
-                $class_id = $this->Class_model->update_class($data, array("class_id" => $param2));
-                $count_numeric = $this->Class_model->get_data_by_cols('count(name_numeric) as count_numeric', array('name_numeric' => $data['name_numeric'], 'class_id' . '!=' => $param2), 'result_array');
-                if ($count_numeric[0]['count_numeric'] == 0) {
-                    $class_id = $this->Class_model->update_class($data, array("class_id" => $param2));
-                    $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
-                    // redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
-                    redirect($_SERVER['HTTP_REFERER']);
-                } else {
-                    $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry_of_name_numeric_,so_could_not_edit'));
-                    //redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
-                    redirect($_SERVER['HTTP_REFERER']);
-                }
-            } else {
-                $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry'));
-                redirect($_SERVER['HTTP_REFERER']);
-            }
-        }
-    } else if ($param1 == 'edit') {
-        $page_data['edit_data'] = $this->Class_model->get_data_by_cols('*', array(
-            'class_id' => $param2), 'result_type');
-    }
-    if ($param1 == 'delete') {
-        $year = $this->globalSettingsRunningYear;
-        $this->load->model('Enroll_model');
-        $students = $this->Enroll_model->check_student_before_delete_class($param2, $year);
-        if (!empty($students)) {
-            $this->session->set_flashdata('flash_message', get_phrase('Could not delete the class because, Students are present in this class'));
-            redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
-        } else {
-            $this->load->library("fi_functions");
-            $this->fi_functions->delete_group($param2);
-            $this->Class_model->delete_class(array("class_id" => $param2));
-            $this->session->set_flashdata('flash_message', get_phrase('data_deleted_successfully'));
-            redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
-        }
-    }
-    if ($param1 == 'import_excel') {
-        if (empty($_FILES['userfile']['name'])) {
-            $this->form_validation->set_rules('userfile', 'Document', 'required');
-            $this->session->set_flashdata('flash_message_error', 'Please select a document to upload!!');
-        } else {
-            $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip');
-            if (in_array($_FILES['userfile']['type'], $allowed_types)) {
-                $path = 'uploads/class_details.xlsx';
-                $file_name_with_path = 'uploads/class_bulk_upload_error_details_for_excel_file.xlsx';
-                @unlink($path);
-                @unlink($file_name_with_path);
-                @ini_set('memory_limit', '-1');
-                @set_time_limit(0);
-                move_uploaded_file($_FILES['userfile']['tmp_name'], $path);
-                // Importing excel sheet for bulk class & sections uploads
-                include 'Simplexlsx.class.php';
-
-                $xlsx = new SimpleXLSX($path);
-
-                list($num_cols, $num_rows) = $xlsx->dimension();
-                $f = 0;
-                $fielsdStringForAdmin = "Class Name,Class Numeric Name,Section Name,Seection Nick Name,Teacher Email Id,Room No,Max Capacity";
-                $fielsdString = "class_name,name_numeric,section_name,nick_name,email,room_no,max_capacity";
-                $fielsdStringMandotary = $fielsdString; //"class_name,name_numeric,section_name,email";
-                $fielsdArr = explode(',', $fielsdString);
-                $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
-                $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
-                $someRowError = FALSE;
-                $errorMsgArr = array();
-                $errorExcelArr = array();
-                $errorExcelArr[] = $fielsdStringForAdminArr;
-                $errorRowNo = 2;
-                foreach ($xlsx->rows() as $r) {
-                    // Ignore the inital name row of excel file
-                    $data = array();
-                    $dataClass = array();
-                    $error = FALSE;
-                    // Ignore the inital name row of excel file
-                    if ($f == 0) {
-                        $f++;
-                        continue;
-                    } $f++;
-                    if ($num_cols > count($fielsdArr)) {
-                        $num_cols = count($fielsdArr);
-                    }
-                    $blankErrorMsgArr = array();
-                    $rsTeacher = array();
-                    $rsSectionClassTeacherExist = array();
-                    $rsSectionClassBothExist = array();
-                    $errorRowIncrease = FALSE;
-                    for ($i = 0; $i < $num_cols; $i++) {
-                        // checking is filds is mandetory or not
-                        if (in_array($fielsdArr[$i], $fielsdStringMandotaryArr)) {
-                            if (trim($r[$i]) == "") {
-                                //echo "here"; //die();
-                                $error = TRUE;
-                                $blankErrorMsgArr[] = $fielsdStringForAdminArr[$i] . " should not be blank at row no " . $errorRowNo;
+                                if ($fielsdArr[$i] == 'name') {
+                                    $data['name'] = trim($r[$i]);
+                                }
+                                //pre($errorMsgArr);//die;
+                                //pre(trim($fielsdArr[$i]));pre('$error');pre($error);
                             } else {
-                                // now check teh uniques for email then phone
-                                if ($fielsdArr[$i] == 'email') {
-
-                                    $rsTeacher = $this->Teacher_model->get_data_by_cols('teacher_id', array('email' => trim($r[$i])));
-                                    $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
-                                    if ($validPhoneEmailCheck != "ok") {
-                                        $error = TRUE;
-                                        $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
-                                    }
-
-                                    if (count($rsTeacher) == 0) {
-                                        $error = TRUE;
-                                        $errorMsgArr[] = "Teacher email id not exists at row no " . $errorRowNo;
-                                    }
+                                /* if($fielsdArr[$i]=='date_time'){
+                                $rawDOB=trim($r[$i]);
+                                $newDOB=$this->get_mysql_date_formate_from_raw($rawDOB);
+                                if($newDOB!=""){
+                                $data[$fielsdArr[$i]]=$newDOB;
+                                }else{
+                                $data[$fielsdArr[$i]]=date('Y-m-d H:i:s');
+                                }
+                                } */
+                            }
+                        }
+                        if (count($blankErrorMsgArr) > 0) {
+                            $error = TRUE;
+                            if (count($blankErrorMsgArr) <= count($fielsdArr)) {
+                                foreach ($blankErrorMsgArr AS $errorKey => $errorVal) {
+                                    $errorMsgArr[] = $errorVal;
                                 }
                             }
                         }
-                        $data[trim($fielsdArr[$i])] = trim($r[$i]);
-                    }
-                    $this->load->model('Class_model');
-                    //pre($data);die;
-                    $rsSectionClassTeacherExist = $this->Class_model->check_section_exist_with_class_and_teacher($data['section_name'], $data['class_name'], $data['email']);
-                    if (count($rsSectionClassBothExist) > 0) {
-                        $error = TRUE;
-                        $errorMsgArr[] = "section,class name and teacher are already exists at row no - " . $errorRowNo;
-                    }
-
-                    $rsSectionClassBothExist = $this->Class_model->check_section_exist_with_class($data['section_name'], $data['class_name']);
-
-                    if (count($blankErrorMsgArr) > 0) {
-                        $error = TRUE;
-                        if (count($blankErrorMsgArr) <= count($fielsdArr)) {
-                            foreach ($blankErrorMsgArr AS $errorKey => $errorVal) {
-                                $errorMsgArr[] = $errorVal;
-                            }
-                        }
-                    }
-
-                    if ($error === FALSE) {
-                        $classDataArr = $this->Class_model->get_data_by_cols('class_id', array('name' => $data['class_name']));
-                        if (count($classDataArr) > 0) {
-                            $class_id = $classDataArr[0]->class_id;
+                        //pre($data); //die('//hii');
+                        //pre('$error');pre($error); //die();
+                        if ($error === FALSE) {
+                            //$data['date_time']=strtotime(date("Y-m-d H:i:s")); 
+                            //$data['parent_id'] = $parent_id;
+                            $data['year'] = $this->globalSettingsRunningYear;
+                            //pre($data);
+                            //pre('kkkkkkkkkkkkk');die;
+                            //pre($data);die;
+                            $subject_id = $this->Subject_model->save_subject($data);
                         } else {
-                            $class_id = $this->Class_model->add(array('name' => $data['class_name'], 'name_numeric' => $data['name_numeric'], 'teacher_id' => $rsTeacher[0]->teacher_id, 'isActive' => '1'));
+                            //pre($errorMsgArr);//die;
+                            $errorExcelArr[] = $r;
+                            $someRowError = TRUE;
                         }
-                        $rsCheckSectionArr = array('name' => $data['section_name'], 'class_id' => $class_id, 'teacher_id' => $rsTeacher[0]->teacher_id);
-                        $rsCheckSectionDataArr = $this->Section_model->get_data_by_cols('section_id', $rsCheckSectionArr);
-                        if (count($rsCheckSectionDataArr) == 0) {
-                            $sectionArr = array('name' => $data['section_name'], 'class_id' => $class_id, 'teacher_id' => $rsTeacher[0]->teacher_id, 'nick_name' => $data['nick_name'], 'room_no' => $data['room_no'], 'max_capacity' => $data['max_capacity']);
-                            $this->Class_model->save_section($sectionArr);
-                        }
-                    } else {
-                        $errorExcelArr[] = $r;
-                        $someRowError = TRUE;
-                    }
-                    $errorRowNo++;
-                }
+                        $errorRowNo++;
+                    } //ends foreach
+                    //pre($errorMsgArr); exit;
 
-                //pre($errorMsgArr); exit;
-                if ($someRowError == FALSE) {
-                    //$this->generate_cv($error_msg);
-                    generate_log("No error for this upload at - " . time(), 'class_bulk_upload' . date('d-m-Y-H') . '.log');
-                    $this->session->set_flashdata('flash_message', get_phrase('classes_added'));
-                    redirect(base_url() . 'index.php?school_admin/bulk_upload/', 'refresh');
-                } else {
-                    //pre($errorMsgArr); die('here');
-                    generate_log(json_encode($errorMsgArr), 'class_bulk_upload_error_details.log', TRUE);
-                    @unlink($file_name_with_path);
-                    create_excel_file($file_name_with_path, $errorExcelArr, 'Class Upload Data');
-                    $this->session->set_flashdata('flash_message_error', "Some rows are not uploaded,due to invalid data.");
-                    redirect(base_url() . 'index.php?school_admin/class_bulk_upload_error', 'refresh');
+                    if ($someRowError == FALSE) {
+                        //$this->generate_cv$error_msg);
+                        generate_log("No error for this upload at - " . time(), 'subject_bulk_upload' . date('d-m-Y-H') . '.log');
+                        $this->session->set_flashdata('flash_message', get_phrase('subject_details_added'));
+                        redirect(base_url() . 'index.php?school_admin/bulk_upload/', 'refresh');
+                    } else {
+                        //pre($errorMsgArr); die('here');
+                        generate_log(json_encode($errorMsgArr), 'subject_bulk_upload_error_details.log', TRUE);
+                        $file_name_with_path = 'uploads/subject_bulk_upload_error_details_for_excel_file.xlsx';
+                        @unlink($file_name_with_path);
+                        create_excel_file($file_name_with_path, $errorExcelArr, 'subject Upload Data');
+                        $this->session->set_flashdata('flash_message_error', "Some rows are not uploaded,due to invalid data.");
+                        redirect(base_url() . 'index.php?school_admin/subject_bulk_upload_error', 'refresh');
+                    }
+                }//ends allowed type code
+                else {
+                    $this->session->set_flashdata('flash_message_error', 'Sorry, File extension is not supported, Please enter data in Excel Spread Sheet!!');
+                    redirect(base_url() . 'index.php?school_admin/bulk_upload');
                 }
+            }
+            $this->session->set_flashdata('flash_message', get_phrase('subjects_added_successfully.'));
+            redirect(base_url() . 'index.php?school_admin/bulk_upload', 'refresh');
+        }
+
+        $page_data['teachers'] = $this->Teacher_model->get_data_by_cols("*", array(), "result_array", array('name' => 'asc'));
+        $page_data['classes'] = $this->Class_model->get_class_array();
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        if ($param1 == '') {
+            $this->load->model("Class_model");
+
+            $page_data['class_id'] = $this->Class_model->get_first_class_id();
+            //$subjects = $this->Subject_model->get_subject_array(array('class_id' => $page_data['class_id']));
+            $subjects = $this->Subject_model->get_all_subjects(array('sub.class_id' => $page_data['class_id']));
+
+            if (count($subjects)) {
+                foreach ($subjects as $key => $row) {
+                    $subjects[$key]['transaction'] = $this->Crud_model->getSubjectTransaction($row['subject_id']);
+                }
+            }
+
+            $page_data['subjects'] = $subjects;
+        } else {
+            $page_data['class_id'] = $param1;
+            //'$subjects = $this->Subject_model->get_subject_array(array('class_id' => $param1));
+            $subjects = $this->Subject_model->get_all_subjects(array('sub.class_id' => $page_data['class_id']));
+
+            if (count($subjects)) {
+                foreach ($subjects as $key => $row) {
+                    $subjects[$key]['transaction'] = $this->Crud_model->getSubjectTransaction($row['subject_id']);
+                }
+            }
+            $page_data['subjects'] = $subjects;
+        }
+
+        $page_data['page_name'] = 'subject';
+        $page_data['page_title'] = get_phrase('manage_subject');
+        $this->load->view('backend/index', $page_data);
+    }
+
+    /* * **MANAGE CLASSES**** */
+    function classes($param1 = '', $param2 = '') {
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect(base_url(), 'refresh');
+        $this->load->model("Class_model");
+        $this->load->model("Teacher_model");
+        $page_data = $this->get_page_data_var();
+        if ($param1 == 'create') {
+            $this->form_validation->set_rules('name', 'Class name', 'trim|required');
+            $this->form_validation->set_rules('name_numeric', 'Class numeric name', 'numeric|trim|required|_unique_sch[class.name_numeric]');
+            $this->form_validation->set_message('is_unique', 'Name Numeric ' . $this->input->post('name_numeric') . " is already used by other class, please enter other Name Numeric");
+            $this->form_validation->set_rules('teacher_id', 'Teacher name', 'trim|required');
+            $this->form_validation->set_error_delimiters('', '');
+            if ($this->form_validation->run() == FALSE) {
+                $this->session->set_flashdata('flash_message_error', validation_errors());
             } else {
-                $this->session->set_flashdata('flash_message', "Invalid class bulk upload file.");
+                $name = $this->input->post('name');
+                $data['name'] = $this->input->post('name');
+                $data['name_numeric'] = $this->input->post('name_numeric');
+                $data['teacher_id'] = $this->input->post('teacher_id');
+                $class_id = $this->Class_model->save_class($data, $name);
+                if ($class_id == '' || $class_id == NULL) {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry'));
+                    redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
+                } else {
+                    //create a section by default
+                    $data2['class_id'] = $class_id;
+                    $data2['name'] = 'A';
+                    $data2['nick_name'] = 'Section A';
+                    $data2['teacher_id'] = $data['teacher_id'];
+                    $data2['max_capacity'] = 20;
+                    // echo '<pre>'; print_r($data2); exit;
+                    $section_id = $this->Class_model->save_section($data2);
+
+                    /* Create Group in fincance system start here */
+                    $group_data = array('id' => $class_id, 'gname' => $name, 'sorder' => $class_id);
+                    $group_id = $this->Class_model->add_group_finance($group_data);
+                    /* Create Group in finance system end here */
+
+                    $this->session->set_flashdata('flash_message', get_phrase('class_added_successfully'));
+                    redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
+                }
             }
         }
-        redirect(base_url() . 'index.php?school_admin/bulk_upload', 'refresh');
+        if ($param1 == 'do_update') {
+
+            $this->form_validation->set_rules('name', 'Class name', 'trim|required');
+            $this->form_validation->set_rules('name_numeric', 'Class numeric name', 'trim|required');
+            //$this->form_validation->set_rules('teacher_id', 'Teacher name', 'trim|required');
+            $this->form_validation->set_error_delimiters('', '');
+            if ($this->form_validation->run() == FALSE) {
+                $this->session->set_flashdata('flash_message_error', validation_errors());
+                //redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
+                redirect($_SERVER['HTTP_REFERER']);
+            } else {
+                $data['name'] = $this->input->post('name');
+                $data['name_numeric'] = $this->input->post('name_numeric');
+                //$data['teacher_id'] = $this->input->post('teacher_id');
+                //$data['number_of_seat'] = $this->input->post('number_of_seat');
+                $count = $this->Class_model->get_data_by_cols('count(name) as count', array('name' => $data['name'], 'class_id' . '!=' => $param2), 'result_array');
+                if ($count[0]['count'] == 0) {
+                    //$class_id = $this->Class_model->update_class($data, array("class_id" => $param2));
+                    $count_numeric = $this->Class_model->get_data_by_cols('count(name_numeric) as count_numeric', array('name_numeric' => $data['name_numeric'], 'class_id' . '!=' => $param2), 'result_array');
+                    if ($count_numeric[0]['count_numeric'] == 0) {
+                        $class_id = $this->Class_model->update_class($data, array("class_id" => $param2));
+                        $this->session->set_flashdata('flash_message', get_phrase('Class_updated_successfully'));
+                        // redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
+                        redirect($_SERVER['HTTP_REFERER']);
+                    } else {
+                        $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry_of_name_numeric_,so_could_not_edit'));
+                        //redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
+                        redirect($_SERVER['HTTP_REFERER']);
+                    }
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('duplicate_entry'));
+                    redirect($_SERVER['HTTP_REFERER']);
+                }
+            }
+        } else if ($param1 == 'edit') {
+            $page_data['edit_data'] = $this->Class_model->get_data_by_cols('*', array(
+                'class_id' => $param2), 'result_type');
+        }
+        if ($param1 == 'delete') {
+            $year = $this->globalSettingsRunningYear;
+            $this->load->model('Enroll_model');
+            $students = $this->Enroll_model->check_student_before_delete_class($param2, $year);
+            if (!empty($students)) {
+                $this->session->set_flashdata('flash_message', get_phrase('Could_not_delete_the_class_because,_Students_are_present_in_this_class'));
+                redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
+            } else {
+                $this->load->library("fi_functions");
+                $this->fi_functions->delete_group($param2);
+                $this->Class_model->delete_class(array("class_id" => $param2));
+                $this->session->set_flashdata('flash_message', get_phrase('class_deleted_successfully'));
+                redirect(base_url() . 'index.php?school_admin/classes/', 'refresh');
+            }
+        }
+        if ($param1 == 'import_excel') {
+            if (empty($_FILES['userfile']['name'])) {
+                $this->form_validation->set_rules('userfile', 'Document', 'required');
+                $this->session->set_flashdata('flash_message_error', 'Please select a document to upload!!');
+            } else {
+                $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip');
+                if (in_array($_FILES['userfile']['type'], $allowed_types)) {
+                    $path = 'uploads/class_details.xlsx';
+                    $file_name_with_path = 'uploads/class_bulk_upload_error_details_for_excel_file.xlsx';
+                    @unlink($path);
+                    @unlink($file_name_with_path);
+                    @ini_set('memory_limit', '-1');
+                    @set_time_limit(0);
+                    move_uploaded_file($_FILES['userfile']['tmp_name'], $path);
+                    // Importing excel sheet for bulk class & sections uploads
+                    include 'Simplexlsx.class.php';
+
+                    $xlsx = new SimpleXLSX($path);
+
+                    list($num_cols, $num_rows) = $xlsx->dimension();
+                    $f = 0;
+                    $fielsdStringForAdmin = "Class Name,Class Numeric Name,Section Name,Seection Nick Name,Teacher Email Id,Room No,Max Capacity";
+                    $fielsdString = "class_name,name_numeric,section_name,nick_name,email,room_no,max_capacity";
+                    $fielsdStringMandotary = $fielsdString; //"class_name,name_numeric,section_name,email";
+                    $fielsdArr = explode(',', $fielsdString);
+                    $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
+                    $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
+                    $someRowError = FALSE;
+                    $errorMsgArr = array();
+                    $errorExcelArr = array();
+                    $errorExcelArr[] = $fielsdStringForAdminArr;
+                    $errorRowNo = 2;
+                    foreach ($xlsx->rows() as $r) {
+                        // Ignore the inital name row of excel file
+                        $data = array();
+                        $dataClass = array();
+                        $error = FALSE;
+                        // Ignore the inital name row of excel file
+                        if ($f == 0) {
+                            $f++;
+                            continue;
+                        } $f++;
+                        if ($num_cols > count($fielsdArr)) {
+                            $num_cols = count($fielsdArr);
+                        }
+                        $blankErrorMsgArr = array();
+                        $rsTeacher = array();
+                        $rsSectionClassTeacherExist = array();
+                        $rsSectionClassBothExist = array();
+                        $errorRowIncrease = FALSE;
+                        for ($i = 0; $i < $num_cols; $i++) {
+                            // checking is filds is mandetory or not
+                            if (in_array($fielsdArr[$i], $fielsdStringMandotaryArr)) {
+                                if (trim($r[$i]) == "") {
+                                    //echo "here"; //die();
+                                    $error = TRUE;
+                                    $blankErrorMsgArr[] = $fielsdStringForAdminArr[$i] . " should not be blank at row no " . $errorRowNo;
+                                } else {
+                                    // now check teh uniques for email then phone
+                                    if ($fielsdArr[$i] == 'email') {
+
+                                        $rsTeacher = $this->Teacher_model->get_data_by_cols('teacher_id', array('email' => trim($r[$i])));
+                                        $validPhoneEmailCheck = $this->checkValidPhoneEmail(trim($r[$i]), 'email');
+                                        if ($validPhoneEmailCheck != "ok") {
+                                            $error = TRUE;
+                                            $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " Should be " . $validPhoneEmailCheck . " at row no -" . $errorRowNo;
+                                        }
+
+                                        if (count($rsTeacher) == 0) {
+                                            $error = TRUE;
+                                            $errorMsgArr[] = "Teacher email id not exists at row no " . $errorRowNo;
+                                        }
+                                    }
+                                }
+                            }
+                            $data[trim($fielsdArr[$i])] = trim($r[$i]);
+                        }
+                        $this->load->model('Class_model');
+                        //pre($data);die;
+                        $rsSectionClassTeacherExist = $this->Class_model->check_section_exist_with_class_and_teacher($data['section_name'], $data['class_name'], $data['email']);
+                        if (count($rsSectionClassBothExist) > 0) {
+                            $error = TRUE;
+                            $errorMsgArr[] = "section,class name and teacher are already exists at row no - " . $errorRowNo;
+                        }
+
+                        $rsSectionClassBothExist = $this->Class_model->check_section_exist_with_class($data['section_name'], $data['class_name']);
+
+                        if (count($blankErrorMsgArr) > 0) {
+                            $error = TRUE;
+                            if (count($blankErrorMsgArr) <= count($fielsdArr)) {
+                                foreach ($blankErrorMsgArr AS $errorKey => $errorVal) {
+                                    $errorMsgArr[] = $errorVal;
+                                }
+                            }
+                        }
+
+                        if ($error === FALSE) {
+                            $classDataArr = $this->Class_model->get_data_by_cols('class_id', array('name' => $data['class_name']));
+                            if (count($classDataArr) > 0) {
+                                $class_id = $classDataArr[0]->class_id;
+                            } else {
+                                $class_id = $this->Class_model->add(array('name' => $data['class_name'], 'name_numeric' => $data['name_numeric'], 'teacher_id' => $rsTeacher[0]->teacher_id, 'isActive' => '1'));
+                            }
+                            $rsCheckSectionArr = array('name' => $data['section_name'], 'class_id' => $class_id, 'teacher_id' => $rsTeacher[0]->teacher_id);
+                            $rsCheckSectionDataArr = $this->Section_model->get_data_by_cols('section_id', $rsCheckSectionArr);
+                            if (count($rsCheckSectionDataArr) == 0) {
+                                $sectionArr = array('name' => $data['section_name'], 'class_id' => $class_id, 'teacher_id' => $rsTeacher[0]->teacher_id, 'nick_name' => $data['nick_name'], 'room_no' => $data['room_no'], 'max_capacity' => $data['max_capacity']);
+                                $this->Class_model->save_section($sectionArr);
+                            }
+                        } else {
+                            $errorExcelArr[] = $r;
+                            $someRowError = TRUE;
+                        }
+                        $errorRowNo++;
+                    }
+
+                    //pre($errorMsgArr); exit;
+                    if ($someRowError == FALSE) {
+                        //$this->generate_cv($error_msg);
+                        generate_log("No error for this upload at - " . time(), 'class_bulk_upload' . date('d-m-Y-H') . '.log');
+                        $this->session->set_flashdata('flash_message', get_phrase('classes_added'));
+                        redirect(base_url() . 'index.php?school_admin/bulk_upload/', 'refresh');
+                    } else {
+                        //pre($errorMsgArr); die('here');
+                        generate_log(json_encode($errorMsgArr), 'class_bulk_upload_error_details.log', TRUE);
+                        @unlink($file_name_with_path);
+                        create_excel_file($file_name_with_path, $errorExcelArr, 'Class Upload Data');
+                        $this->session->set_flashdata('flash_message_error', "Some rows are not uploaded,due to invalid data.");
+                        redirect(base_url() . 'index.php?school_admin/class_bulk_upload_error', 'refresh');
+                    }
+                } else {
+                    $this->session->set_flashdata('flash_message', "Invalid class bulk upload file.");
+                }
+            }
+            redirect(base_url() . 'index.php?school_admin/bulk_upload', 'refresh');
+        }
+
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $page_data['classes_record'] = $this->Class_model->get_class_teacher_detail_array();
+        $page_data['teachers'] = $this->Teacher_model->get_teacher_array();
+        $page_data['page_name'] = 'class';
+        $page_data['page_title'] = get_phrase('manage_class');
+        $this->load->view('backend/index', $page_data);
     }
 
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    $page_data['classes_record'] = $this->Class_model->get_class_teacher_detail_array();
-    $page_data['teachers'] = $this->Teacher_model->get_teacher_array();
-    $page_data['page_name'] = 'class';
-    $page_data['page_title'] = get_phrase('manage_class');
-    $this->load->view('backend/index', $page_data);
-}
-
-// ACADEMIC SYLLABUS
-function academic_syllabus($class_id = '') {
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect(base_url(), 'refresh');
-    $this->load->model("Class_model");
-    $this->load->model("Academic_syllabus_model");
-    $page_data = $this->get_page_data_var();
-    if ($class_id == '') {
+    // ACADEMIC SYLLABUS
+    function academic_syllabus($class_id = '') {
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect(base_url(), 'refresh');
         $this->load->model("Class_model");
-        $class_id = $this->Class_model->get_first_class_id();
+        $this->load->model("Academic_syllabus_model");
+        $page_data = $this->get_page_data_var();
+        if ($class_id == '') {
+            $this->load->model("Class_model");
+            $class_id = $this->Class_model->get_first_class_id();
+        }
+        if ($class_id != '') {
+            $rs_academic_syllabus = $this->Academic_syllabus_model->get_all(array('class_id' => $class_id, 'year' => $this->globalSettingsRunningYear));
+            $page_data['syllabus'] = $rs_academic_syllabus;
+        }
+        /* foreach ($page_data['syllabus'] as $k => $v) {
+        $page_data['syllabus'][$k]['uploader_name'] = $this->Academic_syllabus_model->get_uploader_name($v['uploader_type'], $v['uploader_id']);
+        } */
+
+        $page_data['class_name'] = $this->Class_model->get_data_by_cols('name', array('class_id' => $class_id), 'result_array');
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $page_data['page_name'] = 'academic_syllabus';
+        $page_data['page_title'] = get_phrase('academic_syllabus');
+        $page_data['class_id'] = $class_id;
+    //    $page_data['syllabus'] = $rs_academic_syllabus;
+        $page_data['classes'] = $this->Class_model->get_class_array();
+        $this->load->view('backend/index', $page_data);
     }
-    if ($class_id != '') {
-        $rs_academic_syllabus = $this->Academic_syllabus_model->get_all(array('class_id' => $class_id, 'year' => $this->globalSettingsRunningYear));
-        $page_data['syllabus'] = $rs_academic_syllabus;
-    }
-    /* foreach ($page_data['syllabus'] as $k => $v) {
-      $page_data['syllabus'][$k]['uploader_name'] = $this->Academic_syllabus_model->get_uploader_name($v['uploader_type'], $v['uploader_id']);
-      } */
 
-    $page_data['class_name'] = $this->Class_model->get_data_by_cols('name', array('class_id' => $class_id), 'result_array');
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    $page_data['page_name'] = 'academic_syllabus';
-    $page_data['page_title'] = get_phrase('academic_syllabus');
-    $page_data['class_id'] = $class_id;
-//    $page_data['syllabus'] = $rs_academic_syllabus;
-    $page_data['classes'] = $this->Class_model->get_class_array();
-    $this->load->view('backend/index', $page_data);
-}
-
-function upload_academic_syllabus() {
-    $this->load->model("Class_model");
-    $data['academic_syllabus_code'] = substr(md5(rand(0, 1000000)), 0, 7);
-    $data['title'] = $this->input->post('title');
-    $data['description'] = $this->input->post('description');
-    $data['class_id'] = $this->input->post('class_id');
-    $data['uploader_type'] = $this->session->userdata('login_type');
-    $data['uploader_id'] = $this->session->userdata('login_user_id');
-    $data['year'] = $this->globalSettingsRunningYear;
-    $data['timestamp'] = strtotime(date("Y-m-d H:i:s"));
-    $files = $_FILES['file_name'];
-    $this->load->library('upload');
-    $config['upload_path'] = 'uploads/syllabus/';
-    $config['allowed_types'] = 'txt|doc|docx|jpg|png|gif|xls|pdf|jpeg|csv|xlsx|xlx';
-    $config['remove_spaces'] = FALSE;
-    $_FILES['file_name']['name'] = $files['name'];
-    $_FILES['file_name']['type'] = $files['type'];
-    $_FILES['file_name']['tmp_name'] = $files['tmp_name'];
-    $_FILES['file_name']['size'] = $files['size'];
-    $this->upload->initialize($config);
-    if ($this->upload->do_upload('file_name')) {
-        $data['file_name'] = $_FILES['file_name']['name'];
-        $this->Class_model->upload_academic_syllabus($data);
-        $this->session->set_flashdata('flash_message', get_phrase('syllabus_uploaded'));
-        redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $data['class_id'], 'refresh');
-    } else {
-        $this->session->set_flashdata('flash_message', get_phrase('Sorry, File extension is not supported, please upload only txt,.doc,.docx, .xls, .pdf, .images'));
-        redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $data['class_id'], 'refresh');
-    }
-}
-
-function download_academic_syllabus($academic_syllabus_code) {
-    $this->load->model("Class_model");
-    $file_name = $this->Class_model->get_academic_syllabus_name($academic_syllabus_code);
-    $this->load->helper('download');
-    $data = file_get_contents("uploads/syllabus/" . $file_name);
-    $name = $file_name;
-    force_download($name, $data);
-}
-
-function delete_academic_syllabus($academic_syllabus_code, $class_id) {
-    $this->load->model("Class_model");
-    $file_name = $this->Class_model->get_academic_syllabus_name($academic_syllabus_code);
-    unlink("uploads/syllabus/" . $file_name);
-    $this->Class_model->delete_academic_syllabus($academic_syllabus_code);
-    $this->session->set_flashdata('flash_message', get_phrase('syllabus_deleted'));
-    redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $class_id, 'refresh');
-}
-
-function edit_academic_syllabus($academic_syllabus_code) {
-    $this->load->model("Class_model");
-    $data['title'] = $this->input->post('title');
-    $data['description'] = $this->input->post('description');
-    $data['class_id'] = $this->input->post('class_id');
-    $data['uploader_type'] = $this->session->userdata('login_type');
-    $data['uploader_id'] = $this->session->userdata('login_user_id');
-    $data['year'] = $this->Class_model->get_year_academic_syllabus();
-    $data['timestamp'] = strtotime(date("Y-m-d H:i:s"));
-    if (!empty($_FILES['file_name']['name'])) {
-        $file_name = $this->Class_model->get_academic_syllabus_name($academic_syllabus_code);
-        unlink("uploads/syllabus/" . $file_name);
+    function upload_academic_syllabus() {
+        $this->load->model("Class_model");
+        $data['academic_syllabus_code'] = substr(md5(rand(0, 1000000)), 0, 7);
+        $data['title'] = $this->input->post('title');
+        $data['description'] = $this->input->post('description');
+        $data['class_id'] = $this->input->post('class_id');
+        $data['uploader_type'] = $this->session->userdata('login_type');
+        $data['uploader_id'] = $this->session->userdata('login_user_id');
+        $data['year'] = $this->globalSettingsRunningYear;
+        $data['timestamp'] = strtotime(date("Y-m-d H:i:s"));
         $files = $_FILES['file_name'];
         $this->load->library('upload');
         $config['upload_path'] = 'uploads/syllabus/';
-        $config['allowed_types'] = '*';
+        $config['allowed_types'] = 'txt|doc|docx|jpg|png|gif|xls|pdf|jpeg|csv|xlsx|xlx';
+        $config['remove_spaces'] = FALSE;
         $_FILES['file_name']['name'] = $files['name'];
         $_FILES['file_name']['type'] = $files['type'];
         $_FILES['file_name']['tmp_name'] = $files['tmp_name'];
         $_FILES['file_name']['size'] = $files['size'];
         $this->upload->initialize($config);
-        $this->upload->do_upload('file_name');
-        $data['file_name'] = $_FILES['file_name']['name'];
+        if ($this->upload->do_upload('file_name')) {
+            $data['file_name'] = $_FILES['file_name']['name'];
+            $this->Class_model->upload_academic_syllabus($data);
+            $this->session->set_flashdata('flash_message', get_phrase('syllabus_uploaded'));
+            redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $data['class_id'], 'refresh');
+        } else {
+            $this->session->set_flashdata('flash_message', get_phrase('Sorry,_File_extension_is_not_supported,_please_upload_only_txt,.doc,.docx,_.xls,_.pdf,_.images'));
+            redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $data['class_id'], 'refresh');
+        }
     }
-    $this->Class_model->update_academic_syllabus($data, $academic_syllabus_code);
-    $this->session->set_flashdata('flash_message', get_phrase('syllabus_updated'));
-    redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $data['class_id'], 'refresh');
-}
+
+    function download_academic_syllabus($academic_syllabus_code) {
+        $this->load->model("Class_model");
+        $file_name = $this->Class_model->get_academic_syllabus_name($academic_syllabus_code);
+        $this->load->helper('download');
+        $data = file_get_contents("uploads/syllabus/" . $file_name);
+        $name = $file_name;
+        force_download($name, $data);
+    }
+
+    function delete_academic_syllabus($academic_syllabus_code, $class_id) {
+        $this->load->model("Class_model");
+        $file_name = $this->Class_model->get_academic_syllabus_name($academic_syllabus_code);
+        unlink("uploads/syllabus/" . $file_name);
+        $this->Class_model->delete_academic_syllabus($academic_syllabus_code);
+        $this->session->set_flashdata('flash_message', get_phrase('syllabus_deleted'));
+        redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $class_id, 'refresh');
+    }
+
+    function edit_academic_syllabus($academic_syllabus_code) {
+        $this->load->model("Class_model");
+        $data['title'] = $this->input->post('title');
+        $data['description'] = $this->input->post('description');
+        $data['class_id'] = $this->input->post('class_id');
+        $data['uploader_type'] = $this->session->userdata('login_type');
+        $data['uploader_id'] = $this->session->userdata('login_user_id');
+        $data['year'] = $this->Class_model->get_year_academic_syllabus();
+        $data['timestamp'] = strtotime(date("Y-m-d H:i:s"));
+        if (!empty($_FILES['file_name']['name'])) {
+            $file_name = $this->Class_model->get_academic_syllabus_name($academic_syllabus_code);
+            unlink("uploads/syllabus/" . $file_name);
+            $files = $_FILES['file_name'];
+            $this->load->library('upload');
+            $config['upload_path'] = 'uploads/syllabus/';
+            $config['allowed_types'] = '*';
+            $_FILES['file_name']['name'] = $files['name'];
+            $_FILES['file_name']['type'] = $files['type'];
+            $_FILES['file_name']['tmp_name'] = $files['tmp_name'];
+            $_FILES['file_name']['size'] = $files['size'];
+            $this->upload->initialize($config);
+            $this->upload->do_upload('file_name');
+            $data['file_name'] = $_FILES['file_name']['name'];
+        }
+        $this->Class_model->update_academic_syllabus($data, $academic_syllabus_code);
+        $this->session->set_flashdata('flash_message', get_phrase('syllabus_updated'));
+        redirect(base_url() . 'index.php?school_admin/academic_syllabus/' . $data['class_id'], 'refresh');
+    }
 
 /* * **MANAGE SECTIONS**** */
 
@@ -3340,7 +3357,7 @@ function sections($param1 = '', $param2 = '', $param3 = '') {
     $page_data = $this->get_page_data_var();
     if ($param1 == 'create') {
         $this->form_validation->set_rules('name', 'section name', 'trim|required');
-        $this->form_validation->set_rules('nick_name', 'section nick name', 'trim|required');
+        $this->form_validation->set_rules('nick_name', 'Descripton', 'trim|required');
         $this->form_validation->set_rules('class_id', 'class name', 'trim|required');
         $this->form_validation->set_rules('teacher_id', 'Teacher_id', 'trim|required');
         $this->form_validation->set_rules('room_no', 'room number', 'trim|required|is_unique[section.room_no]');
@@ -3373,8 +3390,8 @@ function sections($param1 = '', $param2 = '', $param3 = '') {
     if ($param1 == 'edit') {
         $class_id = $this->uri->segment(5);
         $this->form_validation->set_rules('name', 'section name', 'trim|required');
-        $this->form_validation->set_rules('nick_name', 'section nick name', 'trim|required');
-//        $this->form_validation->set_rules('class_id', 'class name', 'trim|required');
+        $this->form_validation->set_rules('nick_name', 'Description', 'trim|required');
+        //        $this->form_validation->set_rules('class_id', 'class name', 'trim|required');
         $this->form_validation->set_rules('teacher_id', 'Teacher_id', 'trim|required');
         $this->form_validation->set_rules('room_no', 'room number', 'trim|required');
         $this->form_validation->set_rules('max_capacity', 'maximum capicity', 'trim|required');
@@ -3384,18 +3401,18 @@ function sections($param1 = '', $param2 = '', $param3 = '') {
         } else {
             $data['name'] = $this->input->post('name');
             $data['nick_name'] = $this->input->post('nick_name');
-//            $data['class_id'] = $this->input->post('class_id');
+            //            $data['class_id'] = $this->input->post('class_id');
             $data['teacher_id'] = $this->input->post('teacher_id');
             $data['room_no'] = $this->input->post('room_no');
             $data['max_capacity'] = $this->input->post('max_capacity');
 
             $count = $this->Section_model->check_section($class_id, $data['name'], $param2);
 
-//            echo $count[0]['count'];exit;
+                //            echo $count[0]['count'];exit;
             if ($count == 0) {
 
                 $count_room = $this->Section_model->check_room_no($data['room_no'], $param2);
-//                echo $count_room[0]['count_room'];exit;    
+                    //                echo $count_room[0]['count_room'];exit;    
                 if ($count_room == 0) {
                     $year = $this->globalSettingsSMSDataArr[2]->description;
                     $count_students = $this->Class_model->get_count_students(array('section.section_id' => $param2), $year);
@@ -3407,18 +3424,18 @@ function sections($param1 = '', $param2 = '', $param3 = '') {
                     }
                     if ($data['max_capacity'] >= $student) {
                         $this->Class_model->update_section($data, array("section_id" => $param2));
-                        $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+                        $this->session->set_flashdata('flash_message', get_phrase('section_has_been_updated_successfully'));
                         redirect(base_url() . 'index.php?school_admin/section/' . $class_id, 'refresh');
                     } else {
-                        $this->session->set_flashdata('flash_message_error', get_phrase('Could not edit because, maximum_capacity_should_be greater_than_no .of_students'));
+                        $this->session->set_flashdata('flash_message_error', get_phrase('Could_not_edit_because,_maximum_capacity_should_be greater_than_no._of_students'));
                         redirect(base_url() . 'index.php?school_admin/section/' . $class_id, 'refresh');
                     }
                 } else {
-                    $this->session->set_flashdata('flash_message_error', get_phrase('Could not edit because, Duplicate Entry of Room Number'));
+                    $this->session->set_flashdata('flash_message_error', get_phrase('Could_not_edit_because,_Duplicate_Entry_of_Room_Number'));
                     redirect(base_url() . 'index.php?school_admin/section/' . $class_id, 'refresh');
                 }
             } else {
-                $this->session->set_flashdata('flash_message_error', get_phrase('Could not edit because, Duplicate Entry'));
+                $this->session->set_flashdata('flash_message_error', get_phrase('Could_not_edit_because,_Duplicate_Entry'));
                 redirect(base_url() . 'index.php?school_admin/section/' . $class_id, 'refresh');
             }
         }
@@ -3429,11 +3446,11 @@ function sections($param1 = '', $param2 = '', $param3 = '') {
         $this->load->model('Enroll_model');
         $students = $this->Enroll_model->check_student_before_delete_section($param2, $param3, $year);
         if (!empty($students)) {
-            $this->session->set_flashdata('flash_message', get_phrase('Could not delete the section because students are present in this class and section'));
+            $this->session->set_flashdata('flash_message', get_phrase('Could_not_delete_the_section_because_students_are_present_in_this_class_and_section'));
             redirect(base_url() . 'index.php?school_admin/section/' . $param3, 'refresh');
         } else {
             $this->Class_model->delete_section(array("section_id" => $param2));
-            $this->session->set_flashdata('flash_message', get_phrase('data_deleted_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('section_has_been_deleted_successfully'));
             redirect(base_url() . 'index.php?school_admin/section/' . $param3, 'refresh');
         }
     }
@@ -3929,7 +3946,7 @@ function online_exam($param1 = '', $param2 = '', $param3 = '') {
 
         //pre($data);
         //exit;
-        $this->session->set_flashdata('flash_message', get_phrase('exam_added'));
+        $this->session->set_flashdata('flash_message', get_phrase('online_exam_added_successfully'));
         redirect(base_url() . 'index.php?school_admin/online_exam/', 'refresh');
         // print_r(json_encode($response_array));//exit;
     }
@@ -3952,7 +3969,7 @@ function online_exam($param1 = '', $param2 = '', $param3 = '') {
 
         $this->Exam_model->update_online_exam($param3, $data);
 
-        $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+        $this->session->set_flashdata('flash_message', get_phrase('online_exam_updated_successfully'));
         redirect(base_url() . 'index.php?school_admin/online_exam/', 'refresh');
     } else if ($param1 == 'edit') {
         $page_data['edit_data'] = $this->Exam_model->get_online_data($param2);
@@ -3966,13 +3983,13 @@ function online_exam($param1 = '', $param2 = '', $param3 = '') {
         if ($param2 == 'active') {
             $data = array('status' => 'inactive');
             $this->Exam_model->online_exam_status($param3, $data);
-
             $this->session->set_flashdata('flash_message', get_phrase('exam_inactive'));
+            redirect(base_url() . 'index.php?school_admin/online_exam/', 'refresh');
         } else {
             $data = array('status' => 'active');
             $this->Exam_model->online_exam_status($param3, $data);
-
             $this->session->set_flashdata('flash_message', get_phrase('exam_active'));
+            redirect(base_url() . 'index.php?school_admin/online_exam/', 'refresh');
         }
         redirect(base_url() . 'index.php?school_admin/online_exam/', 'refresh');
     }
@@ -3989,7 +4006,6 @@ function online_exam($param1 = '', $param2 = '', $param3 = '') {
 /* * **************ADD QUESTION IN ONLINE EXAM  ******************* */
 
 function add_question_online($param1 = '', $param2 = '', $param3 = '', $param4 = '') {
-
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $this->load->model("Subject_model");
@@ -4016,6 +4032,7 @@ function add_question_online($param1 = '', $param2 = '', $param3 = '', $param4 =
             $this->form_validation->set_rules('answer3', 'Answer 3', 'trim|required');
             $this->form_validation->set_rules('answer4', 'Answer 4', 'trim|required');
             $this->form_validation->set_rules('subject_id', 'Subject', 'trim|required');
+            $this->form_validation->set_rules('correct_answer', 'Correct Answer', 'trim|required');
 
             if ($this->form_validation->run() == FALSE) {
             $this->session->set_flashdata('flash_validation_error', validation_errors());
@@ -4054,7 +4071,7 @@ function add_question_online($param1 = '', $param2 = '', $param3 = '', $param4 =
                 $response_array = array('status' => "success", 'message' => "Question Has been Created");
                 //pre($data);
                 //exit;           
-                $this->session->set_flashdata('flash_message', get_phrase('question_added'));
+                $this->session->set_flashdata('flash_message', get_phrase('question_added_successfully'));
                 redirect(base_url() . 'index.php?school_admin/add_subject_online_exam/' . $param1 . '/' . $param2 . '/' . $data['subject_id'], 'refresh');
                 // print_r(json_encode($response_array));//exit;
             }
@@ -4096,7 +4113,7 @@ function add_question_online($param1 = '', $param2 = '', $param3 = '', $param4 =
                 $response_array = array('status' => "success", 'message' => "Question Has been Created");
                 //pre($data);
                 //exit;           
-                $this->session->set_flashdata('flash_message', get_phrase('question_added'));
+                $this->session->set_flashdata('flash_message', get_phrase('question_added_successfully'));
                 redirect(base_url() . 'index.php?school_admin/add_subject_online_exam/' . $param1 . '/' . $param2 . '/' . $data['subject_id'], 'refresh');
                 // print_r(json_encode($response_array));//exit;
             }
@@ -4133,7 +4150,7 @@ function add_question_online($param1 = '', $param2 = '', $param3 = '', $param4 =
             $response_array = array('status' => "success", 'message' => "Question Has been Created");
             //pre($data);
             //exit;           
-            $this->session->set_flashdata('flash_message', get_phrase('question_added'));
+            $this->session->set_flashdata('flash_message', get_phrase('question_added_successfully'));
             redirect(base_url() . 'index.php?school_admin/add_subject_online_exam/' . $param1 . '/' . $param2 . '/' . $data['subject_id'], 'refresh');
             // print_r(json_encode($response_array));//exit;
         }
@@ -4186,6 +4203,7 @@ function add_question_online($param1 = '', $param2 = '', $param3 = '', $param4 =
         redirect(base_url() . 'index.php?school_admin/add_subject_online_exam/' . $param4 . '/' . $param3, 'refresh');
     }
 
+//    echo "success".$param1; die;
     $subject = $this->Subject_model->get_data_by_cols('*', array('class_id' => $param1), 'result_type');
 
     $page_data['class_id'] = $param1;
@@ -4623,7 +4641,7 @@ function tabulation_sheet($class_id = '', $section_id = '', $exam_id = '') {
     $this->load->view('backend/index', $page_data);
 }
 
-public function tabulation_sheet_print_view($class_id = '', $section_id = '', $exam_id = '') {
+ function tabulation_sheet_print_view($class_id = '', $section_id = '', $exam_id = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $this->load->model("Subject_model");
@@ -5034,9 +5052,9 @@ function groups($param1 = "", $param2 = "", $param3 = "") {
     switch ($param1) {
         case 'add': $res = $this->Exam_model->group_add($data);
             if ($res) {
-                $this->session->set_flashdata("flash_message", get_phrase("Successfully created group."));
+                $this->session->set_flashdata("flash_message", get_phrase("Successfully_created_group."));
             } else {
-                $this->session->set_flashdata("flash_message_error", get_phrase("Error on creating group."));
+                $this->session->set_flashdata("flash_message_error", get_phrase("Error_on_creating_group."));
             }
             redirect(base_url() . "index.php?school_admin/exam_settings");
             break;
@@ -5046,9 +5064,9 @@ function groups($param1 = "", $param2 = "", $param3 = "") {
             $data = array("id" => $id);
             $res = $this->Exam_model->group_delete($data);
             if ($res) {
-                $this->session->set_flashdata("flash_message", get_phrase("Successfully deleted group."));
+                $this->session->set_flashdata("flash_message", get_phrase("Successfully_deleted_group."));
             } else {
-                $this->session->set_flashdata("flash_message_error", get_phrase("Error on deleting group."));
+                $this->session->set_flashdata("flash_message_error", get_phrase("Error_on_deleting_group."));
             }
             redirect(base_url . "index.php?school_admin/exam_settings");
     }
@@ -5154,7 +5172,7 @@ function cce_subjects($param1 = '', $param2 = '') {
     }
 
 
-    $subjects = $this->Cce_model->get_cce_subjects(array('class_id' => $param1));
+    $subjects = $this->Cce_model->get_cce_subjects(array('class_id' => $param1,'section_id' => $param2));
     $page_data['total_notif_num'] = $this->get_no_of_notication();
     $page_data['cce_class_id'] = $param1;
     $page_data['subjects'] = $subjects;
@@ -5883,20 +5901,42 @@ function manage_attendance() {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $page_data = $this->get_page_data_var();
-    $page_data['classes'] = $this->Class_model->get_class_array();
-    $this->load->model("Holiday_model");
+    if($this->input->server('REQUEST_METHOD')=='POST'){
+        $this->form_validation->set_rules('class_id', 'Class', 'required');
+        $this->form_validation->set_rules('section_id', 'Section', 'required');
+        $this->form_validation->set_rules('timestamp', 'Date', 'required');
+        if ($this->form_validation->run() == TRUE) {
+            $class_id = $this->input->post('class_id');
+            $section_id = $this->input->post('section_id');
+            $date = date('Y-m-d',strtotime($this->input->post('timestamp')));
+            redirect(base_url('index.php?school_admin/manage_attendance_view/'.$class_id.'/'.$section_id.'/'.$date),'refresh');
+        } 
+    }
+    
+    $this->load->model('Holiday_model');
     $holidays = $this->Holiday_model->get_holiday_list_attendance();
     $holiday_dates = array();
     foreach ($holidays as $holiday) {
-        $holiday_dates[] = $holiday['date_start'];
-        for ($i = 0; $i < ($holiday['number_of_days'] - 1); $i++) {
-            $holiday_dates[] = date('Y-m-d', strtotime($holiday['date_start'] . ' + ' . $i . ' days'));
+        $date_start = date('Y-m-d',strtotime($holiday['date_start']));
+        $date_end = date('Y-m-d',strtotime($holiday['date_end']));
+        if($holiday['date_end']!='0000-00-00'){
+            $period = new DatePeriod(new DateTime($date_start),new DateInterval('P1D'),new DateTime($date_end));
+            foreach($period as $date) { 
+                $holiday_dates[] = $last_date = $date->format('Y-m-d');
+            }
+            $holiday_dates[] = $last_date = date('Y-m-d', strtotime($last_date.' + 1 days'));
+        }else{
+            for ($i = 0; $i <=$holiday['number_of_days']; $i++) {
+                $holiday_dates[] = date('Y-m-d', strtotime($date_start . ' + '.$i.' days'));
+            }
         }
     }
+    //echo '<pre>';print_r($holiday_dates);exit;
     $page_data['holidays'] = $holiday_dates;
     $page_data['page_name'] = 'manage_attendance';
     $page_data['page_title'] = get_phrase('manage_attendance_of_class');
     $page_data['total_notif_num'] = $this->get_no_of_notication();
+    $page_data['classes'] = $this->Class_model->get_class_array();
     $this->load->view('backend/index', $page_data);
 }
 
@@ -5908,40 +5948,6 @@ function save_class_order() {
     echo "success";
 }
 
-function manage_attendance_view($class_id = '', $section_id = '', $timestamp = '') {
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect(base_url(), 'refresh');
-    $this->load->model('Attendance_model');
-    $this->load->model("Section_model");
-    $this->load->model("Holiday_model");
-
-    $page_data = $this->get_page_data_var();
-    $page_data['class_name'] = $this->Class_model->get_class_record(array('class_id' => $class_id), "name");
-    $page_data['section_name'] = $this->Class_model->get_section_record(array('section_id' => $section_id), "name");
-    $running_year = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
-    $page_data['class_id'] = $class_id;
-    $page_data['status']    =   array(['status_value'=>'0','status_name'=>'undefined'],['status_value'=>'1','status_name'=>'present'],['status_value'=>'2','status_name'=>'absent']);
-    $page_data['timestamp'] = $timestamp;
-    $page_data['section_id'] = $section_id;
-    $page_data['page_title'] = get_phrase('manage_attendance_of_class') . ' ' . $page_data['class_name'] . ' : ' . get_phrase('section') . ' ' . $page_data['section_name'];
-    $page_data['att_of_students'] = $this->Attendance_model->getstudents_attendence($page_data['class_id'], $page_data['section_id'], $running_year, $page_data['timestamp']);
-    //pre($page_data['att_of_students']); die();
-    $page_data['total_notif_num'] = $this->get_no_of_notication();
-    $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_type');
-    $page_data['sections'] = $this->Section_model->get_data_by_cols('*', array("class_id" => $class_id));
-    $holidays = $this->Holiday_model->get_holiday_list_attendance();
-    $holiday_dates = array();
-    foreach ($holidays as $holiday) {
-        $holiday_dates[] = $holiday['date_start'];
-        for ($i = 0; $i < ($holiday['number_of_days'] - 1); $i++) {
-            $holiday_dates[] = date('Y-m-d', strtotime($holiday['date_start'] . ' + ' . $i . ' days'));
-        }
-    }
-    $page_data['holidays'] = $holiday_dates;
-    $page_data['page_name'] = 'manage_attendance_view';
-    $this->load->view('backend/index', $page_data);
-}
-
 function get_section($class_id) {
     $page_data = $this->get_page_data_var();
     $page_data['class_id'] = $class_id;
@@ -5950,26 +5956,22 @@ function get_section($class_id) {
 }
 
 function attendance_selector() {
+    //$this->load->model('Holiday_model');
+    //$holidays = $this->Holiday_model->get_holiday_list_attendance();
+
     $this->form_validation->set_rules('class_id', 'Class', 'required');
     $this->form_validation->set_rules('section_id', 'Section', 'required');
     $this->form_validation->set_rules('timestamp', 'Date', 'required');
-    $page_data = $this->get_page_data_var();
+    //$page_data = $this->get_page_data_var();
+    //echo '<pre>';print_r($this->input->post());exit;
     if ($this->form_validation->run() == TRUE) {
-        $data['class_id'] = $this->input->post('class_id');
-        $data['year'] = $this->input->post('year');
-        $data['timestamp'] = strtotime($this->input->post('timestamp'));
-        $data['section_id'] = $this->input->post('section_id');
-        $this->load->model("Holiday_model");
-        $holidays = $this->Holiday_model->get_holiday_list_attendance();
-        $holiday_dates = array();
-        foreach ($holidays as $holiday) {
-            $holiday_dates[] = $holiday['date_start'];
-            for ($i = 0; $i < ($holiday['number_of_days'] - 1); $i++) {
-                $holiday_dates[] = date('Y-m-d', strtotime($holiday['date_start'] . ' + ' . $i . ' days'));
-            }
-        }
-        $page_data['holidays'] = $holiday_dates;
-        $page_data['query'] = $this->Attendance_model->get_data_by_cols("*", array('class_id' => $data['class_id'], 'section_id' => $data['section_id'], 'year' => $data['year'], 'timestamp' => $data['timestamp']), "result_array");
+        $class_id = $this->input->post('class_id');
+        $section_id = $this->input->post('section_id');
+        $year = $this->input->post('year');
+        $date = date('Y-m-d',strtotime($this->input->post('timestamp')));
+
+        /* $page_data['query'] = $this->Attendance_model->get_data_by_cols("*", array('class_id' => $data['class_id'], 'section_id' => $data['section_id'], 
+        'year' => $data['year'], 'timestamp' => $data['timestamp']), "result_array");
 
         if (count($page_data['query']) < 1) {
             $students = $this->Enroll_model->get_data_by_cols("*", array('class_id' => $data['class_id'], 'section_id' => $data['section_id'], 'year' => $data['year']), "result_array");
@@ -5986,7 +5988,6 @@ function attendance_selector() {
         //echo count($students);
         $count_student=0;
         foreach ($students as $row) {
-
             $attn_data['class_id'] = $data['class_id'];
             $attn_data['year'] = $data['year'];
             $attn_data['timestamp'] = $data['timestamp'];
@@ -5994,114 +5995,287 @@ function attendance_selector() {
             $attn_data['student_id'] = $row['student_id'];
             //pre($attn_data); 
             $rs = $this->Attendance_model->get_data_by_cols("*", array("year" => $data['year'], "timestamp" => $data['timestamp'], "student_id" => $row['student_id']), 'result_type');
-            
             $count_student+= count($rs);
-           
-        }//echo $count_student;
+        }
+        //echo $count_student;
             //echo $this->db->last_query();
-            /*echo count($count_student).'<br/>';
-            echo count($students).'<br/>';*/ //die();
-            if($count_student < count($students)){
-                $class_id = $data['class_id'];
-                $year = $data['year'];
-                $timestamp = $data['timestamp'];
+        if($count_student < count($students)){
+            $class_id = $data['class_id'];
+            $year = $data['year'];
+            $timestamp = $data['timestamp'];
 
-                $query = $this->Student_model->get_data_not_in_attendance($class_id, $year, $timestamp);
-                //pre($query); 
-                $attn_data = array();
-                foreach($query as $key => $dataadd){
-                    $attn_data['class_id'] = $dataadd['class_id'];
-                    $attn_data['year'] = $dataadd['year'];
-                    $attn_data['timestamp'] = $data['timestamp'];
-                    $attn_data['section_id'] = $dataadd['section_id'];
-                    $attn_data['student_id'] = $dataadd['student_id'];
-                    $this->Attendance_model->add($attn_data);
-                    /*echo $this->db->last_query();*/
-                }
-                
-        } //die();
-        $page_data['attendance_of_students'] = $this->Attendance_model->get_data_by_cols('*', array('class_id' => $data['class_id'], 'section_id' => $data['section_id'], 'year' => $data['year'], 'timestamp' => $data['timestamp']), 'result_type');
+            $query = $this->Student_model->get_data_not_in_attendance($class_id, $year, $timestamp);
+            //pre($query); 
+            $attn_data = array();
+            foreach($query as $key => $dataadd){
+                $attn_data['class_id'] = $dataadd['class_id'];
+                $attn_data['year'] = $dataadd['year'];
+                $attn_data['timestamp'] = $data['timestamp'];
+                $attn_data['section_id'] = $dataadd['section_id'];
+                $attn_data['student_id'] = $dataadd['student_id'];
+                $this->Attendance_model->add($attn_data);
+                echo $this->db->last_query();
+            }  
+        } //die(); */
+        //$page_data['attendance_of_students'] = $this->Attendance_model->get_data_by_cols('*', array('class_id' => $data['class_id'], 'section_id' => $data['section_id'], 'year' => $data['year'], 'timestamp' => $data['timestamp']), 'result_type');
         /*pre($page_data['attendance_of_students']);
         echo $this->db->last_query(); die();*/
-        redirect(base_url() . 'index.php?school_admin/manage_attendance_view/' . $data['class_id'] . '/' . $data['section_id'] . '/' . $data['timestamp'], 'refresh');
+        redirect(base_url('index.php?school_admin/manage_attendance_view/'.$class_id.'/'.$section_id.'/'.$date),'refresh');
     } else {
-        $page_data['classes'] = $this->Class_model->get_class_array();
-        $page_data['page_name'] = 'manage_attendance';
-        $page_data['page_title'] = get_phrase('manage_attendance_of_class');
-        $page_data['total_notif_num'] = $this->get_no_of_notication();
-        $this->load->view('backend/index', $page_data);
+        redirect('index.php?school_admin/manage_attendance');
     }
 }
 
-function attendance_update($class_id = '', $section_id = '', $timestamp = '') {
-    $running_year = $this->globalSettingsRunningYear;
-    $active_sms_service = $this->globalSettingsActiveSms;
-    $locationData = $this->globalSettingsLocation;
+function manage_attendance_view($class_id='', $section_id='', $date='') {
+    if ($this->session->userdata('school_admin_login') != 1)
+        redirect(base_url(), 'refresh');
+
+    $this->load->model('Attendance_model');
+    $this->load->model("Section_model");
+    $this->load->model("Holiday_model");
     $page_data = $this->get_page_data_var();
-    if (empty($locationData)) {
-        $this->session->set_flashdata('flash_message', "Set locataion country name in setting  for notification use.");
-        rediect(base_url() . 'index.php?school_admin/attendance_report');
-    } else {
-        $location = $this->globalSettingsLocation;
+    $page_data['class_name'] = $this->Class_model->get_class_record(array('class_id' => $class_id), "name");
+    $page_data['section_name'] = $this->Class_model->get_section_record(array('section_id' => $section_id), "name");
+    $running_year = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
+    $page_data['class_id'] = $class_id;
+    $page_data['section_id'] = $section_id;
+    $page_data['date'] = $date;
+    $page_data['page_title'] = get_phrase('manage_attendance_of_class').' '.$page_data['class_name'].'-'.get_phrase('section').' '.$page_data['section_name'];
+    
+    //$page_data['status']    =   array(['status_value'=>'0','status_name'=>'undefined'],['status_value'=>'1','status_name'=>'present'],['status_value'=>'2','status_name'=>'absent']);
+    /* $page_data['timestamp'] = $timestamp;
+    $page_data['att_of_students'] = $this->Attendance_model->getstudents_attendence($page_data['class_id'], $page_data['section_id'], $running_year, $page_data['timestamp']);
+    //pre($page_data['att_of_students']); die();
+    $page_data['total_notif_num'] = $this->get_no_of_notication();
+    $holidays = $this->Holiday_model->get_holiday_list_attendance();
+    $holiday_dates = array();
+    foreach ($holidays as $holiday) {
+        $holiday_dates[] = $holiday['date_start'];
+        for ($i = 0; $i < ($holiday['number_of_days'] - 1); $i++) {
+            $holiday_dates[] = date('Y-m-d', strtotime($holiday['date_start'] . ' + ' . $i . ' days'));
+        }
     }
+    $page_data['holidays'] = $holiday_dates; */
 
-    $attendance_of_students = $this->Attendance_model->get_data_by_cols('*', array('class_id' => $class_id, 'section_id' => $section_id, 'year' => $running_year, 'timestamp' => $timestamp), 'result_type');
-    foreach ($attendance_of_students as $row) {
-        $attendance_status = $this->input->post('update_attendance_' . $row['attendance_id']);
-        //$attendance_status = $this->input->post('status_' . $row['attendance_id']);
-        if ($attendance_status != '') {
+    $holidays = $this->Holiday_model->get_holiday_list_attendance();
+    $holiday_dates = array();
+    foreach ($holidays as $holiday) {
+        $holiday_dates[] = $holiday['date_start'];
+        for ($i = 1; $i <= ($holiday['number_of_days']-1); $i++) {
+            $holiday_dates[] = date('Y-m-d', strtotime($holiday['date_start'] . ' + ' . $i . ' days'));
+        }
+    }
+    $page_data['holidays'] = $holiday_dates;
 
-            $this->Attendance_model->update($row['attendance_id'], array('status' => $attendance_status));
+    //echo sett('running_year');exit;
+    $whr = array('E.class_id' => $class_id, 'E.section_id' => $section_id, 'E.year' => sett('running_year'));
+    $page_data['attendance'] = $this->Attendance_model->get_student_attendance($whr,$date);
 
-            //$this->Attendance_model->get_other_data($row['student_id']);
-            $rsParentStudent = $this->Attendance_model->get_other_data($row['student_id']);
-            if (!empty($rsParentStudent)) {
-                $student_name = $rsParentStudent[0]['name'];
-                $receiver_phone = $rsParentStudent[0]['cell_phone'];
-                $device_token = $rsParentStudent[0]['device_token'];
-                $parent_email = $rsParentStudent[0]['parent_email'];
-                $parent_id = $rsParentStudent[0]['parent_id'];
-                $parent_name = $rsParentStudent[0]['father_name'] . " " . $rsParentStudent[0]['father_lname'];
+    $page_data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_type');
+    $page_data['sections'] = $this->Section_model->get_data_by_cols('*', array("class_id" => $class_id));
+    //echo '<pre>';print_r($page_data['attendance']);exit;
+
+    $page_data['page_name'] = 'manage_attendance_view';
+    $this->load->view('backend/index', $page_data);
+}
+
+function attendance_update($class_id='',$section_id='',$date='') {
+    if($this->input->server('REQUEST_METHOD')=='POST'){
+        date_default_timezone_set('Asia/Kolkata');
+        $running_year = $this->globalSettingsRunningYear;
+        $active_sms_service = $this->globalSettingsActiveSms;
+        $location = $this->globalSettingsLocation;
+        $fcm_server_key = $this->globalSettingsSystemFCMServerrKey;
+        $page_data = $this->get_page_data_var();
+        if (empty($location)) {
+            $this->session->set_flashdata('flash_message', 'Set locataion country name in setting  for notification use.');
+            rediect(base_url('index.php?school_admin/attendance_report'));
+        }
+
+        $stu_atten = $this->input->post('atten');
+        $has_atten = $this->input->post('has_atten');
+
+        foreach($stu_atten as $stu_id=>$status){
+            $att_id = $has_atten[$stu_id]?$has_atten[$stu_id]:FALSE;
+            if(!$att_id && $status!=0){
+                $sturec = $this->Attendance_model->get_student(array('S.student_id'=>$stu_id));
+                
+                $whr = array('class_id'=>$class_id,'section_id'=>$section_id,'date'=>$date,'student_id'=>$stu_id);
+                $record = $this->db->get_where('attendance',$whr)->row();
+                
+                if($record){
+                    $flag = $this->db->update('attendance',array('status'=>$status),array('attendance_id'=>$record->attendance_id)); 
+                }else{ 
+                    $save_att = array('timezone'=>date_default_timezone_get(),
+                                    'timestamp'=>time(),
+                                    'date'=>$date,
+                                    'year'=>_getYear(),
+                                    'class_id'=>$class_id,
+                                    'section_id'=>$section_id,
+                                    'student_id'=>$stu_id,
+                                    'status'=>$status,
+                                    'custom_updated'=>1,
+                                    'school_id'=>_getSchoolid());
+                    $flag = $this->db->insert('attendance',$save_att);
+                }    
+
+                if($flag && !$record){
+                    $student_name = $sturec->name;
+                    $receiver_phone = $sturec->parent_phone;
+                    $device_token = $sturec->device_token;
+                    $parent_email = $sturec->parent_email;
+                    $parent_id = $sturec->parent_id;
+                    $parent_name = $sturec->father_name.' '.$sturec->father_lname;
+
+                    if ($status == 2) {
+                        $message = 'Your child' . ' ' . ucfirst($student_name) . ' is absent today.';
+                        $activity = 'child_out';
+                    } else {
+                        $message = 'Your child' . ' ' . ucfirst($student_name) . ' is present today.';
+                        $activity = 'child_in';
+                    }
+
+                    $msg = $message;
+                    $message = array();
+                    $message_body = $msg;
+                    $message['sms_message'] = $msg;
+                    $message['subject'] = $this->globalSettingsSystemName . " Student Attendance";
+                    $message['messagge_body'] = $message_body;
+                    $message['to_name'] = $parent_name;
+
+                    $phone = array($receiver_phone);
+                    $email = array($parent_email);
+
+                    $user_details = array();
+                    $user_details = array('user_id' => $parent_id, 'user_type' => 'parent');
+
+                    if ($device_token != '') {
+                        $user_details['device_details'] = array('token' => $device_token,'server_key' => $fcm_server_key,'instance' => CURRENT_INSTANCE);
+                    }
+                    send_school_notification($activity, $message, $phone, $email, $user_details);
+                    $this->session->set_flashdata('flash_message', get_phrase('attendance_updated'));
+                }    
             }
-
-            $fcm_server_key = $this->globalSettingsSystemFCMServerrKey;
-
-            if ($attendance_status == 2) {
-                $message = 'Your child' . ' ' . ucfirst($student_name) . ' is absent today.';
-                $activity = 'child_out';
-            } else {
-                $message = 'Your child' . ' ' . ucfirst($student_name) . ' is present today.';
-                $activity = 'child_in';
-            }
-
-            $msg = $message;
-            $message = array();
-            $message_body = $msg;
-            $message['sms_message'] = $msg;
-            $message['subject'] = $this->globalSettingsSystemName . " Student Attendance";
-            $message['messagge_body'] = $message_body;
-            $message['to_name'] = $parent_name;
-
-            $phone = array($receiver_phone);
-            $email = array($parent_email);
-
-            $user_details = array();
-            $user_details = array('user_id' => $parent_id, 'user_type' => 'parent');
-
-            if ($device_token != "") {
-                $user_details['device_details'] = array(
-                    'token' => $device_token,
-                    'server_key' => $fcm_server_key,
-                    'instance' => CURRENT_INSTANCE);
-            }
-            send_school_notification($activity, $message, $phone, $email, $user_details);
-
-            $this->session->set_flashdata('flash_message', get_phrase('attendance_updated'));
         }
     }
 
-    redirect(base_url() . 'index.php?school_admin/manage_attendance_view/' . $class_id . '/' . $section_id . '/' . $timestamp, 'refresh');
+    redirect(base_url() . 'index.php?school_admin/manage_attendance_view/'.$class_id.'/'.$section_id.'/'.$date, 'refresh');
 }
+
+function manage_teacher_attendance() {
+    if ($this->session->userdata('school_admin_login') != 1)
+        redirect(base_url(), 'refresh');
+    $page_data = $this->get_page_data_var();
+    if($this->input->server('REQUEST_METHOD')=='POST'){
+        $this->form_validation->set_rules('date', 'Date', 'required');
+        if ($this->form_validation->run() == TRUE) {
+            $date = date('Y-m-d',strtotime($this->input->post('date')));
+            redirect(base_url('index.php?school_admin/manage_teacher_attendance_view/'.$date),'refresh');
+        } 
+    }
+    
+    $page_data['page_name'] = 'manage_teacher_attendance';
+    $page_data['page_title'] = get_phrase('manage_attendance_of_teacher');
+    $page_data['total_notif_num'] = $this->get_no_of_notication();
+    $this->load->view('backend/index', $page_data);
+}
+
+function manage_teacher_attendance_view($date='') {
+    if ($this->session->userdata('school_admin_login') != 1)
+        redirect(base_url(), 'refresh');
+
+    $this->load->model('Attendance_model');
+    $page_data = $this->get_page_data_var();
+    $page_data['date'] = $date;
+    $page_data['page_title'] = get_phrase('manage_attendance_of_teacher').' on '.$date;
+    
+    $page_data['attendance'] = $this->Attendance_model->get_teacher_attendance(array(),$date);
+
+    $page_data['page_name'] = 'manage_teacher_attendance_view';
+    $this->load->view('backend/index', $page_data);
+}
+
+function teacher_attendance_update($date='') {
+    if($this->input->server('REQUEST_METHOD')=='POST'){
+        date_default_timezone_set('Asia/Kolkata');
+        $running_year = $this->globalSettingsRunningYear;
+        $active_sms_service = $this->globalSettingsActiveSms;
+        $location = $this->globalSettingsLocation;
+        $fcm_server_key = $this->globalSettingsSystemFCMServerrKey;
+        $page_data = $this->get_page_data_var();
+        if (empty($location)) {
+            $this->session->set_flashdata('flash_message', 'Set locataion country name in setting  for notification use.');
+            rediect(base_url('index.php?school_admin/attendance_report'));
+        }
+
+        $techer_atten = $this->input->post('atten');
+        $has_atten = $this->input->post('has_atten');
+
+        foreach($techer_atten as $teacher_id=>$status){
+            $att_id = $has_atten[$teacher_id]?$has_atten[$teacher_id]:FALSE;
+            if(!$att_id && $status!=0){
+                $trec = $this->Attendance_model->get_teacher(array('teacher_id'=>$teacher_id));
+                
+                $whr = array('date'=>$date,'teacher_id'=>$teacher_id);
+                $record = $this->db->get_where('attendance_teacher',$whr)->row();
+                
+                if($record){
+                    $flag = $this->db->update('attendance_teacher',array('status'=>$status),array('attendance_id'=>$record->attendance_id)); 
+                }else{ 
+                    $save_att = array('timezone'=>date_default_timezone_get(),
+                                      'timestamp'=>time(),
+                                      'date'=>$date,
+                                      'year'=>_getYear(),
+                                      'teacher_id'=>$teacher_id,
+                                      'status'=>$status,
+                                      'custom_updated'=>1,
+                                      'school_id'=>_getSchoolid());
+                    $flag = $this->db->insert('attendance_teacher',$save_att);
+                }
+
+                if($flag && !$record){
+                    $teacher_name = $trec->name;
+                    $receiver_phone = sett('phone');
+                    $device_token = '';
+                    $receiver_email = '';
+
+                    if ($status == 2) {
+                        $message = 'Dear sir, Attendance For '.$teacher_name.' has been marked present on '.date('H:i A');
+                        $activity = 'teacher_in';
+                    } else {
+                        $message = 'Dear sir, Attendance For '.$teacher_name.' has been marked absent on '.date('H:i A');
+                        $activity = 'teacher_out';
+                    }
+
+                    $msg = $message;
+                    $message = array();
+                    $message_body = $msg;
+                    $message['sms_message'] = $msg;
+                    $message['subject'] = $this->globalSettingsSystemName . " Student Attendance";
+                    $message['messagge_body'] = $message_body;
+                    $message['to_name'] = '';
+
+                    $phone = array($receiver_phone);
+                    $email = array($receiver_email);
+
+                    $user_details = array();
+                    $user_details = array('user_type' => 'admin');
+
+                    if ($device_token != '') {
+                        $user_details['device_details'] = array('token' => $device_token,'server_key' => $fcm_server_key,'instance' => CURRENT_INSTANCE);
+                    }
+                    send_school_notification($activity, $message, $phone, $email, $user_details);
+                } 
+
+                $this->session->set_flashdata('flash_message', get_phrase('attendance_updated'));
+            }
+        }
+    }
+
+    redirect(base_url('index.php?school_admin/manage_teacher_attendance_view/'.$date), 'refresh');
+}
+
+
 
 /* * **** DAILY ATTENDANCE **************** */
 
@@ -6163,11 +6337,11 @@ function attendance_selector2() {
     //$session = $this->input->post('session');
     //$encoded_session = urlencode( base64_encode( $session ) );
     redirect(base_url() . 'index.php?school_admin/manage_attendance/' . $this->input->post('date') . '/' .
-            $this->input->post('month') . '/' .
-            $this->input->post('year') . '/' .
-            $this->input->post('class_id') . '/' .
-            $this->input->post('section_id') . '/' .
-            $this->input->post('session'), 'refresh');
+    $this->input->post('month') . '/' .
+    $this->input->post('year') . '/' .
+    $this->input->post('class_id') . '/' .
+    $this->input->post('section_id') . '/' .
+    $this->input->post('session'), 'refresh');
 }
 
 ///////ATTENDANCE REPORT /////
@@ -6206,15 +6380,25 @@ function attendance_report_view($class_id = '', $section_id = '', $month = '') {
     $page_data = $this->get_page_data_var();
 
     $this->load->model('Student_model');
-    $this->load->model("Holiday_model");
+    $this->load->model('Holiday_model');
     $holidays = $this->Holiday_model->get_holiday_list_attendance();
     $holiday_dates = array();
     foreach ($holidays as $holiday) {
-        $holiday_dates[] = $holiday['date_start'];
-        for ($i = 0; $i < ($holiday['number_of_days'] - 1); $i++) {
-            $holiday_dates[] = date('Y-m-d', strtotime($holiday['date_start'] . ' + ' . $i . ' days'));
+        $date_start = date('Y-m-d',strtotime($holiday['date_start']));
+        $date_end = date('Y-m-d',strtotime($holiday['date_end']));
+        if($holiday['date_end']!='0000-00-00'){
+            $period = new DatePeriod(new DateTime($date_start),new DateInterval('P1D'),new DateTime($date_end));
+            foreach($period as $date) { 
+                $holiday_dates[] = $last_date = $date->format('Y-m-d');
+            }
+            $holiday_dates[] = $last_date = date('Y-m-d', strtotime($last_date.' + 1 days'));
+        }else{
+            for ($i = 0; $i <=$holiday['number_of_days']; $i++) {
+                $holiday_dates[] = date('Y-m-d', strtotime($date_start . ' + '.$i.' days'));
+            }
         }
     }
+
     $page_data['holidays'] = $holiday_dates;
     $setting_records = $this->Setting_model->get_data_by_cols('*', array(), 'result_array');
     $page_data['minimum_attendance'] = fetch_parl_key_rec($setting_records, 'minimum_attendance');
@@ -6227,26 +6411,34 @@ function attendance_report_view($class_id = '', $section_id = '', $month = '') {
     $page_data['total_notif_num'] = $this->get_no_of_notication();
     $page_data['classes'] = $this->Class_model->get_data_by_cols("*", array(), "arrr");
     $page_data['sections'] = $this->Section_model->get_data_by_cols("*", array('class_id' => $class_id), "result_array");
-    $running_year = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
-    $page_data['students'] = $this->Student_model->get_students_attendance($class_id, $section_id, $running_year);
-    $page_data['year'] = explode('-', $running_year);
-    $page_data['days'] = cal_days_in_month(CAL_GREGORIAN, $month, $page_data['year'][0]);
-    $page_data['page_title'] = get_phrase('attendance_report_of_class') . ' ' . $page_data['class_name'] . ' : ' . get_phrase('section') . ' ' . $page_data['section_name'];
+    //$running_year = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
+    //$page_data['students'] = $this->Student_model->get_students_attendance($class_id, $section_id, $running_year);
+
+    $running_year = sett('running_year');
+    $whr = array('E.class_id' => $class_id, 'E.section_id' => $section_id);
+    $page_data['students'] = $students = $this->Attendance_model->get_student_attendance($whr);
+
+    $sess_years = explode('-', $running_year);
+    $page_data['year'] = $year = date('m')>3?$sess_years[0]:$sess_years[1];
+    $page_data['days'] = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+    $page_data['page_title'] = get_phrase('attendance_report_of_class').' '.$page_data['class_name'].' : '.get_phrase('section').' '.$page_data['section_name'];
     //Add Attendance array to student array
 
-
-    foreach ($page_data['students'] as $k => $v) {
+    foreach ($students as $k => $v) {
         $p = 0;
         for ($i = 1; $i <= $page_data['days']; $i++) {
-            $timestamp = strtotime($i . '-' . $month . '-' . $page_data['year'][0]);
-            $data = array('section_id' => $page_data['section_id'], 'class_id' => $page_data['class_id'], "year" => $running_year, "timestamp" => $timestamp, 'student_id' => $v['student_id']);
-            $atten = $this->Student_model->get_attendance($data);
+            //$timestamp = strtotime($i . '-' . $month . '-' . $page_data['year'][0]);
+            $date = $year.'-'.$month.'-'.($i<10?'0'.$i:$i);
+            $whr = array('section_id' => $v->section_id, 'class_id'=>$v->class_id,"year"=>$v->running_year,'student_id' => $v->student_id);
+            $this->db->select("*,DATE_FORMAT(FROM_UNIXTIME(`timestamp`), '%Y-%m-%d') tmdate");
+            $this->db->where("(date = '".$date."' OR DATE_FORMAT(FROM_UNIXTIME(`timestamp`), '%Y-%m-%d') = '".$date."')");    
+            $atten = $this->db->get_where('attendance',$whr)->result_array();
+            //$atten = $this->Student_model->get_attendance($data);
 
-            if (!empty($atten) && count($atten) > 0)
-
-            //pre($atten); die();
-                if (isset($atten) && !empty($atten) && count($atten) > 0)
-                    $page_data['students'][$k]['atten'][$p] = $atten[0];
+            if (!empty($atten) && count($atten) > 0){
+                //$page_data['students'][$k]->atten[$p+1] = $atten[0];
+                $page_data['students'][$k]->atten[$i] = $atten[0];
+            }
             $p++;
         }
     }//pre($page_data); die();
@@ -6287,8 +6479,10 @@ function attendance_report_print_view($class_id = '', $section_id = '', $month =
     foreach ($page_data['students'] as $k => $v) {
         $p = 0;
         for ($i = 1; $i <= $days; $i++) {
-            $timestamp = strtotime($i . '-' . $month . '-' . $page_data['year'][0]);
-            $tempArr = array('section_id' => $page_data['section_id'], 'class_id' => $page_data['class_id'], "year" => $running_year, "timestamp" => $timestamp, 'student_id' => $v['student_id']);
+            //$timestamp = strtotime($i . '-' . $month . '-' . $page_data['year'][0]);
+            $timestamp = $page_data['year'][0].'-' .$month.'-'.($i<10?'0'.$i:$i);
+            $tempArr = array('section_id' => $page_data['section_id'], 'class_id' => $page_data['class_id'], "year" => $running_year, 
+                "DATE(date)" => $timestamp, 'student_id' => $v['student_id']);
             $attendance = $this->Student_model->get_attendance($tempArr);
             $page_data['attendance'] = $attendance;
             //pre($attendance); die();
@@ -6671,7 +6865,7 @@ function transport($param1 = '', $param2 = '', $param3 = '') {
 //        $data2['route_id']      =   $route_id;
 //        $this->load->model('fee_fi_model');
 //        $this->fee_fi_model->add($data2);
-        $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+        $this->session->set_flashdata('flash_message', get_phrase('route_added_successfully'));
         redirect(base_url() . 'index.php?school_admin/transport', 'refresh');
     }
     if ($param1 == 'do_update') {
@@ -6681,7 +6875,7 @@ function transport($param1 = '', $param2 = '', $param3 = '') {
 //        $data['route_fare'] = $this->input->post('route_fare');        
         $this->Transport_model->update($param2, $data);
 
-        $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+        $this->session->set_flashdata('flash_message', get_phrase('route_updated_successfully'));
         redirect(base_url() . 'index.php?school_admin/transport', 'refresh');
     } else if ($param1 == 'edit') {
         $page_data['edit_data'] = $this->Transport_model->get_data_by_cols('*', array(
@@ -6689,9 +6883,10 @@ function transport($param1 = '', $param2 = '', $param3 = '') {
                 ), 'result_type');
     }
     if ($param1 == 'delete') {
+
         $this->Transport_model->delete($param2);
 
-        $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+        $this->session->set_flashdata('flash_message', get_phrase('route_deleted_successfully'));
         redirect(base_url() . 'index.php?school_admin/transport', 'refresh');
     }
     if ($param1 == 'import_excel') {
@@ -6710,7 +6905,7 @@ function transport($param1 = '', $param2 = '', $param3 = '') {
         $xlsx = new SimpleXLSX($path);
         list($num_cols, $num_rows) = $xlsx->dimension();
         $f = 0;
-        $fielsdStringForAdmin = "Route Name,Route From,Route To,Route Fare Name";
+        $fielsdStringForAdmin = "Route Name,Route From,Route To,Route Fare";
         $fielsdString = "route_id,route_from,route_to,route_fare";
         $fielsdStringMandotary = $fielsdString;
         $fielsdArr = explode(',', $fielsdString);
@@ -6769,7 +6964,7 @@ function transport($param1 = '', $param2 = '', $param3 = '') {
                     }
 
 
-                    if ($fielsdArr[$i] == 'route_fare') {
+                    /*if ($fielsdArr[$i] == 'route_fare') {
                         $routeFareArr = $this->Transport_model->get_route_fare(6, $this->globalSettingsRunningYear, trim($r[$i]));
                         if (!empty($routeFareArr)) {
                             $data[$fielsdArr[$i]] = $routeFareArr[0]->sales_price;
@@ -6777,8 +6972,8 @@ function transport($param1 = '', $param2 = '', $param3 = '') {
                             $error = TRUE;
                             $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo . ".Check in FI about transport data in charges list.";
                         }
-                    }
-                    if ($fielsdArr[$i] != 'route_id' && $fielsdArr[$i] != 'route_fare') {
+                    }*/
+                    if ($fielsdArr[$i] != 'route_id') {
                         $data[$fielsdArr[$i]] = trim($r[$i]);
                     }
                     //pre($data);
@@ -6847,7 +7042,7 @@ function transport($param1 = '', $param2 = '', $param3 = '') {
         $page_data['transports'][$k]['transaction'] = $this->Crud_model->getTransportTransaction($v['transport_id']);
     }
     $page_data['page_name'] = 'transport';
-    $page_data['page_title'] = get_phrase('manage_transport');
+    $page_data['page_title'] = get_phrase('manage_route');
     $this->load->view('backend/index', $page_data);
 }
 
@@ -6901,6 +7096,12 @@ function noticeboard($param1 = '', $param2 = '', $param3 = '') {
         redirect(base_url(), 'refresh');
     $this->load->model("Notification_model");
     $page_data = $this->get_page_data_var();
+
+    $school_id = '';
+    if(($this->session->userdata('school_id'))) {
+        $school_id = $this->session->userdata('school_id');
+    }
+
     if ($param1 == 'create') {
         $this->form_validation->set_rules('notice_title', 'Notice Title', 'required');
         $this->form_validation->set_rules('notice', 'Description', 'required');
@@ -7008,7 +7209,7 @@ function noticeboard($param1 = '', $param2 = '', $param3 = '') {
     $page_data['total_notif_num'] = $this->get_no_of_notication();
     if ($param1 == '') {
         $page_data['page_name'] = 'noticeboard';
-        $page_data['page_title'] = get_phrase('manage_noticeboard');
+        $page_data['page_title'] = get_phrase('noticeboard');
         $page_data['notices'] = $this->Notification_model->getNotices();
         $class_array = $this->Class_model->get_class_array();
         $page_data['classes'] = $class_array;
@@ -7049,7 +7250,7 @@ function message($param1 = 'message_home', $param2 = '', $param3 = '') {
         $page_data['current_message_thread_code'] = $param2;
         $this->crud_model->mark_thread_messages_read($param2, $school_id);
         $page_data['messages'] = $this->Message_model->get_data_by_cols('*', array('message_thread_code' => $param2, 'message_status' => 'All', 'school_id' => $school_id), 'result_array');
-        //echo $this->db->last_query();die;
+
         $parent = array();
         $parent_all = array();
         $i = 0;
@@ -7060,11 +7261,10 @@ function message($param1 = 'message_home', $param2 = '', $param3 = '') {
             $sender = explode('-', $message['sender']);
             $sender_account_type = $sender[0];
             $sender_id = $sender[1];
-//            $img_user[]['image'] = $this->crud_model->get_image_url($sender_account_type, $sender_id);
 
             $model_name = ucfirst($sender_account_type . '_model');
             if ($sender_account_type == 'parent') {
-                $parent = $this->Parent_model->get_data_by_cols('father_name,parent_image', array($sender_account_type . '_id' => $sender_id), 'result_array');
+                $parent = $this->Parent_model->get_data_by_cols('father_name,father_lname,parent_image', array($sender_account_type . '_id' => $sender_id), 'result_array');
                 if (!empty($parent)) {
                     $parent_all[]['name'] = $parent[0]['father_name'];
 
@@ -7083,7 +7283,7 @@ function message($param1 = 'message_home', $param2 = '', $param3 = '') {
                 $this->load->model('Student_model');
                 //echo $model_name;
                 if ($model_name == "Teacher_model") {
-                    $parent = $this->$model_name->get_data_by_cols("name,teacher_image", array($sender_account_type . '_id' => $sender_id), 'result_array');
+                    $parent = $this->$model_name->get_data_by_cols("name,last_name,teacher_image", array($sender_account_type . '_id' => $sender_id), 'result_array');
                     if (!empty($parent)) {
                         $parent_all[]['name'] = $parent[0]['name'];
                         if($parent[0]["teacher_image"]!=''){
@@ -7096,7 +7296,7 @@ function message($param1 = 'message_home', $param2 = '', $param3 = '') {
                         $image[]['image'] = "user.png";
                     }
                 } else if ($model_name == "Student_model") {
-                    $parent = $this->$model_name->get_data_by_cols("name,stud_image", array($sender_account_type . '_id' => $sender_id), 'result_array');
+                    $parent = $this->$model_name->get_data_by_cols("name,lname,stud_image", array($sender_account_type . '_id' => $sender_id), 'result_array');
                     if (!empty($parent)) {
                         $parent_all[]['name'] = $parent[0]['name'];
 
@@ -7111,7 +7311,7 @@ function message($param1 = 'message_home', $param2 = '', $param3 = '') {
                     }
                 } else {
                     //$parent = $this->$model_name->get_data_by_cols("name,image", array($sender_account_type . '_id' => $sender_id), 'result_array');
-                    $parent = $this->School_Admin_model->get_data_by_cols("name,profile_pic", array($sender_account_type . '_id' => $sender_id), 'result_array');
+                    $parent = $this->School_Admin_model->get_data_by_cols("name,last_name,profile_pic", array($sender_account_type . '_id' => $sender_id), 'result_array');
 
                     if (!empty($parent)) {
                         $parent_all[]['name'] = $parent[0]['name'];
@@ -7219,9 +7419,9 @@ function message($param1 = 'message_home', $param2 = '', $param3 = '') {
     }
 }
 
-/* * ***SITE/SYSTEM SETTINGS******** */
-
+/*****SITE/SYSTEM SETTINGS*********/
 function system_settings($param1 = '', $param2 = '', $param3 = '') {
+
     $this->load->helper('functions');
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url() . 'index.php?login', 'refresh');
@@ -7276,6 +7476,12 @@ function system_settings($param1 = '', $param2 = '', $param3 = '') {
         $data['description'] = $this->input->post('endto');
         $this->Setting_model->update('endto', $data);
 
+        $data['description'] = $this->input->post('start_month');
+        $this->Setting_model->update('start_month', $data);
+        
+        $data['description'] = $this->input->post('end_month');
+        $this->Setting_model->update('end_month', $data);
+
         $data['description'] = $this->input->post('facebook_page');
         $this->Setting_model->update('facebook_page', $data);
 
@@ -7296,6 +7502,24 @@ function system_settings($param1 = '', $param2 = '', $param3 = '') {
 
         $data['description'] = $this->input->post('enroll_code_prefix');
         $this->Setting_model->update('enroll_code_prefix', $data);
+
+        $data['description'] = $this->input->post('bus_attendance_buffer_time');
+        $this->Setting_model->update('bus_attendance_buffer_time', $data);
+        
+        $data['description'] = $this->input->post('rfid_attendance_buffer_time');
+        $this->Setting_model->update('rfid_attendance_buffer_time', $data);
+
+        $data['description'] = $this->input->post('timezone');
+        $this->Setting_model->update('timezone', $data);
+
+        $data['description'] = $this->input->post('fees_priority_1');
+        $this->Setting_model->update('fees_priority_1', $data);
+
+        $data['description'] = $this->input->post('fees_priority_2');
+        $this->Setting_model->update('fees_priority_2', $data);
+        
+        $data['description'] = $this->input->post('fees_priority_3');
+        $this->Setting_model->update('fees_priority_3', $data);
 
         $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
         redirect(base_url() . 'index.php?school_admin/system_settings/', 'refresh');
@@ -7607,13 +7831,14 @@ function manage_profile($param1 = '', $param2 = '', $param3 = '') {
                     $this->session->set_flashdata('flash_message', get_phrase('account_details_updated'));
                 }
             } else {
-                $this->session->set_flashdata('flash_message_error', get_phrase('It may be the wrong filetype. We only allow JPG, GIF, and PNG filetypes!!'));
+                $this->session->set_flashdata('flash_message_error', get_phrase('It_may_be_the_wrong_filetype._We_only_allow_JPG,_GIF,_and_PNG_filetypes!!'));
                 redirect(base_url() . 'index.php?school_admin/manage_profile/', 'refresh');
             }
         } else {
             $data['profile_pic'] = $this->input->post('image');
             $user_id = $this->session->userdata('school_admin_id');
             $this->School_Admin_model->update_profile($data, $user_id);
+			$this->session->set_flashdata('flash_message', get_phrase('profile_information_has_been_updated_successfully.'));
             redirect(base_url() . 'index.php?school_admin/manage_profile/', 'refresh');
         }
     }
@@ -7748,7 +7973,6 @@ function bus($param1 = '', $param2 = '') {
         $this->form_validation->set_rules('route', 'Route Id', 'trim|required');
         $this->form_validation->set_rules('no_of_seat', 'Number of Seats', 'trim|required');
         if ($this->form_validation->run() == TRUE) {
-
             $data['name'] = $this->input->post('name');
             $data['bus_unique_key'] = $this->input->post('key');
             $data['device_imei'] = $this->input->post('imei');
@@ -7764,14 +7988,15 @@ function bus($param1 = '', $param2 = '') {
                 if ($count_buses >= 1)
                     $this->Bus_driver_modal->update_no_of_buses($data['route_id'], $count_buses[0]['count']);
             }
-            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('bus_added_successfully'));
             redirect(base_url() . 'index.php?school_admin/bus/', 'refresh');
         }else {
+//       echo "sucess"; die; 
 //            $page_data['buses'] = $this->Bus_driver_modal->get_bus_with_route1();
 //            $page_data['page_title'] = get_phrase('manage_bus');
 //            $page_data['page_name'] = 'bus_manage';
 //            $this->load->view('backend/index', $page_data);
-            $this->session->set_flashdata('flash_message_error', "Could not add because " . validation_errors());
+            $this->session->set_flashdata('flash_error_show', "Could not add because " . validation_errors());
             redirect(base_url() . 'index.php?school_admin/bus/', 'refresh');
         }
     }
@@ -7788,7 +8013,7 @@ function bus($param1 = '', $param2 = '') {
             $data['number_of_seat'] = $this->input->post('no_of_seats');
             $data['route_id'] = $this->input->post('route');
             $this->Bus_driver_modal->update_bus($data, $param2);
-            $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+            $this->session->set_flashdata('flash_message', get_phrase('bus_updated_successfully'));
             redirect(base_url() . 'index.php?school_admin/bus/', 'refresh');
         } else {
             $this->session->set_flashdata('flash_message_error', validation_errors());
@@ -7798,7 +8023,7 @@ function bus($param1 = '', $param2 = '') {
     if ($param1 == 'delete') {
         $data = array('bus_id' => $param2);
         $this->Bus_driver_modal->delete_bus($data);
-        $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+        $this->session->set_flashdata('flash_message', get_phrase('bus_deleted_successfully'));
         redirect(base_url() . 'index.php?school_admin/bus/', 'refresh');
     }
 
@@ -7819,9 +8044,9 @@ function bus($param1 = '', $param2 = '') {
         $xlsx = new SimpleXLSX($path);
         list($num_cols, $num_rows) = $xlsx->dimension();
         $f = 0;
-        $fielsdStringForAdmin = "Bus Id(Unique),Bus Name,Route Name,Description";
-        $fielsdString = "bus_unique_key,name,route_id,description";
-        $fielsdStringMandotary = "bus_unique_key,name,route_id,description";
+        $fielsdStringForAdmin = "Bus Id(Unique),Bus Name,Route Name,Description,IMEI,Available Seats";
+        $fielsdString = "bus_unique_key,name,route_id,description,device_imei,number_of_seat";
+        $fielsdStringMandotary = "bus_unique_key,name,route_id,description,device_imei,number_of_seat";
         $fielsdArr = explode(',', $fielsdString);
         $fielsdStringForAdminArr = explode(',', $fielsdStringForAdmin);
         $fielsdStringMandotaryArr = explode(',', $fielsdStringMandotary);
@@ -7877,6 +8102,18 @@ function bus($param1 = '', $param2 = '') {
                             $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo . ' is already exist.';
                         }
                     }
+                    
+                    if ($fielsdArr[$i] == 'device_imei') {
+                        $rsClass = $this->Bus_model->get_bus_imei($r[$i]);
+
+                        if (count($rsClass) == 0) {
+                            $data['device_imei'] = trim($r[$i]);
+                        } else {
+                            $data['device_imei'] = "";
+                            $error = TRUE;
+                            $errorMsgArr[] = $fielsdStringForAdminArr[$i] . " content invalid data at row no -" . $errorRowNo . ' is already exist.';
+                        }
+                    }
 
                     if ($fielsdArr[$i] == 'route_id') {
                         $transportArr = $this->Transport_model->get_name($r[$i]);
@@ -7890,7 +8127,7 @@ function bus($param1 = '', $param2 = '') {
                         }
                     }
 
-                    if ($fielsdArr[$i] == 'name' || $fielsdArr[$i] == 'description') {
+                    if ($fielsdArr[$i] == 'name' || $fielsdArr[$i] == 'description' || $fielsdArr[$i] == 'number_of_seat') {
                         $data[$fielsdArr[$i]] = trim($r[$i]);
                     }
                     if (!empty($errorMsgArr)) {
@@ -7964,13 +8201,29 @@ function bus_admin($param1 = '', $param2 = '') {
     if ($param1 == 'create') {
         $data['name'] = $this->input->post('name');
         $data['email'] = $this->input->post('email');
-        $data['password'] = sha1($this->input->post('password'));
         $data['phone'] = $this->input->post('phone');
         $data['sex'] = $this->input->post('gender');
-        $this->Bus_driver_modal->save_bus_admin($data);
-        $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-        //$this->Email_model->account_opening_email('parent', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL
-        redirect(base_url() . 'index.php?school_admin/bus_admin/', 'refresh');
+        
+        $passcode = create_passcode('bus_admin');
+        $data['password'] = ($passcode != 'invalid') ? sha1($passcode) : '';   
+               
+          if ($data['phone'] != "") {
+              $name = ucfirst($data['name']);
+                 $msg = "Welcome! ".$name." in Sharad School. You are Registered Successfully with Login email:".$data['email']." and Password:" . $passcode;
+                 $phone = $data['phone'];
+                 $message = array();
+                 $message_body = $msg;
+                 $message['sms_message'] = $msg;
+                 $message['subject'] = 'New Registartion ' . $this->globalSettingsSystemName;
+                 $message['messagge_body'] = $message_body;
+                 $message['to_name'] = $name;
+                 send_school_notification('new_user', $message, array($phone), array($data['email']));
+          }
+        
+          $this->Bus_driver_modal->save_bus_admin($data);
+        $this->session->set_flashdata("flash_message", get_phrase("bus_admin_added_successfully"));
+       //$this->Email_model->account_opening_email('parent', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL
+      redirect(base_url() . 'index.php?school_admin/bus_admin/', 'refresh');
     }
     if ($param1 == 'edit') {
         $data['name'] = $this->input->post('name');
@@ -7978,13 +8231,13 @@ function bus_admin($param1 = '', $param2 = '') {
         $data['phone'] = $this->input->post('phone');
         $data['sex'] = $this->input->post('gender');
         $this->Bus_driver_modal->update_bus_admin($data, $param2);
-        $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+        $this->session->set_flashdata("flash_message", get_phrase("bus_admin_updated_successfully"));
         redirect(base_url() . 'index.php?school_admin/bus_admin/', 'refresh');
     }
     if ($param1 == 'delete') {
         $data = array('bus_administrator_id' => $param2);
         $this->Bus_driver_modal->delete_bus_admin($data);
-        $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+        $this->session->set_flashdata('flash_message', get_phrase('bus_admin_deleted_successfully'));
         redirect(base_url() . 'index.php?school_admin/bus_admin/', 'refresh');
     }
     $page_data['bus_admins'] = $this->Bus_driver_modal->get_bus_admins();
@@ -7999,20 +8252,19 @@ function bus_driver($param1 = '', $param2 = '', $param3 = '') {
         redirect('login', 'refresh');
     $page_data = $this->get_page_data_var();
     $page_data['search_text'] = '';
-
     if ($param1 == 'create') {
-
         $this->form_validation->set_rules('name', 'Driver Name', 'trim|required');
         $this->form_validation->set_rules('phone', 'Phone', 'trim|required');
         //$this->form_validation->set_rules('password', 'Password', 'trim|required');
 
-        $this->form_validation->set_rules('phone', 'Phone Number', 'required|trim');
+        $this->form_validation->set_rules('phone', 'Phone Number', 'required|trim|is_unique[bus_driver.phone]');
         $this->form_validation->set_rules('bus_id', 'Bus', 'trim|required');
         $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[bus_driver.email]');
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('flash_message_error', validation_errors());
-            redirect(base_url() . 'index.php?school_admin/bus_driver/');
+        if ($this->form_validation->run() == FALSE) { 
+            $this->session->set_flashdata('flash_validation_error', validation_errors());
+            redirect(base_url() . 'index.php?school_admin/bus_driver/', 'refresh');
         } else {
+//            echo "suycess"; die;
             $data['name'] = $this->input->post('name');
             $data['email'] = $this->input->post('email');
             //$data['password']   =   sha1($this->input->post('password'));
@@ -8021,38 +8273,36 @@ function bus_driver($param1 = '', $param2 = '', $param3 = '') {
             $data['password'] = ($passcode != 'invalid') ? sha1($passcode) : '';
             $data['phone'] = $this->input->post('phone');
             $data['sex'] = $this->input->post('gender');
-            $data['bus_id'] = $this->input->post('bus_id');
-            $this->Bus_driver_modal->save_bus_driver($data);
+            $data['bus_id'] = $this->input->post('bus_id');            
 
+            if($data['phone'] != ''){
             $message = array();
             $message['messagge_body'] = "Welcome Mr " . $data['name'] . " <br>Your passcode for app is " . $passcode . "   <br>Download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
             $message['subject'] = "Your login details for " . CURRENT_INSTANCE . " School";
             $message['to_name'] = $data['name'];
             send_school_notification('new_user', $message, array($data['phone']), array($data['email']));
-
-
-            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-            //$this->Email_model->account_opening_email('parent', $data['email'], $this->input->post('password')); //SEND EMAIL ACCOUNT OPENING EMAIL
+               }
+            $this->Bus_driver_modal->save_bus_driver($data);
+            $this->session->set_flashdata('flash_message', get_phrase('bus_driver_added_successfully'));
             redirect(base_url() . 'index.php?school_admin/bus_driver/', 'refresh');
         }
     } else if ($param1 == 'edit') {
-
         $data['name'] = $this->input->post('name');
         $data['email'] = $this->input->post('email');
         $data['phone'] = $this->input->post('phone');
         $data['sex'] = $this->input->post('gender');
         $this->Bus_driver_modal->update_bus_driver($data, $param2);
-        $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+        $this->session->set_flashdata('flash_message', get_phrase('bus_driver_updated_successfully'));
         redirect(base_url() . 'index.php?school_admin/bus_driver/', 'refresh');
     } else if ($param1 == 'delete') {
         $data = array('bus_driver_id' => $param2);
         $this->Bus_driver_modal->delete_bus_driver($data);
-        $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+        $this->session->set_flashdata('flash_message', get_phrase('bus_driver_deleted_successfully'));
         redirect(base_url() . 'index.php?school_admin/bus_driver/', 'refresh');
     } else if (($param1 == 'toggle_enable') && ($param3 != '')) {
         $dataArray = array('bus_driver_id' => $param2, 'bus_driver_status' => $param3);
         if ($this->Bus_driver_modal->do_toggle_enable_bus_driver($dataArray)) {
-            $this->session->set_flashdata('flash_message', get_phrase(($param3 == 1) ? 'disabled_successfully' : 'enabled_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase(($param3 == 1) ? 'bus_driver_disabled_successfully' : 'bus_driver_enabled_successfully'));
             redirect(base_url() . 'index.php?school_admin/bus_driver/', 'refresh');
         }
     } else if ($param1 == 'import_excel') {
@@ -8060,7 +8310,7 @@ function bus_driver($param1 = '', $param2 = '', $param3 = '') {
         //pre($_FILES);die;
         if (empty($_FILES['userfile']['name'])) {
             $this->form_validation->set_rules('userfile', 'Document', 'required');
-            $this->session->set_flashdata('flash_message_error', 'Please select a document to upload!!');
+            $this->session->set_flashdata('flash_validation_error', 'Please select a document to upload!!');
             redirect(base_url() . 'index.php?school_admin/bulk_upload');
         } else {
             $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/zip');
@@ -8230,12 +8480,12 @@ function bus_driver($param1 = '', $param2 = '', $param3 = '') {
                     $file_name_with_path = 'uploads/bus_driver_bulk_upload_error_details_for_excel_file.xlsx';
                     @unlink($file_name_with_path);
                     create_excel_file($file_name_with_path, $errorExcelArr, 'Bus Driver Upload Data');
-                    $this->session->set_flashdata('flash_message_error', "Some rows are not uploaded,due to invalid data.");
+                    $this->session->set_flashdata('flash_validation_error', "Some rows are not uploaded,due to invalid data.");
                     redirect(base_url() . 'index.php?school_admin/bus_driver_bulk_upload_error', 'refresh');
                 }
             }//ends allowed type code
             else {
-                $this->session->set_flashdata('flash_message_error', 'Sorry, File extension is not supported, Please enter data in Excel Spread Sheet!!');
+                $this->session->set_flashdata('flash_validation_error', 'Sorry, File extension is not supported, Please enter data in Excel Spread Sheet!!');
                 redirect(base_url() . 'index.php?school_admin/bulk_upload');
             }
         }
@@ -8677,9 +8927,9 @@ function ptm_settings($param1 = '', $param2 = '') {
         $num_rows = $this->Parent_teacher_meeting_date_model->get_count($data);
         if (($num_rows) < 1) {
             $this->Parent_teacher_meeting_date_model->save_ptm($data);
-            $this->session->set_flashdata('flash_message', get_phrase('appointment_set_successfully!!'));
+            $this->session->set_flashdata('flash_message', get_phrase('appointment_set_successfully!'));
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('Date already taken for this class and section'));
+            $this->session->set_flashdata('flash_message_error', get_phrase('Date_already_taken_for_this_class_and_section'));
         }
         redirect(base_url() . 'index.php?school_admin/ptm_settings', 'refresh');
     }
@@ -8699,7 +8949,7 @@ function ptm_settings($param1 = '', $param2 = '') {
         $dataArray = array('meeting_date' => $new_date);
 
         if ($this->Parent_teacher_meeting_date_model->update_ptm($dataArray, $condition)) {
-            $this->session->set_flashdata('flash_message', get_phrase('date_changed_succesfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('ptm_settings_changed_succesfully'));
             redirect(base_url() . 'index.php?school_admin/ptm_settings/', 'refresh');
         } else {
             $this->session->set_flashdata('flash_message_error', get_phrase('could_not_update'));
@@ -8742,7 +8992,7 @@ function inventory_category($param1 = '', $param2 = '', $param3 = '') {
             //$data['categories_status'] = $_POST['categoriesStatus'];
             $sql = $this->Inventory_category_model->add($data);
             if ($sql === TRUE) {
-                $this->session->set_flashdata('flash_message', get_phrase('category_added'));
+                $this->session->set_flashdata('flash_message', get_phrase('inventory_category_added_successfully'));
             } else {
                 $this->session->set_flashdata('flash_message_error', get_phrase('error_while_editing_the_category'));
             }
@@ -8754,23 +9004,23 @@ function inventory_category($param1 = '', $param2 = '', $param3 = '') {
         $dataArray = array('categories_id' => $param2);
         $delete = $this->Inventory_category_model->deletebyId($dataArray);
         if ($delete == true) {
-            $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+            $this->session->set_flashdata('flash_message', get_phrase('inventory_category_deleted_successfully'));
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('data_not_deleted'));
+            $this->session->set_flashdata('flash_message_error', get_phrase('inventory_category_not_deleted'));
         }
         redirect(base_url() . 'index.php?school_admin/inventory_category/', 'refresh');
     }
     if ($param1 == 'do_update') {
-        $this->form_validation->set_rules('categoriesName', 'Category Name', 'required|trim|alpha');
+        $this->form_validation->set_rules('categoriesName', 'Category Name', 'required|trim');
         $this->form_validation->set_rules('categoriesStatus', 'Category Status', 'required|trim');
         if ($this->form_validation->run() == TRUE) {
-            if ($_POST) {
+            if ($_POST) { 
                 $data['categories_name'] = $this->input->post('categoriesName');
                 $data['categories_status'] = $this->input->post('categoriesStatus');
                 $categories_id = array('categories_id' => $param2);
                 $updated_data = $this->Inventory_category_model->updatebyId($data, $categories_id);
                 if ($updated_data === TRUE) {
-                    $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+                    $this->session->set_flashdata('flash_message', get_phrase('category_updated_successfully'));
                 } else {
                     $this->session->set_flashdata('flash_message_error', get_phrase('error_while_editing_the_category'));
                 }
@@ -8810,6 +9060,7 @@ function category_edit($param1 = "") {
     $id = $param1;
     $page_data = $this->get_page_data_var();
     $page_data['data'] = $this->Inventory_category_model->get_By_Id($id);
+//    pre($page_data['data']); 
     $page_data['page_title'] = get_phrase('edit_category');
     $page_data['page_name'] = 'category_edit';
     $page_data['total_notif_num'] = $this->get_no_of_notication();
@@ -8825,9 +9076,9 @@ function seller_master($param1 = '', $param2 = '', $param3 = '') {
         $dataArray = array('seller_id' => $param2);
         $delete = $this->Seller_model->deletebyId($dataArray);
         if ($delete == true) {
-            $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+            $this->session->set_flashdata('flash_message', get_phrase('inventory_seller_deleted_successfully'));
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('data_not_deleted'));
+            $this->session->set_flashdata('flash_message_error', get_phrase('inventory_seller_not_deleted'));
         }
         redirect(base_url() . 'index.php?school_admin/seller_master/', 'refresh');
     }
@@ -8849,7 +9100,7 @@ function seller_master($param1 = '', $param2 = '', $param3 = '') {
                     if (in_array($_FILES['attached_document']['type'], $types)) {
                         $ext = explode(".", $file_name);
                     } else {
-                        $this->session->set_flashdata('flash_message_error', get_phrase('Invalid attached file. Only allowed JPG, GIF, and PNG filetypes!!'));
+                        $this->session->set_flashdata('flash_message_error', get_phrase('Invalid_attached_file._Only_allowed_JPG,_GIF,_and_PNG_filetypes!!'));
                         redirect(base_url() . 'index.php?school_admin/seller_add/', 'refresh');
                     }
                 }
@@ -8874,7 +9125,7 @@ function seller_master($param1 = '', $param2 = '', $param3 = '') {
                 $seller_id = array('seller_id' => $param2);
                 $updated_data = $this->Seller_model->updatebyId($data, $seller_id);
                 if ($updated_data == TRUE) {
-                    $this->session->set_flashdata('flash_message', get_phrase('data_updated'));
+                    $this->session->set_flashdata('flash_message', get_phrase('inventory_seller_updated_successfully'));
                 } else {
                     $this->session->set_flashdata('flash_message_error', get_phrase('error_while_editing_the_seller_info'));
                 }
@@ -8897,6 +9148,7 @@ function seller_master($param1 = '', $param2 = '', $param3 = '') {
     }
     $page_data['data'] = $newArray;
     $page_data['page_title'] = get_phrase('seller_master');
+    $page_data['preview_title'] = get_phrase('Business_Card_Preview');
     $page_data['page_name'] = 'seller_master';
     $this->load->view('backend/index', $page_data);
 }
@@ -8934,7 +9186,7 @@ function seller_add() {
                 if (in_array($_FILES['attached_document']['type'], $types)) {
                     $ext = explode(".", $file_name);
                 } else {
-                    $this->session->set_flashdata('flash_message_error', get_phrase('Invalid attached file. Only allowed JPG, GIF, and PNG filetypes!!'));
+                    $this->session->set_flashdata('flash_message_error', get_phrase('Invalid_attached_file._Only_allowed_JPG,_GIF,_and_PNG_filetypes!!'));
                     redirect(base_url() . 'index.php?school_admin/seller_add/', 'refresh');
                 }
             }
@@ -8955,11 +9207,10 @@ function seller_add() {
                     }
                 }
 
-                $this->session->set_flashdata('flash_message', get_phrase('seller_info_added'));
+                $this->session->set_flashdata('flash_message', get_phrase('inventory_seller_added_successfully'));
             } else {
                 $this->session->set_flashdata('flash_message_error', get_phrase('error_while_adding'));
             }
-
             redirect(base_url() . 'index.php?school_admin/seller_master/', 'refresh');
         }
     } else {
@@ -9006,7 +9257,7 @@ function product($param1 = '', $param2 = '', $param3 = '') {
         }
          if ($product == TRUE) {
             //move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/student_image/' . $product_id . '.jpg');
-            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('product_added_successfully'));
             redirect(base_url() . 'index.php?school_admin/manage_product/', 'refresh');
         } 
         }
@@ -9021,18 +9272,22 @@ function product($param1 = '', $param2 = '', $param3 = '') {
         $data['product_unique_id'] = $this->input->post('productUniqueId');
         $data['rate'] = $this->input->post('rate');
         //$data['Quantity'] =1;
-        $categories_name = $this->input->post('category'); //echo $categories_name; exit;
-        $data['categories_id'] = $this->Seller_model->get_category($categories_name);
+        $categories_name = $this->input->post('categories_id'); //echo $categories_name; exit;
+        $data['categories_id'] = $this->Seller_model->get_category($categories_name);       
         $seller_name = $this->input->post('seller');
         $data['seller_id'] = $this->Seller_model->get_seller_name($seller_name);
         $data['status'] = $this->input->post('status');
+        $data['purchase_date'] = $this->input->post('purchase_date');
+        $data['bill_number'] = $this->input->post('bill_number');
+        $data['bill_date'] = $this->input->post('bill_date');
+        $data['purchase_mode'] = $this->input->post('purchase_mode');
         //$img = $_FILES['userfile']['name'];
         //$data['product_image'] = $img;
         $product_id = array('product_id' => $param2);
         $updated_data = $this->Inventory_product_model->updatebyId($data, $product_id);
         if ($updated_data == TRUE) {
             //move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/student_image/' . $product_id . '.jpg');
-            $this->session->set_flashdata('flash_message', get_phrase('data_edited_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('product_edited_successfully'));
         } else {
             $this->session->set_flashdata('flash_message', get_phrase('error_while_editing_data'));
         }
@@ -9043,9 +9298,9 @@ function product($param1 = '', $param2 = '', $param3 = '') {
         $dataArray = array('product_id' => $param2);
         $delete = $this->Inventory_product_model->deletebyId($dataArray);
         if ($delete == true) {
-            $this->session->set_flashdata('flash_message', get_phrase('data_deleted'));
+            $this->session->set_flashdata('flash_message', get_phrase('product_deleted_successfully'));
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('data_not_deleted'));
+            $this->session->set_flashdata('flash_message_error', get_phrase('product_not_deleted'));
         }
         redirect(base_url() . 'index.php?school_admin/manage_product/', 'refresh');
     }
@@ -9063,7 +9318,7 @@ function product($param1 = '', $param2 = '', $param3 = '') {
         $service_id = $this->Inventory_product_service_model->add($dataArr);
         $this->Inventory_product_history_model->add(array('product_id' => $param2, 'current_history_type' => 2, 'added_on' => date('y-m-d H:i:s'), 'history_type_id' => $service_id));
         $product = $this->Inventory_product_model->updatebyId($data, $product_id);
-        $this->session->set_flashdata('flash_message', 'Product send for service sucessfully');
+        $this->session->set_flashdata('flash_message', get_phrase('Product_send _for_service_successfully'));
         redirect(base_url() . 'index.php?school_admin/manage_product/', 'refresh');
     }
     if ($param1 == "return_product_service") {
@@ -9076,7 +9331,7 @@ function product($param1 = '', $param2 = '', $param3 = '') {
         $service_data['reason_for_service'] = $this->input->post('reason');
         $service_data['return_from_service'] = date('Y-m-d H:i:s');
         $this->Inventory_product_service_model->updatebyId($service_id, $service_data);
-        $this->session->set_flashdata('flash_message', 'Product return from service sucessfully');
+        $this->session->set_flashdata('flash_message', get_phrase('Product_return_from_service_successfully'));
         redirect(base_url() . 'index.php?school_admin/manage_product/', 'refresh');
     }
 }
@@ -9123,7 +9378,7 @@ function inventory_edit_product() {
     $id = $this->uri->segment(3);
     $page_data = $this->get_page_data_var();
     $page_data['product'] = $this->Inventory_product_model->get_By_Id($id);
-//    pre($page_data['product']); die;
+    //pre($page_data['product']); die;
     $page_data['categories'] = $this->Inventory_category_model->get_all();
        
     $page_data['seller'] = $this->Seller_model->get_all();
@@ -9148,7 +9403,7 @@ function inventory_edit_product() {
 
 function validate_dynamic($form_id = null) {
     $this->load->model('Dynamic_field_model');
-
+    
     if (empty($form_id))
         return;
     $this->load->model('Dynamic_field_model');
@@ -9160,13 +9415,17 @@ function validate_dynamic($form_id = null) {
     $arrLabel = array();
     $arrValidation = array();
     $arrValidationType = array();
-
+    // validation m for mandatory
+    // validation o for optional
+    
     foreach ($groups as $row) {
         $i = 0;
         $group_id = $row['id'];
         $arrFields = $this->Dynamic_field_model->getDynamicFields($group_id);
+        //pre($arrFields);exit;
         foreach ($arrFields as $field) {
             $db_field = $field['db_field'];
+ 
             $required_validation = '';
             $validation_message = '';
             if (!empty($field['place_holder']))
@@ -9181,7 +9440,13 @@ function validate_dynamic($form_id = null) {
                 if (strtolower($field['validation_type']) == "numeric") {
                     $required_validation .= "|numeric";
                 }
-                $this->form_validation->set_rules($field['db_field'], $validation_message, $required_validation);
+                
+                if($db_field=='parent_id' && $form_id==1){
+                    $this->form_validation->set_rules('parent', $validation_message, $required_validation);
+                }else{
+                    $this->form_validation->set_rules($field['db_field'], $validation_message, $required_validation);
+                }
+                
             }
         }
     }
@@ -9195,71 +9460,30 @@ function parent_add($param1 = '') {
     $page_data['total_notif_num'] = $this->get_no_of_notication();
     if ($param1 == 'create') {
         $form_id = 2;
+       
         $this->validate_dynamic($form_id);
-
         if ($this->form_validation->run() == TRUE) {
-            $data['father_name']    = $this->input->post('father_name');
-            $data['father_mname']   = $this->input->post('father_mname');
-            $data['father_lname'] = $this->input->post('father_lname');
-            $data['mother_name'] = $this->input->post('mother_name');
-            $data['mother_mname'] = $this->input->post('mother_mname');
-            $data['mother_lname'] = $this->input->post('mother_lname');
-            $data['email'] = $this->input->post('email');
-            if(!$data['email']){
-                $instance_name = $this->Crud_model->get_instance_name();
-                $data['email'] = $this->input->post('cell_phone').'@'.$instance_name.'.com';  
-            }
-            //$data['password'] = sha1($passcode);
-            $data['father_profession'] = $this->input->post('father_profession');
-            $data['mother_profession'] = $this->input->post('mother_profession');
-            $data['father_qualification'] = $this->input->post('father_qualification');
-            $data['mother_quaification'] = $this->input->post('mother_quaification');
-            $data['father_passport_number'] = $this->input->post('father_passport_number');
-            $data['mother_passport_number'] = $this->input->post('mother_passport_number');
-            $data['father_icard_no'] = $this->input->post('father_icard_no');
-            $data['father_icard_type'] = $this->input->post('father_icard_type');
-            $data['mother_icard_no'] = $this->input->post('mother_icard_no');
-            $data['mother_icard_type'] = $this->input->post('mother_icard_type');
-            $data['address'] = $this->input->post('address');
-            $data['city'] = $this->input->post('city');
-            $data['state'] = $this->input->post('state');
-            $data['country'] = $this->input->post('country');
-            $data['zip_code'] = $this->input->post('zip_code');
-            $data['cell_phone'] = $this->input->post('cell_phone');
-            $data['home_phone'] = $this->input->post('home_phone');
-            $data['work_phone'] = $this->input->post('work_phone');
-            $data['date_time'] = date('Y-m-d H:i:s');
-            $data['isActive'] = '1';
-            //$data['passcode'] = $passcode; /// generaate 8 design number 
-            $passcode = create_passcode('parent');
-            $data['passcode'] = ($passcode != 'invalid') ? $passcode : '';
-            $data['password'] = ($passcode != 'invalid') ? sha1($passcode) : '';
-
-            //add Guardian details
-            $data_guardian['guardian_fname'] = $this->input->post('guardian_fname');
-            $data_guardian['guardian_lname'] = $this->input->post('guardian_lname');
-            $data_guardian['guardian_profession'] = $this->input->post('guardian_profession');
-            $data_guardian['guardian_address'] = $this->input->post('guardian_address');
-            $data_guardian['guardian_email'] = $this->input->post('guardian_email');
-            $data_guardian['guardian_relation'] = $this->input->post('guardian_relation');
-            $data_guardian['guardian_emergency_number'] = $this->input->post('guardian_emergency_number');
-            $data_guardian['guardian_date_created'] = date('Y-m-d H:i:s');
-            $data_guardian['guardian_isActive'] = '1';
-            $parent_id = $this->Parent_model->save_parent($data);
+            
+            $arrData = $this->get_dynamic_form_data($form_id);
+            $arrGuardianData = $this->get_dynamic_form_data($form_id, 1);
+            $parent_id = $this->Crud_model->save_dynamic_data('parent', $arrData);
+            $arrGuardianData['parent_id'] = $parent_id;
+            $this->Crud_model->save_dynamic_data('guardian', $arrGuardianData);
             if ($parent_id) {
-                $msg = "Welcome Mr " . $data['father_name'] . " your passcode for app is " . $passcode . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
+                $msg = "Welcome Mr " . $arrData['father_name'] . " your passcode for app is " . $arrData['passcode'] . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
                 $message = array();
                 $message['sms_message'] = $msg;
                 $message['subject'] = "Welcome " . $this->globalSettingsSystemName;
                 $message['messagge_body'] = $msg;
-                $message['to_name'] = $data['father_name'] . " " . $data['father_lname'];
-                send_school_notification('new_user', $message, array($data['cell_phone']), array($data['email']));
+                $message['to_name'] = $arrData['father_name'] . " " . $arrData['father_lname'];
+                send_school_notification('new_user', $message, array($arrData['cell_phone']), array($arrData['email']));
 
-                $data_guardian['parent_id'] = $parent_id;
-                $this->Guardian_model->insert_guardian($data_guardian);
+                //$data_guardian['parent_id'] = $parent_id;
+                //$this->Guardian_model->insert_guardian($data_guardian);
             } else {
                 echo "Unbale to insert guardian details!!";
             }
+            
             $this->session->set_flashdata('flash_message', get_phrase('parent_details_added_successfully'));
 
 
@@ -9272,6 +9496,12 @@ function parent_add($param1 = '') {
             foreach ($arr as $key => $value) {
                 $page_data[$key] = $value;
             }
+            $arrPost = array();
+            foreach($_POST as $key => $value)
+            {
+                $arrPost[$key] = $value;
+            }
+            $page_data['arrPost'] =     $arrPost;
             $page_data['total_notif_num'] = $this->get_no_of_notication();
             $page_data['msg'] = validation_errors();
             $page_data['page_title'] = get_phrase('add_parent_details');
@@ -9286,6 +9516,12 @@ function parent_add($param1 = '') {
         foreach ($arr as $key => $value) {
             $page_data[$key] = $value;
         }
+        $arrPost = array();
+            foreach($_POST as $key => $value)
+            {
+                $arrPost[$key] = $value;
+            }
+            $page_data['arrPost'] =     $arrPost;
         $page_data['total_notif_num'] = $this->get_no_of_notication();
         $page_data['page_title'] = get_phrase('add_parent_details');
         $page_data['page_name'] = 'parent_add_new';
@@ -9299,7 +9535,7 @@ function set_dynamic_form($form_id) {
     $arrFields = array();
 
     $groups = $this->Dynamic_field_model->getDynamicGroup($form_id);
-
+    $arrFieldValues  = array();
     $arrGroups = array();
     $arrDbField = array();
     $arrDynamic = array();
@@ -9310,6 +9546,8 @@ function set_dynamic_form($form_id) {
     $arrAjaxEvent = array();
     $arrMin = array();
     $arrMax = array();
+    $arrFields = array();
+    $arrFieldsType = array();
     foreach ($groups as $row) {
         $i = 0;
         $group_id = $row['id'];
@@ -9321,10 +9559,10 @@ function set_dynamic_form($form_id) {
         $arrGroups[$group_id] = $group_name . "||||" . $group_image . "||||" . $group_intro . "||||" . $section_name . "||||" . $is_active;
         $arrFields = $this->Dynamic_field_model->getDynamicFields($group_id);
 
-
         foreach ($arrFields as $field) {
-
             $db_field = $field['db_field'];
+            $this->field[$db_field] = $db_field;
+            $arrFields[] = $db_field;
             $arrDbField[$group_id . "_" . $i] = $db_field;
             $arrLabel[$group_id][$db_field] = $field['label'];
             $arrMin[$group_id][$db_field] = $field['min_length'];
@@ -9332,14 +9570,26 @@ function set_dynamic_form($form_id) {
             $arrAjaxEvent[$group_id][$db_field] = $field['ajax_event'];
             $arrValidation[$group_id][$db_field] = $field['validation'] . "?" . $field['validation_type'];
             $arrFieldValue[$group_id][$db_field] = $field['field_type'] . "?" . $field['field_values'];
+            $this->field[$db_field] = $field['field_type'] . "?" . $field['field_values'];
+            //$this->field[$db_field] = 
             $arrClass[$group_id][$db_field] = $field['image'];
             $arrPlaceHolder[$group_id][$db_field] = $field['place_holder'];
+            $arrFieldsType[$db_field] = $field['field_type'];
+            $arrFieldValues[$db_field] = $field['field_values'];
             $i++;
             if (strtolower($field['field_values']) == "query") {
                 if (empty($field['field_where']))
                     $field['field_where'] = " 1 = 1";
-                $result = $this->Dynamic_field_model->getDynamicQuery($field['field_table'], $field['field_select'], $field['field_where']);
 
+                if($db_field=='scholarship_id'){
+                    if(sett('new_fi')){
+                        $field['field_table'] = 'fee_scholarships';
+                        $field['field_select'] = 'id,name';   
+                    }
+                    $result = $this->Dynamic_field_model->getDynamicQuery($field['field_table'], $field['field_select'], $field['field_where']); 
+                }else{
+                    $result = $this->Dynamic_field_model->getDynamicQuery($field['field_table'], $field['field_select'], $field['field_where']);
+                }    
                 $field_split = explode(",", $field['field_select']);
 
                 foreach ($result as $row) {
@@ -9350,18 +9600,19 @@ function set_dynamic_form($form_id) {
         }
     }
     $arrVariable = array();
-    $arrVariable['arrDynamic'] = $arrDynamic;
-    $arrVariable['arrGroups'] = $arrGroups;
-    $arrVariable['arrLabel'] = $arrLabel;
-    $arrVariable['arrAjaxEvent'] = $arrAjaxEvent;
-    $arrVariable['arrValidation'] = $arrValidation;
-    $arrVariable['arrFieldValue'] = $arrFieldValue;
-    $arrVariable['arrFieldQuery'] = $arrFieldQuery;
-    $arrVariable['arrDbField'] = $arrDbField;
-    $arrVariable['arrClass'] = $arrClass;
-    $arrVariable['arrPlaceHolder'] = $arrPlaceHolder;
-    $arrVariable['arrMin'] = $arrMin;
-    $arrVariable['arrMax'] = $arrMax;
+    $arrVariable['arrFields']       = $arrFields;
+    $arrVariable['arrDynamic']      = $arrDynamic;
+    $arrVariable['arrGroups']       = $arrGroups;
+    $arrVariable['arrLabel']        = $arrLabel;
+    $arrVariable['arrAjaxEvent']    = $arrAjaxEvent;
+    $arrVariable['arrValidation']   = $arrValidation;
+    $arrVariable['arrFieldValue']   = $arrFieldValue;
+    $arrVariable['arrFieldQuery']   = $arrFieldQuery;
+    $arrVariable['arrDbField']      = $arrDbField;
+    $arrVariable['arrClass']        = $arrClass;
+    $arrVariable['arrPlaceHolder']  = $arrPlaceHolder;
+    $arrVariable['arrMin']          = $arrMin;
+    $arrVariable['arrMax']          = $arrMax;
     return $arrVariable;
 }
 
@@ -9394,114 +9645,81 @@ function admission_enquiry() {
     $page_data = $this->get_page_data_var();
     $form_id = 3;
     $this->validate_dynamic($form_id);
-    if ($this->form_validation->run() == TRUE) {
-        $admit_data['admission_form_id'] = $this->Enquired_students_model->genertate_random_admission_form_id();
-        $admit_data['student_fname'] = $this->input->post('student_fname');
-        $admit_data['student_lname'] = $this->input->post('student_lname');
-        $admit_data['parent_fname'] = $this->input->post('parent_fname');
-        $admit_data['parent_lname'] = $this->input->post('parent_lname');
-        $admit_data['class_id'] = $this->input->post('class');
+    if ($this->form_validation->run() == TRUE) 
+        {
+            $school_id = (!empty($_SESSION['school_id'])) ? $_SESSION['school_id'] : '';
+            $arrData = $this->get_dynamic_form_data($form_id);
+            $arrData['school_id'] = $school_id;
+            //$arrSave['create_date'] = date('Y-m-d H:i:s');
+            $arrGuardianData = $this->get_dynamic_form_data($form_id, 1);
+            $arrGuardianData['school_id'] = $school_id;
+            $insert_id = $this->Crud_model->save_dynamic_data('guardian', $arrGuardianData);
+        
+            $arrData['guardian_id'] = $insert_id; 
+            $arrData['admission_form_id'] = $this->Enquired_students_model->genertate_random_admission_form_id();
+            $parent_id = $this->Crud_model->save_dynamic_data('enquired_students', $arrData);
 
-        /* $running_year = $this->Setting_model->get_setting_record(array('type' => 'running_year'), 'description');
-          if (is_class_available_for_admission($admit_data['class_id'], $running_year) == 0) {
-          $this->session->set_flashdata('flash_message', get_phrase('maximum_capacity_of_students_exceeded!!'));
-          redirect(base_url() . 'index.php?school_admin/admission_enquiry', 'refresh');
-          } else if (is_class_available_for_admission($admit_data['class_id'], $running_year) == 1) {
-
-          } */
-        //$this->session->set_flashdata('flash_message', get_phrase('student_admitted'));
-        $bday = $this->input->post('birthday');
-        $admit_data['birthday'] = date('Y-m-d', strtotime($bday));
-        $admit_data['address'] = $this->input->post('address');
-        $admit_data['address_second'] = $this->input->post('address2');
-        $admit_data['city'] = $this->input->post('city');
-        $admit_data['region'] = $this->input->post('region');
-        $admit_data['zip_code'] = $this->input->post('zip_code');
-        $admit_data['country'] = $this->input->post('country');
-        $admit_data['user_email'] = $this->input->post('user_email');
-        $admit_data['mobile_number'] = $this->input->post('mobile_number');
-        $admit_data['phone'] = $this->input->post('phone');
-        $admit_data['work_phone'] = $this->input->post('work_phone');
-        //$admit_data['advance'] = $this->input->post('advance');
-        //$admit_data['transport'] = $this->input->post('transport');           
-        $admit_data['mother_fname'] = $this->input->post('mother_fname');
-        $admit_data['mother_lname'] = $this->input->post('mother_lname');
-        $admit_data['previous_class'] = $this->input->post('previous_class');
-        $admit_data['previous_school'] = $this->input->post('previous_school');
-        $admit_data['previous_result'] = $this->input->post('previous_result');
-        $admit_data['caste_category'] = $this->input->post('category');
-        $admit_data['gender'] = $this->input->post('gender');
-        $admit_data['create_date'] = date("Y-m-d H:i:s");
-        $admit_data['annual_salary'] = $this->input->post('annual_salary');
-        $admit_data['media_consent'] = $this->input->post('media_consent');
-        $admit_data['blood_group'] = $this->input->post('blood_group');
-        $admit_data['emirates_id'] = $this->input->post('emirates_id');
-        $admit_data['visa_no'] = $this->input->post('visa_no');
-        $admit_data['visa_expiry_date'] = $this->input->post('visa_expiry_date');
-        $admit_data['passport_expiry_date'] = $this->input->post('passport_expiry_date');
-        $admit_data['allergies'] = $this->input->post('allergies');
-        //$admit_data['receipt_no'] = $this->input->post('receipt_no');
-        //$admit_data['govt_admission_code'] = $this->input->post('govt_admission_code');
-        //$admit_data['form_no'] = $this->input->post('form_no');
-        //add Guardian details
-        $data_guardian['guardian_fname'] = $this->input->post('guardian_first_name');
-        $data_guardian['guardian_lname'] = $this->input->post('guardian_last_name');
-        $data_guardian['guardian_profession'] = $this->input->post('guradian_profession');
-        $data_guardian['guardian_address'] = $this->input->post('guardian_address');
-        $data_guardian['guardian_email'] = $this->input->post('guradian_email');
-        $data_guardian['guardian_relation'] = $this->input->post('guradian_relation');
-        $data_guardian['guardian_emergency_number'] = $this->input->post('guardian_emergency_number');
-        $data_guardian['guardian_date_created'] = date('Y-m-d H:i:s');
-        $data_guardian['guardian_isActive'] = '1';
-//pre($data_guardian); die;
-        $guardian_id = $this->Guardian_model->insert_guardian($data_guardian);
-        if ($guardian_id) {
-            $admit_data['guardian_id'] = $guardian_id;
-            $this->Enquired_students_model->save_enquired_student($admit_data);
-
-            //Sending msg after submitting enquiry form
-            $msg = "Welcome Mr. " . $admit_data['parent_fname'] . " enquiry form for your ward has been submitted successfully!";
+        if($insert_id)
+        {    
+            $msg = "Welcome Mr. " . $arrData['parent_fname'] . " enquiry form for your ward has been submitted successfully!";
             $message = array();
             $message['sms_message'] = $msg;
             $message['subject'] = "Welcome " . $this->globalSettingsSystemName;
-            $message['messagge_body'] = "Welcome Mr. " . $admit_data['parent_fname'] . " enquiry form for your ward has been submitted successfully!";
-            send_school_notification('new_user', $message, array($admit_data['mobile_number']), array($admit_data['user_email']));
+            $message['messagge_body'] = "Welcome Mr. " . $arrData['parent_fname'] . " enquiry form for your ward has been submitted successfully!";
+            send_school_notification('new_user', $message, array($arrData['mobile_number']), array($arrData['user_email']));
 
             $this->session->set_flashdata('flash_message', get_phrase('enquiry_form_submitted_succesfully!!'));
             redirect(base_url() . 'index.php?school_admin/admission_enquiry/');
-        } else {
+        } 
+        
+        else 
+        {
             $this->session->set_flashdata('flash_message', get_phrase('some_error_ocured!!'));
             $arr = array();
             $form_id = 3;
             $arr = $this->set_dynamic_form($form_id);
-            foreach ($arr as $key => $value) {
+            foreach ($arr as $key => $value) 
+            {
                 $page_data[$key] = $value;
             }
+            $arrPost = array();
+            foreach($_POST as $key => $value)
+            {
+                $arrPost[$key] = $value;
+            }
+            $page_data['arrPost'] =     $arrPost;
+            
         }
-    } else {
-        $this->session->set_flashdata('flash_validation_error', validation_errors());
-        $res_array = $settingsDataArr = $this->Class_model->get_data_by_cols('class_id', array('name' => 'LKG'), 'result_array');
-        // print_r($res_array);
-        if (!empty($res_array)) {
-            $page_data['class_id'] = $res_array[0]['class_id'];
-        }
-        //$this->config->load('country_list', true);
-        //$country_name = $this->config->item('countries', 'country_list');
+       }   
+     else {
+            $this->session->set_flashdata('flash_validation_error', validation_errors());
+            $res_array = $settingsDataArr = $this->Class_model->get_data_by_cols('class_id', array('name' => 'LKG'), 'result_array');
+            // print_r($res_array);
+            if (!empty($res_array)) {
+                $page_data['class_id'] = $res_array[0]['class_id'];
+            }
+            
+    
         $page_data['class_id_nursery'] = $this->Class_model->get_data_by_cols('class_id', array('name' => 'Nursery'), 'result_array');
         $page_data['page_name'] = 'admission_enquiry';
         $page_data['page_title'] = get_phrase('school_admission_form');
         $class_array = $this->Class_model->get_class_array();
-        //$grade_array = $this->Class_model->get_grade_array();
-        //$page_data['grade'] = $grade_array;
         $page_data['classes'] = $class_array;
-        //$page_data['countries'] = $country_name;
         $arr = array();
         $form_id = 3;
         $arr = $this->set_dynamic_form($form_id);
+        
         foreach ($arr as $key => $value) {
             $page_data[$key] = $value;
         }
-        $page_data['CountryList'] = get_country_list();
+        $arrPost = array();
+        foreach($_POST as $key => $value)
+        {
+                $arrPost[$key] = $value;
+        }
+        $page_data['arrPost'] =     $arrPost;
+        
+         $page_data['CountryList'] = get_country_list();
         $page_data['page_title'] = get_phrase('school_admission_form');
         $page_data['page_name'] = 'admission_enquiry';
         $page_data['total_notif_num'] = $this->get_no_of_notication();
@@ -9753,7 +9971,7 @@ function inventory_allotment($param1 = '', $param2 = '', $param3 = '') {
                 $product = $this->Inventory_product_model->updatebyId($data1, $product_id);
                 $this->Inventory_product_history_model->add(array('product_id' => $param2, 'current_history_type' => 1, 'added_on' => date('y-m-d H:i:s'), 'history_type_id' => $allotment_id));
                 if ($product == TRUE) {
-                    $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+                    $this->session->set_flashdata('flash_message', get_phrase('Product_alloted_successfully'));
                 } else {
                     $this->session->set_flashdata('flash_message', get_phrase('error_while_adding_data'));
                 }
@@ -9828,8 +10046,8 @@ function manage_admission($param1 = '') {
         $grade = $this->input->post('grade');
         $transport = $this->input->post('transport');
         $route_id = $this->input->post('route_id');
+		$mess_id = $this->input->post('mess_id');
         if (!empty($student_id)) {
-            //echo '<pre>--';print_r($_POST);exit;
             $condition = array('student_id' => $student_id);
             $data_array = array('class_id' => $class_id, 'section_id' => $section_id);
             $this->Student_model->update_enroll($data_array, $condition);
@@ -9846,46 +10064,61 @@ function manage_admission($param1 = '') {
             }
 
             $this->Student_model->update_student($data_array1, $condition);
-            /*             * ********************************student add start in fi ******************************** */
-            $student_det = $this->Student_model->get_student_details($student_id);
-            if (!empty($student_det)) {
-                if ($stud_image)
-                    $data3['img'] = $stud_image;
-
-                $data3['id'] = $student_det->student_id;
-                $data3['account'] = $student_det->name;
-                $data3['fname'] = '';
-                $data3['company'] = $student_det->father_name . " " . $student_det->father_lname;
-                $data3['lname'] = $student_det->lname;
-                $data3['gid'] = $student_det->class_id;
-                $data3['section_id'] = $section_id;
-                $data3['email'] = $student_det->email;
-                $data3['address'] = ($student_det->address == "") ? "dummy addrress" : $student_det->address;
-                $data3['phone'] = ($student_det->phone == "") ? 'dummy phone' : $student_det->phone;
-                $data3['city'] = ($student_det->location == "") ? 'dummy city' : $student_det->location;
-                $data3['password'] = $student_det->student_pass;
-                $this->Student_model->create_finance_customer_account($data3);
-            } else {
-                $finance_error_msg = get_phrase('student_details_not_found');
-            }
-
-            /*             * ********************************student add end in fi******************************** */
-            //$this->fi_functions->save_invoice($student_id[$i]);
+            /*********************************student add start in fi *********************************/
             $running_year = $this->globalSettingsRunningYear;
             $tution_fee_det = $this->fi_functions->get_fee_detailsbygroup($class_id);
-            if ($tution_fee_det)
-                $tution_fee_id = $tution_fee_det['id'];
-            else
-                $tution_fee_id = 0;
-
+            $tution_fee_id = ($tution_fee_det)?$tution_fee_det['id']:0;
+			$room_id = $this->input->post('room_id');
             $scholarship_id = $this->input->post('scholarship_id');
             $hostfee_inst_type = $this->input->post('hostfee_inst_type');
             $transpfee_inst_type = $this->input->post('transpfee_inst_type');
             $tutionfee_inst_type = $this->input->post('tutionfee_inst_type');
             $dormitory_fee_id = $this->input->post('dormitory_fee_id');
             $transport_fee_id = $this->input->post('transport_fee_id');
-            
-            if(!sett('new_fi')){
+			$dormitory_id = $this->input->post('dormitory_id');
+            $route_id = $this->input->post('route_id');
+            $bus_stop_id = $this->input->post('transport_id');
+			$mess_id = $this->input->post('mess_id');
+            $student_det = $this->Student_model->get_student_details($student_id);
+            //echo '<pre>';print_r($student_det);exit;
+            if(sett('new_fi')){
+                $this->load->model('fees/Fees_model');
+                $fee_stu_config = array(
+                    'student_id' => $student_id,
+                    'running_year' => _getYear(),
+                    'school_term_id' => $tutionfee_inst_type,
+                    'room_id' => $dormitory_fee_id,
+                    'hostel_term_id' => $hostfee_inst_type,
+                    'route_stop_id' => $transport_fee_id,
+                    'transport_term_id' => $transpfee_inst_type,
+                    'scholarship_id' => $scholarship_id,
+					'mess_management_id' => $mess_id,
+                    'school_id' => _getSchoolid(),
+                    'created' => date('Y-m-d H:i:s')
+                );
+                $this->Fees_model->save_stu_config($fee_stu_config);
+            }else{
+                if (!empty($student_det)) {
+                    if ($stud_image)
+                        $data3['img'] = $stud_image;
+
+                    $data3['id'] = $student_det->student_id;
+                    $data3['account'] = $student_det->name;
+                    $data3['fname'] = '';
+                    $data3['company'] = $student_det->father_name . " " . $student_det->father_lname;
+                    $data3['lname'] = $student_det->lname;
+                    $data3['gid'] = $student_det->class_id;
+                    $data3['section_id'] = $section_id;
+                    $data3['email'] = $student_det->email;
+                    $data3['address'] = ($student_det->address == "") ? "dummy addrress" : $student_det->address;
+                    $data3['phone'] = ($student_det->phone == "") ? 'dummy phone' : $student_det->phone;
+                    $data3['city'] = ($student_det->location == "") ? 'dummy city' : $student_det->location;
+                    $data3['password'] = $student_det->student_pass;
+                    $this->Student_model->create_finance_customer_account($data3);
+                } else {
+                    $finance_error_msg = get_phrase('student_details_not_found');
+                }  
+
                 $finance_det = array(
                     'student_id' => $student_id,
                     'academic_year' => $running_year,
@@ -9900,32 +10133,34 @@ function manage_admission($param1 = '') {
                 );
 
                 $finance_stud_config = $this->Student_model->add_student_fee_det($finance_det);
-            }else{
-                $this->load->model('fees/Fees_model');
-                $fee_stu_config = array(
-                    'student_id' => $student_id,
-                    'running_year' => _getYear(),
-                    'school_term_id' => $tutionfee_inst_type,
-                    'room_id' => $dormitory_fee_id,
-                    'hostel_term_id' => $hostfee_inst_type,
-                    'route_stop_id' => $transport_fee_id,
-                    'transport_term_id' => $transpfee_inst_type,
-                    'scholarship_id' => $scholarship_id,
-                    'school_id' => _getSchoolid(),
-                    'created' => date('Y-m-d H:i:s')
-                );
-                $this->Fees_model->save_stu_config($fee_stu_config);
+                //creating invoice for student tution fee,hostel fee,hostelfee
+                $this->generate_admission_invoice($student_id);
             }
-
-            
             $this->Enquired_students_model->update_enquiry(array('counselling' => '1'), $condition);
 
-            //creating invoice for student tution fee,hostel fee,hostelfee
-            $this->generate_admission_invoice($student_id);
+            //Manage Transport Allocation
+            if($transpfee_inst_type && $transport_fee_id){
+                $save_bus_allocation = array('student_id' => $student_id,
+                                             'enroll_code' => $student_det->enroll_code,
+                                             'route_id' => $route_id,
+                                             'bus_stop_id' => $bus_stop_id,
+                                             'start_date' => date('Y-m-d'),
+                                             'school_id' => _getSchoolid());
+                $this->db->insert('student_bus_allocation',$save_bus_allocation);
+            }
+
+            //Manage Dormitory Allocation
+            $hostel_details= $this->Dormitory_model->get_dormitory_array(array('hostel_id'=>$dormitory_id));
+            pre($hostel_details);
+            $save_hostel_allocation = array('student_id' => $student_id,
+                                            'hostel_id' =>$dormitory_id,
+                                            'room_no' => $room_no,
+                                            'mess_management_id',$mess_id);
+			$this->Dormitory_model->add($save_hostel_allocation);
+			
             //Sending message after student submission
             $parentDetail = $this->Student_model->getParentOfStudent($student_id);
-            //echo '<pre>';print_r($parentDetail);exit;
-            $msg = "Congratulations Mr. " . $parentDetail[0]['father_name'] . " admission process for your ward " . $student_det->name . " has been completed successfully!";
+            $msg = "Congratulations Mr. ".$parentDetail[0]['father_name']." admission process for your ward ".$student_det->name." has been completed successfully!";
             $message = array();
             $message['sms_message'] = $msg;
             $message['subject'] = "Welcome " . $this->globalSettingsSystemName;
@@ -9964,7 +10199,6 @@ function get_students_for_admission($class_id_from, $section_id_from = "", $clas
     $page_data['total_notif_num'] = $this->get_no_of_notication();
 
     $page_data['applied_students_list'] = $appliedStudentsList;
-
     $this->load->view('backend/school_admin/admission_selector', $page_data);
 }
 
@@ -10239,6 +10473,8 @@ function counselling($param1 = '') {
     //die($msg);die;
     $row = $this->Student_model->get_parent_id_by_student($param1);
     $student = $this->Student_model->get_students_records($dataArray);
+    $this->Student_model->update_enquired_student($param1,array('counselling'=>1));
+
     $main_date = $this->input->post('date');
     $date = date('Y-m-d', strtotime($main_date));
     $time = date('H:i', strtotime($main_date)); //$this->input->post('time');
@@ -10282,7 +10518,7 @@ function student_overview() {
         $page_data['total_notif_num'] = $this->get_no_of_notication();
         //echo '<pre>';print_r($page_data['total_notif_num'] );exit;
         $page_data['page_name'] = 'student_overview';
-        $page_data['page_title'] = get_phrase('student_enquiry_and_enroll_overview');
+        $page_data['page_title'] = get_phrase('enquiry_form_fees');
 
         if (count($page_data['enquired_students'])) {
             foreach ($page_data['enquired_students'] as $k => $enquired):
@@ -10317,7 +10553,6 @@ function regenerate_passcode_parent($param1 = '') {
     $message = "Welcome Mr " . $parent->father_name . " your passcode for app is " . $data['passcode'] . "   download app here https://play.google.com/store/apps/details?id=" . $this->globalSettingsAppPackageName . "&hl=en";
     $phone_number = array($parent->cell_phone);
      if ($phone_number != "") {
-         echo 
         send_school_notification('update_passcode', $message, $phone_number);
     }
     if ($parent->email != "") {
@@ -10334,7 +10569,7 @@ function regenerate_passcode_parent($param1 = '') {
         send_school_notification('update_passcode', $message, '', $email);
     }
 
-    $this->session->set_flashdata('flash_message', get_phrase('message_sent_successfully'));
+    $this->session->set_flashdata('flash_message', get_phrase('passcode_has_been_sent_to_parent_successfully.'));
     redirect(base_url() . 'index.php?school_admin/parent/', 'refresh');
 }
 
@@ -10403,7 +10638,7 @@ function notification_dashboard() {
     $submit = $this->input->post('submit');
     $input_values = $this->input->post();
     $page_data = $this->get_page_data_var();
-    if ($submit == 'submit') {
+    if ($submit == 'Submit') {
         foreach ($records as $key => $value) {
             $activity = $value['activity'];
 
@@ -10498,6 +10733,402 @@ function guardian_details($param1 = '') {
     $this->load->view('backend/index', $page_data);
 }
 
+/******************************Save Dynamic form *********************************/
+function add_field_to_database($table, $key)
+{
+    //echo "<br>we are her table is $table and key is $key and field is:".$this->field[$key]; 
+    if(strstr($this->field[$key], "?")){
+        $arrField           =        explode("?", $this->field[$key]);
+        $field_type         =       (!empty($arrField[0])) ? $arrField[0] : "";
+        $field_values       =       (!empty($arrField[1])) ? $arrField[1] : "";
+     } 
+        switch($field_type)
+        {
+            case 'text':
+            case 'tel':
+            case 'email':
+            case 'date':    
+                $this->crud_model->alter_table_varchar($table, $key);
+            break;
+            case 'drop':
+                $arr_val = array();
+                if(!empty($field_values))
+                {
+                    if(strtolower($field_values) != 'query')
+                    {
+                        $arr = explode(",", $field_values);
+                        foreach($arr as $value)
+                        {
+                           $arr_explode =  explode("=>", $value);
+                           $arr_val[] = $arr_explode[0];
+                        }    
+                    }    
+                }    
+                $this->crud_model->alter_table_enum($table, $key, $arr_val);
+            break;    
+        }
+    
+}        
+
+    function get_dynamic_form_data($form_id, $guardian = '')
+    {
+        if(isset($_POST))
+        {
+            $arrFieldStructure          = array();
+            $form_id                    = $form_id;
+            $arr                        = $this->set_dynamic_form($form_id);
+            $arrFieldStructure          = $this->crud_model->getStructure($form_id); 
+            $arrFields                  = $arr['arrFields'];
+            $arrSave                    = array();
+            switch($form_id)
+            {
+                // form id 2 indicates parent here
+                case '2':
+                    $table = "parent";
+                    foreach($_POST as $key=>$value)
+                    {           
+                        if(in_array($key, $arrFieldStructure))
+                        {
+                            
+                            if(!empty($guardian))
+                            {    
+                                if(strstr($key, "guardian"))
+                                    $arrSave[$key] = $_POST[$key];
+                                $arrSave['guardian_date_created'] = date('Y-m-d H:i:s');
+                                $arrSave['guardian_isActive'] = '1';
+                            
+                            }
+                            else
+                            {
+                                if((!strstr($key, "guardian")))
+                                        $arrSave[$key] = $_POST[$key];
+                                $passcode = create_passcode('parent');
+                                $arrSave['passcode'] = ($passcode != 'invalid') ? $passcode : '';
+                                $arrSave['password'] = ($passcode != 'invalid') ? sha1($passcode) : '';
+                                $arrSave['date_time'] = date('Y-m-d H:i:s');
+                                $arrSave['isActive'] = '1';
+                                switch($key)
+                                {
+                                    case 'email' :
+                                        if(!$_POST['email']){
+                                            $instance_name = $this->Crud_model->get_instance_name();
+                                            $arrSave['email'] = $this->input->post('cell_phone').'@'.$instance_name.'.com';  
+                                        }
+                                    break;
+                                
+                                }
+                            }    
+                            
+                        }
+                        else
+                        {
+                        $this->add_field_to_database($table, $key);
+                        $arrSave[$key] = $_POST[$key];
+                        }    
+                    }
+                    $arrSave['school_id'] = $_SESSION['school_id'];  
+                    return $arrSave;
+                    break;
+                    // form 3 admission inquiry form
+                case '3':
+                    $table = "enquired_students";
+                    foreach($_POST as $key=>$value)
+                    {           
+                        if(in_array($key, $arrFieldStructure))
+                        {
+                            if(!empty($guardian))
+                            {    
+                                if(strstr($key, "guardian"))
+                                        
+                                    $arrSave[$key] = $_POST[$key];
+                                    $arrSave['guardian_date_created'] = date('Y-m-d H:i:s');
+                                    $arrSave['guardian_isActive'] = '1';
+                                
+                            }
+                            else
+                            {
+                                if((!strstr($key, "guardian")))
+                                        
+                                $arrSave[$key] = $_POST[$key]; 
+                            
+                                
+                                switch($key)
+                                {
+                                    case 'email' :
+                                        if(!$_POST['email']){
+                                            $instance_name = $this->Crud_model->get_instance_name();
+                                            $arrSave['email'] = $this->input->post('cell_phone').'@'.$instance_name.'.com';  
+                                        }
+                                    case 'visa_expiry_date':
+                                    case 'passport_expiry_date' :
+                                    case 'birthday': 
+                                        $arrSave[$key] =  date('Y-m-d', strtotime($_POST['birthday']));
+                                    break;    
+                                }
+                                
+                                
+                            }      
+                        }
+                        else
+                        {
+                            $this->add_field_to_database($table, $key);
+                            $arrSave[$key] = $_POST[$key];
+                        }
+                    }
+                    
+                    return $arrSave;
+                break;
+
+                case 1:
+                    //form 1 direct admission
+                    $table = "student";
+                    foreach($_POST as $key=>$value)
+                    {           
+                        if(in_array($key, $arrFieldStructure))
+                        {
+                            $arrSave[$key] = $_POST[$key];
+                            switch($key)
+                            {
+                                case 'email' :
+                                    if(!$_POST['email']){
+                                        
+                                        $arrSave['email'] = strtolower($_POST['name'].'@'.CURRENT_INSTANCE.'.com');  
+                                    }
+                                case 'parent':
+                                    
+                                break;
+                                case 'passport_expiry_date' :
+                                case 'birthday': 
+                                    $arrSave[$key] =  date('Y-m-d', strtotime($_POST['birthday']));
+                                break;    
+                            }
+                        }
+                        else
+                        {
+                            if(strtolower($key) == "parent")
+                            {
+                                
+                                $arrSave['parent_id'] = $this->Parent_model->get_parent_id($_POST['parent']);
+                                unset($_POST[$key]);
+                            }
+                            else
+                            {     
+                                if($key !='class_id' || $key != 'section_id')
+                                {    
+                                    $this->add_field_to_database($table, $key);
+                                    $arrSave[$key] = $_POST[$key];
+                                }    
+                            }    
+                        }
+                    }
+                    $stu_password = create_passcode('student');
+                    $arrSave['password'] = ($stu_password != 'invalid') ? sha1($stu_password) : '';
+                    $arrSave['passcode'] = ($stu_password != 'invalid') ? $stu_password : '';
+                    $arrSave['school_id'] = $_SESSION['school_id'];
+                    unset($arrSave['tutionfee_inst_type']);
+                    unset($arrSave['transpfee_inst_type']);
+                    unset($arrSave['hostfee_inst_type']);
+                    unset($arrSave['scholarship_id']);
+                    unset($arrSave['transport_fee_id']);
+                    unset($arrSave['class_id']);
+                    unset($arrSave['section_id']);
+                    $student_id = $this->Student_model->save_student($arrSave);
+                        $stud_image = '';
+                    if ($_FILES['userfile']['name'] != '') {
+                        $img = $_FILES['userfile']['name'];
+                        $img = explode(".", $img);
+                        $stud_image = $student_id . "." . end($img);
+                        move_uploaded_file($_FILES['userfile']['tmp_name'], 'uploads/student_image/' . $stud_image);
+                        copy('uploads/student_image/' . $stud_image, 'fi/sysfrm/uploads/user-pics/' . $stud_image);
+                    }
+                    $this->load->model("Student_model");
+                    $this->load->model("Parent_model");
+					$this->load->model("Student_bus_allocation_model");
+					$this->load->model("Hostel_registration_model");
+                    $arrSave['stud_image'] = $stud_image;
+                    $arrSave['student_id'] = $student_id;
+                    $arrSave['tutionfee_inst_type'] = $_POST['tutionfee_inst_type'];
+                    $arrSave['class_id'] = $_POST['class_id'];
+                    $arrSave['section_id'] = $_POST['section_id'];
+                    $arrSave['route_id'] = $_POST['route_id'];
+                    $arrSave['transport_id'] = $_POST['transport_id'];
+                    $arrSave['dormitory_id'] = $_POST['dormitory_id'];
+                    $arrSave['room_id'] = $_POST['room_id'];
+                    $arrSave['transpfee_inst_type'] = $_POST['transpfee_inst_type'];
+                    $arrSave['hostfee_inst_type'] = $_POST['hostfee_inst_type'];
+                    $arrSave['scholarship_id'] = $_POST['scholarship_id'];
+                    $arrSave['dormitory_fee_id'] = (!empty($_POST['dormitory_fee_id'])) ? $_POST['dormitory_fee_id'] :0 ;
+                    $arrSave['transport_fee_id'] = (!empty($_POST['transport_fee_id'])) ? $_POST['transport_fee_id'] :0 ;
+                     $arrSave['mess_management_id']=(!empty($_POST['mess_management_id'])) ? $_POST['mess_management_id'] :0 ;
+                    $sname = '';
+                    $parent_email = '';
+                    $this->load->model('Parent_model');
+                    if(!empty($_POST['parent']))
+                    {    
+                        $parent_email = $_POST['parent']; 
+                        $parent_id = $this->Parent_model->get_parent_id($parent_email);
+                        $parentname = $this->Parent_model->get_data_by_cols('*', array('parent_id' => $parent_id));
+                        $sname = $parentname[0]->father_name . " " . $parentname[0]->father_lname;
+                        $parant_email = $parentname[0]->email;
+                    }   
+                    
+                    $this->saveStudentFinanaceData($arrSave, $student_id, $sname, $parent_email);
+                    $this->saveInstallmentData($arrSave, $student_id);
+                    $this->saveStudentEnrollData($arrSave, $student_id);
+					
+                    //Hostel Entry
+					if($_POST['dormitory_id']!='')
+					{
+						$type = $this->Dormitory_model->get_data_by_cols('hostel_type', array('dormitory_id' => $_POST['dormitory_id']), 'result_array');
+						$hostel_data['hostel_type'] = $type[0]['hostel_type'];
+						$hostel_data['hostel_id'] = $_POST['dormitory_id'];
+						$hostel_data['student_id'] = $student_id;
+						$details = $this->Hostel_room_model->get_data_by_cols('floor_name,room_number', array('hostel_room_id' =>$_POST['room_id']), 'result_array');
+						$hostel_data['floor_name'] = $details[0]['floor_name'];
+						$hostel_data['room_no'] = $details[0]['room_number'];
+						$hostel_data['food'] = "No";
+						$hostel_data['register_date'] = date('Y-m-d');
+						$hostel_data['status'] = "present";
+						$hostel_data['active_status'] = "active";
+						$hostel_data['mess_management_id'] =$_POST['mess_management_id'];
+					
+					$this->Hostel_registration_model->add($hostel_data);					
+					
+					}
+					//Transport Entry
+					if($_POST['route_id']!='')
+					{
+						$enroll_code=$this->Student_model->get_enroll_records(array('student_id'=>$student_id));
+						//echo $this->db->last_query();
+						if($enroll_code)
+						{
+							$ec=$enroll_code[0]['enroll_code'];
+						}
+						
+					$transport_data = array('student_id'=>$student_id,
+									'route_id' =>$_POST['route_id'],
+									'bus_id'   =>$_POST['transport_id'],
+									'enroll_code'=>$ec,
+									);	
+									
+					//pre($transport_data);
+
+					$this->Student_bus_allocation_model->add($transport_data);	
+					
+//die;										
+					}
+                    return $arrSave;
+                break;   
+            }       
+        }
+    }
+    
+    function saveInstallmentData($arrSave, $student_id)
+    {
+        $this->load->library('Fi_functions');
+        $this->load->model("Student_model");
+        $this->load->model('fees/Fees_model');
+        
+        $scholarship_id             = $arrSave['scholarship_id'];
+        $hostfee_inst_type          = $arrSave['hostfee_inst_type'];
+        $transpfee_inst_type        = $arrSave['transpfee_inst_type'];
+        $tutionfee_inst_type        = $arrSave['tutionfee_inst_type'];
+        $dormitory_fee_id           = $arrSave['dormitory_fee_id'];
+        $transport_fee_id           = $arrSave['transport_fee_id'];
+		$mess_management_id 		= $arrSave['mess_management_id'];
+        if(sett('new_fi')){
+            $fee_stu_config = array(
+                'student_id' => $student_id,
+                'running_year' => _getYear(),
+                'school_term_id' => $tutionfee_inst_type,
+                'room_id' => $arrSave['room_id'],
+                'hostel_term_id' => $hostfee_inst_type,
+                'route_stop_id' => $arrSave['transport_id'],
+                'transport_term_id' => $transpfee_inst_type,
+                'scholarship_id' => $scholarship_id,
+				'mess_management_id' => $mess_management_id,
+                'school_id' => _getSchoolid(),
+                'created' => date('Y-m-d H:i:s')
+            );
+            $this->Fees_model->save_stu_config($fee_stu_config);
+        }else{
+            $tution_fee_det = $this->fi_functions->get_fee_detailsbygroup($arrSave['class_id']);
+            $tution_fee_id = ($tution_fee_det)?$tution_fee_det['id']:0;
+            $finance_det = array('student_id'                    => $student_id,
+                                 'academic_year'                 => $this->globalSettingsRunningYear,
+                                 'tution_fee_id'                 => ($tution_fee_id != '' ? $tution_fee_id : 0),
+                                 'trans_fee_id'                  => ($transport_fee_id != '' ? $transport_fee_id : 0),
+                                 'hostel_fee_id'                 => ($dormitory_fee_id != '' ? $dormitory_fee_id : 0),
+                                 'scholarship_id'                => ($scholarship_id != '' ? $scholarship_id : 0),
+                                 'tutionfee_inst_type'           => ($tutionfee_inst_type != '' ? $tutionfee_inst_type : 0),
+                                 'transpfee_inst_type'           => ($transpfee_inst_type != '' ? $transpfee_inst_type : 0),
+                                 'hostfee_inst_type'             => ($hostfee_inst_type != '' ? $hostfee_inst_type : 0),
+                                 'created_by'                    => $this->session->userdata('user_id'));
+            $finance_stud_config = $this->Student_model->add_student_fee_det($finance_det);
+        } 
+        
+        //Manage Transport Allocation
+        if($arrSave['route_id'] && $arrSave['transport_id']){
+            _school_cond();
+            $enroll_rec = $this->db->get_where('enroll',array('student_id'=>$student_id))->row();
+
+            $save_bus_allocation = array('student_id' => $student_id,
+                                         'enroll_code' => ($enroll_rec?$enroll_rec->enroll_code:''),
+                                         'route_id' => $arrSave['route_id'],
+                                         'bus_stop_id' => $arrSave['transport_id'],
+                                         'start_date' => date('Y-m-d'),
+                                         'school_id' => _getSchoolid());
+            $this->db->insert('student_bus_allocation',$save_bus_allocation);
+        }
+    }
+    
+    function saveStudentEnrollData($arrSave, $student_id)
+    {
+        $arrEnroll = array();
+        $this->load->model("Enroll_model");
+        $this->load->model("Student_model");
+        $last_roll_no                   = $this->Enroll_model->get_latest_roll_no($arrSave['class_id'], $arrSave['section_id']);
+        $last_roll_no++;
+        $arrEnroll['student_id']        = $student_id;
+
+        $arrEnroll['roll']              = $last_roll_no; //substr(md5(rand(0, 1000000)), 0, 7);
+        $arrEnroll['class_id']          = $arrSave['class_id'];
+        $arrEnroll['section_id']        = $arrSave['section_id'];
+
+        $arrEnroll['enroll_code']       = substr(md5(rand(0, 1000000)), 0, 7);;
+        $arrEnroll['date_added']        = strtotime(date("Y-m-d H:i:s"));
+        $arrEnroll['year']              = $this->globalSettingsRunningYear;
+        $enroll_id                      = $this->Student_model->enroll_student($arrEnroll);
+            
+                //$this->generate_admission_invoice($student_id);
+    }
+    
+    function saveStudentFinanaceData($arrSave, $student_id, $sname, $parent_email)
+    {
+                
+        $this->load->model("Student_model");
+        $arrFinance = array();    
+        $arrFinance['id']               = $student_id;
+        $arrFinance['account']          = $arrSave['name'];
+        $arrFinance['fname']            = '';
+        $arrFinance['company']          = $sname;
+        $arrFinance['lname']            = $arrSave['lname'];
+        $arrFinance['gid']              = $arrSave['class_id'];
+        $arrFinance['email']            = $arrSave['email'];
+        $arrFinance['second_email']     = $parent_email;
+        $arrFinance['address']          = $arrSave['address'];
+        $arrFinance['phone']            = $arrSave['phone'];
+        $arrFinance['img']              = $arrSave['stud_image'];
+        $arrFinance['city']             = $arrSave['location'];
+        $arrFinance['country']          = $arrSave['nationality'];
+        $arrFinance['dob']              = $arrSave['birthday'];
+        $arrFinance['password']         = ($arrSave['password'] != 'invalid') ? $arrSave['password'] : '';
+        $finance = $this->Student_model->create_finance_customer_account($arrFinance);
+        
+    }
+    
+    
+    
 /* * *****************Send push notification******************************* */
 
 function send_push_notification() {
@@ -10766,7 +11397,7 @@ function fix_clinical_appointment($param1 = '') {
 
 /* * *************************function for adding fee*************************** */
 
-public function add_fee_settings() {
+ function add_fee_settings() {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     /*     * ************************loading model and controllers************** */
@@ -10992,7 +11623,7 @@ function average() {
     $page_data = $this->get_page_data_var();
     $page_data['total_notif_num'] = $this->get_no_of_notication();
     $page_data['average'] = $this->Mark_model->get_average($id);
-    $page_data['page_title'] = get_phrase('average_of_each_exam');
+    $page_data['page_title'] = get_phrase('academic_average');
     $page_data['page_name'] = 'student_average';
     $this->load->view('backend/index', $page_data);
 }
@@ -11090,7 +11721,16 @@ function get_students($class_id, $section_id) {
     }
     echo $response_html;
 }
-
+function get_available_students_for_hostel($class_id, $section_id) {
+    $this->load->model('Hostel_registration_model');
+    $year = $this->globalSettingsRunningYear;
+    $student = $this->Hostel_registration_model->get_available_students($class_id, $section_id, $year);
+    $response_html = '<option value="">Select Student</option>';
+    foreach ($student as $row) {
+        $response_html .= '<option value="' . $row->student_id . '">' . $row->name . '</option>';
+    }
+    echo $response_html;
+}
 function get_description($class_id) {
     $description = $this->Invoice_category_model->get_data_by_cols('*', array('class_id' => $class_id));
     foreach ($description as $row) {
@@ -11226,6 +11866,16 @@ function event($param1 = '', $param2 = '') {
         redirect(base_url(), 'refresh');
     $this->load->model('Event_model');
     $page_data = $this->get_page_data_var();
+
+    /*$students = $this->Student_model->get_all_students_for_push_msg();
+
+    pre($students);die;*/
+
+    $school_id = '';
+    if (($this->session->userdata('school_id'))) {
+        $school_id = $this->session->userdata('school_id');
+    }
+
     if ($param1 == 'create') {
         $data['title'] = $this->input->post('eventType');
         $data['color'] = $this->input->post('colorPicker');
@@ -11247,9 +11897,103 @@ function event($param1 = '', $param2 = '') {
             $message['messagge_body'] = $message_body;
 
             $this->load->model("Notification_model");
-            $create_notif_queue = $this->Notification_model->create_notification_queue('event_notice', $message);
+            //$create_notif_queue = $this->Notification_model->create_notification_queue('event_notice', $message);
             $user_details['user_type'] = array('teacher', 'parent', 'student');
-            send_school_notification('event_notice', $message, '', '', $user_details);
+            //send_school_notification('event_notice', $message, '', '', $user_details);
+
+            $parents = $this->Parent_model->get_data_by_cols('*', array('isActive'=>'1', 'parent_status'=>'1'), 'result_array', array('father_name' => 'asc'));
+
+            if(count($parents)){
+                foreach($parents as $parent){
+                    $data1 = array();
+                     $data1['notice_title'] = $msg;
+                     $data1['message'] = $msg;
+                     $data1['receiver_type'] = 'P';
+                     $ParentName = ucfirst($parent['father_name']) . ' ' . ucfirst($parent['father_mname']) . ' ' . ucfirst($parent['father_lname']);
+                     //$data1['class_id'] = '';
+                     $data1['receiver_id'] = $parent['parent_id'];
+                     $data1['receiver_full_name'] = $ParentName;
+                     $data1['receiver_mobile_no'] = $parent['cell_phone'];
+                     $data1['receiver_email'] = $parent['email'];
+                     $data1['sender_type'] = $this->session->userdata('u_type');
+                     $data1['sender_id'] = $this->session->userdata('login_user_id');             
+                     $data1['device_token'] = $parent['device_token'];
+                     $data1['school_id'] = $school_id;
+                     $data1['db_store'] = 'yes';
+                     $data1['message_schedule_status'] = '1';
+
+                     $message['to_name'] = ucwords($ParentName);
+
+                     $ReceiverPhone = ($parent['cell_phone'] != '') ? $parent['cell_phone'] : (($parent['mother_mobile'] != '') ? $parent['mother_mobile'] : (($parent['home_phone'] != '') ? $parent['home_phone'] : $parent['work_phone']));
+                    $ReceiverEmail = ($parent['email'] != '') ? $parent['email'] : $parent['mother_email'] != '';
+
+                    send_school_notification_new('event_notice', $message, $ReceiverPhone, $ReceiverEmail, $data1, '', 'notification_sms');
+                }
+            }
+
+            $teachers = $this->Teacher_model->get_teacher_array();
+            if(count($teachers)){
+                foreach($teachers as $teacher){
+                    $data2 = array();
+
+                    $TeacherName = ucfirst($teacher['name']) . ' ' . ucfirst($teacher['middle_name']) . ' ' . ucfirst($teacher['last_name']);
+
+                    $data2['notice_title'] = $msg;
+                    $data2['message'] = $msg;
+                    $data2['receiver_type'] = 'T';
+                    $data2['class_id'] = $teacher['class_id'];
+                    $data2['receiver_id'] = $teacher['teacher_id'];
+                    $data2['receiver_full_name'] = $TeacherName;
+                    $data2['receiver_mobile_no'] = $teacher['cell_phone'];
+                    $data2['receiver_email'] = $teacher['email'];
+                    $data2['sender_type'] = $this->session->userdata('u_type');
+                    $data2['sender_id'] = $this->session->userdata('login_user_id');
+                    
+                    $data2['device_token'] = $teacher['device_token'];
+                    $data2['school_id'] = $school_id;
+                    $data2['db_store'] = 'yes';
+
+                    $data2['message_schedule_status'] = '1';
+
+                    $message['to_name'] = ucwords($TeacherName);
+
+                    $ReceiverPhone = ($teacher['cell_phone'] != '') ? $teacher['cell_phone'] : (($teacher['work_phone'] != '') ? $teacher['work_phone'] : $teacher['home_phone']);
+                    $ReceiverEmail = $teacher['email'];
+
+                    send_school_notification_new('event_notice', $message, $ReceiverPhone, $ReceiverEmail, $data2, '', 'notification_sms');
+                }
+            }
+
+            $students = $this->Student_model->get_all_students_for_push_msg();
+            if(count($students)){
+                foreach($students as $student){
+                    $data1 = array();
+                    $StudentName = ucfirst($student['name']) . ' ' . ucfirst($student['mname']) . ' ' . ucfirst($student['lname']);
+
+                    $data1['notice_title'] = $msg;
+                    $data1['message'] = $msg;
+                    $data1['receiver_type'] = 'S';
+                    $data1['class_id'] = $student['class_id'];
+                    $data1['receiver_id'] = $student['student_id'];
+                    $data1['receiver_full_name'] = $StudentName;
+                    $data1['receiver_mobile_no'] = $student['phone'];
+                    $data1['receiver_email'] = $student['email'];
+                    $data1['sender_type'] = $this->session->userdata('u_type');
+                    $data1['sender_id'] = $this->session->userdata('login_user_id');
+                    $data1['device_token'] = $student['device_token'];
+                    $data1['school_id'] = $school_id;
+                    $data1['db_store'] = 'yes';
+
+                    $data1['message_schedule_status'] = '1';
+                    
+                    $message['to_name'] = ucwords($StudentName);
+                    $ReceiverPhone = $student['phone'];
+                    $ReceiverEmail = $student['email'];
+
+                    send_school_notification_new('event_notice', $message, $ReceiverPhone, $ReceiverEmail, $data1, '', 'notification_sms');
+                }
+            }
+
         }
         $this->session->set_flashdata('flash_message', get_phrase('event_added_successfully'));
     }
@@ -11278,7 +12022,7 @@ function event($param1 = '', $param2 = '') {
  * @return Students list with class and section by class
  */
 
-public function map_students_id($class_id = '') {
+ function map_students_id($class_id = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect('login', 'refresh');
     $this->load->model("Class_model");
@@ -11309,7 +12053,7 @@ public function map_students_id($class_id = '') {
     $this->load->view('backend/index', $page_data);
 }
 
-public function map_students_id_after_referesh($class_id = '') {
+ function map_students_id_after_referesh($class_id = '') {
     $this->session->set_flashdata('flash_message', get_phrase('successfully_rfied_updated'));
     redirect(base_url() . 'index.php?school_admin/map_students_id/' . $class_id, 'refresh');
 }
@@ -11332,7 +12076,7 @@ function manage_gallery() {
     $this->load->view('backend/index', $page_data);
 }
 
-public function payment_config($param1 = '') {
+ function payment_config($param1 = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
 
@@ -11371,7 +12115,7 @@ public function payment_config($param1 = '') {
     }
 }
 
-public function view_payment_details($param1 = '', $param2 = '') {
+ function view_payment_details($param1 = '', $param2 = '') {
     $this->load->model("Payment_gateway_model");
     if ($this->session->userdata('school_admin_login') != 1) {
         redirect(base_url(), 'refresh');
@@ -11585,11 +12329,14 @@ function manage_hostel($param1 = '', $dormitory_id = '', $param3 = '') {
     foreach ($page_data['hostel_details'] as $key => $value) {
         $count_stud = 0;
         $warden_ids = explode(',', $value['warden_id']);
-        $count_stud = $this->Hostel_room_model->get_count_of_students($dormitory_id);
+       // $count_stud = $this->Hostel_room_model->get_count_of_students($dormitory_id);
+        
         $warden_id_arr[$value['dormitory_id']]['warden'] = array();
         $warden_id_arr[$value['dormitory_id']]['id'] = $value['dormitory_id'];
+        $count_stud = $this->Hostel_room_model->get_count_of_students($value['dormitory_id']);
+        
         $warden_id_arr[$value['dormitory_id']]['name'] = $value['name'];
-        $warden_id_arr[$value['dormitory_id']]['transaction'] = $count_stud;
+        $warden_id_arr[$value['dormitory_id']]['transaction'] = $count_stud[0]['occupied'];
         $warden_id_arr[$value['dormitory_id']]['phone'] = $value['phone_number'];
         $warden_id_arr[$value['dormitory_id']]['type'] = $value['hostel_type'];
         $warden_id_arr[$value['dormitory_id']]['address'] = $value['hostel_address'];
@@ -11626,7 +12373,9 @@ function hostel_registration($param1 = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $page_data = $this->get_page_data_var();
-    if($param1 == 'create'){        
+	
+    if($param1 == 'create'){ 
+	
     $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
     // $this->form_validation->set_rules('class_id', 'Class', 'trim|required');
     // $this->form_validation->set_rules('section', 'Section', 'trim|required');
@@ -11635,7 +12384,7 @@ function hostel_registration($param1 = '') {
     $this->form_validation->set_rules('hostel_name', 'Hostel Name', 'trim|required');
     $this->form_validation->set_rules('floor', 'Floor', 'trim|required');
     $this->form_validation->set_rules('hostel_room', 'Hostel Room', 'trim|required');
-    $this->form_validation->set_rules('food', 'Food', 'trim|required');
+    //$this->form_validation->set_rules('food', 'Food', 'trim|required');
 //    $this->form_validation->set_rules('register_date', 'Registration Date', 'trim|required');
 //    $this->form_validation->set_rules('vacating_date', 'Vacating Date', 'trim|required');
 
@@ -11648,10 +12397,11 @@ function hostel_registration($param1 = '') {
         $data['floor_name'] = $this->input->post('floor');
         $data['room_no'] = $this->input->post('hostel_room');
         $data['food'] = $this->input->post('food');
-        $data['register_date'] = date('Y-m-d', strtotime($this->input->post('register_date')));
-        $data['vacating_date'] = date('Y-m-d', strtotime($this->input->post('vacating_date')));
+        $data['register_date'] = date('Y-m-d', strtotime(str_replace('/', '-',$this->input->post('register_date'))));
+        $data['vacating_date'] = date('Y-m-d', strtotime(str_replace('/', '-',$this->input->post('vacating_date'))));
         $data['status'] = "present";
         $data['active_status'] = "active";
+		
         $this->load->model('Hostel_registration_model');
         $this->Hostel_registration_model->add($data);
         $stu_update_data = array('dormitory_id' => $data['hostel_id']);
@@ -11662,6 +12412,7 @@ function hostel_registration($param1 = '') {
         $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
         redirect(base_url() . 'index.php?school_admin/manage_allocation', 'refresh');
     }else{
+		pre(validation_errors()) ;
         $this->session->set_flashdata('flash_validation_error', validation_errors());
         redirect(base_url() . 'index.php?school_admin/hostel_registration', 'refresh');
     }
@@ -11738,7 +12489,8 @@ function get_floor_name($hostel_id = "") {
 }
 
 function get_hostel_room($floor_name = "", $hostel_id = "") {
-    $name = $this->Hostel_room_model->get_data_by_cols('room_number', array('floor_name' => $floor_name, 'available_beds >' => 0, 'condition_type' => 'and', 'hostel_id' => $hostel_id));
+    $name = $this->Hostel_room_model->get_data_by_cols('room_number', array('floor_name' => $floor_name, 'condition_type' => 'and', 'hostel_id' => $hostel_id));
+    
     if(count($name) > 0) {
         $response_html = '<option value="">Select Room</option>';
         foreach ($name as $row) {
@@ -11751,7 +12503,13 @@ function get_hostel_room($floor_name = "", $hostel_id = "") {
     }
     echo $error.'||**||'.$response_html;
 }
-
+function get_hostel_room_with_beds($floor_name = "", $hostel_id = "") {
+    $name = $this->Hostel_room_model->get_data_by_cols('*', array('floor_name' => $floor_name, 'condition_type' => 'and', 'hostel_id' => $hostel_id));
+    
+    
+	$page_data['room_detail']=$name;
+    $this->load->view('backend/school_admin/ajax_hostel_room_view.php', $page_data);
+}
 function get_details($room_no = "") {
     $details = $this->Hostel_room_model->get_data_by_cols('*', array('room_number' => $room_no), 'result_array');
     foreach ($details as $value) {
@@ -12119,7 +12877,7 @@ function edit_manage_hostel($dormitory_id = '') {
  * @param string $message  Message to be sent
  */
 
-public function send_sms($phone_number, $message) {
+ function send_sms($phone_number, $message) {
     if (is_array($phone_number)) {
         $phone_number = implode(",", $phone_number);
     }
@@ -12139,7 +12897,7 @@ public function send_sms($phone_number, $message) {
 
 /* * *******************Document Manager****************************** */
 
-public function campus_updates_management($param1 = '', $param2 = '') {
+ function campus_updates_management($param1 = '', $param2 = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $this->load->model("Notification_model");
@@ -12303,8 +13061,8 @@ function print_merit_certificate($param1 = '', $param2 = '', $param3 = '') {
         $page_data['merit_certificate_for'] = $class_name[0]->name;
     } else {
         $class_id = $this->Student_model->get_class_id_by_student($param1);
-        $class_name = $this->Class_model->get_name_by_id($class_id[0]['class_id']);
-        $page_data['merit_certificate_for'] = $class_name[0]->name;
+        $class_name = $this->Class_model->get_name_by_id(@$class_id[0]['class_id']);
+        $page_data['merit_certificate_for'] = @$class_name[0]->name;
     }
 
     $page_data['total_notif_num'] = $this->get_no_of_notication();
@@ -12347,11 +13105,12 @@ function faculty_feedback($param1 = '') {
     $year = $this->globalSettingsRunningYear;
     $this->load->model("Teacher_model");
     $teacher_list = $this->Teacher_model->get_teacher_forFeedback();
+    $this->form_validation->set_error_delimiters('', '');
     if ($param1 == 'create') {
         $this->form_validation->set_rules('teacher_id', 'Teacher', 'required');
         $this->form_validation->set_rules('rating', 'Rating', 'required');
         $this->form_validation->set_rules('feed_back', 'Feed Back', 'required');
-        $this->form_validation->set_error_delimiters('', '');
+        
         if ($this->form_validation->run() == TRUE) {
             $feed_back['teacher_id'] = $this->input->post('teacher_id');
             $feed_back['rating'] = $this->input->post('rating');
@@ -12381,11 +13140,17 @@ function faculty_feedback($param1 = '') {
  * 
  */
 
-public function get_no_of_notication() {
-    $this->load->model("Notification_model");
+ function get_no_of_notication() {
+    /*$this->load->model("Notification_model");
     $user_notif_user = $this->Notification_model->get_notifications('push_notifications', 'admin');
     $user_notif_common = $this->Notification_model->get_notifications('push_notifications');
     $total_count = count($user_notif_user) + count($user_notif_common);
+    return $total_count;*/
+
+    $user_id =   $this->session->userdata('login_user_id');
+    $this->load->model("Notification_model");
+    $data = $this->Notification_model->get_notifications_new('1', 'SA', $user_id);
+    $total_count = count($data);
     return $total_count;
 }
 
@@ -12426,10 +13191,9 @@ function add_student_bus() {
     $this->form_validation->set_rules('student_id', 'Student_id', 'trim|required');
     $this->form_validation->set_rules('route', 'Route', 'trim|required');
     $this->form_validation->set_rules('bus', 'Bus Name', 'trim|required');
-//    $this->form_validation->set_rules('start_date', 'Start Date', 'trim|required');
-//    $this->form_validation->set_rules('end_date', 'End Date', 'trim|required');
+    //$this->form_validation->set_rules('start_date', 'Start Date', 'trim|required');
+    //$this->form_validation->set_rules('end_date', 'End Date', 'trim|required');
     if ($this->form_validation->run() == TRUE) {
-
         $student_id = $this->input->post('student_id');
         $data['student_id'] = $this->input->post('student_id');
         $year = $this->globalSettingsRunningYear;
@@ -12440,8 +13204,16 @@ function add_student_bus() {
         $data['route_id'] = $this->input->post('route');
         $data['bus_stop_id'] = $this->input->post('bustop_id');
         $data['bus_id'] = $this->input->post('bus');
-        $data['start_date'] = date('Y/m/d', (strtotime($this->input->post('start_date'))));
-        $data['end_date'] = date('Y/m/d', (strtotime($this->input->post('end_date'))));
+        $check_avail_seat = $this->Student_bus_allocation_model->count_bus_seat($data['bus_id']);
+        $total_seat = $this->Bus_model->bus_seat($data['bus_id']);
+        $check_avail_seat = $check_avail_seat;
+        $total_seat = $total_seat->number_of_seat;
+        if($total_seat == $check_avail_seat || $total_seat < $check_avail_seat ){
+            $this->session->set_flashdata('flash_validation_error', get_phrase('Not_available_seat_for_this_bus'));
+            redirect(base_url() . 'index.php?school_admin/student_bus_allocation', 'refresh');
+        }
+        /*$data['start_date'] = date('Y/m/d', (strtotime($this->input->post('start_date'))));
+        $data['end_date'] = date('Y/m/d', (strtotime($this->input->post('end_date'))));*/
         $count = $this->Student_bus_allocation_model->get_data_by_cols('count(student_id) as count', array('student_id' => $data['student_id']), 'res_arr');
         if ($count[0]['count'] <= 0) {
             $this->load->model('Transport_model');
@@ -12449,16 +13221,16 @@ function add_student_bus() {
             $this->update_student_transport($student_id, $data['bus_stop_id']);
             $data2['transport_id'] = $data['bus_stop_id'];
             $this->load->model('Student_model');
-            $this->Student_model->update_student($data2, array("student_id" => $student_id));
-            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
-            redirect(base_url() . 'index.php?school_admin/manage_student_bus', 'refresh');
+            $this->Student_model->update_student($data2, array('student_id' => $student_id));
+            $this->session->set_flashdata('flash_message', get_phrase('student_bus_allocated_successfully'));
+            redirect(base_url('index.php?school_admin/manage_student_bus'), 'refresh');
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('this_student_is_already_using_bus_facility'));
-            redirect(base_url() . 'index.php?school_admin/student_bus_allocation', 'refresh');
+            $this->session->set_flashdata('flash_validation_error', get_phrase('this_student_is_already_using_bus_facility'));
+            redirect(base_url('index.php?school_admin/student_bus_allocation'), 'refresh');
         }
     } else {
-        $this->session->set_flashdata('flash_message_error', validation_errors());
-        redirect(base_url() . 'index.php?school_admin/student_bus_allocation', 'refresh');
+        $this->session->set_flashdata('flash_validation_error', validation_errors());
+        redirect(base_url('index.php?school_admin/student_bus_allocation'), 'refresh');
     }
     $page_data['page_title'] = get_phrase('student_bus_allocation');
     $page_data['page_name'] = 'student_bus_allocation';
@@ -12475,10 +13247,11 @@ function update_student_transport($student_id, $transport_data) {
     $academic_year = $this->globalSettingsRunningYear;
     $student_fee_det = $this->fi_functions->getStudentFeeSettings($student_id, $academic_year);
     if ($student_fee_det) {
-        $transport_fee = $student_fee_det[0]->trans_fee_id;
+        $transport_fee = @$student_fee_det[0]->trans_fee_id;
         if ($transport_fee != 0) {
             $fee_det = get_data_generic_fun('fees_fi', '*', array('route_id' => $transport_data['bus_stop_id']));
             $fee_id = $fee_det[0]['fi_id'];
+            $fee_id = 0;
             if ($transport_fee != 0 && $transport_fee != $fee_id) {
                 $data = array('trans_fee_id' => $fee_id);
                 $update_transport_fee = $this->fi_functions->update_student_fee_det(array('student_id' => $student_id, 'academic_year' => $academic_year), $data);
@@ -12524,7 +13297,7 @@ function manage_student_bus() {
     $page_data = $this->get_page_data_var();
     $this->load->model("Student_model");
     $this->load->model("Transport_model");
-    $students = $this->Student_bus_allocation_model->get_data_by_cols('*', array(), 'result_array');
+    $students = $this->Student_bus_allocation_model->get_data_by_cols('*', array(), 'result_array', array('student_id'=>'desc'));
     foreach ($students as $value) {
         $student_name = $this->Student_model->get_data_by_cols('name', array('student_id' => $value['student_id']), 'result_array');
         //$student_name = $student1[0]['name'];
@@ -12562,7 +13335,7 @@ function manage_student_bus() {
         $i++;
     }
     $page_data['student_details'] = $newArray;
-    $page_data['page_title'] = get_phrase('manage_student');
+    $page_data['page_title'] = get_phrase('manage_student_bus');
     $page_data['page_name'] = 'manage_student_bus';
     //pre($page_data); die;
     $this->load->view('backend/index', $page_data);
@@ -12676,7 +13449,7 @@ function bus_details($param1 = "") {
 
             if ($data['route_id'] && $data['driver_id']) {
                 $this->vehicle_details->add_vehicel_details($data);
-                $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+                $this->session->set_flashdata('flash_message', get_phrase('vechile_service_added_successfully'));
                 redirect(base_url() . 'index.php?school_admin/manage_vehicle_details', 'refresh');
             } else {
                 $this->session->set_flashdata('flash_message_error', get_phrase('error_route_or_bus_drive_is_not_alloted_to_this_bus'));
@@ -12704,7 +13477,7 @@ function merit_certificate() {
     $this->load->view('backend/index', $page_data);
 }
 
-public function overall_class_details($class_id = '') {
+ function overall_class_details($class_id = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $page_data = $this->get_page_data_var();
@@ -12799,7 +13572,7 @@ function manage_vehicle_details($param1 = '', $param2 = '', $param3 = '') {
         $this->load->model('vehicle_details');
         $this->vehicle_service_maintenance_model->add($dataArr);
         $this->vehicle_details->updatebyId($param2, $data);
-        $this->session->set_flashdata('flash_message', get_phrase('vehicle is_sent for_service_sucessfully'));
+        $this->session->set_flashdata('flash_message', get_phrase('vehicle_is_sent for_service_sucessfully'));
         redirect(base_url() . 'index.php?school_admin/manage_vehicle_details/', 'refresh');
     }
     if ($param1 == "return_from_service") {
@@ -12815,7 +13588,7 @@ function manage_vehicle_details($param1 = '', $param2 = '', $param3 = '') {
         $this->load->model('vehicle_details');
         $this->vehicle_service_maintenance_model->updatebyId($param2, $dataArr);
         $this->vehicle_details->updatebyId($param3, $data);
-        $this->session->set_flashdata('flash_message', get_phrase('vehicle return from_service_sucessfully'));
+        $this->session->set_flashdata('flash_message', get_phrase('vehicle_return_from_service_sucessfully'));
         redirect(base_url() . 'index.php?school_admin/manage_vehicle_details/', 'refresh');
     }
 }
@@ -12837,18 +13610,78 @@ function delete_ranking($param1 = '', $param2 = '') {
 
 /* * *******MANAGE STUDY MATERIAL*********** */
 
-function study_material($class_id = '', $param1 = '') {
+function study_material($param1 = '', $param2 = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $this->load->model("Class_model");
     $this->load->model("Crud_model");
     $page_data = $this->get_page_data_var();
     $data = $page_data;
-    if ($class_id == '') {
-        $data['class_id'] = $this->Class_model->get_first_class_id();
-    } else {
-        $data['class_id'] = $class_id;
-    }
+
+    $data['class_id'] = $this->Class_model->get_first_class_id();
+
+    if($param1 == "create"){
+
+        $this->form_validation->set_rules('title', 'File Title', 'trim|required');
+        $this->form_validation->set_rules('class_id', 'Class Name', 'required');
+        $this->form_validation->set_rules('description', 'Description', 'required');
+        if (empty($_FILES['file_name']['name'])) {
+            $this->form_validation->set_rules('file_name', 'Document', 'required');
+        }
+        if ($this->form_validation->run() == FALSE) {
+            $this->session->set_flashdata('flash_message_error', validation_errors());
+            redirect(base_url() . 'index.php?teacher/study_material');
+        } else {
+            $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'image/jpeg',
+                'image/png',
+                'image/jpg',
+                'image/jpeg',
+                'text/plain',
+                'application/pdf',
+                'application/msword');
+            if (in_array($_FILES['file_name']['type'], $allowed_types)) {
+                $this->Crud_model->save_study_material_info();
+                $class_id = $this->input->post('class_id');
+                $this->session->set_flashdata('flash_message', get_phrase('study_material_saved_successfuly'));
+                redirect(base_url() . 'index.php?school_admin/study_material/' . $class_id, 'refresh');
+            } else {
+                $this->session->set_flashdata('flash_message_error', 'Sorry, File extension is not supported');
+                redirect(base_url() . 'index.php?school_admin/study_material');
+            }
+        }
+    }else if($param1 == "update") {
+            $file_uploaded = $_FILES['file_name']['name'];
+            $allowed_types = array('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'image/png',
+                'image/jpg',
+                'image/jpeg',
+                'text/plain',
+                'application/pdf',
+                'application/msword');
+
+            if (in_array($_FILES['file_name']['type'], $allowed_types)) {
+                $this->Crud_model->update_study_material_info($param2);
+                $class_id = $this->input->post('class_id');
+                $this->session->set_flashdata('flash_message', get_phrase('study_material_info_updated_successfuly'));
+                redirect(base_url() . 'index.php?school_admin/study_material/' . $class_id, 'refresh');
+            } else {
+                $this->session->set_flashdata('flash_message_error', 'Sorry, File extension is not supported');
+                redirect(base_url() . 'index.php?school_admin/study_material', 'refresh');
+            }
+        }else if($param1 == 'delete'){
+            $this->Crud_model->delete_study_material_info($param2);
+            redirect(base_url() . 'index.php?school_admin/study_material');
+        }else{
+            if($param1 != '') {
+                $data['class_id'] = $param1;    
+            }
+        }
+    
     $data['study_material_info'] = $this->Crud_model->get_study_material($data['class_id']);
     $data['classes'] = $this->Class_model->get_data_by_cols('*', array(), 'result_array', array('name_numeric' => 'asc'));
     $data['page_name'] = 'study_material';
@@ -12936,7 +13769,7 @@ function add_student_bus_enquiry($student_id = '', $route_bus_stop_id = '') {
     }
 }
 
-public function save_fees_settings() {
+ function save_fees_settings() {
     $feeData = array();
     $fees_name = $this->input->post('fees_name');
     $fees_amount = explode('-', $this->input->post('fees_amount'));
@@ -12956,7 +13789,7 @@ public function save_fees_settings() {
     redirect(base_url() . 'index.php?school_admin/student_enquired_view', 'refresh');
 }
 
-public function notifications() {
+ function notifications() {
     $page_data = $this->get_page_data_var();
     $this->load->model("Notification_model");
     $user_id = $this->session->userdata('login_user_id');
@@ -13014,7 +13847,7 @@ function route_bus_stop($param1 = '', $param2 = '', $param3 = '') {
                 $data2['route_id'] = $route_bus_stop_id;
                 $this->Fee_fi_model->add($data2);
             }
-            $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('bus_stop_added_successfully'));
             redirect(base_url() . 'index.php?school_admin/route_bus_stop', 'refresh');
         }
     }
@@ -13033,11 +13866,12 @@ function route_bus_stop($param1 = '', $param2 = '', $param3 = '') {
             $data['route_from'] = $this->input->post('route_from');
             $data['route_to'] = $this->input->post('route_to');
             if(sett('new_fi')){
+                $condition = $param2;
                 $data['route_fare'] = $this->input->post('route_fare');
                 $route_bus_stop_id = $this->Route_bus_stop_model->update_routes($data, $condition);
             }else{
                 $charges_deatils = $this->input->post('route_fare');
-                $pieces = explode("|", $charges_deatils);
+                $pieces = explode('|', $charges_deatils);
                 $charges_amount = $pieces[0];
                 $charges_id = $pieces[1];
                 $data['route_fare'] = $charges_amount;
@@ -13054,20 +13888,21 @@ function route_bus_stop($param1 = '', $param2 = '', $param3 = '') {
                 $this->load->model('fee_fi_model');
                 $this->fee_fi_model->update_transport_charge($data2, $route_bus_stop_id);
             }
-            $this->session->set_flashdata('flash_message', get_phrase('data_updated_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('bus_stop_updated_successfully'));
             redirect(base_url() . 'index.php?school_admin/route_bus_stop', 'refresh');
         }
     }
     if ($param1 == 'delete') {
         if ($this->Route_bus_stop_model->delete_route($param2)) {
             $this->Fee_fi_model->delete_route($param2);
-            $this->session->set_flashdata('flash_message', get_phrase('bus stop_deleted_successfully!!'));
+            $this->session->set_flashdata('flash_message', get_phrase('bus_stop_deleted_successfully'));
             redirect(base_url() . 'index.php?school_admin/route_bus_stop', 'refresh');
         }
     }
     $this->load->library("fi_functions");
     $this->load->model('Route_bus_stop_model');
     $page_data['details'] = $this->Route_bus_stop_model->get_details();
+    
     $running_year = $this->globalSettingsRunningYear;
     $charges = $this->fi_functions->get_routecharges($running_year);
     $page_data['charges'] = $charges;
@@ -13107,7 +13942,7 @@ function fee_structure($param1 = '', $param2 = '', $param3 = '') {
             }
             redirect(base_url() . 'index.php?school_admin/fee_structure', 'refresh');
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('Sorry, File extension is not supported, please upload only .jpg, .jpeg, .pdf, .doc, .docx'));
+            $this->session->set_flashdata('flash_message_error', get_phrase('Sorry,_File_extension_is_not_supported,_please_upload_only_.jpg,_.jpeg,_.pdf,_.doc,_.docx'));
             redirect(base_url() . 'index.php?school_admin/fee_structure', 'refresh');
         }
     } else if (($param1 == 'ToggleEnable') && ($param3 != '')) {
@@ -13138,10 +13973,10 @@ function delete_fee_structure($fee_structure_id) {
             $this->session->set_flashdata('flash_message', get_phrase('fee_structure_deleted'));
             unlink("uploads/FeeStructure/" . $fee_file_name);
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('Sorry, unable to delete !'));
+            $this->session->set_flashdata('flash_message_error', get_phrase('Sorry,_unable_to_delete !'));
         }
     } else {
-        $this->session->set_flashdata('flash_message_error', get_phrase('Sorry, unable to delete !'));
+        $this->session->set_flashdata('flash_message_error', get_phrase('Sorry,_unable_to_delete !'));
     }
     redirect(base_url() . 'index.php?school_admin/fee_structure/', 'refresh');
 }
@@ -13156,15 +13991,15 @@ function download_fee_structure($fee_structure_id = '') {
                 $data = file_get_contents("uploads/FeeStructure/" . $fee_file_name);
                 force_download($fee_file_name, $data);
             } else {
-                $this->session->set_flashdata('flash_message_error', get_phrase('Sorry, failed to download !'));
+                $this->session->set_flashdata('flash_message_error', get_phrase('Sorry,_failed_to_download !'));
                 redirect($_SERVER['HTTP_REFERER']);
             }
         } else {
-            $this->session->set_flashdata('flash_message_error', get_phrase('Sorry, failed to download !'));
+            $this->session->set_flashdata('flash_message_error', get_phrase('Sorry, _failed_to_download !'));
             redirect($_SERVER['HTTP_REFERER']);
         }
     } else {
-        $this->session->set_flashdata('flash_message_error', get_phrase('Sorry, failed to download !'));
+        $this->session->set_flashdata('flash_message_error', get_phrase('Sorry,_failed_to_download !'));
         redirect($_SERVER['HTTP_REFERER']);
     }
 }
@@ -13416,7 +14251,7 @@ function download_grade_bulk_upload_error_file() {
     force_download($name, $data);
 }
 
-public function generate_admission_invoice($student_id, $academic_year = '') {
+ function generate_admission_invoice($student_id, $academic_year = '') {
     $this->load->library('Fi_functions');
     $academic_year = $academic_year ? $academic_year : $this->globalSettingsRunningYear;
     $result = $this->fi_functions->create_admission_invoice($student_id, $academic_year);
@@ -13700,7 +14535,7 @@ function internship_certificate($param1 = '', $param2 = '') {
     $data['teacher_id'] = $teacher_id;
     $data['is_approve'] = "1";
     $this->Experience_certificate_model->add_internship_certificate($data);
-    $this->session->set_flashdata('flash_message', get_phrase('internship_certificate_approve_successfully'));
+    $this->session->set_flashdata('flash_message', get_phrase('internship_certificate_has_been_approved_successfully.'));
     redirect(base_url() . 'index.php?school_admin/internship_certificate/' . $teacher_id, 'refresh');
     }
     $rsTeacherData = $this->Teacher_model->get_teacher_name($teacher_id);
@@ -13719,8 +14554,8 @@ function student_bus($param1, $student_bus_id) {
         $this->form_validation->set_error_delimiters('<div class="error">', '</div>');
         $this->form_validation->set_rules('route', 'Route', 'trim|required');
         $this->form_validation->set_rules('bus', 'Bus Name', 'trim|required');
-        $this->form_validation->set_rules('start_date', 'Start Date', 'trim|required');
-        $this->form_validation->set_rules('end_date', 'End Date', 'trim|required');
+        /*$this->form_validation->set_rules('start_date', 'Start Date', 'trim|required');
+        $this->form_validation->set_rules('end_date', 'End Date', 'trim|required');*/
         if ($this->form_validation->run() == FALSE) {
             $this->session->set_flashdata('flash_message_error', validation_errors());
             redirect(base_url() . 'index.php?school_admin/manage_student_bus');
@@ -13728,18 +14563,18 @@ function student_bus($param1, $student_bus_id) {
             $data['route_id'] = $this->input->post('route');
             $data['bus_stop_id'] = $this->input->post('bustop_id');
             $data['bus_id'] = $this->input->post('bus');
-            $data['start_date'] = date('Y/m/d', (strtotime($this->input->post('start_date'))));
-            $data['end_date'] = date('Y/m/d', (strtotime($this->input->post('end_date'))));
+            /*$data['start_date'] = date('Y/m/d', (strtotime($this->input->post('start_date'))));
+            $data['end_date'] = date('Y/m/d', (strtotime($this->input->post('end_date'))));*/
             $this->load->model('Student_bus_allocation_model');
             $this->Student_bus_allocation_model->updatebyId($data, $student_bus_id);
-            $this->session->set_flashdata('flash_message', get_phrase('data_updated_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('student_bus_allocation_updated_successfully'));
             redirect(base_url() . 'index.php?school_admin/manage_student_bus', 'refresh');
         }
     }
     if ($param1 == 'delete') {
         $this->load->model('Student_bus_allocation_model');
         $this->Student_bus_allocation_model->delete($student_bus_id);
-        $this->session->set_flashdata('flash_message', get_phrase('data_sucessfully_deleted'));
+        $this->session->set_flashdata('flash_message', get_phrase('student_bus_allocation_deleted_successfully'));
         redirect(base_url() . 'index.php?school_admin/manage_student_bus/', 'refresh');
     }
 }
@@ -14226,7 +15061,7 @@ function add_mess_time_table($param1 = "", $param2 = "") {
                 $this->session->set_flashdata('flash_message', get_phrase('data_added_successfully'));
                 redirect(base_url() . 'index.php?school_admin/mess_timetable/' . $data['mess_management_id'], 'refresh');
             } else {
-                $this->session->set_flashdata('flash_message_error', get_phrase('Could not add because we have food already in ' . $data['day'] . " " . $data['type']));
+                $this->session->set_flashdata('flash_message_error', get_phrase('Could_not_add_because_we_have_food_already_in ' . $data['day'] . " " . $data['type']));
                 redirect(base_url() . 'index.php?school_admin/add_mess_time_table/', 'refresh');
             }
         }
@@ -14550,6 +15385,7 @@ function get_page_data_var() {
         $school_id = $this->session->userdata('school_id');
     }
     $page_data = array();
+    $page_data['theme'] = $this->globalSettingsTheme;
     $page_data['system_name'] = $this->globalSettingsSystemName;
     $page_data['system_title'] = $this->globalSettingsSystemTitle;
     $page_data['text_align'] = $this->globalSettingsTextAlign;
@@ -14859,7 +15695,7 @@ function mark_bulk_upload() {
     }
 }
 
-public function online_polls($action = '', $poll_id = '') {
+ function online_polls($action = '', $poll_id = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $page_data = $this->get_page_data_var();
@@ -14906,10 +15742,11 @@ public function online_polls($action = '', $poll_id = '') {
         $online_polls[$key]['total_poll'] = $total_poll[0]->total_poll;
     }
     $page_data['online_polls'] = $online_polls;
+    $page_data['classes'] = $this->Class_model->get_class_array();
     $this->load->view('backend/index', $page_data);
 }
 
-public function generate_online_poll() {
+ function generate_online_poll() {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $page_data = $this->get_page_data_var();
@@ -14942,7 +15779,7 @@ public function generate_online_poll() {
                 );
                 $this->Onlinepoll_model->addAnswer($answer_data);
             }
-            $this->session->set_flashdata('flash_message', get_phrase('online_poll_posted_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('poll_created_successfully'));
             redirect(base_url() . 'index.php?school_admin/online_polls/', 'refresh');
         } else {
             $this->session->set_flashdata('flash_message_error', get_phrase('updation_failed_try_again!!'));
@@ -14960,7 +15797,7 @@ public function generate_online_poll() {
     $this->load->view('backend/index', $page_data);
 }
 
-public function add_student_fee_config($student_id, $fee_data) {
+ function add_student_fee_config($student_id, $fee_data) {
     
 }
 
@@ -15033,7 +15870,7 @@ function deleted_database_manual_backups($fileName) {
  * Student home works
  */
 
-public function home_works($action = '', $home_work_id = '') {
+ function home_works($action = '', $home_work_id = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $page_data = $this->get_page_data_var();
@@ -15068,7 +15905,7 @@ public function home_works($action = '', $home_work_id = '') {
     }
 
     $page_data['page_name'] = 'home_work';
-    $page_data['page_title'] = get_phrase('home_works');
+    $page_data['page_title'] = get_phrase('homeworks');
 
     $home_work_types = $this->Homeworks_model->get_all_data('home_work_types', array());
     $page_data['homework_types'] = $home_work_types;
@@ -15110,6 +15947,7 @@ function save_holiday_list($country = '') {
     $page_data = $this->get_page_data_var();
     $data['title'] = $this->input->post("title");
     $data['date_start'] = date('Y-m-d', strtotime($this->input->post("date")));
+    $data['date_end'] = date('Y-m-d', strtotime($this->input->post("end_date")));
     if ($this->input->post("number_of_days")) {
         $data['number_of_days'] = $this->input->post("number_of_days");
     } else {
@@ -15120,6 +15958,7 @@ function save_holiday_list($country = '') {
     $data['country'] = $country;
     $this->load->model("Holiday_model");
     $this->Holiday_model->save_holiday_list($data);
+    $this->session->set_flashdata('flash_message', get_phrase('holiday_added_successfully.'));
     $page_data['holidays'] = $this->Holiday_model->get_holiday_list();
     $page_data['page_name'] = 'holiday_settings';
     $page_data['page_title'] = get_phrase('holiday_settings');
@@ -15135,6 +15974,7 @@ function deactivate_holiday($param1 = "") {
     $this->load->model("Holiday_model");
     $this->Holiday_model->deactivate_holiday($id1);
     $page_data['holidays'] = $this->Holiday_model->get_holiday_list();
+    $this->session->set_flashdata('flash_message', get_phrase('holiday_has_been_deactivated_successfully.'));
     $page_data['page_name'] = 'holiday_settings';
     $page_data['page_title'] = get_phrase('holiday_settings');
     $this->load->view('backend/index', $page_data);
@@ -15148,6 +15988,7 @@ function activate_holiday($param1 = "") {
     //die;
     $this->load->model("Holiday_model");
     $this->Holiday_model->activate_holiday($id1);
+    $this->session->set_flashdata('flash_message', get_phrase('holiday_has_been_activated_successfully.'));
     $page_data['holidays'] = $this->Holiday_model->get_holiday_list();
     $page_data['page_name'] = 'holiday_settings';
     $page_data['page_title'] = get_phrase('holiday_settings');
@@ -15160,7 +16001,7 @@ function delete_holiday($param1 = "") {
     $this->load->model("Holiday_model");
     $delete = $this->Holiday_model->delete_holiday($id);
     if ($delete) {
-        $this->session->set_flashdata('flash_message', get_phrase('holiday_deleted_successfully'));
+        $this->session->set_flashdata('flash_message', get_phrase('holiday_deleted_successfully.'));
         redirect($_SERVER['HTTP_REFERER']);
     } else {
         $this->session->set_flashdata('flash_message_error', get_phrase('deletion_failed_try_again!!'));
@@ -15172,14 +16013,15 @@ function edit_holiday($id) {
     $page_data = $this->get_page_data_var();
     $data['title'] = $this->input->post("title");
     $data['date_start'] = date('Y-m-d', strtotime($this->input->post("date_start")));
+    $data['date_end'] = date('Y-m-d', strtotime($this->input->post("end_date")));
     if ($this->input->post("number_of_days")) {
         $data['number_of_days'] = $this->input->post("number_of_days");
     } else {
-        $data['number_of_days'] = "1";
+        $data['number_of_days'] = 1;
     }
     $data['is_active'] = "1";
     $data['running_year'] = $this->globalSettingsRunningYear;
-    $country = '';
+    $country = '100';
     $data['country'] = $country;
     $this->load->model("Holiday_model");
     $update = $this->Holiday_model->update_holiday($data, $id);
@@ -15187,7 +16029,7 @@ function edit_holiday($id) {
     $page_data['page_name'] = 'holiday_settings';
     $page_data['page_title'] = get_phrase('holiday_settings');
     if ($update) {
-        $this->session->set_flashdata('flash_message', get_phrase('holiday_update_successfully'));
+        $this->session->set_flashdata('flash_message', get_phrase('holiday_updated_successfully.'));
         redirect($_SERVER['HTTP_REFERER']);
     } else {
         $this->session->set_flashdata('flash_message_error', get_phrase('updation_failed_try_again!!'));
@@ -15524,8 +16366,8 @@ function delete_automatic_timetable_add_teacher_priority($teacher_preference_id)
 
 //student certificate
 
-function student_certificates($param1 = '', $param2 = '') {
-    if ($this->session->userdata('school_admin_login') != 1)
+function student_certificates($param1 = '', $param2 = '', $param3 = '') {
+if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
 
     $this->load->model("Student_certificate_model");
@@ -15534,13 +16376,33 @@ function student_certificates($param1 = '', $param2 = '') {
         $data['certificate_title'] = $this->input->post('ceritificate_title');
         $data['sub_title'] = $this->input->post('sub_title');
         $data['main_cantent'] = $this->input->post('main_cantent');
-        $data['student_id'] = $this->input->post('student_id');
+        $data['student_id'] = $this->input->post('student_name');
         $data['template_type'] = $this->input->post('template_type');
+        $data['certificate_type'] = $this->input->post('certificate_type');
+        $data['page_size'] = $this->input->post('page_size');
+        $data['page_orientation'] = $this->input->post('page_orientation');
+        $data['certificate_authorities'] = $this->input->post('certificate_authority');
         $data['date'] = date('Y-m-d H:i:s');
-//    pre($data); die;
-        $this->Student_certificate_model->add($data);
+        foreach($data['student_id'] as $stu_id):
+         $data['student_id'] = $stu_id;
+         $this->Student_certificate_model->add($data); 
+        endforeach;
+        
         $this->session->set_flashdata('flash_message', get_phrase('certificate_create_successfully'));
         redirect(base_url() . 'index.php?school_admin/student_certificates/', 'refresh');
+    }
+    
+    if($param1 == 'edit'){
+        $data['certificate_title'] = $this->input->post('ceritificate_title');
+        $data['sub_title'] = $this->input->post('sub_title');
+        $data['main_cantent'] = $this->input->post('main_cantent');
+        $data['page_size'] = $this->input->post('page_size');
+        $data['page_orientation'] = $this->input->post('page_orientation');
+        $condition = array('certificate_id'=>$param2);
+        $this->Student_certificate_model->update_cretificate($data,$condition);
+        $this->session->set_flashdata('flash_message', get_phrase('certificate_edit_successfully'));
+        redirect(base_url() . 'index.php?school_admin/student_certificate_list/', 'refresh');
+        
     }
     if ($param1 == 'download') {
         $student_id = $this->input->post('student_id');
@@ -15562,6 +16424,54 @@ function student_certificates($param1 = '', $param2 = '') {
     $this->load->view('backend/index', $page_data);
 }
 
+function all_certificate_types_templateDesign(){
+    if ($this->session->userdata('school_admin_login') != 1)
+        redirect(base_url(), 'refresh');
+    $page_data = $this->get_page_data_var();
+    $page_data['page_title'] = get_phrase('All_template_types');
+    $page_data['page_name'] = 'all_certificate_template';
+    $this->load->view('backend/index', $page_data);
+}
+function all_teacher_certificates(){
+    if ($this->session->userdata('school_admin_login') != 1)
+        redirect(base_url(), 'refresh');
+    $page_data = $this->get_page_data_var();
+    $page_data['page_title'] = get_phrase('All_template_types');
+    $page_data['page_name'] = 'all_teacher_certificate';
+    $this->load->view('backend/index', $page_data);
+}
+
+function certificate_types($param1 = '', $param2 = ''){
+    if ($this->session->userdata('school_admin_login') != 1)
+        redirect(base_url(), 'refresh');    
+    $page_data = $this->get_page_data_var();
+    $this->load->model('Student_certificate_model');
+    if ($param1 == 'create') {
+        $data['certificate_type'] = $this->input->post('certificate_type');
+        $data['certificate_for'] = $this->input->post('certificate_for');
+        $this->Student_certificate_model->add_certificate_type($data);
+        $this->session->set_flashdata('flash_message', get_phrase('certificate_type_create_successfully'));
+        redirect(base_url() . 'index.php?school_admin/certificate_types/', 'refresh');
+    }
+    if($param1 == 'edit'){
+        $data['certificate_type'] = $this->input->post('certificate_type');
+        $data['certificate_for'] = $this->input->post('certificate_for');
+        $this->Student_certificate_model->update_cretificate_type($data, array("certificate_type_id" => $param2));
+         $this->session->set_flashdata("flash_message", get_phrase("certificate_type_updated_successfully"));
+         redirect(base_url() . 'index.php?school_admin/certificate_types/', 'refresh');
+    }
+    if($param1 == 'delete'){
+              $this->Student_certificate_model->delete_certificate_type($param2);
+              $this->session->set_flashdata("flash_message", get_phrase("certificate_type_deleted_successfully"));
+              redirect(base_url() . 'index.php?school_admin/certificate_types/', 'refresh');
+    }
+    $page_data['certificate_type_list'] = $this->Student_certificate_model->get_certificate_type_list();
+//    pre($page_data['certificate_type_list']); die;
+    $page_data['page_title'] = get_phrase('certificate_types');
+    $page_data['page_name'] = 'certificate_types';
+    $this->load->view('backend/index', $page_data);
+}
+
 function template1($param1='',$param2='',$param3=''){
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
@@ -15569,12 +16479,25 @@ function template1($param1='',$param2='',$param3=''){
     $page_data['certificate_design'] = "";
     if($param1=='download'){
     $this->load->model('Student_certificate_model');
+    $this->load->model('Certificate_authorities_model');
     $page_data['certificate_detail'] = $this->Student_certificate_model->get_certificate_record($param2,$param3,'1');
-
 //    pre($page_data['certificate_detail']); die;
+    $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+    $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
     } else {
         $page_data['certificate_design'] = "true";
     }
+    
     $page_data['page_title'] = get_phrase('template1');
     $page_data['page_name'] = 'certificate_template1';
     $this->load->view('backend/index', $page_data);
@@ -15587,11 +16510,24 @@ function template2($param1='',$param2='',$param3=''){
     $page_data['certificate_design'] = "";
     if($param1=='download'){
        $this->load->model('Student_certificate_model');
+       $this->load->model('Certificate_authorities_model');
     $page_data['certificate_detail'] = $this->Student_certificate_model->get_certificate_record($param2,$param3,'2');
 //    pre($page_data['certificate_detail']); die;
+    $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+    $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
     } else {
         $page_data['certificate_design'] = "true";
-    }
+    }    
     $page_data['page_title'] = get_phrase('template2');
     $page_data['page_name'] = 'certificate_template2';
     $this->load->view('backend/index', $page_data);
@@ -15605,8 +16541,21 @@ function template3($param1='',$param2='',$param3=''){
     $page_data['certificate_design'] = "";
     if($param1=='download'){
      $this->load->model('Student_certificate_model');
+     $this->load->model('Certificate_authorities_model');
     $page_data['certificate_detail'] = $this->Student_certificate_model->get_certificate_record($param2,$param3,'3');
 //    pre($page_data['certificate_detail']); die;
+    $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+    $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
     } else {
         $page_data['certificate_design'] = "true";
     }
@@ -15622,11 +16571,27 @@ function template4($param1='',$param2='',$param3=''){
     $page_data['certificate_design'] = "";
     if($param1=='download'){
      $this->load->model('Student_certificate_model');
+     $this->load->model('Certificate_authorities_model');
     $page_data['certificate_detail'] = $this->Student_certificate_model->get_certificate_record($param2,$param3,'4');
+    $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+//    pre($authorities_id); die;
+    $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
+   
 //    pre($page_data['certificate_detail']); die;
     } else {
         $page_data['certificate_design'] = "true";
     }
+//    pre($page_data['authorities']); die;
     $page_data['page_title'] = get_phrase('template4');
     $page_data['page_name'] = 'certificate_template4';
     $this->load->view('backend/index', $page_data);
@@ -15641,15 +16606,34 @@ function teacher_certificates($param1 = '', $param2 = '') {
     if ($param1 == 'create') {
         $data['certificate_title'] = $this->input->post('ceritificate_title');
         $data['sub_title'] = $this->input->post('sub_title');
-        $data['main_content'] = $this->input->post('main_cantent');
+        $data['main_cantent'] = $this->input->post('main_cantent');
         $data['teacher_id'] = $this->input->post('teacher_name');
         $data['template_type'] = $this->input->post('template_type');
+        $data['page_size'] = $this->input->post('page_size');
+        $data['page_orientation'] = $this->input->post('page_orientation');
+        $data['certificate_authorities'] = $this->input->post('certificate_authority');
         $data['date'] = date('Y-m-d H:i:s');
 //    pre($data); die;
-        $this->Teacher_certificate_model->add($data);
+        foreach($data['teacher_id'] as $tea_id):
+         $data['teacher_id'] = $tea_id;
+         $this->Teacher_certificate_model->add($data);                       
+        endforeach;
         $this->session->set_flashdata('flash_message', get_phrase('certificate_create_successfully'));
         redirect(base_url() . 'index.php?school_admin/teacher_certificates/', 'refresh');
     }
+    if($param1 == 'edit'){
+        $data['certificate_title'] = $this->input->post('ceritificate_title');
+        $data['sub_title'] = $this->input->post('sub_title');
+        $data['main_cantent'] = $this->input->post('main_cantent');
+        $data['page_size'] = $this->input->post('page_size');
+        $data['page_orientation'] = $this->input->post('page_orientation');
+        $condition = array('certificate_id'=>$param2);
+        $this->Teacher_certificate_model->update_cretificate($data,$condition);
+        $this->session->set_flashdata('flash_message', get_phrase('certificate_edit_successfully'));
+        redirect(base_url() . 'index.php?school_admin/teacher_certificate_list/', 'refresh');
+        
+    }
+    
     if ($param1 == 'download') {
         $teacher_id = $this->input->post('teacher_id');
         $template_type = $this->input->post('template_type');
@@ -15677,7 +16661,20 @@ function teacher_template1($param1 = '', $param2 = '', $param3 = '') {
     $page_data['certificate_design'] = "";
     if ($param1 == 'download') {
         $this->load->model('Teacher_certificate_model');
+        $this->load->model('Certificate_authorities_model');
         $page_data['certificate_detail'] = $this->Teacher_certificate_model->get_certificate_record($param2,$param3,'1');
+        $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+    $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
     } else {
         $page_data['certificate_design'] = "true";
     }
@@ -15693,7 +16690,20 @@ function teacher_template2($param1 = '', $param2 = '', $param3 = '') {
     $page_data['certificate_design'] = "";
     if ($param1 == 'download') {
         $this->load->model('Teacher_certificate_model');
+        $this->load->model('Certificate_authorities_model');
         $page_data['certificate_detail'] = $this->Teacher_certificate_model->get_certificate_record($param2,$param3,'2');
+        $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+        $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
     } else {
         $page_data['certificate_design'] = "true";
     }
@@ -15709,7 +16719,20 @@ function teacher_template3($param1 = '', $param2 = '', $param3 = '') {
     $page_data['certificate_design'] = "";
     if ($param1 == 'download') {
         $this->load->model('Teacher_certificate_model');
+        $this->load->model('Certificate_authorities_model');
         $page_data['certificate_detail'] = $this->Teacher_certificate_model->get_certificate_record($param2,$param3,'3');
+        $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+        $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
     } else {
         $page_data['certificate_design'] = "true";
     }
@@ -15725,7 +16748,20 @@ function teacher_template4($param1 = '', $param2 = '', $param3 = '') {
     $page_data['certificate_design'] = "";
     if ($param1 == 'download') {
         $this->load->model('Teacher_certificate_model');
+        $this->load->model('Certificate_authorities_model');
         $page_data['certificate_detail'] = $this->Teacher_certificate_model->get_certificate_record($param2,$param3,'4');
+        $authorities_id = $page_data['certificate_detail']->certificate_authorities; 
+        $data = array();
+            if (!empty($authorities_id)) {
+                $valu = explode(",", $authorities_id);
+                $count = count($valu);
+                for($i=0; $i<$count; $i++){
+                $data[] = $this->Certificate_authorities_model->get_data_by_id($valu[$i]);
+                }
+              $page_data['authorities'] = $data;
+            } else {
+                $page_data['authorities'] = '';
+            }
     } else {
         $page_data['certificate_design'] = "true";
     }
@@ -15743,6 +16779,16 @@ function get_section_by_class($class_id) {
         echo '<option value="' . $row['section_id'] . '">' . $row['name'] . '</option>';
     }
 }
+
+//Get Medical Camp Class Wise
+ function get_camp_byclass($class_id) {
+        $page_data = $this->get_page_data_var();
+        $this->load->model("Medical_camp_model");
+        $camp_arr = $this->Medical_camp_model->get_camp_array(array("class_id" => $class_id));
+        foreach ($camp_arr as $row) {
+        echo '<option value="' . $row['medical_camp_id'] . '">' . $row['camp_name'] . '</option>';
+        }
+    }
 
 //Get Student by section id and class id    
 function get_student($section_id, $class_id) {
@@ -15762,9 +16808,32 @@ function get_student($section_id, $class_id) {
     }
 }
 
+function get_template_type($certificate_type_id) {
+    $running_year = $this->Setting_model->get_year();
+    $this->load->model("Certificate_template_model");
+    $template_arr = $this->Certificate_template_model->get_template_certificate_merge_array($certificate_type_id);
+//    echo $this->db->last_query(); die;
+//    pre($template_arr); die;
+    foreach ($template_arr as $row) {
+            echo '<option value="' . $row['template_name'] . '">' . ucfirst($row['template_name']) . '</option>';
+        }
+    
+}
+
 function teacher_attendance_report() {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
+
+    if($this->input->server('REQUEST_METHOD')=='POST'){    
+        $this->form_validation->set_rules('month', 'Month', 'required');
+        if ($this->form_validation->run() == TRUE) {
+            /* $data['year'] = $this->input->post('year');
+            $data['month'] = $this->input->post('month');
+            $data['section_id'] = $this->input->post('section_id'); */
+            redirect(base_url() . 'index.php?school_admin/teacher_attendance_report_view/'.$this->input->post('month'), 'refresh');
+        }       
+    }
+
     $page_data = $this->get_page_data_var();
     $page_data['month'] = date('m');
     $page_data['page_name'] = 'teacher_attendance_report';
@@ -15772,25 +16841,6 @@ function teacher_attendance_report() {
     $page_data['classes'] = $this->Class_model->get_class_array();
     $page_data['total_notif_num'] = $this->get_no_of_notication();
     $this->load->view('backend/index', $page_data);
-}
-
-function teacher_attendance_report_selector() {
-    if ($this->session->userdata('school_admin_login') != 1)
-        redirect(base_url(), 'refresh');
-    $this->form_validation->set_rules('month', 'Month', 'required');
-    if ($this->form_validation->run() == TRUE) {
-        $data['year'] = $this->input->post('year');
-        $data['month'] = $this->input->post('month');
-        $data['section_id'] = $this->input->post('section_id');
-        redirect(base_url() . 'index.php?school_admin/teacher_attendance_report_view/' . $data['month'], 'refresh');
-    } else {
-        $page_data = $this->get_page_data_var();
-        $page_data['page_name'] = 'teacher_attendance_report';
-        $page_data['page_title'] = get_phrase('attendance_report');
-        $page_data['classes'] = $this->Class_model->get_class_array();
-        $page_data['total_notif_num'] = $this->get_no_of_notication();
-        $this->load->view('backend/index', $page_data);
-    }
 }
 
 function teacher_attendance_report_view($month = '') {
@@ -15809,34 +16859,32 @@ function teacher_attendance_report_view($month = '') {
     if (empty($allTeachers)) {
         redirect(base_url() . 'index.php?school_admin/teacher_attendance_report');
     }
-    $page_data['teachers'] = $this->Teacher_model->get_data_by_cols('*', array('isActive' => 1), 'result_arr');
+    $page_data['teachers'] = $this->Teacher_model->get_data_by_cols('*', array('isActive' => 1), 'result_arr',array('name'=>'ASC'));
 
-    $page_data['year'] = explode('-', $running_year);
-    $page_data['days'] = cal_days_in_month(CAL_GREGORIAN, $month, $page_data['year'][0]);
+    $sess_years = explode('-', $running_year);
+    $page_data['year'] = $year = date('m')>3?$sess_years[0]:$sess_years[1];
+    $page_data['days'] = cal_days_in_month(CAL_GREGORIAN, $month, $year);
     $page_data['page_title'] = get_phrase('attendance_report_of_teacher');
     //pre($page_data['teachers']);die;
     foreach ($page_data['teachers'] as $k => $row) { //pre($row);die;
         $p = 0;
         for ($i = 1; $i <= $page_data['days']; $i++) {
-            $timestamp = strtotime($i . '-' . $month . '-' . $page_data['year'][0]);
+            //$timestamp = strtotime($i . '-' . $month . '-' . $page_data['year'][0]);
+            $date = $year.'-'.$month.'-'.($i<10?'0'.$i:$i);
             //$data = array('section_id' => $page_data['section_id'], 'class_id' => $page_data['class_id'], "year" => $running_year, "timestamp" => $timestamp, 'student_id' => $v['student_id']);
             //$atten = $this->Student_model->get_attendance($data);
-            $atten = $this->db->get_where('attendance_teacher', array('year' => $running_year, 'timestamp' => $timestamp, 'teacher_id' => $row['teacher_id']))->result_array();
-            //if(!empty($atten) && count($atten)>0)
-            //pre($atten); //die();
-            if (isset($atten) && !empty($atten) && count($atten) > 0) {
-                $page_data['teachers'][$k]['atten'][$p] = $atten[0];
+            $whr = array('year' => $running_year, 'date' => $date, 'teacher_id' => $row['teacher_id']);
+            $atten = $this->db->get_where('attendance_teacher',$whr)->result_array();
+            if($atten){
+                $page_data['teachers'][$k]['atten'] = $atten;
             }
-            $p++;
         }
     }
-    //die;
-    //pre($page_data['teachers']); die();
-
+    //echo '<pre>';print_r($page_data['teachers']);exit;
     $this->load->view('backend/index', $page_data);
 }
 
-function teacher_attendance_report_print_view($month = "") {
+function teacher_attendance_report_print_view($month = '') {
     if ($this->session->userdata('school_admin_login') != 1)
         redirect(base_url(), 'refresh');
     $this->load->model('Student_model');
@@ -15846,29 +16894,27 @@ function teacher_attendance_report_print_view($month = "") {
     $page_data['total_notif_num'] = $this->get_no_of_notication();
     $running_year = $this->globalSettingsRunningYear;
     $this->load->model("Teacher_model");
-    $page_data['teachers'] = $this->Teacher_model->get_data_by_cols('*', array('isActive' => 1), 'result_arr');
-    $page_data['year'] = explode('-', $running_year);
-    $page_data['days'] = cal_days_in_month(CAL_GREGORIAN, $month, $page_data['year'][0]);
+    $page_data['teachers'] = $this->Teacher_model->get_data_by_cols('*', array('isActive' => 1), 'result_arr',array('name'=>'ASC'));
+    
+    $sess_years = explode('-', $running_year);
+    $page_data['year'] = $year = date('m')>3?$sess_years[0]:$sess_years[1];
+    $page_data['days'] = cal_days_in_month(CAL_GREGORIAN, $month, $year);
     $page_data['page_title'] = get_phrase('attendance_report_of_teacher');
 
     foreach ($page_data['teachers'] as $k => $row) { //pre($row);die;
         $p = 0;
         for ($i = 1; $i <= $page_data['days']; $i++) {
-            $timestamp = strtotime($i . '-' . $month . '-' . $page_data['year'][0]);
-            //$data = array('section_id' => $page_data['section_id'], 'class_id' => $page_data['class_id'], "year" => $running_year, "timestamp" => $timestamp, 'student_id' => $v['student_id']);
-            //$atten = $this->Student_model->get_attendance($data);
-            $atten = $this->db->get_where('attendance_teacher', array('year' => $running_year, 'timestamp' => $timestamp, 'teacher_id' => $row['teacher_id']))->result_array();
-            if (!empty($atten) && count($atten) > 0)
-
-            //pre($atten); die();
-                if (isset($atten) && !empty($atten) && count($atten) > 0)
-                    $page_data['teachers'][$k]['atten'][$p] = $atten[0];
-            $p++;
+            $date = $year.'-'.$month.'-'.($i<10?'0'.$i:$i);
+            $whr = array('year' => $running_year, 'date' => $date, 'teacher_id' => $row['teacher_id']);
+            $atten = $this->db->get_where('attendance_teacher',$whr)->result_array();
+            if($atten){
+                $page_data['teachers'][$k]['atten'] = $atten;
+            }
         }
     }
     //pre($page_data['teachers']); die();
 
-    $this->load->view('backend/index', $page_data);
+    $this->load->view('backend/school_admin/teacher_attendance_report_print_view', $page_data);
 }
 
 function automatic_timetable_create_schedule() {
@@ -15916,7 +16962,7 @@ function product_upload_receipt($param1 = '') {
 //                echo $data['image']; die;
                 move_uploaded_file($_FILES['prodct_receipt']['tmp_name'], 'uploads/allot_product_receipt/' . $data['upload_file_name']);
                 $product_receipt_id = $this->Inventory_allotment_model->save_product_allot_receipt($data);
-                $this->session->set_flashdata('flash_message', get_phrase('upload_successfully'));
+                $this->session->set_flashdata('flash_message', get_phrase('receipt_upload_successfully'));
                 redirect(base_url() . 'index.php?school_admin/product_upload_receipt/' . $product_id, 'refresh');
             } else {
                 $this->session->set_flashdata('flash_message_error', get_phrase('It may be the wrong filetype. We only allow JPG, GIF, and PNG, PDF, DOC filetypes!!'));
@@ -16538,142 +17584,154 @@ function show_timetable($class_id = "") {
             $school_id = $this->session->userdata('school_id');
         }
 
-    if ($param1 == 'send') {
-        //pre($this->input->post());die;
-        $parent_reciever = $this->input->post('parent_reciever');
-        $student_reciever = $this->input->post('student_reciever');
-        $teacher_reciever = $this->input->post('teacher_reciever');
+        if ($param1 == 'send') {
+            //pre($this->input->post());die;
+            $parent_reciever = $this->input->post('parent_reciever');
+            $student_reciever = $this->input->post('student_reciever');
+            $teacher_reciever = $this->input->post('teacher_reciever');
 
-        if (count($parent_reciever)) {
-            $ParentDetails = $this->Parent_model->get_parent_details($parent_reciever);
-            if(count($ParentDetails)) {
-                foreach ($ParentDetails as $parent) {
+            $total_sms_send_user = (count($parent_reciever) + count($student_reciever) + count($teacher_reciever));
+
+            /*if($_SERVER['HTTP_HOST']=='localhost'){
+                $DB2 = $this->load->database('sharad_db', TRUE);
+            }else{
+                $rootPass="6syDmECEyqLneAULy2NYtbSLpCqy727M";
+                $dsn1 = 'mysqli://root:'.$rootPass.'@0.0.0.0/sharad';
+                $DB2 = $this->load->database($dsn1, true);
+            }
+
+            $DB2->where(array('school_id'=>$school_id));
+            $available_sms = $DB2->get('allocate_sms')->row()->notification_sms;
+
+            if($available_sms < $total_sms_send_user){
+                echo 'no_sms_pack';die;
+            }*/             
+
+            if (count($parent_reciever)) {
+                foreach ($parent_reciever as $parent) {
+                    $exp_par = explode('_', $parent);
+                    $ParentDetails = $this->Parent_model->get_parent_details_by_id($exp_par[0]);
+
                     $data = array();
-                    $ParentName = ucfirst($parent['father_name']) . ' ' . ucfirst($parent['father_mname']) . ' ' . ucfirst($parent['father_lname']);
-                    $data['notice_title'] = 'Static Title';
+                    $ParentName = ucfirst($ParentDetails->father_name) . ' ' . ucfirst($ParentDetails->father_mname) . ' ' . ucfirst($ParentDetails->father_lname);
+
+                    $data['notice_title'] = $this->input->post('parent_notice_title');
                     $data['message'] = $this->input->post('parent_message');
                     $data['receiver_type'] = 'P';
-                    //$data['class_id'] = '';
-                    $data['receiver_id'] = $parent['parent_id'];
+                    $data['class_id'] = $exp_par[1];
+                    $data['receiver_id'] = $exp_par[0];
                     $data['receiver_full_name'] = $ParentName;
-                    $data['receiver_mobile_no'] = $parent['cell_phone'];
-                    $data['receiver_email'] = $parent['email'];
+                    $data['receiver_mobile_no'] = $ParentDetails->cell_phone;
+                    $data['receiver_email'] = $ParentDetails->email;
                     $data['sender_type'] = $this->session->userdata('u_type');
                     $data['sender_id'] = $this->session->userdata('login_user_id');
                     $data['later_schedule_time'] = $this->input->post('set_date_time');
-                    $data['device_token'] = $parent['device_token'];
+                    $data['device_token'] = $ParentDetails->device_token;
                     $data['school_id'] = $school_id;
+                    $data['db_store'] = 'yes';
 
                     if($data['later_schedule_time']==''){
-                       $data['message_schedule_status'] = '1'; 
+                        $data['message_schedule_status'] = '1'; 
                     }
 
                     $message = array();
                     $message['sms_message'] = $data['message'];
-                    $message['subject'] = 'title';
+                    $message['subject'] = $data['notice_title'];
                     $message['messagge_body'] = $data['message'];
                     $message['to_name'] = ucwords($ParentName);
-                    //$this->Message_model->add_custom_messsage_schudule($data);
-                    $ReceiverPhone = ($parent['cell_phone'] != '') ? $parent['cell_phone'] : (($parent['mother_mobile'] != '') ? $parent['mother_mobile'] : (($parent['home_phone'] != '') ? $parent['home_phone'] : $parent['work_phone']));
-                    $ReceiverEmail = ($parent['email'] != '') ? $parent['email'] : $parent['mother_email'] != '';
-                    //$user_details = array('user_id' => $parent['parent_id'], 'user_type' => 'parent');
-                    //$par_message = $this->input->post('parent_message');
-                    //if ($data['later_schedule_time'] == '') {
-                    send_school_notification_new('custom_message_admin', $message, $ReceiverPhone, $ReceiverEmail, $data);
-                    /*} else {
-                        echo "";
-                    }*/
+                    $ReceiverPhone = ($ParentDetails->cell_phone != '') ? $ParentDetails->cell_phone : (($ParentDetails->mother_mobile != '') ? $ParentDetails->mother_mobile : (($ParentDetails->home_phone != '') ? $ParentDetails->home_phone : $ParentDetails->work_phone));
+                    $ReceiverEmail = ($ParentDetails->email != '') ? $ParentDetails->email : $ParentDetails->mother_email != '';
+
+                    send_school_notification_new('custom_message_admin', $message, $ReceiverPhone, $ReceiverEmail, $data, '', 'notification_sms');
                 }
-            }
-        }
+            }           
 
-        if (count($student_reciever)) {            
-            $StudentDetails = $this->Student_model->get_student_details_by_id($student_reciever);
-            if (count($StudentDetails)) {
-                foreach ($StudentDetails as $student) {
+            if (count($student_reciever)) {
+                foreach ($student_reciever as $student) {
+                    $exp_stu = explode('_', $student);
+                    $StudentDetails = $this->Student_model->get_student_details_by_id($exp_stu[0]);
+
                     $data1 = array();
-                    $StudentName = ucfirst($student['name']) . ' ' . ucfirst($student['mname']) . ' ' . ucfirst($student['lname']);
+                    $StudentName = ucfirst($StudentDetails->name) . ' ' . ucfirst($StudentDetails->mname) . ' ' . ucfirst($StudentDetails->lname);
 
-                    $data1['notice_title'] = 'Static Title';
+                    $data1['notice_title'] = $this->input->post('student_notice_title');
                     $data1['message'] = $this->input->post('student_message');
                     $data1['receiver_type'] = 'S';
-                    $data1['class_id'] = $student['class_id'];
-                    $data1['receiver_id'] = $student['student_id'];
+                    $data1['class_id'] = $exp_stu[1];
+                    $data1['receiver_id'] = $exp_stu[0];
                     $data1['receiver_full_name'] = $StudentName;
-                    $data1['receiver_mobile_no'] = $student['phone'];
-                    $data1['receiver_email'] = $student['email'];
+                    $data1['receiver_mobile_no'] = $StudentDetails->phone;
+                    $data1['receiver_email'] = $StudentDetails->email;
                     $data1['sender_type'] = $this->session->userdata('u_type');
                     $data1['sender_id'] = $this->session->userdata('login_user_id');
                     $data1['later_schedule_time'] = $this->input->post('set_date_time1');
-                    $data1['device_token'] = $student['device_token'];
+                    $data1['device_token'] = $StudentDetails->device_token;
                     $data1['school_id'] = $school_id;
+                    $data1['db_store'] = 'yes';
 
                     if($data1['later_schedule_time']==''){
-                       $data1['message_schedule_status'] = '1'; 
+                        $data1['message_schedule_status'] = '1'; 
                     }
 
                     $message = array();
                     $message['sms_message'] = $data1['message'];
-                    $message['subject'] = 'title';
+                    $message['subject'] = $data1['notice_title'];
                     $message['messagge_body'] = $data1['message'];
                     $message['to_name'] = ucwords($StudentName);
-                    $ReceiverPhone = $student['phone'];
-                    $ReceiverEmail = $student['email'];
+                    $ReceiverPhone = $StudentDetails->phone;
+                    $ReceiverEmail = $StudentDetails->email;
 
-                    send_school_notification_new('custom_message_admin', $message, $ReceiverPhone, $ReceiverEmail, $data1);
-                    
+                    send_school_notification_new('custom_message_admin', $message, $ReceiverPhone, $ReceiverEmail, $data1, '', 'notification_sms');
                 }
             }
-        }
 
-        if (count($teacher_reciever)) {           
-            $TeacherDetails = $this->Teacher_model->get_teacher_details_by_id($teacher_reciever);
-            if (count($TeacherDetails)) {
-                foreach ($TeacherDetails as $teacher) {
+            if (count($teacher_reciever)) {
+                foreach ($teacher_reciever as $teacher) {
+                    $exp_tea = explode('_', $teacher);
+                    $TeacherDetails = $this->Teacher_model->get_teacher_details_by_id($exp_tea[0]);
+
                     $data2 = array();
+                    $TeacherName = ucfirst($TeacherDetails->name) . ' ' . ucfirst($TeacherDetails->middle_name) . ' ' . ucfirst($TeacherDetails->last_name);
 
-                    $TeacherName = ucfirst($teacher['name']) . ' ' . ucfirst($teacher['middle_name']) . ' ' . ucfirst($teacher['last_name']);
-
-                    $data2['notice_title'] = 'Static Title';
+                    $data2['notice_title'] = $this->input->post('teacher_notice_title');
                     $data2['message'] = $this->input->post('teacher_message');
                     $data2['receiver_type'] = 'T';
-                    $data2['class_id'] = $teacher['class_id'];
-                    $data2['receiver_id'] = $teacher['teacher_id'];
+                    $data2['class_id'] = $exp_tea[1];
+                    $data2['receiver_id'] = $exp_tea[0];
                     $data2['receiver_full_name'] = $TeacherName;
-                    $data2['receiver_mobile_no'] = $teacher['cell_phone'];
-                    $data2['receiver_email'] = $teacher['email'];
+                    $data2['receiver_mobile_no'] = $TeacherDetails->cell_phone;
+                    $data2['receiver_email'] = $TeacherDetails->email;
                     $data2['sender_type'] = $this->session->userdata('u_type');
                     $data2['sender_id'] = $this->session->userdata('login_user_id');
                     $data2['later_schedule_time'] = $this->input->post('set_date_time2');
-                    $data2['device_token'] = $teacher['device_token'];
+                    $data2['device_token'] = $TeacherDetails->device_token;
                     $data2['school_id'] = $school_id;
+                    $data2['db_store'] = 'yes';
 
                     if($data2['later_schedule_time']==''){
-                       $data2['message_schedule_status'] = '1'; 
+                        $data2['message_schedule_status'] = '1'; 
                     }
 
                     $message = array();
                     $message['sms_message'] = $data2['message'];
-                    $message['subject'] = 'title';
+                    $message['subject'] = $data2['notice_title'];
                     $message['messagge_body'] = $data2['message'];
                     $message['to_name'] = ucwords($TeacherName);
+                    $ReceiverPhone = $TeacherDetails->phone;
+                    $ReceiverEmail = $TeacherDetails->email;
 
-                    $ReceiverPhone = ($teacher['cell_phone'] != '') ? $teacher['cell_phone'] : (($teacher['work_phone'] != '') ? $teacher['work_phone'] : $teacher['home_phone']);
-                    $ReceiverEmail = $teacher['email'];
-
-                    send_school_notification_new('custom_message_admin', $message, $ReceiverPhone, $ReceiverEmail, $data2);
+                    send_school_notification_new('custom_message_admin', $message, $ReceiverPhone, $ReceiverEmail, $data2, '', 'notification_sms');
                 }
-            }
+            }            
+        } else {
+            $this->load->model("Notification_model");
+            $page_data['classes'] = $this->Class_model->get_class_array();
+            $page_data['page_name'] = 'mobile_message';
+            $page_data['page_title'] = get_phrase('custom_message');
+            $page_data['notices'] = $this->Notification_model->getNotices();
+            $this->load->view('backend/index', $page_data);
         }
-    } else {
-        $this->load->model("Notification_model");
-        $page_data['classes'] = $this->Class_model->get_class_array();
-        $page_data['page_name'] = 'mobile_message';
-        $page_data['page_title'] = get_phrase('custom_message');
-        $page_data['notices'] = $this->Notification_model->getNotices();
-        $this->load->view('backend/index', $page_data);
     }
-}
 
     function unique_multidim_array($array, $key) { 
         $temp_array = array(); 
@@ -16727,6 +17785,7 @@ function show_timetable($class_id = "") {
                                 $parents[$i]['parent_email'] = $ReceiverEmail;
                                 $parents[$i]['parent_fullname'] = $ReceiverFullname;
                                 $parents[$i]['parent_id'] = $ReceiverId;
+                                $parents[$i]['class_id'] = $cls_id;
                                 $i++;
                             }
                         }
@@ -16747,6 +17806,7 @@ function show_timetable($class_id = "") {
                                 $students[$j]['student_email'] = $ReceiverEmail;
                                 $students[$j]['student_fullname'] = $ReceiverFullname;
                                 $students[$j]['student_id'] = $ReceiverId;
+                                $students[$j]['class_id'] = $cls_id;
                                 $j++;
                             }
                         }
@@ -16766,6 +17826,7 @@ function show_timetable($class_id = "") {
                                 $teachers[$k]['teacher_email'] = $ReceiverEmail;
                                 $teachers[$k]['teacher_fullname'] = $ReceiverFullname;
                                 $teachers[$k]['teacher_id'] = $ReceiverId;
+                                $teachers[$k]['class_id'] = $cls_id;
                                 $k++;
                             }
                         }
@@ -17219,7 +18280,7 @@ function download_student_bulk_photo_upload_error_file() {
                  $data['before_place_work'] = $this->input->post('before_place_work');
                  $data['achivement_award'] = $this->input->post('achivement_award');
 
-         if ($data['phone_no'] != "") {
+                  if ($data['phone_no'] != "") {
 //             echo $data['phone_no']; die;
                  $name = ucfirst($data['name']);
                  $msg = "Welcome! ".$name." in Sharad School. You are Registered Successfully with Login email:".$data['email']." and Password:" . $passcode;
@@ -17231,11 +18292,11 @@ function download_student_bulk_photo_upload_error_file() {
                  $message['messagge_body'] = $message_body;
                  $message['to_name'] = $name;
                  send_school_notification('new_user', $message, array($phone), array($data['email']));
-         } 
+                  } 
                  $this->Doctor_model->add($data);
                  $this->session->set_flashdata("flash_message", get_phrase("data_added_successfully"));
                  redirect(base_url() . 'index.php?school_admin/doctors/', 'refresh');
-         } else{
+         } else{    
                  $this->session->set_flashdata('flash_validation_error', validation_errors());
                  redirect(base_url() . 'index.php?school_admin/doctors/', 'refresh');
          }
@@ -17301,6 +18362,9 @@ function download_student_bulk_photo_upload_error_file() {
     function restor_google_backup_action(){
         if ($this->session->userdata('school_admin_login') != 1)
             redirect(base_url(), 'refresh');
+        @ini_set('memory_limit', '-1');
+        @set_time_limit(0);
+                
         $this->load->library('upload');
         $config['upload_path'] = './uploads/restore_google_back_sql/';
         $config['file_name'] = 'google_drive_restore_sqldump.sql';
@@ -17315,24 +18379,30 @@ function download_student_bulk_photo_upload_error_file() {
                 @unlink($data['full_path']);
                 $this->session->set_flashdata('flash_message_error', "Only sql dump file allow for restore.");
             }else{
-                $RootDBUserPassword="";
+                $RootDBUserPassword=DB_PASS;
                 if(CURRENT_INSTANCE=='beta_ag'){
-                    $dbName='beta_ag_test';
+                    //$dbName='beta_ag_test';
+                    $dbName=CURRENT_INSTANCE;
                 }else{
                     $dbName=CURRENT_INSTANCE;
                 }
-                $shell_exec_command='/var/www/html/google_drive_backup_restore.sh '.$RootDBUserPassword.' '.$dbName.' '.$data['full_path'].' 2>&1 | tee -a /tmp/google_drive_backup_restore_log 2>/dev/null >/dev/null &';
-                generate_log('Going to fire command for shell :::'.$shell_exec_command,'google_drive_restore_log_'.date('Y_m_d').'.log');
-                $error_msg= shell_exec('sudo '.$shell_exec_command);
-                generate_log('getting output from shell_exec() ::: '+$error_msg,'google_drive_restore_log_'.date('Y_m_d').'.log');
-                sleep(200);
-                $content    =   preg_replace('/\s+/','',trim(file_get_contents('/tmp/google_drive_backup_restore_log')));
-                $content    =   preg_replace('/\t/','',$content);
-                $content    =   preg_replace('~[\r\n]+~', '', $content);
-                if($content=='Warning:Usingapasswordonthecommandlineinterfacecanbeinsecure.Warning:Usingapasswordonthecommandlineinterfacecanbeinsecure.'){
-                    $this->session->set_flashdata('flash_message_error','Backup restored successfully');
+                
+                if(file_exists('/var/www/html/google_drive_backup_restore.sh')){
+                    $shell_exec_command='/var/www/html/google_drive_backup_restore.sh '.$RootDBUserPassword.' '.$dbName.' '.$data['full_path'].' 2>&1 | tee -a /tmp/google_drive_backup_restore_log 2>/dev/null >/dev/null &';
+                    generate_log('Going to fire command for shell :::'.$shell_exec_command,'google_drive_restore_log_'.date('Y_m_d').'.log');
+                    $error_msg= shell_exec('sudo '.$shell_exec_command);
+                    generate_log('getting output from shell_exec() ::: '+$error_msg,'google_drive_restore_log_'.date('Y_m_d').'.log');
+                    sleep(200);
+                    $content    =   preg_replace('/\s+/','',trim(file_get_contents('/tmp/google_drive_backup_restore_log')));
+                    $content    =   preg_replace('/\t/','',$content);
+                    $content    =   preg_replace('~[\r\n]+~', '', $content);
+                    if($content=='Warning:Usingapasswordonthecommandlineinterfacecanbeinsecure.Warning:Usingapasswordonthecommandlineinterfacecanbeinsecure.'){
+                        $this->session->set_flashdata('flash_message','Backup restored successfully');
+                    }else{
+                        $this->session->set_flashdata('flash_message_error',"There is some error while restoring your backup,Please contact support@rarome.com.");
+                    }
                 }else{
-                    $this->session->set_flashdata('flash_message_error',"There is some error while restoring your backup,Please contact support@rarome.com.");
+                    $this->session->set_flashdata('flash_message_error','Backup restored facility not available in this server');
                 }
             }
         }else{
@@ -17341,7 +18411,7 @@ function download_student_bulk_photo_upload_error_file() {
         redirect(base_url().'index.php?school_admin/database_data_backup_list');
     }
 
-    /************************Fee Particulars*******************************/
+    /************************Photo Gallery*******************************/
     function photo_galleries(){
        if ($this->session->userdata('school_admin_login') != 1)
            redirect(base_url(), 'refresh');
@@ -17361,6 +18431,9 @@ function download_student_bulk_photo_upload_error_file() {
                $save_data['school_id'] = _getSchoolid();
                $save_data['created'] = date('Y-m-d H:i:s');
                $save_data['updated'] = date('Y-m-d H:i:s');
+               $save_data['created_by_name'] = $this->session->userdata('name');
+               $save_data['created_by_type'] = $this->session->userdata('login_type');
+               $save_data['created_by_id'] = $this->session->userdata('login_user_id');
                $return = $this->Gallery_model->save_gallery($save_data);
 
                if($return){
@@ -17419,9 +18492,17 @@ function download_student_bulk_photo_upload_error_file() {
     }
 
     function photo_gallery_delete($id=false){
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect(base_url(), 'refresh');
         if($this->input->server('REQUEST_METHOD')=='POST'){
-            $this->load->model('Gallery_model');    
-            $this->Gallery_model->gallery_delete(array('id'=>$id));
+            $this->load->model('Gallery_model','S3_model');    
+            $flag = $this->Gallery_model->gallery_delete(array('id'=>$id));
+            if($flag){
+                $images = $this->Gallery_model->get_gallery_images(array('gallery_id'=>$id));
+                foreach($images as $img){
+                    $this->Gallery_model->delete_gallery_img($img->id);
+                }
+            }
             echo json_encode(array('status'=>'success','msg'=>'Photo Gallery Deleted!'));exit;
         }
     }
@@ -17479,7 +18560,12 @@ function download_student_bulk_photo_upload_error_file() {
                                   'main'=>$s3_m_path,
                                   'size'=>($imgSize[0].'x'.$imgSize[1]),
                                   'created'=>date('Y-m-d H:i:s'),
-                                  'updated'=>date('Y-m-d H:i:s'));
+                                  'updated'=>date('Y-m-d H:i:s'),
+                                  'created_by_name' => $this->session->userdata('name'),
+                                  'created_by_type' => $this->session->userdata('login_type'),
+                                  'created_by_id' => $this->session->userdata('login_user_id'),
+                                  'running_year' => _getYear(),
+                                  'school_id' => _getSchoolid());
                 $this->Gallery_model->save_gallery_image($save_img);
             }
 
@@ -17496,7 +18582,7 @@ function download_student_bulk_photo_upload_error_file() {
 
     function gallery_img_edit($img_id=false){
         if ($this->session->userdata('school_admin_login') != 1)
-            redirect(base_url(), 'refresh');
+        redirect(base_url(), 'refresh');
 
         $this->load->model(array('Gallery_model','S3_model'));
         $page_data = $this->get_page_data_var();
@@ -17508,7 +18594,10 @@ function download_student_bulk_photo_upload_error_file() {
             $save_data['title'] = $this->input->post('title');
             $save_data['brief'] = $this->input->post('brief');
             $save_data['updated'] = date('Y-m-d H:i:s');
-            $return = $this->Gallery_model->save_gallery_image($save_data);
+            $flag = $this->Gallery_model->save_gallery_image($save_data);
+            $tags = $this->input->post('tags');
+            $this->Gallery_model->save_gallery_tags($tags,$img_id);
+
 
             $this->session->set_flashdata('flash_message', get_phrase('image_updated_successfully'));
             redirect('index.php?school_admin/photo_gallery_images/'.$page_data['img']->gallery_id, 'refresh');
@@ -17520,11 +18609,15 @@ function download_student_bulk_photo_upload_error_file() {
             $whr['E.class_id'] = $page_data['img']->class_id;
         }
         $page_data['students'] = $this->Gallery_model->get_students($whr);
-        //echo '<pre>';print_r($page_data['objects']);exit;
+        $page_data['peoples'] = $this->db->get_where('photo_gallery_image_tags',array('image_id'=>$img_id))->result();
+        $page_data['faces'] = $this->db->get_where('photo_gallery_image_face_tags',array('image_id'=>$img_id))->result();   
+        //echo '<pre>';print_r($page_data['peoples']);exit;
         $this->load->view('backend/index', $page_data);
     }    
 
     function get_users_by_user_type(){
+       if ($this->session->userdata('school_admin_login') != 1)
+           redirect(base_url(), 'refresh');
         if($this->input->server('REQUEST_METHOD')=='POST'){
             $this->load->model(array('Gallery_model'));
             $return = array('status'=>'success','html'=>'');
@@ -17538,25 +18631,33 @@ function download_student_bulk_photo_upload_error_file() {
                 $records = $this->Gallery_model->get_students($whr);
                 $return['html'] = '<option value="">Select Student</option>';
                 foreach($records as $rec){
-                    $return['html'] .= '<option value="'.$rec->student_id.'">'.$rec->name.' '.$rec->lname.'</option>';
+                    $return['html'] .= '<option value="'.$rec->student_id.'" data-type="S" data-gender="1">'.$rec->name.' '.$rec->lname.'</option>';
                 }
             }else if($type==2){
                 $records = $this->Gallery_model->get_teachers();
                 $return['html'] = '<option value="">Select Teacher</option>';
                 foreach($records as $rec){
-                    $return['html'] .= '<option value="'.$rec->teacher_id.'">'.$rec->name.' '.$rec->last_name.'</option>';
+                    $return['html'] .= '<option value="'.$rec->teacher_id.'" data-type="T" data-gender="1">'.$rec->name.' '.$rec->last_name.'</option>';
                 }
             }else if($type==3){
-                $records = $this->Gallery_model->get_parents();
+                $whr = array();
+                if($class_id!=0){
+                    $whr['E.class_id'] = $class_id;
+                }
+                $records = $this->Gallery_model->get_parents($whr);
                 $return['html'] = '<option value="">Select Parent</option>';
                 foreach($records as $rec){
-                    $return['html'] .= '<option value="'.$rec->parent_id.'">'.$rec->father_name.' '.$rec->father_lname.'</option>';
+                    $return['html'] .= '<option value="'.$rec->parent_id.'" data-type="P" data-gender="1">'.$rec->father_name.' '.$rec->father_lname.'</option>';
                 }
             }else if($type==4){
-                $records = $this->Gallery_model->get_parents();
+                $whr = array();
+                if($class_id!=0){
+                    $whr['E.class_id'] = $class_id;
+                }
+                $records = $this->Gallery_model->get_parents($whr,'P.mother_name ASC');
                 $return['html'] = '<option value="">Select Parent</option>';
                 foreach($records as $rec){
-                    $return['html'] .= '<option value="'.$rec->parent_id.'">'.$rec->mother_name.' '.$rec->mother_lname.'</option>';
+                    $return['html'] .= '<option value="'.$rec->parent_id.'" data-type="P" data-gender="2">'.$rec->mother_name.' '.$rec->mother_lname.'</option>';
                 }
             }
             echo json_encode($return);exit;
@@ -17565,7 +18666,7 @@ function download_student_bulk_photo_upload_error_file() {
     
     function gallery_img_delete($img_id=false){
         if ($this->session->userdata('school_admin_login') != 1)
-            redirect(base_url(), 'refresh');
+        redirect(base_url(), 'refresh');
 
         $this->load->model(array('Gallery_model','S3_model')); 
         $img = $this->Gallery_model->delete_gallery_img($img_id);
@@ -17577,16 +18678,16 @@ function download_student_bulk_photo_upload_error_file() {
         $running_year = $this->globalSettingsRunningYear;
         $student = $this->Student_model->passport_expiry_reminder($running_year);
         foreach($student as $row):
-             $name = ucfirst($row['name']);
-                 $msg = "Hi ". $name." your Passport(".$row['passport_no'].") is about to expire on ".$row['passport_expiry_date']." . Please renew it before time.";
-                 $phone = $row['phone'];
-                 $message = array();
-                 $message_body = $msg;
-                 $message['sms_message'] = $msg;
-                 $message['subject'] = 'Renew Passsport ' . $this->globalSettingsSystemName;
-                 $message['messagge_body'] = $message_body;
-                 $message['to_name'] = $name;
-                 send_school_notification('new_user', $message, array($phone), array($row['email']));
+            $name = ucfirst($row['name']);
+            $msg = "Hi ". $name." your Passport(".$row['passport_no'].") is about to expire on ".$row['passport_expiry_date']." . Please renew it before time.";
+            $phone = $row['phone'];
+            $message = array();
+            $message_body = $msg;
+            $message['sms_message'] = $msg;
+            $message['subject'] = 'Renew Passsport ' . $this->globalSettingsSystemName;
+            $message['messagge_body'] = $message_body;
+            $message['to_name'] = $name;
+            send_school_notification('new_user', $message, array($phone), array($row['email']));
         endforeach;
     }
     
@@ -17595,21 +18696,351 @@ function download_student_bulk_photo_upload_error_file() {
         $student = $this->Student_model->visa_expiry_reminder($running_year);
         foreach($student as $row):
              $name = ucfirst($row['name']);
-                 $msg = "Hi ". $name." your Visa(".$row['visa_no'].") is about to expire on ".$row['visa_expiry_date']." . Please renew it before time.";
-                 $phone = $row['phone'];
+            $msg = "Hi ". $name." your Visa(".$row['visa_no'].") is about to expire on ".$row['visa_expiry_date']." . Please renew it before time.";
+            $phone = $row['phone'];
+            $message = array();
+            $message_body = $msg;
+            $message['sms_message'] = $msg;
+            $message['subject'] = 'Renew Visa ' . $this->globalSettingsSystemName;
+            $message['messagge_body'] = $message_body;
+            $message['to_name'] = $name;
+            send_school_notification('new_user', $message, array($phone), array($row['email']));
+        endforeach;
+    }
+    
+    function manage_camp($param1 = '', $param2 = ''){
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+        
+        $this->load->model('Medical_camp_model');
+        if($param1 == 'create'){
+//         pre($this->input->post()); die;
+            $this->form_validation->set_rules('camp_name', 'Name', 'required');
+            $this->form_validation->set_rules('doctor_name', 'Doctor Name', 'required');
+            $this->form_validation->set_rules('description', 'Description', 'required');
+            $this->form_validation->set_rules('camp_start_date', 'Camp Start Date', 'required');
+            $this->form_validation->set_rules('camp_last_date', 'Camp Last Date', 'required');
+            $this->form_validation->set_rules('class_name', 'Class Name', 'required');
+            if ($this->form_validation->run() == TRUE) {
+                    $data['camp_name'] = $this->input->post('camp_name');
+                    $data['doctor_id'] = $this->input->post('doctor_name');
+                    $data['camp_dsecription'] = $this->input->post('description');
+                    $data['camp_start_date'] = $this->input->post('camp_start_date');
+                    $data['camp_end_date'] = $this->input->post('camp_last_date');
+                    $data['class_id'] = $this->input->post('class_name');
+//              pre($data); die;
+                    $this->Medical_camp_model->add($data);
+                    $this->session->set_flashdata("flash_message", get_phrase("camp_added_successfully"));
+                 redirect(base_url() . 'index.php?school_admin/manage_camp/', 'refresh'); 
+            }else{
+                $this->session->set_flashdata('flash_validation_error', validation_errors());
+                redirect(base_url() . 'index.php?school_admin/add_camp/', 'refresh'); 
+            }
+        }
+        if($param1 == 'edit'){
+                    $data['camp_name'] = $this->input->post('camp_name');
+                    $data['doctor_id'] = $this->input->post('doctor_name');
+                    $data['camp_dsecription'] = $this->input->post('description');
+                    $data['camp_start_date'] = $this->input->post('camp_start_date');
+                    $data['camp_end_date'] = $this->input->post('camp_end_date');
+                    $data['class_id'] = $this->input->post('class_name');
+//                    pre($data); die;
+                $this->Medical_camp_model->update_camp($data, array("medical_camp_id" => $param2));
+                $this->session->set_flashdata("flash_message", get_phrase("camp_updated_successfully"));
+                redirect(base_url() . 'index.php?school_admin/manage_camp/', 'refresh');
+        }
+        if($param1 == 'delete'){
+                    $this->Medical_camp_model->delete_camp($param2);
+                  $this->session->set_flashdata("flash_message", get_phrase("camp_deleted_successfully"));
+                  redirect(base_url() . 'index.php?school_admin/manage_camp/', 'refresh');
+        }
+            $page_data = $this->get_page_data_var();  
+            $page_data['manage_camp_list'] =   $this->Medical_camp_model->get_camp_list();   
+//            pre($page_data['manage_camp_list']); die;
+            $page_data['page_name'] = 'manage_camp';
+            $page_data['page_title'] = get_phrase('manage_camp');
+            $page_data['total_notif_num'] = $this->get_no_of_notication();
+            $this->load->view('backend/index', $page_data); 
+    }
+    
+    function add_camp(){
+           if ($this->session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+           $this->load->model('Doctor_model');
+           $this->load->model('Class_model');
+        $page_data = $this->get_page_data_var();  
+        $page_data['doctor_name_list'] =   $this->Doctor_model->get_doctor_array();
+        $page_data['class_array'] = $this->Class_model->get_class_array();
+//        pre($page_data['doctor_name_list'] ); die;
+        $page_data['page_name'] = 'add_camp';
+        $page_data['page_title'] = get_phrase('add_camp');
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $this->load->view('backend/index', $page_data);
+    }
+
+    function camp_assign_to_student($param1 = '', $param2 = ''){
+         if ($this->session->userdata('school_admin_login') != 1)
+         redirect('login', 'refresh');
+         $page_data = $this->get_page_data_var();
+         $this->load->model('Camp_assign_model');
+         if($param1 == 'create'){
+//             echo "sucess"; die;
+             $data['student_id'] = $this->input->post('student_id');
+//             pre($data['student_id']); die;
+             foreach($data['student_id'] as $stu_id):
+                 $data['student_id'] = $stu_id;
+                 $data['medical_camp_id'] = $this->input->post('camp_type');
+                 $data['class_id'] = $this->input->post('class_id');
+                 $data['section_id'] = $this->input->post('section_id');
+                 $this->Camp_assign_model->add($data);
+             endforeach;
+             
+             $this->session->set_flashdata("flash_message", get_phrase("camp_assign_to_student_successfully"));
+             redirect(base_url() . 'index.php?school_admin/camp_assign_to_student/', 'refresh'); 
+         } 
+         if($param1 == 'edit'){
+             $data['student_id'] = $this->input->post('student_id');
+             $data['medical_camp_id'] = $this->input->post('camp_type');
+             $data['class_id'] = $this->input->post('class_id');
+             $data['section_id'] = $this->input->post('section_id');
+            $this->Camp_assign_model->update_assigncamp($data, array("assign_camp_id" => $param2));
+            $this->session->set_flashdata("flash_message", get_phrase("camp_updated_successfully"));
+            redirect(base_url() . 'index.php?school_admin/camp_assign_to_student/', 'refresh');
+         }         
+        $page_data['camp_assign_list'] =   $this->Camp_assign_model->get_assigncamp_array();
+//        pre($page_data['camp_assign_list']); die;
+        $page_data['page_name'] = 'camp_assign';
+        $page_data['page_title'] = get_phrase('camp_assign_to_student');
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $this->load->view('backend/index', $page_data);
+    }
+    
+    function certificate_authorities($param1 = '', $param2 = ''){
+         if ($this->session->userdata('school_admin_login') != 1)
+         redirect('login', 'refresh');
+         $page_data = $this->get_page_data_var();
+         $this->load->model('Certificate_authorities_model');
+         if($param1 == 'create'){
+             $data['authorities_name'] = $this->input->post('name');
+             $data['designaiton'] = $this->input->post('designation');
+             $types = array('image/jpeg', 'image/gif', 'image/png');
+            if ($_FILES['authorities_sign']['name'] != '') {
+                if (in_array($_FILES['authorities_sign']['type'], $types)) {
+                    $img = $_FILES['authorities_sign']['name'];
+                    $data['signature'] = $img;
+                    if ($this->Certificate_authorities_model->add($data)) {
+                        move_uploaded_file($_FILES['authorities_sign']['tmp_name'], 'uploads/authorities_image/' . $data['signature']);
+                        $this->session->set_flashdata('flash_message', get_phrase('authorities_added_successfully'));
+                    }
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('It_may_be_the_wrong_filetype._We_only_allow_JPG,_GIF,_and_PNG_filetypes!!'));
+                    redirect(base_url() . 'index.php?school_admin/certificate_authorities/' , 'refresh');
+                }
+            }else{
+                $this->Certificate_authorities_model->add($data);
+                $this->session->set_flashdata('flash_message', get_phrase('authorities_added_successfully'));
+                redirect(base_url() . 'index.php?school_admin/certificate_authorities/' , 'refresh');
+            }
+         } 
+         if($param1 == 'edit'){
+             $data['authorities_name'] = $this->input->post('name');
+             $data['designaiton'] = $this->input->post('designation');
+             
+              $types = array('image/jpeg', 'image/gif', 'image/png');
+            if ($_FILES['authorities_sign']['name'] != '') {
+                if (in_array($_FILES['authorities_sign']['type'], $types)) {
+                    $img = $_FILES['authorities_sign']['name'];
+                    $data['signature'] = $img;
+                    if ($this->Certificate_authorities_model->update_authorities($data, array("certificate_authorities_id" => $param2))) {
+                        move_uploaded_file($_FILES['authorities_sign']['tmp_name'], 'uploads/authorities_image/' . $data['signature']);
+                        $this->session->set_flashdata('flash_message', get_phrase('authorities_updated_successfully'));
+                    }
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('It_may_be_the_wrong_filetype._We_only_allow_JPG,_GIF,_and_PNG_filetypes!!'));
+                    redirect(base_url() . 'index.php?school_admin/certificate_authorities/' , 'refresh');
+                }
+            }else{
+                $this->Certificate_authorities_model->update_authorities($data, array("certificate_authorities_id" => $param2));
+                $this->session->set_flashdata('flash_message', get_phrase('authorities_updated_successfully'));
+                redirect(base_url() . 'index.php?school_admin/certificate_authorities/' , 'refresh');
+            }
+            
+            $this->session->set_flashdata("flash_message", get_phrase("authorities_updated_successfully"));
+            redirect(base_url() . 'index.php?school_admin/certificate_authorities/', 'refresh');
+         } 
+         if($param1 == 'delete'){
+                  $this->Certificate_authorities_model->delete_authorities($param2);
+                  $this->session->set_flashdata("flash_message", get_phrase("authorities_deleted_successfully"));
+                  redirect(base_url() . 'index.php?school_admin/certificate_authorities/', 'refresh');
+        }
+        $page_data['authorities_list'] =   $this->Certificate_authorities_model->get_authorities_array();
+        //pre($page_data['authorities_list']); die;
+        $page_data['page_name'] = 'certificate_authorities';
+        $page_data['page_title'] = get_phrase('certificate_authorities');
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $this->load->view('backend/index', $page_data);
+    }
+    
+    function certificate_template_types($param1 = '', $param2 = ''){
+      if ($this->session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+            $this->load->model('Certificate_template_model');
+            $page_data = $this->get_page_data_var(); 
+            if($param1 == 'create'){
+                $data['template_name'] = $this->input->post('template_type_name');
+                $image_path = $_FILES['template_type_path']['name'];
+//                echo "image path".$image_path; die;
+                $types = array('image/jpeg', 'image/gif', 'image/png', 'image/jpg');
+                
+                if($image_path != ''){
+                     $data['image_path ']= $_FILES['template_type_path']['name'];
+                    if (in_array($_FILES['template_type_path']['type'], $types)) {
+                      if ($this->Certificate_template_model->add($data)) {
+                        move_uploaded_file($_FILES['template_type_path']['tmp_name'], 'assets/images/certificate/' . $data['image_path ']);
+                        $this->session->set_flashdata('flash_message', get_phrase('certificate_Template_added_successfully'));
+                         redirect(base_url() . 'index.php?school_admin/certificate_template_types/', 'refresh'); 
+                    }
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('It_may_be_the_wrong_filetype._We_only_allow_JPG,_GIF,_and_PNG_filetypes!!'));
+                    redirect(base_url() . 'index.php?school_admin/certificate_template_types/' , 'refresh');
+                }
+                }else{
+                    $this->Certificate_template_model->add($data);
+                    $this->session->set_flashdata("flash_message", get_phrase("certificate_Template_added_successfully"));
+                    redirect(base_url() . 'index.php?school_admin/certificate_template_types/', 'refresh');                     
+                }
+
+            }
+            if($param1 == 'edit'){
+                $data['template_name'] = $this->input->post('template_name');
+                $types = array('image/jpeg', 'image/gif', 'image/png', 'image/jpg');
+                $image_path = $_FILES['template_path']['name'];
+                if($image_path != ''){
+                     $data['image_path '] = $_FILES['template_path']['name'];
+//                    echo $data['image_path ']; die;
+                     if (in_array($_FILES['template_path']['type'], $types)) {
+                      if ($this->Certificate_template_model->update($data, array("certificate_template_type_id" => $param2))) {
+                        move_uploaded_file($_FILES['template_path']['tmp_name'], 'assets/images/certificate/' . $data['image_path ']);
+                        $this->session->set_flashdata('flash_message', get_phrase('certificate_template_updated_successfully'));
+                         redirect(base_url() . 'index.php?school_admin/certificate_template_types/', 'refresh'); 
+                    }
+                } else {
+                    $this->session->set_flashdata('flash_message_error', get_phrase('It_may_be_the_wrong_filetype._We_only_allow_JPG,_GIF,_and_PNG_filetypes!!'));
+                    redirect(base_url() . 'index.php?school_admin/certificate_template_types/' , 'refresh');
+                }
+                }else{
+                    $this->Certificate_template_model->update($data, array("certificate_template_type_id" => $param2));
+                    $this->session->set_flashdata("flash_message", get_phrase("certificate_Template_updated_successfully"));
+                    redirect(base_url() . 'index.php?school_admin/certificate_template_types/', 'refresh');                     
+                }                
+            }  
+            if($param1 == 'delete'){
+                $this->Certificate_template_model->delete($param2);
+                $this->session->set_flashdata("flash_message", get_phrase("certificate_template_deleted_successfully"));
+                redirect(base_url() . 'index.php?school_admin/certificate_template_types/', 'refresh');
+            }
+            $page_data['template_type_list'] = $this->Certificate_template_model->get_template_array();
+            $page_data['page_name'] = 'certificate_template_type';
+            $page_data['page_title'] = get_phrase('certificate_template_type');
+            $page_data['total_notif_num'] = $this->get_no_of_notication();
+            $this->load->view('backend/index', $page_data);
+    }
+    
+    function add_template_inCertificate_type($param1 = '', $param2 = ''){ 
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+            $this->load->model('Certificate_template_model');
+            $page_data = $this->get_page_data_var();
+            if($param1 == 'create' ){
+                $data['template_id'] = $this->input->post('template_type');
+                foreach($data['template_id'] as $temp_id):
+                    $data['certificate_type_id'] = $this->input->post('certificate_type_id');
+                    $data['template_id'] = $temp_id;
+                    $this->Certificate_template_model->add_certificate_template_merge($data);                       
+                endforeach;
+            }            
+            if ($param1 == 'delete') {
+            $this->Certificate_template_model->delete_template_merge($param2);
+            $this->session->set_flashdata('flash_message', get_phrase('template_deleted_successfully.'));
+            redirect(base_url() . 'index.php?school_admin/certificate_types/', 'refresh');
+        }
+            $this->session->set_flashdata("flash_message", get_phrase("template_added_in_certificate_type_successfully"));
+            redirect(base_url() . 'index.php?school_admin/certificate_types/', 'refresh');
+    }
+ 
+    function vehicle_insorance_reminder(){
+        $this->load->model('vehicle_details');
+       $vehicle_detail = $this->vehicle_details->get_all_vehicle_details(); 
+//       pre($vehicle_detail); die;
+       foreach($vehicle_detail as $row):
+         $expiry_date = $row['insurance_expiry_date'];
+       $today = date('d-m-Y',time()); 
+       $exp = date('d-m-Y',strtotime($expiry_date)); //query result form database
+       $expDate =  date_create($exp);
+       $todayDate = date_create($today);
+       $diff =  date_diff($todayDate, $expDate);
+       $total_day = $diff->format("%R%a"); 
+       if($total_day == '+30' || $total_day == '+31'){
+            $name = ucfirst($row['name']);
+                 $msg = "Welcome! ".$name." Your Bus ".$row['bus_name']." and Bus Number is ".$row['bus_unique_key']." insorance is expire after one month please renew urgent.";
+                 $phone = "";
+                 $email = $row['admin_email'];
                  $message = array();
                  $message_body = $msg;
                  $message['sms_message'] = $msg;
-                 $message['subject'] = 'Renew Visa ' . $this->globalSettingsSystemName;
+                 $message['subject'] = 'Vehicle Expiry Date' . $this->globalSettingsSystemName;
                  $message['messagge_body'] = $message_body;
                  $message['to_name'] = $name;
-                 send_school_notification('new_user', $message, array($phone), array($row['email']));
-        endforeach;
+                 send_school_notification('new_user', $message, array($phone), array($row['admin_email']));
+       }
+    $current_date = date("Y-m-d");   
+    $current_date = strtotime(date("Y-m-d", strtotime($current_date)));
+    $expire_date1 = strtotime(date("Y-m-d", strtotime($expiry_date)) . "+8 days");
+    $expire_date2 = strtotime(date("Y-m-d", strtotime($expiry_date)) . "+16 days");
+       if($current_date == $expire_date1 || $current_date == $expire_date2){
+           $name = ucfirst($row['name']);
+                 $msg = "Welcome! ".$name." Your Bus ".$row['bus_name']." and Bus Number is ".$row['bus_unique_key']." insorance is expire after one month please renew urgent.";
+                 $phone = "";
+                 $email = $row['admin_email'];
+                 $message = array();
+                 $message_body = $msg;
+                 $message['sms_message'] = $msg;
+                 $message['subject'] = 'Vehicle Expiry Date' . $this->globalSettingsSystemName;
+                 $message['messagge_body'] = $message_body;
+                 $message['to_name'] = $name;
+                 send_school_notification('new_user', $message, array($phone), array($row['admin_email']));
+       }
+       endforeach;
     }
-}
+    
+    function student_transfer(){        
+        if ($this->session->userdata('school_admin_login') != 1)
+            redirect('login', 'refresh');
+        $this->load->model("Class_model");
+        $page_data = $this->get_page_data_var();
+        $class_array = $this->Class_model->get_class_array();
+        $page_data['class_array'] = $class_array;
+        $page_data['page_name'] = 'student_transfer';
+        $page_data['page_title'] = get_phrase('camp_assign_to_student');
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $this->load->view('backend/index', $page_data);
+    }
+    
+   function get_students_to_transfer($class_id_from, $section_id_from, $class_id_to, $section_id_to) {
+        $page_data = array();
+        $page_data = $this->get_page_data_var();
+        $page_data['class_id_from'] = $class_id_from;
+        $page_data['section_id_from'] = $section_id_from;
+        $page_data['class_id_to'] = $class_id_to;
+        $page_data['section_id_to'] = $section_id_to;
+        $page_data['total_notif_num'] = $this->get_no_of_notication();
+        $running_year = $this->globalSettingsRunningYear;
+        $students = $this->Student_model->get_student_by_class_And_section($class_id_from,$section_id_from,$running_year);
+        $page_data['students'] = $students;
+//        pre($students); die;
+        $this->load->view('backend/school_admin/student_transfer_selector', $page_data);
+    }
+ }
 // --------------------------------------------------------------------------
 /* End of file Admin.php */
 /* Location: ./application/controllers/Admin.php */
-
-
-    

@@ -155,7 +155,7 @@ class Default_RolesController extends Zend_Controller_Action
      * @return Zend_Form.
      */
     public function editAction()
-    {        
+    {  
         $groups_model = new Default_Model_Groups();        
         $role_model = new Default_Model_Roles();
         $group_arr = $groups_model->getGroupsListForRoles();                                                         
@@ -287,18 +287,19 @@ class Default_RolesController extends Zend_Controller_Action
                 if($Id == 'update')
                 {    
                     $tableid = $id;
-                    $menu_data_post = $chk_menu; //$this->_request->getParam('menu_data_post');
+                    $menu_data_post = $this->_request->getParam('menu_data_post');
                     if(count($menu_data_post) > 0)
                     {
                         $add_arr = array_diff($chk_menu_val,$menu_data_post);
                         $del_arr = array_diff($menu_data_post,$chk_menu_val);
                         $update_arr =  array_diff($chk_menu_val,$add_arr);
+
                         foreach($del_arr as $key => $value)
                         {
                             $delete_prev_data = array(
-                                                'modifiedby' => $loginUserId,
-                                                'modifieddate' => gmdate("Y-m-d H:i:s"),
-                                                'isactive' => 0,
+                                'modifiedby' => $loginUserId,
+                                'modifieddate' => gmdate("Y-m-d H:i:s"),
+                                'isactive' => 0,
                             );
                             $where_delete = "id = ".$key;
                             $previlege_model ->SaveorUpdatePrivilegesData($delete_prev_data, $where_delete); 
@@ -411,7 +412,8 @@ class Default_RolesController extends Zend_Controller_Action
                 $messages['result']='error';
                 $this->_helper->json($messages);	    	
             }
-        }           
+        }   
+        $this->_redirect('roles');
     }
 
     /**
@@ -495,6 +497,7 @@ class Default_RolesController extends Zend_Controller_Action
 				
 		}
         $this->_helper->json($messages);
+        $this->_redirect('roles');
     }// end of delete action
     
     public function mailing_function($sess_values,$role_name,$save_type,$roles_model)

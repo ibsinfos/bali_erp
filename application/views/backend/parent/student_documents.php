@@ -11,7 +11,7 @@
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?parents/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
             <li class="active">
-                <?php echo get_phrase($page_title).' - '.$student_name; ?>
+                <?php echo get_phrase($page_title) . ' - ' . $student_name; ?>
             </li>
         </ol>
     </div>
@@ -19,8 +19,8 @@
 
 <div class="row">
     <div class="col-md-12 p-0">
-        <div class="col-lg-4 col-sm-4 col-xs-12">
-            <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('Transfer Certificate Genereate');?>" data-position='right'>
+        <div class="col-lg-6 col-sm-6 col-xs-12">
+            <div class="white-box" data-step="5" data-intro="<?php echo get_phrase('Transfer Certificate Genereate'); ?>" data-position='right'>
                 <h3 class="m-t-0 m-b-20 text-center"><b><?php echo get_phrase('transfer_certificate'); ?></b></h3>
                 <ul class="list-inline text-center">
                     <a href="<?php echo base_url(); ?>index.php?parents/print_transfer_certificate/<?php echo $student_id; ?>">
@@ -29,18 +29,18 @@
                 </ul>
             </div>
         </div>
-        <div class="col-lg-4 col-sm-4 col-xs-12">
-            <div class="white-box" data-step="6" data-intro="<?php echo get_phrase('Merit Certificate Genereate');?>" data-position='right'>
-                <h3 class="m-t-0 m-b-20 text-center"><b><?php echo get_phrase('merit_certificate'); ?></b></h3>
-                <ul class="list-inline text-center">
-                    <a href="<?php echo base_url(); ?>index.php?parents/print_merit_certificate/<?php echo $student_id; ?>">
-                        <button  type="button" class="btn btn-default btn-outline btn-circle btn-xl m-r-5"><i class="fa fa-vcard-o"></i></button>
-                    </a>
-                </ul>
-            </div>
-        </div>
-        <div class="col-lg-4 col-sm-4 col-xs-12">
-            <div class="white-box" data-step="7" data-intro="<?php echo get_phrase('Upload Documents from here');?>" data-position='left'>
+        <!--        <div class="col-lg-4 col-sm-4 col-xs-12">
+                    <div class="white-box" data-step="6" data-intro="<?php echo get_phrase('Merit Certificate Genereate'); ?>" data-position='right'>
+                        <h3 class="m-t-0 m-b-20 text-center"><b><?php echo get_phrase('merit_certificate'); ?></b></h3>
+                        <ul class="list-inline text-center">
+                            <a href="<?php echo base_url(); ?>index.php?parents/print_merit_certificate/<?php echo $student_id; ?>">
+                                <button  type="button" class="btn btn-default btn-outline btn-circle btn-xl m-r-5"><i class="fa fa-vcard-o"></i></button>
+                            </a>
+                        </ul>
+                    </div>
+                </div>-->
+        <div class="col-lg-6 col-sm-6 col-xs-12">
+            <div class="white-box" data-step="7" data-intro="<?php echo get_phrase('Upload Documents from here'); ?>" data-position='left'>
                 <h3 class="m-t-0 m-b-20 text-center"><b><?php echo get_phrase('upload_files'); ?></b></h3>
                 <ul class="list-inline text-center">
                     <a href="#" onclick="showAjaxModal('<?php echo base_url(); ?>index.php?modal/popup/modal_upload_file/<?php echo $student_id; ?>');">
@@ -52,33 +52,35 @@
     </div>
 </div>
 
-			<div class="row m-0">   
-				<div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Download or Delete Documents');?>" data-position='top'>
-                    <table id="example23" class="table-responsive display nowrap" cellspacing="0" width="100%">
+<div class="row m-0">   
+    <div class="col-md-12 white-box" data-step="5" data-intro="<?php echo get_phrase('Download or Delete Documents'); ?>" data-position='top'>
+        <table id="ex" class="table-responsive display nowrap" cellspacing="0" width="100%">
 
-                        <thead>
-                            <tr>
-                                <th><div><?php echo get_phrase('name'); ?></div></th>                                
-                                <th><div><?php echo get_phrase('date'); ?></div></th>
-                                <th><div><?php echo get_phrase('size'); ?></div></th>
-                                <th><div><?php echo get_phrase('options'); ?></div></th>
-                            </tr>
-                        </thead>
-                        <tbody><?php $count = 1; foreach ($subfiles as $row): ?>
-                            <tr>                                    
-                                <td><?php echo str_replace($instance,"",$row->Key); ?></td>
-                                <td><?php echo $row->LastModified; ?></td>
-                                <td><?php echo $row->Size; ?></td>
-                                <td>
-                                <!--Download-->
-                               <a href="<?php echo base_url(); ?>index.php?parents/download_document/<?php echo $row->Key; ?>" ><i class="fa fa-downlaod"></i><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Download"><i class="fa fa-download"></i></button></a>
-								<!--delete-->
-<!--                                    <a onclick="confirm_modal('<?php echo base_url(); ?>index.php?parents/sections/delete/<?php echo $row['section_id']; ?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete"><i class="fa fa-trash-o"></i></button></a>-->
-                                </td>
-                            </tr>
-                                <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                                </div>
-                        </div>
-      
+            <thead>
+                <tr>
+                    <th><div><?php echo get_phrase('s._no.'); ?></div></th>
+                    <th><div><?php echo get_phrase('name'); ?></div></th>                                
+                    <th><div><?php echo get_phrase('date'); ?></div></th>
+                    <th><div><?php echo get_phrase('size'); ?></div></th>
+                    <th><div><?php echo get_phrase('options'); ?></div></th>
+                </tr>
+            </thead>
+            <tbody><?php $count = 1;
+                foreach ($subfiles as $row): ?>
+                    <tr>                                    
+                        <td><?php echo $count++; ?></td>
+                        <td><?php echo str_replace($instance, "", $row->Key); ?></td>
+                        <td><?php echo $row->LastModified; ?></td>
+                        <td><?php echo $row->Size; ?></td>
+                        <td>
+                            <!--Download-->
+                            <a href="<?php echo base_url(); ?>index.php?parents/download_document/<?php echo $row->Key; ?>" ><i class="fa fa-downlaod"></i><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Download"><i class="fa fa-download"></i></button></a>
+                            <!--delete-->
+    <!--                                    <a onclick="confirm_modal('<?php echo base_url(); ?>index.php?parents/sections/delete/<?php echo $row['section_id']; ?>');"><button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete"><i class="fa fa-trash-o"></i></button></a>-->
+                        </td>
+                    </tr>
+<?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>

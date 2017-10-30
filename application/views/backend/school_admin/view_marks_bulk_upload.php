@@ -10,7 +10,7 @@
         </ol>
     </div>
 </div>
-<div class="panel panel-danger block6" data-step="5" data-intro="<?php echo get_phrase('Instructions to be followed before uploading a file');?>" data-position='bottom'>
+<div class="panel panel-danger block6" data-step="5" data-intro="<?php echo get_phrase('Instructions_to_be_followed_before_uploading_a_file');?>" data-position='bottom'>
     <div class="panel-heading"> The following instructions are to be followed for Marksheet Bulk Upload.
         <div class="pull-right"><a href="#" data-perform="panel-collapse"><i class="ti-minus"></i></a> <a href="#" data-perform="panel-dismiss"><i class="ti-close"></i></a> </div>
     </div>
@@ -31,7 +31,7 @@
     <div class="box-content">
         <div class="row">
             <div class="form-group col-sm-6">
-                <label class="control-label"><?php echo get_phrase('Select Exam'); ?></label>
+                <label class="control-label"><?php echo get_phrase('Select_Exam'); ?></label>
                 <select class="selectpicker" data-style="form-control" onchange="get_class_by_exam(this.value);" id="exam_id" name="exam_id" data-live-search="true">
                     <option value="">Select</option>
                     <?php foreach ($exams As $k): ?>
@@ -41,7 +41,7 @@
             </div>
 
             <div class="form-group col-sm-6">
-                <label class="control-label"><?php echo get_phrase('Select Class'); ?></label>
+                <label class="control-label"><?php echo get_phrase('Select_Class'); ?></label>
                 <select class="selectpicker" data-style="form-control" onchange="return get_section_subject_by_class(this.value);" id="class_data_holder" name="class_id" data-live-search="true">
                     <option value=""><?php echo get_phrase('select_section'); ?></option>
                 </select>
@@ -49,7 +49,7 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12 text-right"><input type="button" name="download_mark_template" id="download_mark_template" value="Download Mark Upload Templatae" class="fcbtn btn btn-danger btn-outline btn-1d"/></div>    
+            <div class="col-md-12 text-center"><input type="button" name="download_mark_template" id="download_mark_template" value="Download Mark Upload Template" class="fcbtn btn btn-danger btn-outline btn-1d"/></div>    
         </div>
     </div>
 </div>
@@ -58,7 +58,7 @@
     <div class="row">
         <?php echo form_open(base_url() . 'index.php?school_admin/mark_bulk_upload/', array('id' => 'form-upload', 'class' => 'validate', 'enctype' => 'multipart/form-data')); ?>
         <div class="col-md-8">
-            <div class="form-group" data-step="7" data-intro="<?php echo get_phrase('Upload the template');?>" data-position='bottom'>
+            <div class="form-group" data-step="7" data-intro="<?php echo get_phrase('Upload_the_template');?>" data-position='bottom'>
                 <input type="file" name="userfile" id="userfile" class="form-control bor_no_here required" required>
             </div>
         </div>
@@ -88,6 +88,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('#download_mark_template').on('click', function () {
+            var flag = 0;
             //EliminaTipo2('kkk','success');
             var exam_id = $('#exam_id').val();
             var class_id = $('#class_data_holder').val();
@@ -105,6 +106,15 @@
             if (class_id == "") {
                 EliminaTipo2("Please select class to get the mark template for bulk upload.", 'error');
             }
+            
+            $.ajax({
+                url: '<?php echo base_url(); ?>index.php?Ajax_controller/check_exam_routine_set/' + exam_id+'/'+class_id,
+                success:function (response){
+                    if(response == 1){
+                        flag = 1;
+                    }
+                }
+            });
 
             /*if(section_id==""){
              EliminaTipo2("Please select section to get the mark template for bulk upload.",'error');
@@ -115,7 +125,11 @@
              }*/
             //goForDownload(exam_id,class_id,section_id,subject_id);
             //location.href='<?php //echo base_url();       ?>index.php?ajax_controller/download_mark_bulk_upload_template/'+exam_id+'/'+class_id+'/'+section_id+'/'+subject_id+'/';
-            location.href = '<?php echo base_url(); ?>index.php?ajax_controller/download_mark_bulk_upload_template/' + exam_id + '/' + class_id;
+            if(flag == 1) {
+                location.href = '<?php echo base_url(); ?>index.php?ajax_controller/download_mark_bulk_upload_template/' + exam_id + '/' + class_id;
+            } else {
+                message_modal('You need to add exam routine first.');
+            }
         });
     });
 

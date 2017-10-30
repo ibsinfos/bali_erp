@@ -78,7 +78,7 @@
             <tbody>
                 <?php $count = 1;
             foreach ($details as $key => $value): 
-               
+                    
                 ?>
                     <tr>
                         <td>
@@ -111,11 +111,23 @@
 
                             <!--delete-->
                       
-                      
+                            <?php
+                            //echo "<br>here value transaciton is:".$value['transaction'];
+                            if(intval($value['transaction'])>0)
+                            {
+                                      
+                           echo '<button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 disabled"  data-placement="top" data-original-title="'.get_phrase('delete_class').'" title="'.get_phrase('delete_class').'"><i class="fa fa-trash-o"></i> </button>';
+                            }
+                            else
+                            {
+                                ?>
+                            
                             <a href="#" onclick="confirm_modal('<?php echo base_url(); ?>index.php?school_admin/manage_hostel/delete/<?php echo $value['id']; ?>');">
                                 <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete Hostel" title="Delete Hostel"><i class="fa fa-trash-o"></i></button>
                             </a>
-                      
+                      <?php
+                            }
+                        ?>    
                         </td>
                     </tr>
                     <?php endforeach; ?>

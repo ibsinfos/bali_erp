@@ -10,7 +10,18 @@ class Student_bus_allocation_model extends CI_Model {
     function __construct() {
         parent::__construct();
     }
-
+	 public function add($data) {
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $data['school_id'] = $school_id;
+            } 
+        }
+        $this->db->insert('student_bus_allocation', $data);
+        
+        return true;
+    }
     public function get_details($id){
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
@@ -189,6 +200,19 @@ class Student_bus_allocation_model extends CI_Model {
                 $this->db->insert('student_bus_allocation', $datum);
             }
         }   
+    }
+    
+    public function count_bus_seat($bus_id = '') {
+         $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+        $this->db->from($this->_table);
+        $this->db->where('bus_id',$bus_id);
+        return $this->db->count_all_results();
     }
     
     

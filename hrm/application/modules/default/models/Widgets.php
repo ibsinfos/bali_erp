@@ -606,7 +606,7 @@ class Default_Model_Widgets extends Zend_Db_Table_Abstract
 			}
 			else if($id == 20)
 			{
-				$queryStr = "select count(a.group_id) param2,g.group_name as param1 from main_groups g inner join main_roles a on g.id=a.group_id where a.isactive=1 and g.isactive=1 group by a.group_id ORDER BY a.modifieddate DESC $limit";
+				$queryStr = "select count(a.group_id) param2,g.group_name as param1 from main_groups g inner join main_roles a on g.id=a.group_id where a.isactive=1 and g.isactive=1 GROUP BY a.group_id ORDER BY a.modifieddate DESC $limit";
 			  $res_array = $db->query($queryStr)->fetchAll();
 				
 				// Get count of records in this case
@@ -641,7 +641,7 @@ class Default_Model_Widgets extends Zend_Db_Table_Abstract
 			   {
 				$queryStr = "   SELECT hg.groupname param1,count(h.holidayname) param2 FROM main_holidaygroups as hg 
 								LEFT JOIN main_holidaydates AS h ON h.groupid=hg.id
-								WHERE hg.isactive = 1 and h.isactive=1 group by hg.groupname order by hg.modifieddate desc;";
+								WHERE hg.isactive = 1 and h.isactive=1 GROUP BY hg.groupname order by hg.modifieddate desc;";
 				$res_array = $db->query($queryStr)->fetchAll();
 				$countQuery = "select COUNT(id) count from main_holidaygroups where  isactive=1;";
 				$res_array["count"] = $db->query($countQuery)->fetch();

@@ -59,7 +59,8 @@ class Cli_controller extends CI_Controller{
         //echo $path;die;
         generate_log("creating the path : ".$path,"create_back_up_google_drive_".CURRENT_INSTANCE.".log");
         $folerName=date('d-m-Y').'_back_up';
-        $folderId=$this->google_drive_backup_machine->getFileIdByName($folerName);
+        //$this->load->library("Google_drive_backup_machine");
+        //$folderId=$this->google_drive_backup_machine->getFileIdByName($folerName);
         
         if(file_exists($path)){
             /// sending file to google drive
@@ -88,7 +89,8 @@ class Cli_controller extends CI_Controller{
             generate_log("collecting folderId","create_back_up_google_drive_".CURRENT_INSTANCE.".log");
             generate_log("searching Folder in google drive as : ".GOOGLE_DRIVE_BACKUP_FOLDER,"create_back_up_google_drive_".CURRENT_INSTANCE.".log");
             //$folderId=$this->google_drive_backup_machine->getFileIdByName(GOOGLE_DRIVE_BACKUP_FOLDER."2" );
-            $folderId=$this->google_drive_backup_machine->getFileIdByName("test" );
+            $folderId=$this->google_drive_backup_machine->getFileIdByName($folerName);
+            //die($folderId);
             generate_log("collecting $folderId done.","create_back_up_google_drive_".CURRENT_INSTANCE.".log");
             //$getParent= $this->getParent($folderId);
             if( ! $folderId ) {
@@ -161,7 +163,7 @@ class Cli_controller extends CI_Controller{
         $skipTableBackupArr=array('member','member1');
         $skipTableArr=array();
         foreach ($tables as $table_names){
-            generate_log("start for ".$table_names,"database_data_backup_log_".CURRENT_INSTANCE.".log");
+            //generate_log("start for ".$table_names,"database_data_backup_log_".CURRENT_INSTANCE.".log");
             if(in_array($table_names, $skipTableBackupArr)){
                 continue;
             }
@@ -172,7 +174,7 @@ class Cli_controller extends CI_Controller{
                 }
                 $statement_values.=PHP_EOL."TRUNCATE TABLE `".$table_names."`;".PHP_EOL;
             }
-            generate_log("just before taking data from table get_data_generic_fun(): ".$table_names,"database_data_backup_log_".CURRENT_INSTANCE.".log");
+            //generate_log("just before taking data from table get_data_generic_fun(): ".$table_names,"database_data_backup_log_".CURRENT_INSTANCE.".log");
             $statement =  get_data_generic_fun($table_names,'*',array(),'result_arr');
             if(!empty($statement)){
                 foreach ($statement as $key => $post) {
@@ -186,9 +188,9 @@ class Cli_controller extends CI_Controller{
                     }
                 $statement_values .="insert into ".$table_names." values "."(".implode(',',$values).");";
                 }
-                generate_log("get_data_generic_fun() return data for : ".$table_names." ==== ".$statement_values,"database_data_backup_log_".CURRENT_INSTANCE.".log");
+                //generate_log("get_data_generic_fun() return data for : ".$table_names." ==== ".$statement_values,"database_data_backup_log_".CURRENT_INSTANCE.".log");
             }else{
-                generate_log("get_data_generic_fun() return no data : ".$table_names,"database_data_backup_log_".CURRENT_INSTANCE.".log");
+                //generate_log("get_data_generic_fun() return no data : ".$table_names,"database_data_backup_log_".CURRENT_INSTANCE.".log");
             }
             $statement = $statement_values . ";";     
         }

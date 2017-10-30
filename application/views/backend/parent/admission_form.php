@@ -7,7 +7,7 @@
     <!-- .breadcrumb -->
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
-        <a href="javascript: void(0);" onclick="javascript:introJs().start();" target="_blank" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
+        <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?parents/Dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
             <li class="active"><?php echo get_phrase('Admission Form'); ?></li>
@@ -45,8 +45,6 @@
     <?php echo get_phrase("kindly_ensure_the_details_added_are_correct.__('*')_shows_mandatory_fields"); ?>
                     </div>
                 </div> 
-
-
                 <h2  style="margin-left:5px;">Student Information</h2>
                 <div class="panel panel-default" style="margin-left:5px;margin-right:5px">
                     <div class="panel-body">

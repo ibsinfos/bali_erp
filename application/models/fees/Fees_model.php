@@ -98,7 +98,7 @@ class Fees_model extends CI_Model {
         return $flag;
     }
     /********************Fee Particular functions***************/
-    public function get_fee_heads($whr=array()) {
+    public function get_fee_heads($whr=array(),$order='FH.name ASC') {
         _school_cond('FH.school_id');
         _year_cond('FH.running_year');
         $this->db->select('FH.*,(SELECT count(*) FROM fee_rel_group_heads WHERE head_id=FH.id) in_grps,
@@ -106,6 +106,7 @@ class Fees_model extends CI_Model {
         (SELECT count(*) FROM fee_invoice_items WHERE item_type=1 AND item_id=FH.id) in_invitem');
         $this->db->from('fee_heads FH');
         $this->db->where($whr);
+        $this->db->order_by($order);
         return $this->db->get()->result(); 
     }
 
@@ -533,8 +534,8 @@ class Fees_model extends CI_Model {
 
     //Transport Fee Setup Functions
     function get_transport_fee_setup($running_year=false,$school_id=false,$whr=array()) {
-        _school_cond('TCS.school_id',$school_id);
-        _year_cond('TCS.running_year',$running_year);
+        _school_cond('TCS.school_id');
+        _year_cond('TCS.running_year');
         $this->db->select('TCS.*,FT.name fee_term_name');
         $this->db->from('fee_transport_charge_setups TCS');
         $this->db->join('fee_terms FT','FT.id=TCS.fee_term_id','LEFT');
@@ -674,12 +675,106 @@ class Fees_model extends CI_Model {
         return $this->db->delete('fee_fines',$whr);
     }
 
+    //Employee Slip Management
+    function generated_employe_payslips($month,$whr=array()){
+        _school_cond('ES.school_id');
+        //_year_cond('ES.school_id');
+        $subquery = ",(SELECT is_paid FROM payroll_payslip WHERE emp_id=ES.user_id 
+         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
+         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) is_paid,
+        
+        (SELECT id FROM payroll_payslip WHERE emp_id=ES.user_id 
+         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
+         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) payslip_id,
+         
+         (SELECT generate_date FROM payroll_payslip WHERE emp_id=ES.user_id 
+         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
+         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) generate_date,
+         
+         (SELECT net_pay FROM payroll_payslip WHERE emp_id=ES.user_id 
+         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
+         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) net_pay";
+        $this->db->select('ES.*,ESD.*'.$subquery);
+        $this->db->from('main_employees_summary ES');
+        $this->db->join('main_empsalarydetails ESD','ESD.user_id =ES.user_id','LEFT');
+        //$this->db->join('payroll_payslip PP',' PP.emp_id=ES.user_id','LEFT');
+        $this->db->where($whr);
+        //$this->db->where('PP.id IS NOT NULL');
+        $this->db->having('payslip_id IS NOT NULL');
+        $this->db->order_by('ES.firstname','DESC');
+        return $this->db->get()->result();
+    }
+    
+    function get_employee_roles(){
+        return $this->db->order_by('rolename','ASC')->get_where('main_roles',array('isactive'=>1))->result();
+    }
+
+    //Get Enquired Student Amount Collected
+    function get_enquired_collected_amount(){
+
+    }
+
+    //Wallet Functions
+    function get_wallets($whr=array(),$sql='',$joins=array(),$ordery_by='W.id DESC'){
+        _school_cond('W.school_id');
+        $this->db->select('W.*'.$sql,false);
+        $this->db->from('wallets W');
+        foreach($joins as $join){
+            $this->db->join($join[0],$join[1],$join[2]);
+        }
+        $this->db->where($whr);
+        $this->db->order_by($ordery_by);
+        return $this->db->get()->result();
+    }
+
+    function get_wallet($whr){
+        $this->db->select('W.*,CONCAT(P.father_name," ",P.father_lname) parent_name',false);
+        $this->db->from('wallets W');
+        $this->db->join('parent P','P.parent_id=W.user_id','LEFT');
+        $this->db->where($whr);
+        return $this->db->get()->row();
+    }
+
+    function save_wallet($data){
+        if(isset($data['id']) && $data['id']){
+            $this->db->update('wallets',$data,array('id'=>$data['id']));
+            $flag = $data['id'];
+        }else{
+            $this->db->insert('wallets',$data);
+            $flag = $this->db->insert_id();
+        }
+        return $flag;
+    }
+
+    
+    function get_wallet_transactions($whr=array(),$order_by='id desc'){
+       return $this->db->order_by($order_by)->get_where('wallet_transactions',$whr)->result();
+    }
+
+    function save_wallet_transaction($data){
+        if(isset($data['id']) && $data['id']){
+            $this->db->update('wallet_transactions',$data,array('id'=>$data['id']));
+            $flag = $data['id'];
+        }else{
+            $this->db->insert('wallet_transactions',$data);
+            $flag = $this->db->insert_id();
+        }
+        return $flag;
+    }
+
+
+
     /********************Other functions***************/
     function get_classes(){
         _school_cond();
         return $this->db->order_by('name_numeric','ASC')->get('class')->result(); 
     }
 
+    function get_parents($whr=array()){
+        _school_cond();
+        return $this->db->order_by('father_name','ASC')->get_where('parent',$whr)->result(); 
+    }
+    
     function get_students($whr=array(),$having=array()){
         _school_cond('S.school_id');
         _year_cond('E.year');
@@ -740,44 +835,5 @@ class Fees_model extends CI_Model {
         $this->db->order_by('fc.category_name', 'asc');
         $this->db->where($where);
         return $this->db->get()->result_array();
-    }
-
-    //Employee Slip Management
-    function generated_employe_payslips($month,$whr=array()){
-        _school_cond('ES.school_id');
-        //_year_cond('ES.school_id');
-        $subquery = ",(SELECT is_paid FROM payroll_payslip WHERE emp_id=ES.user_id 
-         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
-         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) is_paid,
-        
-        (SELECT id FROM payroll_payslip WHERE emp_id=ES.user_id 
-         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
-         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) payslip_id,
-         
-         (SELECT generate_date FROM payroll_payslip WHERE emp_id=ES.user_id 
-         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
-         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) generate_date,
-         
-         (SELECT net_pay FROM payroll_payslip WHERE emp_id=ES.user_id 
-         AND MONTH(generate_date)='".date('m',strtotime('01-'.$month))."'
-         AND YEAR(generate_date)='".date('Y',strtotime('01-'.$month))."' LIMIT 1) net_pay";
-        $this->db->select('ES.*,ESD.*'.$subquery);
-        $this->db->from('main_employees_summary ES');
-        $this->db->join('main_empsalarydetails ESD','ESD.user_id =ES.user_id','LEFT');
-        //$this->db->join('payroll_payslip PP',' PP.emp_id=ES.user_id','LEFT');
-        $this->db->where($whr);
-        //$this->db->where('PP.id IS NOT NULL');
-        $this->db->having('payslip_id IS NOT NULL');
-        $this->db->order_by('ES.firstname','DESC');
-        return $this->db->get()->result();
-    }
-    
-    function get_employee_roles(){
-        return $this->db->order_by('rolename','ASC')->get_where('main_roles',array('isactive'=>1))->result();
-    }
-
-    //Get Enquired Student Amount Collected
-    function get_enquired_collected_amount(){
-
     }
 }

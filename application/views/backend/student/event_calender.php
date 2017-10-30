@@ -85,7 +85,6 @@ $csrf = new CSRF_Protect();
 						<!-- /.panel-heading -->
 						<div class="panel-body">
 							<div class="table-responsive" style="color:#aaa!important;border-color:#ddd!important;">
-
 								<div class="col-md-9 no-padding">
 									<div id="events"></div>
 								</div>
@@ -269,10 +268,13 @@ $csrf = new CSRF_Protect();
 		</script>
 		<!-- ColorPicker Initialization -->
 		<script>
-			$(function() {
-				$('#cp1').colorpicker();
-			});
-
+                    $(function() {
+                            //$('#cp1').colorpicker();
+                        setTimeout(function(){    
+                            $('.fc-prev-button ').html('<i class="fa fa-chevron-left"></i>');
+                            $('.fc-next-button ').html('<i class="fa fa-chevron-right"></i>');
+                        },500);
+                    });
 		</script>
 		<!-- JS array created from database -->
 		<?php echo listEvents(); ?>

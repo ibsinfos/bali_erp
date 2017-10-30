@@ -1,5 +1,6 @@
 
 <script type="text/javascript">
+    
     function showAjaxModal(url) {
         // SHOWING AJAX PRELOADER IMAGE
         jQuery('#modal_ajax .modal-body').html('<div style="text-align:center;margin-top:200px;"><img src="assets/images/preloader.gif" /></div>');
@@ -13,9 +14,20 @@
             success: function (response)
             {
                 jQuery('#modal_ajax .modal-body').html(response);
-                $('.selectpicker').selectpicker('refresh');
-                $('.selectpicker1').selectpicker('refresh');
-                var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+//                $('#modal_ajax .modal-body form').removeClass('form-material');
+//                $('#modal_ajax .modal-body div').removeClass('form-material');
+                if($( "#modal_ajax .modal-body button" ).parent().hasClass('text-right')) { 
+                    if($('#modal_ajax .modal-body form')) {
+                      //$( "#modal_ajax .modal-body button" ).parent().prepend('<div class="clearfix">&nbsp;</div>');
+                      $( "#modal_ajax .modal-body button" ).parent().removeClass('text-right');
+                      $( "#modal_ajax .modal-body button" ).parent().addClass('text-center');
+                  }
+                } 
+                $('.selectpicker,.selectpicker1').selectpicker('refresh');
+
+                callTabs();
+                enableSwitchery();
+                /* var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
                 $('.js-switch').each(function() {//data-color="#707cd2"
                     objData = $(this).data();
                     if(!objData.color){
@@ -25,7 +37,7 @@
                     if(objData.className==undefined){
                         new Switchery($(this)[0], objData);
                     }
-                });
+                }); */
             }
         });
     }
@@ -64,7 +76,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h4 class="modal-title" id="myModalLabel"><?php echo $system_name; ?></h4>
+                <h4 class="modal-title" id="myModalLabel"><?php echo @$preview_title; ?></h4>
             </div>
             <div class="modal-body">
                 
@@ -94,6 +106,12 @@
     <!-- /.modal-dialog -->
 </div>
 <script type="text/javascript">
+    function message_modal(message) {
+	//alert(delete_url);die;
+        jQuery('#message_box').modal('show', {backdrop: 'static'});
+        document.getElementById('message_title').innerHTML=message;
+        //jQuery('#modal-4').modal('hide');
+    }
     function confirm_modal(delete_url) {
 	//alert(delete_url);die;
         jQuery('#modal-4').modal('show', {backdrop: 'static'});
@@ -310,6 +328,21 @@
             <div class="modal-footer" style="margin:0px; border-top:0px; text-align:center;">
                 <a href="#" class="btn btn-danger" id="confirm_action_link"><?php echo get_phrase('yes'); ?></a>
                 <button type="button" class="btn btn-info" data-dismiss="modal"><?php echo get_phrase('no'); ?></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="message_box">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="message_title" style="text-align:center;"></h4>
+            </div>
+            <div class="modal-footer" style="margin:0px; border-top:0px; text-align:center;">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><?php echo get_phrase('close'); ?></button>
             </div>
         </div>
     </div>

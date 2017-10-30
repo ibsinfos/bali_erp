@@ -1,6 +1,4 @@
-<?php
-if (!empty($progress_report)){ ?>
-    <div class="row">
+<div class="row">
         <div class="col-md-12 white-box">                              
                     <table class= "custom_table table display" cellspacing="0" width="100%" id="example">
                      <thead>
@@ -14,7 +12,9 @@ if (!empty($progress_report)){ ?>
                             <th><div>Date</div></th>
                              </tr>
                     </thead>
-                        <?php foreach ($progress_report as $row): ?>
+                        <?php
+                        if (!empty($progress_report)){ 
+                        foreach ($progress_report as $row): ?>
                              <tbody>
                         <tr>
                    
@@ -32,14 +32,10 @@ if (!empty($progress_report)){ ?>
                         </tr>
                             </tbody>
                         <?php endforeach; ?>
+                        <?php }?>
                     </table>
         </div>
     </div>
-    
-<?php } else{
-    echo "No Data Available";
-}
-?>
 <script>
 $('#example').DataTable({
         dom: 'Bfrtip',

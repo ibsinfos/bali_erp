@@ -18,7 +18,7 @@
                 <li>
 					<a href="#credit" data-toggle="tab">
                                             <span class="visible-xs"><i class="entypo-vcard"></i></span> 
-						<span class="hidden-xs"><i class="entypo-vcard"></i><?php echo get_phrase('Add credit student');?></span>
+						<span class="hidden-xs"><i class="entypo-vcard"></i><?php echo get_phrase('Add_credit_student');?></span>
 					</a>
 				</li>
 			</ul>
@@ -298,14 +298,14 @@
 
 	                               <div class="col-xs-12 col-sm-6">
                                         <div class="">
-	                                    <label class="control-label"><?php echo get_phrase('current amount');?></label>
+	                                    <label class="control-label"><?php echo get_phrase('current_amount');?></label>
 	                                    
 	                                        <input type="text" readonly="readonly" id="student_balance_text" class="form-control" name="title" value=""/>
 	                                    </div>
 	                                </div>
                                        <div class="col-xs-12 col-sm-6">
 	                                <div class="">
-	                                    <label class="control-label"><?php echo get_phrase('add amount');?></label>
+	                                    <label class="control-label"><?php echo get_phrase('add_amount');?></label>
 	                                    
 	                                        <input type="text" class="form-control" name="amount"/>
                                             <input type="hidden" class="form-control" name="type" value="credit"/>

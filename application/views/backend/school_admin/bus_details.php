@@ -30,9 +30,9 @@
     </div>
 </div>
 
-    <?php if ($this->session->flashdata('flash_message_error')) { ?>        
+    <?php if ($this->session->flashdata('flash_validation_error')) { ?>        
         <div class="alert alert-danger">
-            <?php echo $this->session->flashdata('flash_message_error'); ?>
+            <?php echo $this->session->flashdata('flash_validation_error'); ?>
         </div>
     <?php } ?>
 
@@ -126,7 +126,7 @@
                     </div>  
             </div>
     
-        <div class="col-xs-12 text-right">
+        <div class="col-xs-12 text-center">
             <input type="submit" data-step="6" data-intro="<?php echo get_phrase('On click of submit, details will get added and if any error is their then it will display in the page');?>" data-position='left'class="fcbtn btn btn-danger btn-outline btn-1d" value="Submit"/>
             
         </div>

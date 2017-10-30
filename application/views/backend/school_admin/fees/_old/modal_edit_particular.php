@@ -5,11 +5,11 @@
         <div class="form-horizontal form-material">
             <div class="row">
                 <div class="col-xs-12">
-                    <label for="running_session"><?php echo get_phrase("running_session"); ?></label>
+                    <label for="running_session"><?php echo get_phrase("current_session"); ?></label>
                     <div class="input-group">
                         <div class="input-group-addon"><i class="fa fa-sellsy"></i></div>
                         <select name="running_year" class="selectpicker" data-style="form-control" data-live-search="true">
-                            <option value=""><?php echo get_phrase('select_running_session');?></option>
+                            <option value=""><?php echo get_phrase('select_current_session');?></option>
                             <?php $last_year = date('Y',strtotime('-1 year'));
                                 for($i = 0; $i < 10; $i++){
                                     $grp_year = ($last_year+$i).'-'.($last_year+($i+1));?>

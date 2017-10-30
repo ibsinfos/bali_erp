@@ -25,14 +25,19 @@
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
+
         <ol class="breadcrumb">
-            <li>
-                <a href="<?php echo base_url(); ?>index.php?school_admin/Dashboard">
-                    <?php echo get_phrase('Dashboard'); ?>
-                </a>
+            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li><?php echo get_phrase('student'); ?>
+                <ul>                    
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_information"><?php echo get_phrase('student_information'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_promotion"><?php echo get_phrase('student_promotion'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/map_students_id"><?php echo get_phrase('map_students_id'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_fee_configuration"><?php echo get_phrase('student_fee_setting'); ?></a></li>
+                </ul>
             </li>
             <li class="active">
-                <?php echo get_phrase($page_title); ?>
+                <?php echo $page_title; ?>
             </li>
         </ol>
     </div>
@@ -82,14 +87,15 @@ if ($is_approve == '1'){
 ?>
 
 <?php if ($is_approve == '1') { ?>
-    <div class="col-md-12 m-b-20 text-right no-padding">
-        <input type="button" value="Approved" id="tc_confm" class="fcbtn btn btn-danger btn-outline btn-1d" data-step="5" data-intro="Click on confirm button , then you will get a print button for print certificate." data-position='right' disabled="">
-        <button value="Print"  onclick="PrintElem('#print');" class="fcbtn btn btn-danger btn-outline btn-1d"> Print </button>
+    <div class="col-md-12 m-b-20 text-center no-padding">
+        <input type="button" value="Approved" id="tc_confm" class="fcbtn btn btn-danger btn-outline btn-1d" disabled="">
+        <button value="Print" data-step="5" data-intro="<?php echo get_phrase('you_can_print_transfer_certificate_by_clicking_this_button.');?>" data-position='left'  onclick="PrintElem('#print');" class="fcbtn btn btn-danger btn-outline btn-1d"> Print </button>
     </div>
 <?php } else { ?>
+
     <form method="post" action="<?php echo base_url(); ?>index.php?school_admin/print_transfer_certificate/create/<?php echo $student->student_id; ?>">
         <div class="col-md-12 m-b-20 text-right no-padding">
-            <button value="submit" class="fcbtn btn btn-danger btn-outline btn-1d"> Approve </button>     
+            <button value="submit" class="fcbtn btn btn-danger btn-outline btn-1d"  data-step="5" data-intro="<?php echo get_phrase('you_can_approve_transfer_certificate_by_clicking_this_button.');?>" data-position='top'> Approve </button>     
 
         <?php } ?>
     </div>
@@ -226,7 +232,8 @@ if ($is_approve == '1'){
                         } else {
                             echo "";
                         }
-                            ?></div></div>
+                            ?></div>
+                    </div>
                 </div>
 
                 <div class="form-group col-md-6">
@@ -236,9 +243,14 @@ if ($is_approve == '1'){
                         <div id="academic_year1_val" class="print_text"><?php echo $running_year; ?></div>
                     </div>
                 </div>
-                <input type="hidden" name="parent_id" value="<?php echo $student->parent_id; ?>"
-                       <div class="form-group col-md-6">&nbsp;
-                    <label class="control-label col-sm-12 m-b-20" >Result at the end of academic year, or upon departure:</label>
+                <div class="col-md-12">
+                    <input type="hidden" name="parent_id" value="<?php echo $student->parent_id; ?>">
+                    
+                    <div class="col-md-12">&nbsp;
+                        <label class="control-label col-sm-12 m-b-20" >
+                            Result at the end of academic year, or upon departure:
+                        </label>
+
                     <div class="form-group col-md-6">
                         <label class="control-label"> a) Passed and Promoted to class</label>
                         <div>
@@ -318,6 +330,7 @@ if ($is_approve == '1'){
 
 
                 </div>
+            </div>
             </div>
         </div>
         <div class="col-md-1"></div>

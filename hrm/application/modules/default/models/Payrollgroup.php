@@ -33,7 +33,7 @@ class Default_Model_Payrollgroup extends Zend_Db_Table_Abstract
     
     public function get_payroll_group_code(){
         $db = Zend_Db_Table::getDefaultAdapter();
-        $catData = $db->query("SELECT * FROM payroll_category WHERE status=1 AND emp_id IS NULL");
+        $catData = $db->query("SELECT * FROM payroll_category WHERE status=1 AND (emp_id IS NULL OR emp_id = '0')");
         $rsCateResult = $catData->fetchAll();
         return $rsCateResult;
     }

@@ -10,7 +10,7 @@
             <tr>
                 <th class="text-center">
                     <div>
-                    <input type="checkbox" class="js-switch selected_student_checkbox" id="checkAll" name="select_all" />
+                    <input type="checkbox" class="selected_student_checkbox" id="checkAll" name="select_all" />
                     </div>
                 </th>
                 <th class="text-center">
@@ -170,10 +170,11 @@
             <?php endforeach; ?>
         </tbody>
     </table>
-
-    <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-t-20">
-        <?php echo get_phrase('promote_selected_students'); ?>
-    </button>
+    <div align="center">
+        <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d m-t-20">
+            <?php echo get_phrase('promote_selected_students'); ?>
+        </button>
+    </div>
 </div>
 
 <script type="text/javascript">

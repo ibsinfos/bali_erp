@@ -71,7 +71,7 @@ class Default_ServicerequestsController extends Zend_Controller_Action
             $searchData = rtrim($searchData,',');
             /** search from grid - END **/
         }
-     
+    // echo $grid_type;
         $dataTmp = $ser_req_model->getGrid($sort, $by, $perPage, $pageNo, $searchData,$call,$dashboardcall,$grid_type,$status_value,'','');
 
         array_push($data,$dataTmp);
@@ -99,7 +99,7 @@ class Default_ServicerequestsController extends Zend_Controller_Action
             $loginUserId = $auth->getStorage()->read()->id;
             $loginuserRole = $auth->getStorage()->read()->emprole;
             $loginuserGroup = $auth->getStorage()->read()->group_id;            
-            $login_bu = $auth->getStorage()->read()->businessunit_id;
+            //$login_bu = $auth->getStorage()->read()->businessunit_id;
             $login_dept = $auth->getStorage()->read()->department_id;
             $reporting_manager = $auth->getStorage()->read()->reporting_manager;  
             $org_head_flag = $auth->getStorage()->read()->is_orghead;
@@ -113,19 +113,19 @@ class Default_ServicerequestsController extends Zend_Controller_Action
         if($grid_type != '')
         {   
        
-            if($login_bu == 0)
+            //if($login_bu == 0)
                 $service_desk_flag = 0;
-            else 
-            {
-                $bu_model = new Default_Model_Businessunits();
-                $bu_data = $bu_model->getSingleUnitData($login_bu);
-                $service_desk_flag = $bu_data['service_desk_flag'];            
-            }
+//            else 
+//            {
+//                $bu_model = new Default_Model_Businessunits();
+//                $bu_data = $bu_model->getSingleUnitData($login_bu);
+//                $service_desk_flag = $bu_data['service_desk_flag'];            
+//            }
             
-            $service_types_data = $sd_req_model->getServiceTypes($login_bu,$login_dept,$service_desk_flag);
+            $service_types_data = $sd_req_model->getServiceTypes('',$login_dept,$service_desk_flag);
             $grid_type = sapp_Global::_decrypt($grid_type);
             $grid_type_arr = $sd_req_model->getGridtypearr();
-         
+         //print_r($service_types_data); die;
         if(empty($service_types_data))
 		{
 			

@@ -7,14 +7,27 @@
     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
         <button class="right-side-toggle waves-effect waves-light btn-info btn-circle pull-right m-l-20"><i class="ti-settings text-white"></i></button>
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
+        
         <ol class="breadcrumb">
-            <li><a href="<?php echo base_url(); ?>index.php?school_admin/Dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
-            <li class="active"><?php echo get_phrase('student_marksheet'); ?></li>
+            <li><a href="<?php echo base_url(); ?>index.php?school_admin/dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>
+            <li><?php echo get_phrase('student'); ?>
+                <ul>                    
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_information"><?php echo get_phrase('student_information'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_promotion"><?php echo get_phrase('student_promotion'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/map_students_id"><?php echo get_phrase('map_students_id'); ?></a></li>
+                    <li><a href="<?php echo base_url(); ?>index.php?school_admin/student_fee_configuration"><?php echo get_phrase('student_fee_setting'); ?></a></li>
+                </ul>
+            </li>
+            <li class="active">
+                <?php echo get_phrase('student_marksheet'); ?>
+            </li>
         </ol>
     </div>
     <!-- /.breadcrumb -->
 </div>
-<?php       
+
+<?php    
+$k=5;   
         foreach ($student_info as $row1):
             foreach ($marks_data as $row2):
             $row2 = $row2['marks'];
@@ -22,7 +35,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-danger block6" data-collapsed="0">
-                    <div class="panel-heading">
+                    <div class="panel-heading" data-step="<?php echo $k++; ?>" data-intro="<?php echo get_phrase('marksheet_of_exam_'.$row2['name']); ?>" data-position="top">
                         <?php echo $row2['name']; ?>
                     </div>
                     <?php

@@ -9,7 +9,7 @@
         <a href="javascript: void(0);" onclick="javascript:introJs().start();" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Take a Tour</a>
         <ol class="breadcrumb">
             <li><a href="<?php echo base_url(); ?>index.php?school_admin/Dashboard"><?php echo get_phrase('Dashboard'); ?></a></li>            
-            <li class="active"><?php echo get_phrase("student's library"); ?></li>
+            <li class="active"><?php echo get_phrase("student's_library"); ?></li>
         </ol>
     </div>
     <!-- /.breadcrumb -->

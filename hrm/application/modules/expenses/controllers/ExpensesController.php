@@ -2311,7 +2311,7 @@ class Expenses_ExpensesController extends Zend_Controller_Action
 				
 				$mpdf->list_indent_first_level = 0;
 				$mpdf->SetDisplayMode('fullpage');
-				$mpdf->pagenumPrefix = 'Generated using Sentrifugo'.str_repeat(" ",72);
+				//$mpdf->pagenumPrefix = 'Generated using Sentrifugo'.str_repeat(" ",72);
 				$mpdf->pagenumSuffix = '';
 				$mpdf->nbpgPrefix = ' out of ';
 				$mpdf->nbpgSuffix = '';

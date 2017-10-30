@@ -212,6 +212,41 @@ class Notification_model extends CI_Model {
         
     }
 
+
+    public function get_notifications_new($push_notify = '', $receiver_type = '', $receiver_id = '', $class_id = ''){
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('school_id',$school_id);
+            } 
+        }
+
+        $result = array();
+
+        if($push_notify == '1'){
+            $this->db->select('*');
+            $this->db->from('custom_message_noticeboard');
+
+            if( $receiver_type != '' ) {
+                $this->db->where( 'receiver_type' , $receiver_type );
+            }
+            if( $receiver_id != '') {
+                $this->db->where( 'receiver_id' , $receiver_id );
+            }
+            if( $class_id != '' ) {
+                $this->db->where( 'class_id' , $class_id );
+            }
+
+            $this->db->where(array('is_read'=>'0', 'message_schedule_status'=>'1', 'push_notify'=>'1'));
+
+            $this->db->order_by('custom_message_id','DESC');
+
+            $result = $this->db->get()->result_array();
+        }
+        return $result;        
+    }
+
     /*
      * Save notification queue
      */
@@ -245,18 +280,34 @@ class Notification_model extends CI_Model {
     }
 
     public function getNotices() {
-        $school_id = '';
-        if(($this->session->userdata('school_id'))) {
-            $school_id = $this->session->userdata('school_id');
-            if($school_id > 0){
-                $this->db->where('nb.school_id',$school_id);
-            } 
-        }
-        $this->db->select('DISTINCT(nb.notice_title), nb.notice_id, nb.notice, nb.create_timestamp,nb.create_time,nb.sender_type, class.class_id, class.name');
+        /*$this->db->select('DISTINCT(nb.notice_title), nb.notice_id, nb.notice, nb.create_timestamp,nb.create_time,nb.sender_type, class.class_id, class.name');
         $this->db->from('noticeboard as nb');
         $this->db->join('class', 'class.class_id = nb.class_id', 'left');
         $this->db->order_by('nb.create_timestamp', 'DESC');
         $res = $this->db->get()->result_array();
+        return $res;*/
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+        }
+
+        $user_id  = $this->session->userdata('login_user_id');
+        $where = array('nb.message_schedule_status'=>'1', 'nb.push_notify'=>'1', 'nb.receiver_type'=>'SA', 'nb.receiver_id'=>$user_id, 'nb.school_id'=>$school_id);
+        //$this->db->select('nb.*, class.name class_name');
+        $this->db->select('nb.*');
+        $this->db->from('custom_message_noticeboard as nb');
+        //$this->db->join('class', 'class.class_id = nb.class_id');
+        $this->db->order_by('nb.custom_message_id', 'DESC');
+        $this->db->where($where);
+        $this->db->or_where('(nb.sender_type="SA" AND nb.sender_id='.$user_id.')');
+       
+        $this->db->group_by('nb.notice_title');
+        $res = $this->db->get()->result_array();
+        
+        $where2 = array('message_schedule_status'=>'1', 'push_notify'=>'1', 'receiver_id'=>$user_id, 'receiver_type'=>'SA', 'school_id'=>$school_id);
+        $this->db->where($where2);
+        $this->db->update('custom_message_noticeboard',array('is_read'=>'1'));
+
         return $res;
     }
 
@@ -319,7 +370,7 @@ class Notification_model extends CI_Model {
     }
 
     public function getNotices_for_teacher($teacher_id = '') {
-        $class_id = $this->Section_model->get_class_deatils_by_teacher($teacher_id);        
+        /*$class_id = $this->Section_model->get_class_deatils_by_teacher($teacher_id);        
         $school_id = '';
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
@@ -337,6 +388,60 @@ class Notification_model extends CI_Model {
         $this->db->group_by('nb.notice_title');
         $this->db->order_by('nb.create_timestamp', 'DESC');
         $res = $this->db->get()->result_array();
+        return $res;*/
+
+        /*$where = array('nb.message_schedule_status'=>'1', 'nb.push_notify'=>'1', 'nb.receiver_id'=>$teacher_id, 'nb.receiver_type'=>'T');
+
+        $class_id = $this->Section_model->get_class_deatils_by_teacher($teacher_id);        
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('nb.school_id',$school_id);
+            } 
+        }
+        $this->db->select('nb.*, class.name class_name');
+        $this->db->from('custom_message_noticeboard as nb');
+        $this->db->join('class', 'class.class_id = nb.class_id');*/
+        /*foreach ($class_id as $cls) {
+            $class_id = $cls['class_id'];
+            $this->db->or_where_in('nb.class_id', array($class_id, 0));
+        }         
+        $this->db->group_by('nb.notice_title');*/
+        // $this->db->order_by('nb.custom_message_id', 'DESC');
+
+        // $this->db->where($where);
+
+        // $res = $this->db->get()->result_array();
+
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('nb.school_id',$school_id);
+            } 
+        }
+
+        $where = array('nb.message_schedule_status'=>'1', 'nb.push_notify'=>'1', 'nb.school_id'=>$school_id, 'nb.receiver_type'=>'T', 'nb.receiver_id'=>$teacher_id);
+
+        $this->db->select('nb.*');
+        $this->db->from('custom_message_noticeboard as nb');
+        $this->db->order_by('nb.custom_message_id', 'DESC');
+        $this->db->group_by('nb.notice_title');
+        $this->db->where($where);
+
+        $this->db->or_where('(nb.sender_type="T" AND nb.sender_id='.$teacher_id.')');
+
+        $res = $this->db->get()->result_array();
+
+        $where2 = array('message_schedule_status'=>'1', 'push_notify'=>'1', 'receiver_id'=>$teacher_id, 'receiver_type'=>'T', 'school_id'=>$school_id);
+
+
+        $this->db->where($where2);
+
+        $this->db->update('custom_message_noticeboard', 
+            array('is_read'=>'1'));
+
         return $res;
     }
 
@@ -450,7 +555,7 @@ class Notification_model extends CI_Model {
                 $this->db->where('nb.school_id',$school_id);
             } 
         }
-        $this->db->select('nb.notice_title, nb.notice,c.class_id,c.name, nb.create_timestamp'); // Select field
+        /*$this->db->select('nb.notice_title, nb.notice,c.class_id,c.name, nb.create_timestamp'); // Select field
         $this->db->from('noticeboard nb'); // from Table1
         $this->db->where('nb.class_id',$class_id);
         $this->db->or_where('nb.class_id','0');
@@ -458,6 +563,61 @@ class Notification_model extends CI_Model {
         $this->db->order_by('nb.create_timestamp', 'DESC'); 
         
         $res = $this->db->get()->result_array();
+        return $res;*/
+
+        $receiver_id = $this->session->userdata('login_user_id');
+
+        $where = array('nb.message_schedule_status'=>'1', 'nb.push_notify'=>'1', 'nb.receiver_id'=>$receiver_id, 'nb.receiver_type'=>'P');
+
+        $this->db->select('nb.notice_title, nb.message, nb.sender_type, nb.message_created_at'); // Select field
+        $this->db->from('custom_message_noticeboard nb'); // from Table1
+
+        $this->db->order_by('nb.custom_message_id', 'DESC');
+
+        $this->db->where($where);         
+        
+        $res = $this->db->get()->result_array();
+
+        $where2 = array('message_schedule_status'=>'1', 'push_notify'=>'1', 'receiver_id'=>$receiver_id, 'receiver_type'=>'P', 'school_id'=>$school_id);
+
+
+        $this->db->where($where2);
+
+        $this->db->update('custom_message_noticeboard', 
+            array('is_read'=>'1'));
+
+        return $res;
+    }
+
+    public function getNotices_for_students($student_id = '',$class_id = '') {      
+        $school_id = '';
+        if(($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+            if($school_id > 0){
+                $this->db->where('nb.school_id',$school_id);
+            } 
+        }
+
+        $where = array('nb.message_schedule_status'=>'1', 'nb.push_notify'=>'1', 'nb.receiver_id'=>$student_id, 'nb.class_id'=>$class_id, 'nb.receiver_type'=>'S');
+        //pre($where);die;
+
+        $this->db->select('nb.notice_title, nb.message, nb.sender_type, nb.message_created_at'); // Select field
+        $this->db->from('custom_message_noticeboard nb'); // from Table1
+
+        $this->db->order_by('nb.custom_message_id', 'DESC');
+
+        $this->db->where($where);         
+        
+        $res = $this->db->get()->result_array();
+
+        $where2 = array('message_schedule_status'=>'1', 'push_notify'=>'1', 'receiver_id'=>$student_id, 'class_id'=>$class_id, 'receiver_type'=>'S', 'school_id'=>$school_id);
+
+
+        $this->db->where($where2);
+
+        $this->db->update('custom_message_noticeboard', 
+            array('is_read'=>'1'));
+
         return $res;
     }
 

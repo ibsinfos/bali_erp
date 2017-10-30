@@ -40,7 +40,7 @@
 <div class="row">
 <div class="col-sm-12">
     <div class="white-box" data-step="6" data-intro="<?php echo get_phrase('Here you can view the Vehicle Details.');?>" data-position="top"> 
-        <table id="example23" class="new_tabulation table display nowrap" cellspacing="0" width="100%">
+        <table id="manage_vehicle_details" class="new_tabulation table display nowrap" cellspacing="0" width="100%">
             <thead>
                 <tr>
                     <th><?php echo get_phrase('no'); ?></th>
@@ -142,6 +142,3 @@
     </div>
 </div>
 </div>
-
-
-

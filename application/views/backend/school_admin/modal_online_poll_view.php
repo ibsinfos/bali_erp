@@ -12,7 +12,7 @@
                 <table class="table table-hover manage-u-table table-bordered">
                     <tr>
                         <td><?php echo get_phrase('poll_description'); ?></td>
-                        <td><b><?php echo $online_polls['poll_descreption']; ?></b></td>
+                        <td style ="white-space:normal"><b><?php echo $online_polls['poll_descreption']; ?></b></td>
                     </tr>
                     <tr>
                         <td><?php echo get_phrase('post_date'); ?></td>

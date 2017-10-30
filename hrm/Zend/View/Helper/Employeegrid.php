@@ -47,6 +47,8 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 
 	public function employeegrid ($dataArray)
 	{
+//            echo '<pre>';
+//            print_r($dataArray); die;
 		$request = Zend_Controller_Front::getInstance();
         $params = $request->getRequest()->getParams();		
 		$employeeTabs = array('employee','dependencydetails','creditcarddetails','visaandimmigrationdetails','workeligibilitydetails','disabilitydetails','empcommunicationdetails','empskills','empleaves','empholidays','medicalclaims','educationdetails','experiencedetails','trainingandcertificationdetails','emppersonaldetails','myemployees','empperformanceappraisal','emppayslips','empbenefits','emprenumerationdetails','emprequisitiondetails','empadditionaldetails','empsecuritycredentials','empsalarydetails','empjobhistory','addemployeeleaves');	
@@ -67,7 +69,6 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 		$menunamestr = '';		$sortStr ="";$objId='';$context ="";$actnArr = array();
 		$sortStr = $dataArray['by'];
 		$actions_arr=array();$privilegesofObj=array();
-		
 		
 		if(in_array($dataArray['objectname'],$employeeTabs))
 		{	
@@ -92,7 +93,7 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 				{
 					
 					$actions_arr = $dataArray['actions_arr'];
-					array_push($actions_arr,$dataArray['menuName']);
+					array_push($actions_arr,$dataArray['menuName']); 
 				}
 				else
 				{	
@@ -135,9 +136,8 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 			
 		}
 		else	{	$actions_arr =array();}
-		
-		
-		$gridFieldsArr=array();$tmpActionsArr=array();
+
+                $gridFieldsArr=array();$tmpActionsArr=array();
 		$tmpActionsArr = $actions_arr;
 		array_pop($tmpActionsArr);	//last element of actions array is menuname so delete that & check the privileges are empty or not...
 		
@@ -215,7 +215,7 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 					$extra['action'] =array(); 				  
 				}else
 				{
-				
+                                    
 				  $extra['action'] = array('name' => 'edit', 'value' =>'<div class="grid-action-align">
 								'.((in_array('view',$actions_arr)?$viewpopup_str:'')).'
 								'.((in_array('edit',$actions_arr)?$editpopup_str:'')).'
@@ -232,8 +232,15 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
                         $edit_str = '<a href= "'.BASE_URL.$dataArray['objectname'].'/edit/id/{{id}}" name="{{id}}" class="sprite edit"  title=\'Edit\'></a>';
 						if($dataArray['objectname'] == 'employee')
 						{
-							
-							$delete_str  = '';
+                                                    $extra['action'] = array('name' => 'serial_number', 'value' => '<div class="grid-action-align" style="float:none; margin-top:4px;">
+										' . ($sn) . '
+									</div>');
+                                                    $extra['action'] = array('name' => 'edit', 'value' => '<div class="grid-action-align" style="float:none; margin-top:4px;">
+										' . ((in_array('view', $actions_arr) ? $view_str : '')) . '
+										' . ((in_array('edit', $actions_arr) ? $edit_str : '')) . '
+										' . ((in_array('delete', $actions_arr) ? $delete_str : '')) . '
+									</div>'); //onclick ="javascript:editlocdata(\'{{id}}\')" 
+                                                    $delete_str  = '';
 						}
 						else
                         $delete_str = '<a name="{{id}}" onclick= changeEmployeestatus(\''.$dataArray['objectname'].'\',\'{{id}}\',\''.$msgdta.'\',\''.$dataArray['userid'].'\')	href= javascript:void(0) title=\'Delete\' class="sprite delete" ></a>';
@@ -243,7 +250,7 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 						  $extra['action'] =array(); 
 						}else
 						{
-						  $extra['action'] = array('name' => 'edit', 'value' =>'<div class="grid-action-align">
+						  $extra['action'] = array('name' => 'edit', 'value' =>'<div class="grid-action-align" style="float:none; margin-top:4px;">
 										'.((in_array('view',$actions_arr)?$view_str:'')).'
 										'.((in_array('edit',$actions_arr)?$edit_str:'')).'
 										'.((in_array('delete',$actions_arr)?$delete_str:'')).'
@@ -388,6 +395,7 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 				
 				$value = (is_array($value) && !isset($value['sortkey']))? $value['value']:$value;	
 				if($value == 'Action') $width = 'width=90'; else $width =  '';
+                                if($value == 'S. No.') $width = 'width=20'; else $width =  '';
 				$output .= "<th ".$width.">";
 				// Check if Sorting is set to True
 				if($sorting) {
@@ -396,6 +404,8 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 					if(@$this->extra[$key]['name'] != '' && !is_array($value)) {
 						if($value == "Action")	
 							$output .= "<span class='action-text'>Action</span>";
+                                                elseif($value == "S. No.")
+                                                    $output .= "<span class='action-text'>S. No.</span>";
 						else
 							$output .= $value;
 					} else {
@@ -462,13 +472,14 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 				
 				$value = (is_array($value) && !isset($value['sortkey']))? $value['value']:$value;	
 				if($value == 'Action') $width = 'width=90'; else $width =  '';//'width='.$eachColumnWidth;
+                                if($value == 'S. No.') $width = 'width=20'; else $width =  '';
 				$output .= "<th ".$width.">";
 				// Check if Sorting is set to True
 				if($sorting) {
 
 					// Disable Sorting if Key is in Extra Columns
 					if(@$this->extra[$key]['name'] != '' && !is_array($value)) {
-						if($value == "Action")	
+						if($value == "Action" || $value == "S. No.")	
 							$output .= "<span class='action-text'></span>";
 						else
 							$output .= $value;
@@ -479,8 +490,8 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 						} 
 						$welcome = 'false';
 						$urlString = $_SERVER['REQUEST_URI'];
-						
-						if($key != 'id')
+
+                                                if($key != 'id')
 						{
 							$sText = '';
 							
@@ -491,7 +502,6 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 							
 							if(is_array($searchArray)) { if(array_key_exists($key,$searchArray)) $sText = $searchArray[$key]; else $sText = ''; }
 							
-                                                        
 							if(isset($search_filters[$key]))
 							{
                                                             $search_function = 'getsearchdata("'.$name.'","'.$conText.'","'.$key.'",event';
@@ -499,8 +509,11 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 								
 							}
 							else
+                                                        {
+                                                            if($tabindx!=0)
 								$output .= "<input tabIndex=$tabindx type='text' name='$name' id='$key' style='$display' class='searchtxtbox_$name table_inputs grid_search_inputs' value='$sText' onkeydown='getsearchdata(\"$name\",\"$conText\",\"$key\",event,\"text\")' />";
-						}
+                                                        }
+                                                }
 					}
 				}  else {
 					//For Sort Icons....
@@ -523,17 +536,19 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 
 		// Start Looping Data
 		$ii=0;
-                
+                $sn = 1;
 		foreach($paginator as $p) {
 			$cell_color = ($ii % 2 == 0 ? "row1" : "row2");
 			$ii++;$bodyCount = 0;
 			$output.="<tr onclick='selectrow($name,this);' class='$cell_color'>";
+                        $td=0;
 			// Reset Fields Array to Top
 			if(!empty($fields)) 
 			{ 
+                            
 				reset($fields); 
 				foreach($fields AS $k=>$v) {
-								$tdclass = '';
+					$tdclass = '';
 					// Look for additional attributes
 					$characterlimit = 40;
 					if(is_array($v)) {
@@ -546,9 +561,15 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 					} else {
 						$output .= "<td {$tdclass}>";
 					}
+//             
+//            
 					// Check to see if this Field is in Extra Columns
-					if(isset($this->extra[$k]['value'])) {
+					if($td==0)
+                                                $output .='<div style="float:left; margin-right:10px;">'.$sn.'.</div>';
+                                        if(isset($this->extra[$k]['value'])) {
+                                            
 						$output .= $this->_parseExtra($k,$p);
+                                                
 					} else {					
 						if( $bodyCount== 0 && $jsFillFnName != '')
 						{
@@ -570,8 +591,10 @@ class Zend_View_Helper_Employeegrid extends Zend_View_Helper_Abstract {
 
 					$output .= "</td>";
 					$bodyCount++;
+                                        $td++;
 				}
 			}
+                        $sn++;
 			// Close the Table Row
 			$output.="</tr>";
 

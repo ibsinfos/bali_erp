@@ -40,34 +40,53 @@ class Default_Model_Requisitionhistory extends Zend_Db_Table_Abstract
      */
     public function saveOrUpdateRequisitionHistory($data, $where)
     {
-		if($where != ''){
-			$this->update($data, $where);
-			return 'update';
-		} else {
-			$this->insert($data);
-			$id=$this->getAdapter()->lastInsertId($this->_name);
-			return $id;
-		}
-	}	//end of SaveorUpdateRequisitionhistory
+        $auth = Zend_Auth::getInstance();
+        if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
+        if($where != ''){
+                $this->update($data, $where);
+                return 'update';
+        } else {
+                $data['school_id']=$school_id;
+                $this->insert($data);
+                $id=$this->getAdapter()->lastInsertId($this->_name);
+                return $id;
+        }
+    }	//end of SaveorUpdateRequisitionhistory
     public function getRequisitionHistory($id)
     {
+        $auth = Zend_Auth::getInstance();
+        if($auth->hasIdentity()){
+            $userid = $auth->getStorage()->read()->id;			
+            $usergroup = $auth->getStorage()->read()->group_id;
+            $school_id = $auth->getStorage()->read()->school_id;
+        } 	
         $history = array();
   		$db = Zend_Db_Table::getDefaultAdapter();
-		$where = " e.requisition_id = ".$id." AND e.isactive = 1 ";
+		$where = " e.requisition_id = ".$id." AND e.isactive = 1 AND e.school_id='".$school_id."'";
 		$by=" e.createddate desc ";
 	    $history = $this->select()
-					->setIntegrityCheck(false)
-					->from(array('e' => 'main_requisition_history'),array('history'=>"concat(e.description,c.userfullname)",'hdate'=>"date(e.createddate)",'htime'=>"time(e.createddate)"))
-					->joinLeft(array('c'=>'main_users'), 'c.id=e.createdby',array('emp_profile_img'=>'c.profileimg','emp_name'=>'c.userfullname'))	
-					->where($where)
-					->order($by);
+                ->setIntegrityCheck(false)
+                ->from(array('e' => 'main_requisition_history'),array('history'=>"concat(e.description,c.userfullname)",'hdate'=>"date(e.createddate)",'htime'=>"time(e.createddate)"))
+                ->joinLeft(array('c'=>'main_users'), 'c.id=e.createdby',array('emp_profile_img'=>'c.profileimg','emp_name'=>'c.userfullname'))	
+                ->where($where)
+                ->order($by);
 		
     	return  $this->fetchAll($history)->toArray();
      }
 	 public function getRequisitionHistoryforCandidate($id)
 	 {
+            $auth = Zend_Auth::getInstance();
+            if($auth->hasIdentity()){
+                $userid = $auth->getStorage()->read()->id;			
+                $usergroup = $auth->getStorage()->read()->group_id;
+                $school_id = $auth->getStorage()->read()->school_id;
+            } 	
 		$history = array();
-		$where = " e.candidate_id = ".$id." AND e.isactive = 1 ";
+		$where = " e.candidate_id = ".$id." AND e.isactive = 1 AND e.school_id='".$school_id."'";
 		$by=" e.id desc ";
     	if($id != '')
     	{

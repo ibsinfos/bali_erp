@@ -1,0 +1,147 @@
+ body {
+	margin: 0;
+	padding: 0;
+ }
+ 
+ #background 
+{ 
+	 left: 0px; 
+	 top: 0px; 
+	 position: relative; 
+	 margin-left: auto; 
+	 margin-right: auto; 
+	 width: 9000px;
+	 height: 6300px; 
+	 overflow: hidden;
+	 z-index:0;
+	} 
+
+ #VectorSmartObject 
+{ 
+	 left: -350px; 
+	 top: -46px; 
+	 position: absolute; 
+	 width: 9878px;
+	 height: 6390px;
+	 z-index:1;
+} 
+
+ #VectorSmartObject_0 
+{ 
+	 left: 6693px; 
+	 top: 479px; 
+	 position: absolute; 
+	 width: 2016px;
+	 height: 3341px;
+	 z-index:2;
+} 
+
+ #Loremipsumdolorsitam 
+{       
+         font-size: 800px;
+         font-family: Old English Text MT;
+	 left: 2567px; 
+	 top: 3082px; 
+     font-size: 100pt;
+	 position: absolute; 
+	 width: 4136px;
+	 height: 167px;
+	 z-index:3;
+} 
+
+ #Loremipsumdolorsitam_0 
+{ 
+	 left: 2556px; 
+	 top: 3986px;
+     font-size: 80pt;
+	 position: absolute; 
+	 width: 5259px;
+	 height: 583px;
+	 z-index:4;
+} 
+
+ #Rectangle1 
+{ 
+	 left: 1594px; 
+	 top: 5434px; 
+	 position: absolute; 
+	 width: 1773px;
+	 height: 27px;
+	 z-index:5;
+} 
+
+ #Rectangle1copy 
+{ 
+	 left: 5734px; 
+	 top: 5434px; 
+	 position: absolute; 
+	 width: 1773px;
+	 height: 27px;
+	 z-index:6;
+} 
+
+ #date 
+{ 
+	 left: 2257px; 
+	 top: 5585px; 
+	 position: absolute; 
+	 width: 449px;
+	 height: 122px;
+	 z-index:7;
+} 
+
+ #signature 
+{ 
+	 left: 6117px; 
+	 top: 5579px; 
+	 position: absolute; 
+	 width: 1006px;
+	 height: 128px;
+	 z-index:8;
+} 
+
+ #thiscertificateispre 
+{ 
+         font-size: 200px; 
+         font-family: Old English Text MT;
+	 left: 1554px; 
+	 top: 1522px; 
+	 position: absolute; 
+	 width: 3207px;
+	 height: 128px;
+	 z-index:9;
+} 
+
+ #certificate 
+{        
+         font-size: 400px;
+         font-family: Old English Text MT;
+	 left: 712px; 
+	 top: 711px; 
+	 position: absolute; 
+	 width: 4024px;
+	 height: 380px;
+	 z-index:10;
+} 
+
+ #ofappreciation 
+{ 
+	 left: 568px; 
+	 top: 1218px; 
+	 position: absolute; 
+	 width: 1565px;
+	 height: 143px;
+	 z-index:11;
+} 
+
+ #VmalooProject 
+{ 
+	 left: 1563px; 
+	 top: 2309px; 
+     font-size: 100pt;
+     font-family: "Times New Roman", Times, serif;
+	 position: absolute; 
+	 width: 4896px;
+	 height: 739px;
+	 z-index:12;
+} 

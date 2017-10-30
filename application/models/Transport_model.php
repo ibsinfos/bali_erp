@@ -6,9 +6,9 @@ if (!defined('BASEPATH'))
 class Transport_model extends CI_Model {
     private $_table="transport";
     
-    var $column_order = array(null, 'route_name', 'number_of_vehicle', 'description', 'route_fare'); //set column field database for datatable orderable
-    var $column_search = array('route_name', 'number_of_vehicle', 'description', 'route_fare'); //set column field database for datatable searchable 
-    var $order = array('transport_id' => 'asc'); // default order 
+    var $column_order = array(null, 't.route_name', 't.number_of_vehicle', 'bs.route_from', 'bs.route_to', 'bs.route_fare'); //set column field database for datatable orderable
+    var $column_search = array('t.route_name', 't.number_of_vehicle', 'bs.route_from', 'bs.route_to', 'bs.route_fare'); //set column field database for datatable searchable 
+    var $order = array('bs.route_bus_stop_id' => 'desc'); // default order 
 
     function __construct() {
         parent::__construct();
@@ -24,6 +24,11 @@ class Transport_model extends CI_Model {
         }
         $transport_array = $this->db->get('transport')->result_array();
         return $transport_array;
+    }
+    
+    public function get_transport_array_for_student_fees_config(){
+        $rs=$this->db->select('t.*')->from($this->_table.' AS t')->join('route_bus_stop AS rbs','rbs.route_id=t.transport_id')->group_by('t.transport_id')->get()->result_array();
+        return $rs;
     }
 
     public function add_student($data) {
@@ -261,10 +266,14 @@ class Transport_model extends CI_Model {
         if(($this->session->userdata('school_id'))) {
             $school_id = $this->session->userdata('school_id');
             if($school_id > 0){
-                $this->db->where('school_id',$school_id);
+                $this->db->where('bs.school_id', $school_id);
             } 
         }
-        $this->db->from($this->_table);
+        //$this->db->from($this->_table);
+
+        $this->db->select('bs.*, bs.route_fare as fare_price, t.*'); // Select field
+        $this->db->from($this->_table .' as t');
+        $this->db->join('route_bus_stop bs', 'bs.route_id = t.transport_id');
 
         $i = 0;
 

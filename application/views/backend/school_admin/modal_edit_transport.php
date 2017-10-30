@@ -20,7 +20,7 @@
             </div>
             <div class="form-group">
               <div class="col-md-12 text-right">
-                  <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light"><?php echo get_phrase('update');?></button>
+                  <button type="submit" class="fcbtn btn btn-danger btn-outline btn-1d m-l-20 hidden-xs hidden-sm waves-effect waves-light"><?php echo get_phrase('update');?></button>
               </div>
             </div>
         <?php echo form_close();?>

@@ -42,22 +42,21 @@
                                     }else{
                                           $image_url = base_url().'uploads/student_image/'.$edit_data['stud_image'];
                                     }  ?>
-                                        <div class="col-xs-2 col-md-1 no-padding text-left table-stu-info">                                         
+                                        <div class="col-xs-2 col-md-12 no-padding text-left table-stu-info">                                         
                                             <!--<a href="#" class="profile-picture">-->
                                          <div class="el-overlay-1" onmouseover="$('#profile_overlay').show();" onmouseout="$('#profile_overlay').hide();">
                                             <img src="<?php echo $image_url;?>" id="blah" alt="image" width="150" height="150" onmouseover="$('#profile_overlay').show();" onmouseout="$('#profile_overlay').show();"/> 
                                          <!--</a>-->
-<div id="profile_overlay" class="el-overlay1" style="position: absolute;left: 0px;bottom: 0px;top: 0px;width: 170%;height: 60%;color: rgb(255, 255, 255);background-color: rgb(0, 0, 0);opacity: 0.5;text-align: center; display: none;">
+<div id="profile_overlay" class="el-overlay1" style="position: absolute;left: 0px;bottom: 0px;top: 0px;width: 12.5%;height: 100%;color: rgb(255, 255, 255);background-color: rgb(0, 0, 0);opacity: 0.5;text-align: center; display: none;">
                         <a href="#" onclick="remove_profile(<?php echo $edit_data['student_id']; ?>);" title="Remove Photo"><i class="fa fa-trash" style="margin-top:70px; font-size: 30px;"></i></a>
                 </div>
                                          </div>
-
+                                        </div>
                                         <div class="col-xs-10 col-md-11 m-t-10">
                                             <h2 class="stu-name-margin"><?php echo $edit_data['name']." ".$edit_data['lname']; ?></h2>
                                         </div>
                                     </div>
-                                <table class="table table-bordered table_row_hover">
-                                    
+                                <table class="table table-bordered table_row_hover">                                    
                                     <tr>
                                          <th><b><?php echo get_phrase('email_: '); ?></b></th>
                                          <td><?php echo $edit_data['email']; ?></td>

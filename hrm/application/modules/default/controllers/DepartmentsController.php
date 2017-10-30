@@ -1,4 +1,4 @@
-x<?php
+<?php
 /********************************************************************************* 
  *  This file is part of Sentrifugo.
  *  Copyright (C) 2015 Sapplica
@@ -322,14 +322,14 @@ class Default_DepartmentsController extends Zend_Controller_Action
 				$statesmodel = new Default_Model_States();
 				$citiesmodel = new Default_Model_Cities();
 				$timezonemodel = new Default_Model_Timezone();
-				$businessunitsmodel = new Default_Model_Businessunits();
+				//$businessunitsmodel = new Default_Model_Businessunits();
 				$orgInfoModel = new Default_Model_Organisationinfo();
 				$employeeModal = new Default_Model_Employee();
 				$allTimezoneData = $timezonemodel->fetchAll('isactive=1','timezone')->toArray();			
 				$allCountriesData = $countriesModel->fetchAll('isactive=1','country')->toArray();
 				$allStatesData = $statesmodel->fetchAll('isactive=1','state')->toArray();
 				$allCitiesData = $citiesmodel->fetchAll('isactive=1','city')->toArray();	
-				$allBusinessunitsData = $businessunitsmodel->fetchAll('isactive=1','unitname')->toArray();	
+				//$allBusinessunitsData = $businessunitsmodel->fetchAll('isactive=1','unitname')->toArray();	
 				$deptData = array();
 				$deptform->setAttrib('action',BASE_URL.'departments/edit');	
 				$country = $getorgData[0]['country'];
@@ -442,7 +442,7 @@ class Default_DepartmentsController extends Zend_Controller_Action
 				$this->view->deptData = sizeof($deptData);
 				$this->view->form = $deptform;
 					
-				if(!empty($allBusinessunitsData) && !empty($allCountriesData) && !empty($allStatesData) && !empty($allCitiesData) && !empty($allTimezoneData))
+				if(!empty($allCountriesData) && !empty($allStatesData) && !empty($allCitiesData) && !empty($allTimezoneData))
 				{
 					$this->view->configuremsg = '';
 				}else{
@@ -463,11 +463,11 @@ class Default_DepartmentsController extends Zend_Controller_Action
 					$msgarray['city'] = 'Cities are not configured yet.';
 					$flag = 'false';
 				}
-				if(empty($allBusinessunitsData))
-				{
-					$msgarray['unitid'] = 'Business units are not added yet.';
-					$flag = 'false';
-				}
+//				if(empty($allBusinessunitsData))
+//				{
+//					$msgarray['unitid'] = 'Business units are not added yet.';
+//					$flag = 'false';
+//				}
 				if(empty($allTimezoneData))
 				{
 					$msgarray['timezone'] = 'Time zones are not configured yet.';

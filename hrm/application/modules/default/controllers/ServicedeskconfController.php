@@ -159,7 +159,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 							}
 						}
 						
-						if($data['service_desk_id'] !='' && $data['service_desk_id'] != 'NULL' &&   isset($data['businessunit_id'])) 
+						if($data['service_desk_id'] !='' && $data['service_desk_id'] != 'NULL') 
 					    {
 					    	if($data['request_for']=='1'){
 								$serviceDeptData = $servicedeskdepartmentmodel->getServiceDeskDepartmentDatabyID($data['service_desk_id']);
@@ -254,13 +254,13 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 							 }
 						     $approvingauthflag = 3;
 					    }
-                       $bunitdata = $bunitModel->fetchAll('isactive=1','unitname');
-					   $servicedeskconfform->businessunit_id->addMultiOptions(array(''=>'Select Business unit','0'=>'No Business Unit'));
-						foreach ($bunitdata->toArray() as $bdata)
-						{
-							$servicedeskconfform->businessunit_id->addMultiOption($bdata['id'],$bdata['unitname']);
-						}
-					    $servicedeskconfform->setDefault('businessunit_id',$data['businessunit_id']);
+                      // $bunitdata = $bunitModel->fetchAll('isactive=1','unitname');
+					   //$servicedeskconfform->businessunit_id->addMultiOptions(array(''=>'Select Business unit','0'=>'No Business Unit'));
+//						foreach ($bunitdata->toArray() as $bdata)
+//						{
+//							$servicedeskconfform->businessunit_id->addMultiOption($bdata['id'],$bdata['unitname']);
+//						}
+					    //$servicedeskconfform->setDefault('businessunit_id',$data['businessunit_id']);
 					    $servicedeskconfform->setDefault('approvingauthority',$approvingauthflag);
 					    $this->view->approvingauthflag = $approvingauthflag;
 					    $this->view->service_desk_flag = $data['service_desk_flag'];
@@ -295,17 +295,17 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 		{
 			   $this->view->ermsg = 'nodata';
 		}
-	     if(!empty($data['businessunit_id'])) {
-			$buname = $bunitModel->getSingleUnitData($data['businessunit_id']);
-			
-			if(!empty($buname)){
-				$data['businessunit_id'] = $buname['unitname'];
-			}
-			else
-			{
-				$data['businessunit_id'] = "";
-			}
-		}
+//	     if(!empty($data['businessunit_id'])) {
+//			$buname = $bunitModel->getSingleUnitData($data['businessunit_id']);
+//			
+//			if(!empty($buname)){
+//				$data['businessunit_id'] = $buname['unitname'];
+//			}
+//			else
+//			{
+//				$data['businessunit_id'] = "";
+//			}
+//		}
 		 if(isset($data['service_desk_flag'])){
 			   if($data['service_desk_flag']=='0'){
 				$data['service_desk_flag']="Department wise";
@@ -409,16 +409,16 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 				 if(is_numeric($id) && $id>0)
 				{
 					$data = $servicedeskconfmodel->getServiceDeskConfbyID($id);
-					
+					//print_r($data); die;
 					if(!empty($data))
 					{
 						$data = $data[0];
 						//echo"<pre>";print_r($data);exit;
-						$bunitData = $bunitModel->getSingleUnitData($data['businessunit_id']);
-						if(!empty($bunitData))
-						{
-							$servicedeskconfform->businessunit_id->addMultiOption($bunitData['id'],utf8_encode($bunitData['unitname']));
-						}
+//						$bunitData = $bunitModel->getSingleUnitData($data['businessunit_id']);
+//						if(!empty($bunitData))
+//						{
+//							$servicedeskconfform->businessunit_id->addMultiOption($bunitData['id'],utf8_encode($bunitData['unitname']));
+//						}
 						
 						$catData=$servicedeskconfmodel->getActiveCategoriesData();
 						
@@ -524,7 +524,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 					    }
 					    
 						$servicedeskconfform->populate($data);
-						$servicedeskconfform->setDefault('businessunit_id',$data['businessunit_id']);
+						//$servicedeskconfform->setDefault('businessunit_id',$data['businessunit_id']);
 						$servicedeskconfform->setDefault('approvingauthority',$approvingauthflag);
 						$servicedeskconfform->setDefault('request_for',$data['request_for']);
 						if(sizeof($departmentlistArr) > 0)
@@ -541,7 +541,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 					    $this->view->cc_mail_recievers_value = ($data['cc_mail_recievers']!=''?$data['cc_mail_recievers']:'');  	
 						$servicedeskconfform->setAttrib('action',BASE_URL.'servicedeskconf/edit/id/'.$id);
                         $this->view->data = $data;
-                        $servicedeskconfform->businessunit_id->setAttrib("disabled", "disabled");
+                        //$servicedeskconfform->businessunit_id->setAttrib("disabled", "disabled");
                         $servicedeskconfform->request_for->setAttrib("disabled", "disabled");
                         $servicedeskconfform->service_desk_flag->setAttrib("disabled", "disabled");
                         $servicedeskconfform->department_id->setAttrib("disabled", "disabled");
@@ -567,6 +567,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 		}	
 		catch(Exception $e)
 		{
+                    
 			   $this->view->ermsg = 'nodata';
 		}	
 		$this->view->form = $servicedeskconfform;
@@ -598,7 +599,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 		$prevBusinessunit = '';
 		$errorflag = "true";
 		 $id = $this->_request->getParam('id');
-         $businessunit_id = $this->_request->getParam('businessunit_id');
+         //$businessunit_id = $this->_request->getParam('businessunit_id');
          $service_desk_flag = $this->_request->getParam('service_desk_flag');
          $department_id = $this->_request->getParam('department_id');
          $request_for = $this->_request->getParam('request_for');
@@ -615,10 +616,10 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 		 $deptid='';
 		 //validating category field
 		 
-	if(!empty($businessunit_id) && $request_for=='2' && $service_desk_id==''){
+	if($request_for=='2' && $service_desk_id==''){
 			
 		 	$assetcategoriesModel = new Assets_Model_AssetCategories();
-		 	$user_cat_data=$assetcategoriesModel->getActiveCategoriesData($bunitid,$deptid);
+		 	$user_cat_data=$assetcategoriesModel->getActiveCategoriesData('',$deptid);
 		    $asset_cat_array = array();
 		 	if(count($user_cat_data) > 0)
 		 	{
@@ -740,10 +741,10 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 		$servicedeskids = implode(",",$servicedeskidarr);
 		   }
 		
-		   	if($businessunit_id !='' && $service_desk_id !='' && $id == '')
+		   	if($service_desk_id !='' && $id == '')
 		        {
 		        	
-					$serviceconfArr = $servicedeskconfmodel->checkuniqueServiceConfData($businessunit_id,$service_desk_flag,$servicedeskids,$department_id,$request_for);
+					$serviceconfArr = $servicedeskconfmodel->checkuniqueServiceConfData('',$service_desk_flag,$servicedeskids,$department_id,$request_for);
 					
 					if(!empty($serviceconfArr))
 					{
@@ -761,26 +762,26 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 		   /**
 		    * Validating if pending requests are there when changing the implementation
 		    */
-		        if($businessunit_id !='')
+		        if(1==1)
 		        {
-			        $implementationdata = $businessunitsmodel->getSingleUnitData($businessunit_id);
-			        if(!empty($implementationdata))
-						$prevBusinessunit = $implementationdata['service_desk_flag'];
-					if($service_desk_flag !='')
-					{
-						if($prevBusinessunit != $service_desk_flag)
-						{
-							$pendingRequestdata = $servicedeskconfmodel->getPendingServiceReqData($businessunit_id);
-								if(!empty($pendingRequestdata))
-								{
-								   if($pendingRequestdata[0]['count'] > 0)
-								   {
-								   	    $msgarray['service_desk_flag'] = 'Applicability cannot be changed as requests are in pending state.';
-						 				$errorflag = "false";
-								   }
-								}   
-						}
-					}
+			       // $implementationdata = $businessunitsmodel->getSingleUnitData($businessunit_id);
+//			        if(!empty($implementationdata))
+//						$prevBusinessunit = $implementationdata['service_desk_flag'];
+//					if($service_desk_flag !='')
+//					{
+//						if($prevBusinessunit != $service_desk_flag)
+//						{
+//							$pendingRequestdata = $servicedeskconfmodel->getPendingServiceReqData($businessunit_id);
+//								if(!empty($pendingRequestdata))
+//								{
+//								   if($pendingRequestdata[0]['count'] > 0)
+//								   {
+//								   	    $msgarray['service_desk_flag'] = 'Applicability cannot be changed as requests are in pending state.';
+//						 				$errorflag = "false";
+//								   }
+//								}   
+//						}
+//					}
 		        }
 		  /**
 		   * End validating pending request checking 
@@ -807,7 +808,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 	for($j=0;$j<sizeof($servicedeskidarr);$j++)
 	 {	
 	   if($id!=''){
-	    	$data = array('businessunit_id'=>$businessunit_id,
+	    	$data = array(
 			                 'department_id'=>($department_id!=''?$department_id:NULL), 
 							 'service_desk_flag'=>$service_desk_flag,
 			   				 'request_for'=>$request_for,
@@ -825,7 +826,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 					// $servicedeskconfform->request_for->setRequired(false);
 					
 	    }else{
-			   $data = array('businessunit_id'=>$businessunit_id,
+			   $data = array(
 			                 'department_id'=>($department_id!=''?$department_id:NULL), 
 							 'service_desk_flag'=>$service_desk_flag,
 			   	           	 'request_for'=>$request_for,
@@ -856,37 +857,37 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 					$actionflag = 1;
 				}
 				
-				$budata = array('service_desk_flag' => $service_desk_flag,
-								'modifiedby'=>$loginUserId,
-							  	'modifieddate'=>gmdate("Y-m-d H:i:s")
-								);
-				$buwhere = array('id=?'=>$businessunit_id);
+//				$budata = array('service_desk_flag' => $service_desk_flag,
+//								'modifiedby'=>$loginUserId,
+//							  	'modifieddate'=>gmdate("Y-m-d H:i:s")
+//								);
+//				$buwhere = array('id=?'=>$businessunit_id);
 				
 				/* If implementation wise is changed then all the previous records are inactivated and new record is inserted 
 				 * Else normal update - insert will take place. 
 				 */ 
-                if($prevBusinessunit != $service_desk_flag)
-				{
-					if(!empty($servicedeskidarr) && $j==0) {
-						 $prevBUData = array('isactive'=>0,
-						 					'modifiedby'=>$loginUserId,
-								  			'modifieddate'=>gmdate("Y-m-d H:i:s")
-						 					);
-						 $prevBUwhere = array('businessunit_id=?'=>$businessunit_id);					
-						  /*Inactivating previous records */
-						  $prevBUId = $servicedeskconfmodel->SaveorUpdateServiceConfData($prevBUData, $prevBUwhere);
-					} 
-					  
-					  $data['createdby'] = $loginUserId;
-					  $data['createddate'] = gmdate("Y-m-d H:i:s");
-					  $data['isactive'] = 1;
-					  $where = '';
-					  $actionflag = 1;
-					  /* Inserting new record */
-					
-					  $Id = $servicedeskconfmodel->SaveorUpdateServiceConfData($data, $where);
-				}
-				else
+//                if($prevBusinessunit != $service_desk_flag)
+//				{
+//					if(!empty($servicedeskidarr) && $j==0) {
+//						 $prevBUData = array('isactive'=>0,
+//						 					'modifiedby'=>$loginUserId,
+//								  			'modifieddate'=>gmdate("Y-m-d H:i:s")
+//						 					);
+//						 $prevBUwhere = array('businessunit_id=?'=>$businessunit_id);					
+//						  /*Inactivating previous records */
+//						  $prevBUId = $servicedeskconfmodel->SaveorUpdateServiceConfData($prevBUData, $prevBUwhere);
+//					} 
+//					  
+//					  $data['createdby'] = $loginUserId;
+//					  $data['createddate'] = gmdate("Y-m-d H:i:s");
+//					  $data['isactive'] = 1;
+//					  $where = '';
+//					  $actionflag = 1;
+//					  /* Inserting new record */
+//					
+//					  $Id = $servicedeskconfmodel->SaveorUpdateServiceConfData($data, $where);
+//				}
+//				else
 				{
 					 
 					  /* Insert or update based on action */
@@ -896,7 +897,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 	 }
 		
 				/* Updating service desk flag in business unit table */
-				$BId = $businessunitsmodel->SaveorUpdateBusinessUnits($budata, $buwhere);
+				//$BId = $businessunitsmodel->SaveorUpdateBusinessUnits($budata, $buwhere);
 				if($Id == 'update')
 				{
 				   $tableid = $id;
@@ -1118,14 +1119,17 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 			$servicedeskconfmodel = new Default_Model_Servicedeskconf();
 			$servicedeskdepartmentmodel = new Default_Model_Servicedeskdepartment();
 			  $servicedeskconfdata = $servicedeskconfmodel->getServiceDeskConfbyID($id);
-			  if(!empty($servicedeskconfdata))
-			  	$pendingRequestdata = $servicedeskconfmodel->getPendingServiceReqData($servicedeskconfdata[0]['businessunit_id']);
+
+                          if(!empty($servicedeskconfdata))
+			  	$pendingRequestdata = $servicedeskconfmodel->getPendingServiceReqData('');
 			  if(!empty($pendingRequestdata))
 			  	$count = $pendingRequestdata[0]['count'];
 			  if($count < 1)
 			  {	
+                              
 				  $serviceDeptData = $servicedeskdepartmentmodel->getServiceDeskDepartmentDatabyID($servicedeskconfdata[0]['service_desk_id']);
-				  $data = array('isactive'=>0,'modifieddate'=>gmdate("Y-m-d H:i:s"));
+
+                                  $data = array('isactive'=>0,'modifieddate'=>gmdate("Y-m-d H:i:s"));
 				  $where = array('id=?'=>$id);
 				  $Id = $servicedeskconfmodel->SaveorUpdateServiceConfData($data, $where);
 				    if($Id == 'update')
@@ -1186,7 +1190,7 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 		$employeeData = array();
 		$servicedeskData = array();
 		$implementationdata= array();
-		$employeeData = $employeemodel->getEmployeesForServiceDesk($bunitid,$deptid);
+		$employeeData = $employeemodel->getEmployeesForServiceDesk('',$deptid);
 		//echo '<pre>';
 		if(isset($bunitid) && $bunitid != '')
 			{
@@ -1199,8 +1203,8 @@ class Default_ServicedeskconfController extends Zend_Controller_Action
 			}			
 			//$servicedeskData = $servicedeskconfmodel->getActiveServiceDepartments($bunitid,$deptid,$reqfor);
 			}
-			if($bunitid !='')
-			$implementationdata = $businessunitsmodel->getSingleUnitData($bunitid);
+//			if($bunitid !='')
+//			$implementationdata = $businessunitsmodel->getSingleUnitData($bunitid);
 		//print_r($employeeData);
 		//exit;
 		$this->view->employeedata=$employeeData;

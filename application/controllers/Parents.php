@@ -219,6 +219,16 @@ class Parents extends CI_Controller {
         $page_data= $this->get_page_data_var();
         $children_of_parent = array();
         $children_of_parent = $this->Student_model->get_data_by_cols('*', array('parent_id' => $this->session->userdata('parent_id')), 'result_array');  //get_data_generic_fun('student','*',array('parent_id'=>$this->session->userdata('parent_id')),'result_array');
+
+        $school_id = '';
+        if (($this->session->userdata('school_id'))) {
+            $school_id = $this->session->userdata('school_id');
+        }        
+        $receiver_id = $this->session->userdata('login_user_id');
+        $where2 = array('message_schedule_status'=>'1', 'push_notify'=>'1', 'receiver_id'=>$receiver_id, 'receiver_type'=>'P', 'school_id'=>$school_id);
+        $this->db->where($where2);
+        $this->db->update('custom_message_noticeboard', 
+            array('is_read'=>'1'));
        
         foreach ($children_of_parent as $child) {
             $class_id = $this->Student_model->get_class_id_by_student($child['student_id']);
@@ -1347,12 +1357,18 @@ class Parents extends CI_Controller {
      */
 
     public function get_no_of_notication() {
-        $this->load->model("Notification_model");
+        /*$this->load->model("Notification_model");
         $user_id = $this->session->userdata('login_user_id');
         $user_notif_user = $this->Notification_model->get_notifications('push_notifications', 'parent', $user_id);
         $user_notif_user_type = $this->Notification_model->get_notifications('push_notifications', 'parent');
         $user_notif_common = $this->Notification_model->get_notifications('push_notifications');
         $total_count = count($user_notif_user) + count($user_notif_user_type) + count($user_notif_common);
+        return $total_count;*/
+
+        $user_id =   $this->session->userdata('login_user_id');
+        $this->load->model("Notification_model");
+        $data = $this->Notification_model->get_notifications_new('1', 'P', $user_id);
+        $total_count = count($data);
         return $total_count;
     }
 
@@ -1792,7 +1808,7 @@ class Parents extends CI_Controller {
         //pre($online_poll_list);
         //die($action);
         if($action == 'polled') {
-            $this->session->set_flashdata('flash_message', get_phrase('poll_updated_successfully'));
+            $this->session->set_flashdata('flash_message', get_phrase('vote_submitted'));
             redirect(base_url() . 'index.php?parents/online_polls/' , 'refresh');
         }
         //pre($online_poll_list);die;
@@ -2153,7 +2169,7 @@ if ($this->session->userdata('parent_login') != 1)
         $this->load->view('backend/index', $page_data);
     }
     
-     public function clinical_history($param1 = '', $param2 = '') {
+    public function clinical_history($param1 = '', $param2 = '') {
         if ($this->session->userdata('parent_login') != 1)
             redirect(base_url(), 'refresh');
         
@@ -2166,7 +2182,7 @@ if ($this->session->userdata('parent_login') != 1)
             $this->form_validation->set_rules('diagnosis', 'Diagnosis', 'required');
             $this->form_validation->set_rules('precription', 'Precription', 'required');
             $this->form_validation->set_rules('start_date', 'Start Date', 'required');
-//            pre($this->input->post()); die;
+            //            pre($this->input->post()); die;
          if ($this->form_validation->run() == TRUE) {
                  $data['symptoms']  =   $this->input->post('symptoms');
                  $data['diagnosis']  =  $this->input->post('diagnosis');
@@ -2176,7 +2192,7 @@ if ($this->session->userdata('parent_login') != 1)
                  $data['end_date'] =    $this->input->post('end_date');
                  $data['student_id'] =  $param1;
                  $data['parent_id'] =   $this->session->userdata('parent_id');
-//                 pre($data); die;
+                    //                 pre($data); die;
                  $this->Clinical_history_model->add($data);
                  $this->session->set_flashdata("flash_message", get_phrase("data_added_successfully"));
                  redirect(base_url() . 'index.php?parents/clinical_history/'.$param1, 'refresh');
@@ -2187,20 +2203,20 @@ if ($this->session->userdata('parent_login') != 1)
        }
  
         if($param2 == 'edit'){
-                 $data['symptoms']  =   $this->input->post('symptoms');
-                 $data['diagnosis']  =  $this->input->post('diagnosis');
-                 $data['prescription'] = $this->input->post('precription');
-                 $data['start_date'] =  $this->input->post('start_date');
-                 $data['end_date'] =    $this->input->post('end_date');
-      //                    pre($data); die;
-                $this->Clinical_history_model->update_clinical($data, array("clinical_history_id" => $param1));
-                $this->session->set_flashdata("flash_message", get_phrase("updated_successfully"));
-                redirect(base_url() . 'index.php?parents/clinical_history/'.$param1, 'refresh');
+            $data['symptoms']  =   $this->input->post('symptoms');
+            $data['diagnosis']  =  $this->input->post('diagnosis');
+            $data['prescription'] = $this->input->post('precription');
+            $data['start_date'] =  $this->input->post('start_date');
+            $data['end_date'] =    $this->input->post('end_date');
+            //pre($data); die;
+            $this->Clinical_history_model->update_clinical($data, array("clinical_history_id" => $param1));
+            $this->session->set_flashdata("flash_message", get_phrase("updated_successfully"));
+            redirect(base_url() . 'index.php?parents/clinical_history/'.$param1, 'refresh');
         }
         if($param2 == 'delete'){
-                $this->Clinical_history_model->delete_clinical($param1);
-                $this->session->set_flashdata("flash_message", get_phrase("deleted_successfully"));
-                redirect(base_url() . 'index.php?parents/clinical_history/'.$param1, 'refresh');
+            $this->Clinical_history_model->delete_clinical($param1);
+            $this->session->set_flashdata("flash_message", get_phrase("deleted_successfully"));
+            redirect(base_url() . 'index.php?parents/clinical_history/'.$param1, 'refresh');
         }
         $page_data['page_title']    =   get_phrase('clinical_history');
         $page_data['page_name']     =   'clinical_history';
@@ -2210,8 +2226,45 @@ if ($this->session->userdata('parent_login') != 1)
         $page_data['student_id'] = $param1;
         $condition = array($page_data['student_id'] => $param1);
         $page_data['clinical_details']       =   $this->Clinical_history_model->get_clinical_array($condition);
-//        pre($page_data['clinical_details']); die;
+        //pre($page_data['clinical_details']); die;
         $page_data['total_notif_num']  =   $this->get_no_of_notication();
         $this->load->view('backend/index', $page_data);
     }
+
+    /************************Photo Gallery*******************************/
+    function photo_galleries($student_id=false){
+        if ($this->session->userdata('parent_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $this->load->model('Gallery_model');    
+        $page_data = $this->get_page_data_var();
+       
+        $page_data['page_name'] = 'gallery/photo_galleries';
+        $page_data['page_title'] = get_phrase('photo_galleries');
+        $whr_in = array('PG.class_id'=>array(0));
+        $page_data['records'] = $this->Gallery_model->get_galleries_for_parent_student(array(),'PG.id DESC',$whr_in,$student_id);
+        //echo '<pre>';print_r($page_data['records']);exit;
+        $this->load->view('backend/index', $page_data);
+    }
+    
+    //Gallery Images
+    function photo_gallery_images($gallery_id=false){
+        if ($this->session->userdata('parent_login') != 1)
+            redirect(base_url(), 'refresh');
+
+        $this->load->model(array('Gallery_model','S3_model'));
+        $page_data = $this->get_page_data_var();
+        $instance = $this->Crud_model->get_instance_name();
+        $page_data['bucket'] = $bucket = 'https://'.S3_model::$bucket.'.s3.amazonaws.com/';
+        $page_data['gallery'] = $rec = $this->Gallery_model->get_gallery_record($gallery_id);
+        if(!$page_data['gallery']){
+            redirect(base_url(), 'refresh');
+        }
+
+        $page_data['page_name'] = 'gallery/images';
+        $page_data['page_title'] = get_phrase('photo_galleries_images');
+        $page_data['images'] = $this->Gallery_model->get_gallery_images_for_parent_student(array('IM.gallery_id'=>$gallery_id));  
+        //echo '<pre>';print_r($page_data['objects']);exit;
+        $this->load->view('backend/index', $page_data);
+    }  
 }

@@ -33,6 +33,14 @@
             </select>
         </div>
     </div>
+
+    <div class="col-md-2 hidden-xs">
+        <a href="#" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_study_material_add_by_admin');" >
+            <button type="button" class=" m-b-20 btn btn-primary btn-circle btn-lg pull-right tooltip-danger" data-target="#add-contact" data-toggle="tooltip" data-placement="left" data-original-title="Add New" data-step="6" data-intro="<?php echo get_phrase('Add new Study Material');?>" data-position='left' >
+             <i class="fa fa-plus"></i>    
+            </button>                 
+        </a>
+    </div>
  </div>
 
 <div class="col-md-12 white-box preview_outer">
@@ -43,7 +51,7 @@
             <th><div><?php echo get_phrase('title');?></div></th>
             <th><div><?php echo get_phrase('class');?></div></th>
             <th><div><?php echo get_phrase('uploaded_by');?></div></th>
-            <th><div><?php echo get_phrase('file_name');?></div></th>
+            <!-- <th><div><?php echo get_phrase('file_name');?></div></th> -->
             <th><div><?php echo get_phrase('description');?></div></th> 
             <th><div><?php echo get_phrase('added_on');?></div></th>
             <th data-step="7" data-intro="<?php echo get_phrase('Here are the options of edit, delete and download.');?>" data-position='top'><div><?php echo get_phrase('options');?></div></th>
@@ -59,8 +67,8 @@
                 <td><?php echo $count++; ?></td>               
                 <td><?php echo $row['title']?></td>
                 <td><?php echo $row['classname']?></td>
-                <td><?php echo $row['teacher_name']?></td>
-                <td><?php echo $row['file_name']; ?></td>
+                <td><?php echo $row['uploader_type']=='SA' ? 'School Admin':'Teacher'; ?></td>
+                <!-- <td><?php echo $row['file_name']; ?></td> -->
                 <td><?php echo $row['description']?></td> 
                 <td><?php echo $row['timestamp']; ?></td>
                 <td>
@@ -78,6 +86,14 @@
                                 data-placement="top" data-original-title="<?php echo get_phrase('download') ?>" title="<?php echo get_phrase('download') ?>">
                         <i class="fa fa-download"></i>
                           </button>
+                    </a>
+
+                    <a href="#" onclick="showAjaxModal('<?php echo base_url();?>index.php?modal/popup/modal_study_material_edit_by_admin/<?php echo $row['document_id'];?>');" >
+                        <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Edit" title="Edit" ><i class="fa fa-pencil-square-o"></i></button>
+                    </a>
+
+                    <a href="#" onclick="confirm_modal('<?php echo base_url(); ?>index.php?school_admin/study_material/delete/<?php echo $row['document_id'];?>');">
+                        <button type="button" class="btn btn-default btn-outline btn-circle btn-lg m-r-5 tooltip-danger" data-toggle="tooltip" data-placement="top" data-original-title="Delete" title="Delete"><i class="fa fa-trash-o"></i></button>
                     </a>                    
                 </td>
                 

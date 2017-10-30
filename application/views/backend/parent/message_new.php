@@ -10,7 +10,7 @@
                     ?>
 
                     <option value="school_admin-<?php echo $row['school_admin_id']; ?>">
-                        - <?php echo $row['name']; ?></option>
+                        - <?php echo ucwords($row['first_name'].' '.$row['last_name']); ?></option>
 
                 <?php endforeach; ?>
             </optgroup>
@@ -20,7 +20,7 @@
                     ?>
 
                     <option value="teacher-<?php echo $row['teacher_id']; ?>">
-                        - <?php echo $row['name']; ?></option>
+                        - <?php echo ucwords($row['name']." ".$row['middle_name']." ".$row['last_name']); ?></option>
 
                 <?php endforeach; ?>
             </optgroup>
@@ -32,7 +32,7 @@
     <textarea class="form-control" rows="20" placeholder="Type your message" name="message" placeholder="<?php echo get_phrase('write_your_message'); ?>" id="sample_wysiwyg" required="required"></textarea>
     </div>    
     <div class="custom-send m-t-20 text-right">
-        <button class="btn btn-danger btn-rounded" type="submit"> <?php echo get_phrase('send'); ?></button>
+        <button class="fcbtn btn btn-danger btn-outline btn-1d" type="submit"> <?php echo get_phrase('send'); ?></button>
     </div>
     <?php echo form_close(); ?>
 </div>
